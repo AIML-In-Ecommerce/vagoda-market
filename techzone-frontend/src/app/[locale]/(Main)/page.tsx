@@ -1,11 +1,20 @@
-import Image from "next/image";
+import HomeCarousel from "@/component/user/HomeCarousel";
+import HomeFlashSales from "@/component/user/HomeFlashSales";
+import HomeSuggestedProduct from "@/component/user/HomeSuggestedProduct";
+import { Flex } from "antd";
+
 
 export default function Home() {
+
+
+
   return (
     <>
-      <div className="flex items-center justify-center underline m-auto">
-        Hello
-      </div>
+      <Flex vertical className="w-full h-full" align="center" gap={"6px"}>
+        <HomeCarousel />
+        <HomeFlashSales />
+        <HomeSuggestedProduct />
+      </Flex>
     </>
   );
 }
