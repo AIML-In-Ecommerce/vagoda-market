@@ -27,6 +27,7 @@ import "../globals.css";
 // import { AuthProvider } from "@/context/AuthContext";
 // import StyledComponentsRegistry from "../../../lib/AntdRegistry";
 import { ReactNode } from "react";
+import CategoryDrawer from "@/component/user/utils/CategoryDrawer";
 // import { NextIntlClientProvider, useMessages } from "next-intl";
 // import UserLayout from "@/component/UserLayout";
 
@@ -68,6 +69,7 @@ export default function MainLayout({children, params: {locale}}: RootLayoutProps
     <html lang={locale}>
       {/* <body className={inter.className}> */}
       <body className="w-full">
+        <CategoryDrawer />
         {children}
       </body>
     </html>
