@@ -3,6 +3,7 @@ import { useState } from "react";
 import {
   Badge,
   Button,
+  Card,
   Carousel,
   Descriptions,
   DescriptionsProps,
@@ -10,6 +11,7 @@ import {
   Flex,
   FloatButton,
   InputNumber,
+  List,
   Modal,
   Progress,
   Rate,
@@ -205,6 +207,22 @@ export default function ProductDetail() {
     },
   ];
 
+  // combo products
+  const data = [
+    {
+      title: "Combo 1",
+    },
+    {
+      title: "Combo 2",
+    },
+    {
+      title: "Combo 3",
+    },
+    {
+      title: "Combo 4",
+    },
+  ];
+
   // modal
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
@@ -270,10 +288,10 @@ export default function ProductDetail() {
 
             <div className="flex flex-row gap-3 my-2">
               <div className="line-through text-gray-600 uppercase text-2xl">
-                8,900,000Đ
+                8,900,000 Đ
               </div>
               <div className="font-bold text-red-500 uppercase text-2xl">
-                4,900,000Đ
+                4,900,000 Đ
               </div>
               <div className="text-red-500 uppercase text-xs mt-1">-50%</div>
             </div>
@@ -291,7 +309,22 @@ export default function ProductDetail() {
           </div>
         </div>
         {/* related products to buy with  */}
-        <Carousel autoplay style={{ maxWidth: "200" }}>
+        <div className="">
+          <div className="font-semibold p-5 text-md">Combo suggestions</div>
+
+          <List
+            grid={{ gutter: 16, column: 4 }}
+            dataSource={data}
+            renderItem={(item) => (
+              <List.Item>
+                <div className="cursor-pointer">
+                  <Card title={item.title}>Card content</Card>
+                </div>
+              </List.Item>
+            )}
+          />
+        </div>
+        {/* <Carousel autoplay style={{ maxWidth: "200" }}>
           <div>
             <img
               className="h-64 object-cover w-full"
@@ -320,7 +353,7 @@ export default function ProductDetail() {
               // alt={classInfo.name}
             />{" "}
           </div>
-        </Carousel>
+        </Carousel> */}
         {/* tabs, descriptions and review summary */}
         <div className="my-5">
           <Tabs
@@ -346,27 +379,15 @@ export default function ProductDetail() {
 
         <ReviewList />
 
-        <FloatButton.Group
-        // open={openButton}
-        // trigger="click"
-        // style={{ right: 24 }}
-        // icon={<CustomerServiceOutlined />}
-        >
+        <FloatButton.Group>
           <FloatButton
             icon={<GiShoppingCart />}
             tooltip={<div>Add to Cart</div>}
-            badge={{ count: 123, overflowCount: 999 }}
+            badge={{ count: 23, overflowCount: 999 }}
             onClick={showModal}
           />
           <FloatButton.BackTop tooltip={<div>Move to Top</div>} />
         </FloatButton.Group>
-        {/* <Switch
-          onChange={onChange}
-          checked={openButton}
-          style={{
-            margin: 16,
-          }}
-        /> */}
 
         <Modal
           open={open}
