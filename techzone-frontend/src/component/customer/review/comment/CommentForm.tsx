@@ -1,5 +1,6 @@
 // import { useAuth } from "@/context/AuthContext";
 // import { useTranslations } from "next-intl";
+import { Avatar } from "antd";
 import React, { FormEvent, ReactNode, useState } from "react";
 import { IoMdTrash } from "react-icons/io";
 
@@ -38,21 +39,29 @@ const CommentForm = (props: CommentFormProps) => {
   return (
     <React.Fragment>
       <div className="flex flex-row relative items-center px-3 py-2 rounded-lg bg-gray-100">
-        <div
+        {/* <div
           className="rounded-full w-14 h-14 aspect-square mr-5"
           style={{
             backgroundImage: `url(${logginedUser.avatar})`,
             backgroundSize: "cover",
             backgroundRepeat: "no-repeat",
           }}
-        />
+        /> */}
+
+        <div className="m-3">
+          <Avatar
+            size="large"
+            src="https://api.dicebear.com/7.x/miniavs/svg?seed=1"
+          />
+        </div>
+
         <form onSubmit={submitHandler}>
           <div className="flex flex-row gap-3">
             <textarea
               id="freeform"
               name="freeform"
               rows={2}
-              cols={90}
+              cols={105}
               wrap="soft"
               placeholder="leave_a_comment"
               className="w-full focus:outline-none mx-auto pl-[8px] pt-[2px] 

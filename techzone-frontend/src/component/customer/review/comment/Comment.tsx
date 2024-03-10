@@ -8,6 +8,7 @@ import { AffectedCommentType, CommentType } from "@/model/CommentType";
 // import { useAuth } from "@/context/AuthContext";
 // import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
+import { Avatar } from "antd";
 
 interface CommentProps {
   comment: CommentType;
@@ -72,14 +73,20 @@ const Comment = (props: CommentProps) => {
       )} */}
       <div className="flex flex-row gap-x-3 bg-[#ECECEC] p-3 rounded-xl">
         {!isEditing && (
-          <div
-            className="rounded-full w-14 h-14 aspect-square mr-5"
-            style={{
-              backgroundImage: `url(${props.comment.user.avatar})`,
-              backgroundSize: "cover",
-              backgroundRepeat: "no-repeat",
-            }}
-          />
+          // <div
+          //   className="rounded-full w-14 h-14 aspect-square mr-5"
+          //   style={{
+          //     backgroundImage: `url(${props.comment.user.avatar})`,
+          //     backgroundSize: "cover",
+          //     backgroundRepeat: "no-repeat",
+          //   }}
+          // />
+          <div className="m-3">
+            <Avatar
+              size="large"
+              src="https://api.dicebear.com/7.x/miniavs/svg?seed=1"
+            />
+          </div>
         )}
         <div className="flex-1 flex flex-col text-start">
           {!isEditing && (

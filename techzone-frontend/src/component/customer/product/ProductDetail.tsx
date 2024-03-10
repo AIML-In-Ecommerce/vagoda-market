@@ -14,11 +14,14 @@ import {
   Progress,
   Rate,
   Spin,
+  Switch,
   Tabs,
   Tag,
 } from "antd";
 import ReviewList from "./ReviewList";
+import FloatingCartForm from "./FloatingCartForm";
 import { GiShoppingCart } from "react-icons/gi";
+import { CustomerServiceOutlined } from "@ant-design/icons";
 
 export default function ProductDetail() {
   const items: DescriptionsProps["items"] = [
@@ -202,10 +205,11 @@ export default function ProductDetail() {
     },
   ];
 
+  // modal
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
-  const [modalText, setModalText] = useState(<>Add to cart?</>);
+  const [modalText, setModalText] = useState(<>Estimated price: 0</>);
   const showModal = () => {
     setOpen(true);
   };
@@ -228,9 +232,16 @@ export default function ProductDetail() {
     setOpen(false);
   };
 
+  // button group
+  const [openButton, setOpenButton] = useState(true);
+  const onChange = (checked: boolean) => {
+    console.log("Clicked open group button");
+    setOpenButton(checked);
+  };
+
   return (
     <div className="justify-between mx-10 lg:mx-20 gap-10 grid grid-cols-3">
-      <div className="col-span-3">
+      <div className="col-span-2">
         {/* about product */}
         <div className="flex lg:flex-row md:flex-row flex-col my-10">
           <div className="bg-white shadow-md max-w-1/4 h-fit p-4">
@@ -257,14 +268,16 @@ export default function ProductDetail() {
               <div className="font-bold uppercase text-xl">4.5</div>
             </Flex>
 
-            <div className="flex flex-row gap-3">
-              <div className="line-through text-gray-600 uppercase">
+            <div className="flex flex-row gap-3 my-2">
+              <div className="line-through text-gray-600 uppercase text-2xl">
                 8,900,000Đ
               </div>
-              <div className="font-bold text-red-500 uppercase">4,900,000Đ</div>
+              <div className="font-bold text-red-500 uppercase text-2xl">
+                4,900,000Đ
+              </div>
               <div className="text-red-500 uppercase text-xs mt-1">-50%</div>
             </div>
-            <div className="capitalize text-xs">Sub-category:</div>
+            <div className="capitalize text-xs mt-5">Sub-category:</div>
             <Tag>
               <a href="https://github.com/ant-design/ant-design/issues/1862">
                 Điện máy - Điện gia dụng
@@ -324,18 +337,36 @@ export default function ProductDetail() {
           />
         </div>
       </div>
+      <div className="col-span-1 my-10">
+        <FloatingCartForm />
+      </div>
       <div className="col-span-2">
         {/* reviews */}
         <Divider>Khách hàng đánh giá</Divider>
 
         <ReviewList />
 
-        <FloatButton
-          icon={<GiShoppingCart />}
-          tooltip={<div>Add to Cart</div>}
-          badge={{ count: 123, overflowCount: 999 }}
-          onClick={showModal}
-        />
+        <FloatButton.Group
+        // open={openButton}
+        // trigger="click"
+        // style={{ right: 24 }}
+        // icon={<CustomerServiceOutlined />}
+        >
+          <FloatButton
+            icon={<GiShoppingCart />}
+            tooltip={<div>Add to Cart</div>}
+            badge={{ count: 123, overflowCount: 999 }}
+            onClick={showModal}
+          />
+          <FloatButton.BackTop tooltip={<div>Move to Top</div>} />
+        </FloatButton.Group>
+        {/* <Switch
+          onChange={onChange}
+          checked={openButton}
+          style={{
+            margin: 16,
+          }}
+        /> */}
 
         <Modal
           open={open}
@@ -375,15 +406,6 @@ export default function ProductDetail() {
           />
           <p>{modalText}</p>
         </Modal>
-        {/* <Modal
-          title="Cart Details"
-          open={open}
-          onOk={handleOk}
-          confirmLoading={confirmLoading}
-          onCancel={handleCancel}
-        >
-          <p>{modalText}</p>
-        </Modal> */}
       </div>
     </div>
   );
