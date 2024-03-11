@@ -1,8 +1,8 @@
 'use client'
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import SimpleProductCard from "./utils/SimpleProductCard"
-import { Card, Carousel, Col, Flex, Row, Skeleton, Typography } from "antd"
+import { Button, Card, Carousel, Col, Flex, Row, Skeleton, Typography } from "antd"
 import Link from "next/link"
 import {AiOutlineRight} from "react-icons/ai"
 
@@ -337,6 +337,8 @@ export default function HomeFlashSales({}: HomeFlashSalesProps)
         })
 
         setProducts(tr_data)
+
+        
     },
     [])
 
@@ -386,6 +388,20 @@ export default function HomeFlashSales({}: HomeFlashSalesProps)
         return result
     }
 
+    const PrevButton = 
+    <>
+        <Button>
+            Previous
+        </Button>
+    </>
+
+    const NextButton =
+    <>
+        <Button>
+            Next
+        </Button>
+    </>
+
     return(
         <>
             <div className="w-full bg-blue-100 flex justify-center">
@@ -408,11 +424,17 @@ export default function HomeFlashSales({}: HomeFlashSalesProps)
                                 </Typography.Text>
                             </Flex>
                         </Flex>
-                        <Carousel
-                        autoplay
-                        >
-                            {productDisplay()}
-                        </Carousel>
+                        <div>
+                            {PrevButton}
+                            <div className="block">
+                                <Carousel
+                                autoplay={true}
+                                >
+                                    {productDisplay()}
+                                </Carousel>
+                            </div>
+                            {NextButton}
+                        </div>
                     </Card>
                     <div className="invisible h-10 w-full">
                     </div>

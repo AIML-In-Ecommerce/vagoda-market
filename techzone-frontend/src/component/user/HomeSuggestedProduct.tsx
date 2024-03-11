@@ -383,12 +383,6 @@ export default function HomeSuggestedProduct()
         return result
     }
 
-    const prevButton = <>
-        <Button>
-            prev
-        </Button>
-    </>
-
     return(
         <>
             <div className="w-full flex justify-center items-center">
