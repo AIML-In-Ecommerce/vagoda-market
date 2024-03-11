@@ -108,7 +108,7 @@ const Comment = (props: CommentProps) => {
                   }
                 )}
               </span>
-              <p className="font-roboto mt-[10px] text-dark-light">
+              <p className="font-roboto mt-[10px] text-dark-light overscroll-x-contain">
                 {props.comment.desc}
               </p>
             </>

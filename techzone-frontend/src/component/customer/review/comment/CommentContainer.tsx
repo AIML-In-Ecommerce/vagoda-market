@@ -378,7 +378,8 @@ const CommentContainer = () => {
     <React.Fragment>
       <div>
         <div className="container m-2 text-left italic text-blue-400 font-roboto">
-          {Object.keys(comments).length} comments
+          {/* {Object.keys(comments).length} comments */}
+          {Object.keys(comments).length} bình luận
         </div>
         <CommentForm
           btnLabel={<FiSend />}

@@ -44,6 +44,7 @@ const Review = () => {
       <Flex gap="small">
         <div className="m-2 my-5 text-xl"> Tạm tính: 0 Đ</div>
       </Flex>
+
       <Flex vertical gap="small" style={{ width: "100%" }}>
         <Button type="primary" danger block size="large">
           Mua ngay

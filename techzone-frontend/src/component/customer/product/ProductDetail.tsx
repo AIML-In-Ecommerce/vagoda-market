@@ -287,10 +287,10 @@ export default function ProductDetail() {
             </Flex>
 
             <div className="flex flex-row gap-3 my-2">
-              <div className="line-through text-gray-600 uppercase text-2xl">
+              <div className="line-through text-gray-600 uppercase text-xl md:text-2xl lg:text-2xl">
                 8,900,000 Đ
               </div>
-              <div className="font-bold text-red-500 uppercase text-2xl">
+              <div className="font-bold text-red-500 uppercase text-xl md:text-2xl lg:text-2xl">
                 4,900,000 Đ
               </div>
               <div className="text-red-500 uppercase text-xs mt-1">-50%</div>
@@ -418,6 +418,23 @@ export default function ProductDetail() {
             </Button>,
           ]}
         >
+          {/* <div className="mx-2">
+            <Flex gap="small">
+              <div className="mt-1"> Số lượng: </div>
+              <InputNumber
+                min={0}
+                max={999}
+                defaultValue={0}
+                // onChange={onChange}
+                changeOnWheel
+              />
+            </Flex>
+          </div>
+
+          <Flex gap="small">
+            <div className="m-2 my-5 text-xl"> {modalText} </div>
+          </Flex> */}
+
           <InputNumber
             min={0}
             max={999}

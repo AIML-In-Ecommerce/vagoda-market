@@ -63,7 +63,8 @@ const CommentForm = (props: CommentFormProps) => {
               rows={2}
               cols={105}
               wrap="soft"
-              placeholder="leave_a_comment"
+              // placeholder="leave_a_comment"
+              placeholder="Để lại bình luận"
               className="w-full focus:outline-none mx-auto pl-[8px] pt-[2px] 
               rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500
               resize-none"
