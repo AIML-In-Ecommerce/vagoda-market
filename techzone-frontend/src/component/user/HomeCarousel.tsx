@@ -181,23 +181,35 @@ export default function HomeCarousel({}:HomeCarouselProps)
 
     return(
         <>
-            <div className="w-full flex justify-center items-center" style={LargeBackground}>
-                <div className="flex justify-center items-center backdrop-blur-md w-full h-full">
+            <div className="w-full flex flex-col justify-end items-center" style={LargeBackground}>
+                <div className="flex flex-col relative justify-center items-center backdrop-blur-md w-full h-full">
+                    <div className="invisible h-10">
+                        hidden block
+                    </div>
                     <div className="container w-2/3 h-1/2">
                         <Carousel autoplay={true} style={{height:"100%"}}
                             afterChange={afterCarouselChange}
                         >
                             {CarouselDisplay}
                         </Carousel>
-                        <div className="w-full mt-2">
-                            <Flex justify="center" className="w-full">
-                                <Flex justify="evenly" gap={"8px"}>
-                                    {SmallEventsDisplay}
-                                </Flex>
-                            </Flex>
-                        </div>
+                    </div>
+                    <div className="invisible h-32">
+                        hidden block
                     </div>
                 </div>
+            </div>
+            <div className="absolute z-10 bottom-60">
+                <div className="w-full h-40 flex flex-col justify-start">
+                    <div className="w-full">
+                        <Flex justify="center" className="w-full">
+                            <Flex justify="evenly" gap={"8px"}>
+                                {SmallEventsDisplay}
+                            </Flex>
+                        </Flex>
+                    </div>
+                </div>
+            </div>
+            <div className="w-full h-10 bg-blue-50">
             </div>
         </>
     )

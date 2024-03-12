@@ -11,7 +11,7 @@ export default function Home() {
 
   return (
     <>
-      <Flex vertical className="w-full h-full" align="center" gap={"6px"}>
+      <Flex vertical className="w-full h-full" align="center">
         <HomeCarousel />
         <HomeFlashSales />
         <HomeSuggestedProduct />
