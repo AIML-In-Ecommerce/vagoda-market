@@ -5,7 +5,7 @@ import SimpleProductCard from "./utils/SimpleProductCard"
 import { Button, Card, Carousel, Col, Flex, Row, Skeleton, Typography } from "antd"
 import Link from "next/link"
 import {AiOutlineRight} from "react-icons/ai"
-import { Arrow } from "./utils/CarouselArrow"
+import { CarouselArrow } from "./utils/CarouselArrow"
 
 interface HomeFlashSalesProps
 {
@@ -430,8 +430,8 @@ export default function HomeFlashSales({}: HomeFlashSalesProps)
                                 <Carousel
                                 autoplay={true}
                                 arrows
-                                nextArrow={<Arrow direction="right"/>}
-                                prevArrow={<Arrow direction="left"/>}
+                                nextArrow={<CarouselArrow direction="right"/>}
+                                prevArrow={<CarouselArrow direction="left"/>}
                                 >
                                     {productDisplay()}
                                 </Carousel>

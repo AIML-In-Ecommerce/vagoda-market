@@ -41,7 +41,7 @@ const StyleSheet = {
 // directly without wrapping them in this component doesn't work. Additionally, if
 // we don't add currentSlide and slideCount to the pops, we get console errors.
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const Arrow = ({ currentSlide, direction, slideCount, ...carouselProps }: ArrowProps & AntdArrowProps) =>
+export const CarouselArrow = ({ currentSlide, direction, slideCount, ...carouselProps }: ArrowProps & AntdArrowProps) =>
   direction === 'left' ? (
     <div >
         <LeftOutlined {...carouselProps} style={StyleSheet.leftArrow} />

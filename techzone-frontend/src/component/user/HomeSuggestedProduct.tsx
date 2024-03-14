@@ -4,10 +4,9 @@
 import { Card, Carousel, Flex, Skeleton, Typography,  } from "antd"
 import { useEffect, useState } from "react"
 import ProductItem from "./utils/ProductItem"
-import { FaAngleLeft } from "react-icons/fa6";
 import Link from "next/link";
 import { AiOutlineRight } from "react-icons/ai";
-import { Arrow } from "./utils/CarouselArrow";
+import { CarouselArrow } from "./utils/CarouselArrow";
 
 // import SimpleProductCard from "./utils/SimpleProductCard"
 
@@ -623,8 +622,8 @@ export default function HomeSuggestedProduct({}: HomeSuggestedProductProps)
                         autoplay
                         autoplaySpeed={autoPlayCarouselSpeed}
                         arrows
-                        prevArrow={<Arrow direction="left"/>}
-                        nextArrow={<Arrow direction="right"/>}
+                        prevArrow={<CarouselArrow direction="left"/>}
+                        nextArrow={<CarouselArrow direction="right"/>}
                         >
                             {productDisplay()}
                         </Carousel>
