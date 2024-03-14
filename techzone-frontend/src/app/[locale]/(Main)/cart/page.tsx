@@ -1,8 +1,8 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Affix, Button, Card, Divider, InputNumber, Modal, Radio, Space, Table, Tag, Image } from 'antd';
+import { Affix, Button, Card, Divider, InputNumber, Modal, Radio, Space, Table, Tag, Image, Flex } from 'antd';
 import type { TableColumnsType } from 'antd';
-import { FaRegTrashAlt, FaPlus, FaMinus } from "react-icons/fa";
+import { FaRegTrashCan, FaPlus, FaMinus, FaRegCircleQuestion } from "react-icons/fa6";
 
 interface DataType {
     key: React.Key;
@@ -109,6 +109,9 @@ export default function Home() {
 
     const onQuantityChange = (key: React.Key, value: number) => {
         // Update the 'amount' field of the product with the specified key
+        if (!value) {
+            return;
+        }
         if (products) {
             const updatedProducts = products.map((product: { key: React.Key; }) => {
                 if (product.key === key) {
@@ -135,7 +138,7 @@ export default function Home() {
     }
 
     const onDecrease = (key: React.Key, value: number) => {
-        // Update the 'amount' field of the produc
+        // Update the 'amount' field of the product
         if (value === 1) return handleShowDeleteOneModal(key)
 
         if (products) {
@@ -246,11 +249,11 @@ export default function Home() {
         {
             title:
                 <Button onClick={() => handleShowDeleteManyModal()}>
-                    <FaRegTrashAlt />
+                    <FaRegTrashCan />
                 </Button>,
             dataIndex: 'remove',
             render: (value: number, record: DataType) => (
-                <Button onClick={() => handleShowDeleteOneModal(record.key)}><FaRegTrashAlt /></Button>
+                <Button onClick={() => handleShowDeleteOneModal(record.key)}><FaRegTrashCan /></Button>
             ),
             fixed: 'right'
         },
@@ -289,12 +292,17 @@ export default function Home() {
                         />
                     </div>
 
-                    <div className="lg:col-start-5 lg:col-span-2">
+                    <div className="lg:col-start-5 lg:col-span-2 w-10/12">
                         <Affix offsetTop={top}>
-                            <Space direction="vertical" size="middle" style={{ display: 'flex' }}>
-                                <Card title="Giao tới" size="small">
-                                    <div className="flex flex-row font-bold">
-                                        <p>NGUYEN MINH QUANG</p>
+                            <Space direction="vertical" size="middle" className="flex">
+                                <Card title={
+                                    <div className="flex flex-row justify-between">
+                                        <span className="text-slate-400">Giao tới</span>
+                                        <a className="text-blue-400 hover:underline">Thay đổi</a>
+                                    </div>
+                                } size="small">
+                                    <div className="flex flex-row font-bold space-x-5">
+                                        <p>NGUYỄN MINH QUANG</p>
                                         <Divider type="vertical"></Divider>
                                         <p className="mx-5">0839994855</p>
                                     </div>
@@ -303,12 +311,21 @@ export default function Home() {
                                         <p className="mx-3 text-slate-500">135B Trần Hưng Đạo, Phường Cầu Ông Lãnh, Quận 1, Hồ Chí Minh</p>
                                     </div>
                                 </Card>
-                                <Card title="Techzone khuyến mãi" size="small">
-                                    <p>Card content</p>
-                                    <p>Card content</p>
+                                <Card size="small">
+                                    <div className="flex flex-col">
+
+                                        <div className="flex flex-row justify-between">
+                                            <div className="font-semibold">Techzone Khuyến Mãi</div>
+                                            <div className="flex flex-row space-x-2">
+                                                <div className="text-slate-500">Có thể chọn 2</div>
+                                                <div className="text-slate-500"><FaRegCircleQuestion /></div>
+                                            </div>
+                                        </div>
+                                        <a className="mt-10">Chọn hoặc nhập mã khuyến mãi khác</a>
+                                    </div>
                                 </Card>
                                 <Card size="small">
-                                    <div className="flex text-lg justify-between">
+                                    <div className="flex justify-between">
                                         <p>Tạm tính</p>
                                         <p>{provisional.toLocaleString("vi-VN", {
                                             style: "currency",
@@ -316,7 +333,7 @@ export default function Home() {
                                             minimumFractionDigits: 0,
                                         })}</p>
                                     </div>
-                                    <div className="flex text-lg justify-between">
+                                    <div className="flex justify-between">
                                         <p>Giảm giá</p>
                                         <p>- {discount.toLocaleString("vi-VN", {
                                             style: "currency",
@@ -325,10 +342,10 @@ export default function Home() {
                                         })}</p>
                                     </div>
                                     <Divider></Divider>
-                                    <div className="flex text-lg justify-between">
+                                    <div className="flex justify-between">
                                         <p>Tổng tiền</p>
                                         <p className="flex flex-col space-y-3 grid">
-                                            <p className="text-red-400 text-xl font-bold justify-self-end">
+                                            <p className="text-red-400 text-lg font-bold justify-self-end">
                                                 {total.toLocaleString("vi-VN", {
                                                     style: "currency",
                                                     currency: "VND",
