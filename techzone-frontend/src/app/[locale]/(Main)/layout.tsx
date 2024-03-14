@@ -28,6 +28,7 @@ import "../globals.css";
 // import StyledComponentsRegistry from "../../../lib/AntdRegistry";
 import { ReactNode } from "react";
 import { NextIntlClientProvider, useMessages } from "next-intl";
+import Navbar from "@/component/customer/Navbar";
 // import UserLayout from "@/component/UserLayout";
 
 interface RootLayoutProps {
@@ -56,7 +57,10 @@ export default function RootLayout({
           {/* <UserLayout children={children} locale={locale} /> */}
           {/* <UserLayout locale={locale}>{children}</UserLayout> */}
           {/* </AuthProvider> */}
-          {children}
+          <div className="bg-cover bg-slate-50 min-h-screen">
+            <Navbar />
+            {children}
+          </div>
         </NextIntlClientProvider>
       </body>
     </html>

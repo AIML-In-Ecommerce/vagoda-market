@@ -47,7 +47,8 @@ export default function AddressModal(props: AddressModalProps) {
         open={props.isVisible}
         onOk={handleOk}
         onCancel={handleCancel}
-        className=" justify-center"
+        className=" justify-center "
+        okType={"default"}
       >
         <Radio.Group onChange={onChange} value={value}>
           <Space direction="vertical">

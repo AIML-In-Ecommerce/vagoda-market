@@ -26,13 +26,13 @@ import React, { useEffect, useMemo, useState } from "react";
 import { HiChevronDown } from "react-icons/hi2";
 import { GrFilter } from "react-icons/gr";
 import { IoImageOutline } from "react-icons/io5";
-import "../../globals.css";
+
 import { IoRemoveOutline } from "react-icons/io5";
 import { IoIosArrowRoundForward } from "react-icons/io";
 import { CheckboxValueType } from "antd/es/checkbox/Group";
 import ProductItemList from "@/component/customer/ProductItemList";
 
-export default function ProductList() {
+export default function LaptopCategory() {
   const filterList = ["Dưới 1.000.000", "5 sao", "Laptop", "Màn hình máy tính"];
   const [loading, setLoading] = useState(true);
   const [ratingFilter, setRatingFilter] = useState(0);
@@ -40,40 +40,121 @@ export default function ProductList() {
 
   const CheckboxGroup = Checkbox.Group;
 
-  const categories = [
-    "Laptop",
-    "Điện máy - Điện gia dụng",
-    "PC- Máy tính bộ",
-    "Màn hình máy tính",
-    "Linh kiện máy tính",
-    "Phụ kiện máy tính",
-    "Game & Stream",
-    "Điện thoại & Phụ kiện",
-    "Phụ kiện",
-    "Thiết bị âm thanh",
-    "Thiết bị văn phòng",
-    "Khác",
+  const brands = [
+    "Apple (Macbook)",
+    "Acer",
+    "ASUS",
+    "Dell",
+    "HP",
+    "Lenovo",
+    "LG",
+    "MSI",
+    "Gigabyte",
+    "Microsoft",
   ];
-  const defaultCheckedList = ["Laptop"];
 
-  const [checkedCategoryList, setCheckedCategoryList] =
+  const configurations = [
+    "RTX 30 Series",
+    "RTX 40 Series",
+    "Intel i3",
+    "Intel i5",
+    "Intel i7",
+    "Intel i9",
+    "Ryzen 3",
+    "Ryzen 5",
+    "Ryzen 7",
+  ];
+
+  const defaultCheckedListBrand = ["Apple (Macbook)"];
+
+  const [checkedListBrand, setCheckedListBrand] = useState<CheckboxValueType[]>(
+    defaultCheckedListBrand
+  );
+
+  const checkAllBrand = brands.length === checkedListBrand.length;
+  const indeterminateBrand =
+    checkedListBrand.length > 0 && checkedListBrand.length < brands.length;
+
+  const onChangeCheckboxBrand = (list: CheckboxValueType[]) => {
+    setCheckedListBrand(list);
+  };
+
+  const onCheckAllChangeBrand: CheckboxProps["onChange"] = (e) => {
+    setCheckedListBrand(e.target.checked ? brands : []);
+  };
+
+  const onChangeBrand = (checked: boolean) => {
+    setLoading(!checked);
+  };
+
+  const defaultCheckedList = ["Apple (Macbook)"];
+
+  const [checkedConfigurationList, setCheckedConfigurationList] =
     useState<CheckboxValueType[]>(defaultCheckedList);
 
-  const checkAll = categories.length === checkedCategoryList.length;
+  const checkAllConfiguration =
+    configurations.length === checkedConfigurationList.length;
   const indeterminate =
-    checkedCategoryList.length > 0 &&
-    checkedCategoryList.length < categories.length;
+    checkedConfigurationList.length > 0 &&
+    checkedConfigurationList.length < brands.length;
 
-  const onChangeCheckboxCategory = (list: CheckboxValueType[]) => {
-    setCheckedCategoryList(list);
+  const onChangeCheckboxConfiguration = (list: CheckboxValueType[]) => {
+    setCheckedConfigurationList(list);
   };
 
-  const onCheckAllChange: CheckboxProps["onChange"] = (e) => {
-    setCheckedCategoryList(e.target.checked ? categories : []);
+  const onCheckAllChangeConfiguration: CheckboxProps["onChange"] = (e) => {
+    setCheckedConfigurationList(e.target.checked ? brands : []);
   };
 
-  const onChange = (checked: boolean) => {
+  const onChangeConfiguration = (checked: boolean) => {
     setLoading(!checked);
+  };
+
+  const sizes = ["Dưới 13 inch", "13-14 inch", "15.6 inch", "Trên 15.6 inch"];
+
+  const needs = [
+    "Laptop Gaming",
+    "Laptop Văn Phòng",
+    "Đồ họa - Studio",
+    "Work Station",
+  ];
+
+  const defaultCheckedListSize = ["Dưới 13 inch"];
+  const defaultCheckedListNeed = ["Laptop Gaming"];
+
+  const [checkedListSize, setCheckedListSize] = useState<CheckboxValueType[]>(
+    defaultCheckedListSize
+  );
+  const [checkedListNeed, setCheckedListNeed] = useState<CheckboxValueType[]>(
+    defaultCheckedListNeed
+  );
+
+  const checkAllSize = sizes.length === checkedListSize.length;
+  const indeterminateSize =
+    checkedListSize.length > 0 && checkedListSize.length < sizes.length;
+
+  const checkAllNeed = needs.length === checkedListNeed.length;
+  const indeterminateNeed =
+    checkedListNeed.length > 0 && checkedListNeed.length < needs.length;
+
+  const onChangeCheckboxSize = (list: CheckboxValueType[]) => {
+    setCheckedListSize(list);
+  };
+
+  const onCheckAllChangeSize: CheckboxProps["onChange"] = (e) => {
+    setCheckedListSize(e.target.checked ? sizes : []);
+  };
+
+  const onChangeSize = (checked: boolean) => {
+    setLoading(!checked);
+  };
+
+  const onCheckAllChangeNeed: CheckboxProps["onChange"] = (e) => {
+    setCheckedListNeed(e.target.checked ? needs : []);
+  };
+
+  const onChangeCheckboxNeed = (list: CheckboxValueType[]) => {
+    setCheckedListNeed(list);
   };
 
   useEffect(() => {
@@ -299,17 +380,25 @@ export default function ProductList() {
           </div>
 
           <h3 className="font-semibold mb-4">Giá</h3>
-          <Button className="rounded-2xl">Dưới 1.000.000</Button>
-          {/* <Button className="rounded-2xl flex items-center space-x-1 mt-1">
+          <div className="flex grid grid-cols-2 space-x-1 gap-1">
+            <Button className="rounded-2xl">Dưới 10tr</Button>
+            {/* <Button className="rounded-2xl flex items-center space-x-1 mt-1">
             500.000 <IoIosArrowRoundForward /> 1.000.000
           </Button> */}
-          <Button className="rounded-2xl flex items-center space-x-1 mt-1">
-            1.000.000 <IoIosArrowRoundForward /> 5.000.000
-          </Button>
-          <Button className="rounded-2xl flex items-center space-x-1 mt-1">
-            5.000.000 <IoIosArrowRoundForward /> 10.000.000
-          </Button>
-          <Button className="rounded-2xl mt-1">Trên 10.000.000</Button>
+            <Button className="rounded-2xl flex items-center space-x-1 ">
+              10tr <IoIosArrowRoundForward /> 15tr
+            </Button>
+            <Button className="rounded-2xl flex items-center space-x-1 ">
+              15tr <IoIosArrowRoundForward /> 20tr
+            </Button>
+            <Button className="rounded-2xl flex items-center space-x-1 ">
+              20tr <IoIosArrowRoundForward /> 25tr
+            </Button>
+            <Button className="rounded-2xl flex items-center space-x-1 ">
+              25tr <IoIosArrowRoundForward /> 30tr
+            </Button>
+            <Button className="rounded-2xl mt-1 ">Trên 30tr</Button>
+          </div>
           <h4 className="text-sm text-slate-500 mt-4">Chọn khoảng giá</h4>
           <div className="w-1/2 flex items-center w-full mt-1">
             <InputNumber
@@ -373,19 +462,61 @@ export default function ProductList() {
               </Radio>
             </Space>
           </Radio.Group>
-          <h3 className="font-semibold my-4">Danh mục sản phẩm</h3>
+          <h3 className="font-semibold my-4">Thương hiệu</h3>
           <Checkbox
             indeterminate={indeterminate}
-            onChange={onCheckAllChange}
-            checked={checkAll}
+            onChange={onCheckAllChangeBrand}
+            checked={checkAllBrand}
           >
             Check all
           </Checkbox>
 
           <CheckboxGroup
-            options={categories}
-            value={checkedCategoryList}
-            onChange={onChangeCheckboxCategory}
+            options={brands}
+            value={checkedListBrand}
+            onChange={onChangeCheckboxBrand}
+          />
+          <h3 className="font-semibold my-4">Cấu hình</h3>
+          <Checkbox
+            indeterminate={indeterminate}
+            onChange={onCheckAllChangeConfiguration}
+            checked={checkAllConfiguration}
+          >
+            Check all
+          </Checkbox>
+
+          <CheckboxGroup
+            options={configurations}
+            value={checkedConfigurationList}
+            onChange={onChangeCheckboxConfiguration}
+          />
+          <h3 className="font-semibold my-4">Kích thước</h3>
+          <Checkbox
+            indeterminate={indeterminateSize}
+            onChange={onCheckAllChangeSize}
+            checked={checkAllSize}
+          >
+            Check all
+          </Checkbox>
+
+          <CheckboxGroup
+            options={sizes}
+            value={checkedListSize}
+            onChange={onChangeCheckboxSize}
+          />
+          <h3 className="font-semibold my-4">Cấu hình</h3>
+          <Checkbox
+            indeterminate={indeterminate}
+            onChange={onCheckAllChangeNeed}
+            checked={checkAllNeed}
+          >
+            Check all
+          </Checkbox>
+
+          <CheckboxGroup
+            options={needs}
+            value={checkedListNeed}
+            onChange={onChangeCheckboxNeed}
           />
         </div>
       )}
