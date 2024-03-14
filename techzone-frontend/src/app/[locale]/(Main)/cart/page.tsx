@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Affix, Button, Card, Divider, InputNumber, Modal, Radio, Space, Table, Tag, Image } from 'antd';
 import type { TableColumnsType } from 'antd';
-import { FaRegTrashAlt } from "react-icons/fa";
+import { FaRegTrashAlt, FaPlus, FaMinus } from "react-icons/fa";
 
 interface DataType {
     key: React.Key;
@@ -25,17 +25,29 @@ export default function Home() {
     const [discount, setDiscount] = useState(0);
     const [total, setTotal] = useState(0);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [showDeleteManyModal, setShowDeleteManyModal] = useState(false);
 
-    const showModal = (key: any) => {
+    const handleShowDeleteOneModal = (key: any) => {
         setSelectedKey(key);
         setShowDeleteModal(true);
     }
-    const handleDelete = (key: any) => {
+    const handleDeleteOneModal = (key: any) => {
         handleRemoveRow(key);
         setShowDeleteModal(false);
     }
-    const handleCancel = () => {
+    const handleCancelOneModal = () => {
         setShowDeleteModal(false);
+    }
+
+    const handleShowDeleteManyModal = () => {
+        setShowDeleteManyModal(true);
+    }
+    const handleDeleteManyModal = () => {
+        handleRemoveSelectedRows();
+        setShowDeleteManyModal(false);
+    }
+    const handleCancelManyModal = () => {
+        setShowDeleteManyModal(false);
     }
 
     const fetchProducts = async () => {
@@ -108,17 +120,50 @@ export default function Home() {
         }
     }
 
+    const onIncrease = (key: React.Key, value: number) => {
+        // Update the 'amount' field of the product
+        if (value === 100) return;
+        if (products) {
+            const updatedProducts = products.map((product: { key: React.Key; }) => {
+                if (product.key === key) {
+                    return { ...product, amount: value + 1 };
+                }
+                return product;
+            });
+            setProducts(updatedProducts);
+        }
+    }
+
+    const onDecrease = (key: React.Key, value: number) => {
+        // Update the 'amount' field of the produc
+        if (value === 1) return handleShowDeleteOneModal(key)
+
+        if (products) {
+            const updatedProducts = products.map((product: { key: React.Key; }) => {
+                if (product.key === key) {
+                    return { ...product, amount: value - 1 };
+                }
+                return product;
+            });
+            setProducts(updatedProducts);
+        }
+    }
+
     const handleRemoveRow = (key: React.Key) => {
         if (products) {
             const updatedProducts = products.filter((product: { key: React.Key; }) => product.key !== key);
             setProducts(updatedProducts);
         }
+        const updatedRowKeys = selectedRowKeys.filter(beforeKey => beforeKey !== key);
+        setSelectedRowKeys(updatedRowKeys);
+
     };
 
     const handleRemoveSelectedRows = () => {
         console.log('handleRemoveSelectedRows', selectedRowKeys)
         const updatedProducts = products.filter((product: { key: React.Key; }) => !selectedRowKeys.includes(product.key));
-        setProducts(updatedProducts)
+        setProducts(updatedProducts);
+        setSelectedRowKeys([]);
     };
 
     const handleProvisional = () => {
@@ -136,24 +181,24 @@ export default function Home() {
 
     const columns: TableColumnsType<DataType> = [
         {
-            title: 'Name',
+            title: <span className="text-lg">Sản phẩm ({selectedRowKeys.length})</span>,
             dataIndex: 'name',
-            render: (text: string, record: DataType) => 
-            <Space size={12} className="flex">
-                 <Image
+            render: (text: string, record: DataType) =>
+                <Space size={12} className="flex">
+                    <Image
                         width={160}
-                        src={record.image} 
-                        alt={""}  />
-                <span className="text-xl font-normal">{text}</span>
-                
-            </Space>
-            
-            
+                        src={record.image}
+                        alt={""} />
+                    <span className="text-lg font-normal">{text}</span>
+
+                </Space>
+
+
         },
         {
-            title: 'Unit Price',
+            title: <span className="text-lg">Đơn giá</span>,
             dataIndex: 'unit_price',
-            render: (value: number) => <a className="text-xl">
+            render: (value: number) => <a className="text-lg">
                 {value.toLocaleString("vi-VN", {
                     style: "currency",
                     currency: "VND",
@@ -161,23 +206,34 @@ export default function Home() {
                 })}</a>,
         },
         {
-            title: 'Amount',
+            title: <span className="text-lg">Số lượng</span>,
             dataIndex: 'amount',
             render: (value: number, record: DataType) =>
-                <InputNumber
-                    min={1}
-                    defaultValue={1}
-                    onChange={(value: any) =>
-                        onQuantityChange(record.key, value)}
-                    value={value}
-                    changeOnWheel />
+                <Space size={5} className="flex">
+                    <Button onClick={() => onDecrease(record.key, value)}>
+                        <FaMinus />
+                    </Button>
+                    <InputNumber
+                        className="w-16 justify-center"
+                        controls={false}
+                        min={1}
+                        max={100}
+                        defaultValue={1}
+                        width={10}
+                        onChange={(value: any) =>
+                            onQuantityChange(record.key, value)}
+                        value={value} />
+                    <Button onClick={() => onIncrease(record.key, value)}>
+                        <FaPlus />
+                    </Button>
+                </Space>
 
         },
         {
-            title: 'Into Money',
+            title: <span className="text-lg">Thành tiền</span>,
             dataIndex: 'final_price',
             render: (value: number, record: DataType) => (
-                <span className="text-red-500 font-bold text-xl">
+                <span className="text-red-500 font-bold text-lg ">
                     {(record.unit_price * (record.amount || 1)).toLocaleString("vi-VN", {
                         style: "currency",
                         currency: "VND",
@@ -185,15 +241,16 @@ export default function Home() {
                     })}
                 </span>
             ),
+            width: "16%"
         },
         {
             title:
-                <Button onClick={() => handleRemoveSelectedRows()}>
+                <Button onClick={() => handleShowDeleteManyModal()}>
                     <FaRegTrashAlt />
                 </Button>,
             dataIndex: 'remove',
             render: (value: number, record: DataType) => (
-                <Button onClick={() => showModal(record.key)}><FaRegTrashAlt /></Button>
+                <Button onClick={() => handleShowDeleteOneModal(record.key)}><FaRegTrashAlt /></Button>
             ),
             fixed: 'right'
         },
@@ -216,8 +273,8 @@ export default function Home() {
 
     return (
         <React.Fragment>
-            <div className="flex flex-col p-5 mx-auto">
-                <div className="text-2xl font-bold">CART</div>
+            <div className="container flex flex-col p-5 mx-auto">
+                <div className="text-xl font-bold">GIỎ HÀNG</div>
                 <div className="mt-5 flex lg:flex-row lg:grid lg:grid-cols-6 lg:gap-20 sm:flex-col">
                     <div className="col-start-1 col-span-4">
                         <Table
@@ -228,13 +285,14 @@ export default function Home() {
                             columns={columns}
                             dataSource={products}
                             loading={loading}
+
                         />
                     </div>
 
                     <div className="lg:col-start-5 lg:col-span-2">
                         <Affix offsetTop={top}>
                             <Space direction="vertical" size="middle" style={{ display: 'flex' }}>
-                                <Card title="Deliver to" size="small">
+                                <Card title="Giao tới" size="small">
                                     <div className="flex flex-row font-bold">
                                         <p>NGUYEN MINH QUANG</p>
                                         <Divider type="vertical"></Divider>
@@ -245,21 +303,21 @@ export default function Home() {
                                         <p className="mx-3 text-slate-500">135B Trần Hưng Đạo, Phường Cầu Ông Lãnh, Quận 1, Hồ Chí Minh</p>
                                     </div>
                                 </Card>
-                                <Card title="Techzone Promotions" size="small">
+                                <Card title="Techzone khuyến mãi" size="small">
                                     <p>Card content</p>
                                     <p>Card content</p>
                                 </Card>
                                 <Card size="small">
-                                    <div className="flex justify-between">
-                                        <p>Provisional</p>
+                                    <div className="flex text-lg justify-between">
+                                        <p>Tạm tính</p>
                                         <p>{provisional.toLocaleString("vi-VN", {
                                             style: "currency",
                                             currency: "VND",
                                             minimumFractionDigits: 0,
                                         })}</p>
                                     </div>
-                                    <div className="flex justify-between">
-                                        <p>Discount</p>
+                                    <div className="flex text-lg justify-between">
+                                        <p>Giảm giá</p>
                                         <p>- {discount.toLocaleString("vi-VN", {
                                             style: "currency",
                                             currency: "VND",
@@ -267,23 +325,23 @@ export default function Home() {
                                         })}</p>
                                     </div>
                                     <Divider></Divider>
-                                    <div className="flex justify-between">
-                                        <p>Total</p>
+                                    <div className="flex text-lg justify-between">
+                                        <p>Tổng tiền</p>
                                         <p className="flex flex-col space-y-3 grid">
-                                            <p className="text-red-400 text-2xl font-bold justify-self-end">
+                                            <p className="text-red-400 text-xl font-bold justify-self-end">
                                                 {total.toLocaleString("vi-VN", {
-                                                style: "currency",
-                                                currency: "VND",
-                                                minimumFractionDigits: 0,
-                                            })}</p>
-                                            <p className="text-slate-400 text-lg justify-self-end">(VAT included if applicable)</p>
+                                                    style: "currency",
+                                                    currency: "VND",
+                                                    minimumFractionDigits: 0,
+                                                })}</p>
+                                            <p className="text-slate-400 text-lg justify-self-end">(Đã bao gồm VAT nếu có)</p>
                                         </p>
 
                                     </div>
                                 </Card>
                                 <Button type="primary" size="large" danger block
                                     disabled={isEmpty(selectedRowKeys.length)}>
-                                    Purchases ({selectedRowKeys.length})
+                                    Mua Hàng ({selectedRowKeys.length})
                                 </Button>
                             </Space>
                         </Affix>
@@ -291,16 +349,35 @@ export default function Home() {
                 </div>
             </div>
             <Modal
+                width={400}
                 open={showDeleteModal}
-                title="Remove"
+                onCancel={handleCancelOneModal}
+                title={<span className="text-xl">Xóa sản phẩm</span>}
                 footer={() => (
                     <>
-                        <Button key="cancel" onClick={handleCancel}>Cancel</Button>,
-                        <Button key="ok" type="primary" onClick={() => handleDelete(selectedKey)} danger>Remove</Button>
+                        <Button key="cancel" onClick={handleCancelOneModal}>Hủy</Button>,
+                        <Button key="ok" type="primary" onClick={() => handleDeleteOneModal(selectedKey)} danger>Xóa</Button>
                     </>
                 )}
+                centered
             >
-                Do you want to delete this product?
+                Bạn có muốn xóa sản phẩm này khỏi giỏ hàng không?
+            </Modal>
+
+            <Modal
+                width={400}
+                open={showDeleteManyModal}
+                onCancel={handleCancelManyModal}
+                title={<span className="text-xl">Xóa sản phẩm</span>}
+                footer={() => (
+                    <>
+                        <Button key="cancel" onClick={handleCancelManyModal}>Hủy</Button>,
+                        <Button key="ok" type="primary" onClick={handleDeleteManyModal} danger>Xóa</Button>
+                    </>
+                )}
+                centered
+            >
+                Bạn có muốn xóa các sản phẩm đã chọn khỏi giỏ hàng không?
             </Modal>
         </React.Fragment>
     );
