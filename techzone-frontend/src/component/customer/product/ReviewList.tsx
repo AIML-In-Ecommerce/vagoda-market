@@ -141,7 +141,7 @@ const ReviewList = () => {
           showQuickJumper
           showTotal={(total, range) =>
             // `${range[0]}-${range[1]} of ${total} items`
-            `Từ ${range[0]} đến ${range[1]} trên tổng ${total} sản phẩm`
+            `Từ ${range[0]} đến ${range[1]} trên tổng ${total} đánh giá`
           }
           defaultCurrent={page}
           defaultPageSize={itemNumber}

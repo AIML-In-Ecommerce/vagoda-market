@@ -45,7 +45,8 @@ const Comment = (props: CommentProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [commentToDelete, setCommentToDelete] = useState("");
   const { locale } = useParams();
-  const language = locale === "en" ? "en-EN" : "vi-VN";
+  // const language = locale === "en" ? "en-EN" : "vi-VN";
+  const language = "vi-VN";
 
   const openModal = (comment: any) => {
     setCommentToDelete(comment);

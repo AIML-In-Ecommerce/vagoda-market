@@ -3,8 +3,6 @@ import { useState } from "react";
 import {
   Badge,
   Button,
-  Card,
-  Carousel,
   Descriptions,
   DescriptionsProps,
   Divider,
@@ -16,14 +14,13 @@ import {
   Progress,
   Rate,
   Spin,
-  Switch,
   Tabs,
   Tag,
 } from "antd";
 import ReviewList from "./ReviewList";
 import FloatingCartForm from "./FloatingCartForm";
 import { GiShoppingCart } from "react-icons/gi";
-import { CustomerServiceOutlined } from "@ant-design/icons";
+import ComboList from "./ComboList";
 
 export default function ProductDetail() {
   const items: DescriptionsProps["items"] = [
@@ -79,7 +76,8 @@ export default function ProductDetail() {
   // tabs, descriptions and review summary
   const tabItems = [
     {
-      label: `Descriptions`,
+      // label: `Descriptions`,
+      label: "Mô tả",
       key: "1",
       children: (
         <div className="p-2">
@@ -117,12 +115,14 @@ export default function ProductDetail() {
       ),
     },
     {
-      label: `Technical Specifications`,
+      // label: `Technical Specifications`,
+      label: "Thông số kĩ thuật",
       key: "2",
       children: <Descriptions bordered items={items} />,
     },
     {
-      label: `Review Summary`,
+      // label: `Review Summary`,
+      label: `Tổng quan đánh giá`,
       key: "3",
       children: (
         <div className="p-2">
@@ -207,21 +207,23 @@ export default function ProductDetail() {
     },
   ];
 
-  // combo products
-  const data = [
+  // images
+  const images = [
     {
-      title: "Combo 1",
+      url: "https://i.insider.com/5f835d4ebab422001979aaeb",
     },
     {
-      title: "Combo 2",
+      url: "https://bizweb.dktcdn.net/thumb/medium/100/391/225/products/t8max-1.jpg?v=1598201886260",
     },
     {
-      title: "Combo 3",
+      url: "https://product.hstatic.net/200000805527/product/z3994157810128_ac5e199adba96c46d6d7282b2bfdcdc5-scaled_843ed368395649f6a68bc7c08dd20524_master.jpg",
     },
     {
-      title: "Combo 4",
+      url: "https://product.hstatic.net/200000805527/product/z3994157835398_2b54a80e46f44a6d57b7a7500a87e49e-scaled_37202a4918fa4f03a6e275b8312f0587_master.jpg",
     },
   ];
+
+  const [mainImage, setMainImage] = useState(images[0].url);
 
   // modal
   const [loading, setLoading] = useState(false);
@@ -258,17 +260,40 @@ export default function ProductDetail() {
   };
 
   return (
-    <div className="justify-between mx-10 lg:mx-20 gap-10 grid grid-cols-3">
-      <div className="col-span-2">
+    <div className="justify-between mx-10 lg:mx-20 gap-10 grid grid-cols-8">
+      <div className="col-span-5 lg:col-span-6">
         {/* about product */}
-        <div className="flex lg:flex-row md:flex-row flex-col my-10">
-          <div className="bg-white shadow-md max-w-1/4 h-fit p-4">
-            <img
-              className="h-64 object-cover w-full"
-              src={"https://i.insider.com/5f835d4ebab422001979aaeb"}
-              // alt={classInfo.name}
-            />
-          </div>
+        <div className="bg-white shadow-md flex lg:flex-row md:flex-row flex-col my-10">
+          <Flex vertical>
+            <div className="bg-white shadow-md max-w-1/4 h-fit p-4">
+              <img
+                className="h-80 w-80 object-contain"
+                src={mainImage}
+                // alt={classInfo.name}
+              />
+            </div>
+
+            <div className="m-2">
+              <List
+                grid={{ gutter: 16, column: 4 }}
+                dataSource={images}
+                renderItem={(item) => (
+                  <List.Item>
+                    <div
+                      className="cursor-pointer border-2"
+                      onClick={() => setMainImage(item.url)}
+                    >
+                      <img
+                        className="h-14 w-full object-contain"
+                        src={item.url}
+                        alt={item.url}
+                      />
+                    </div>
+                  </List.Item>
+                )}
+              />
+            </div>
+          </Flex>
           {/* desc */}
           <div className="p-4">
             <div className="font-bold uppercase text-lg">
@@ -309,51 +334,10 @@ export default function ProductDetail() {
           </div>
         </div>
         {/* related products to buy with  */}
-        <div className="">
-          <div className="font-semibold p-5 text-md">Combo suggestions</div>
+        <div className="font-semibold p-5 text-md">Sản phẩm có thể kết hợp</div>
 
-          <List
-            grid={{ gutter: 16, column: 4 }}
-            dataSource={data}
-            renderItem={(item) => (
-              <List.Item>
-                <div className="cursor-pointer">
-                  <Card title={item.title}>Card content</Card>
-                </div>
-              </List.Item>
-            )}
-          />
-        </div>
-        {/* <Carousel autoplay style={{ maxWidth: "200" }}>
-          <div>
-            <img
-              className="h-64 object-cover w-full"
-              src={"https://i.insider.com/5f835d4ebab422001979aaeb"}
-              // alt={classInfo.name}
-            />{" "}
-          </div>
-          <div>
-            <img
-              className="h-64 object-cover w-full"
-              src={"https://i.insider.com/5f835d4ebab422001979aaeb"}
-              // alt={classInfo.name}
-            />{" "}
-          </div>
-          <div>
-            <img
-              className="h-64 object-cover w-full"
-              src={"https://i.insider.com/5f835d4ebab422001979aaeb"}
-              // alt={classInfo.name}
-            />{" "}
-          </div>
-          <div>
-            <img
-              className="h-64 object-cover w-full"
-              src={"https://i.insider.com/5f835d4ebab422001979aaeb"}
-              // alt={classInfo.name}
-            />{" "}
-          </div>
-        </Carousel> */}
+        <ComboList />
+
         {/* tabs, descriptions and review summary */}
         <div className="my-5">
           <Tabs
@@ -370,10 +354,10 @@ export default function ProductDetail() {
           />
         </div>
       </div>
-      <div className="col-span-1 my-10">
+      <div className="col-span-3 my-10 lg:col-span-2">
         <FloatingCartForm />
       </div>
-      <div className="col-span-2">
+      <div className="col-span-5 lg:col-span-6">
         {/* reviews */}
         <Divider>Khách hàng đánh giá</Divider>
 
