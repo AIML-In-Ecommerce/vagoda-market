@@ -2,6 +2,8 @@ import HomeCarousel from "@/component/user/HomeCarousel";
 import HomeCategoryCarousel from "@/component/user/HomeCategoryCarousel";
 import HomeFlashSales from "@/component/user/HomeFlashSales";
 import HomeSuggestedProduct from "@/component/user/HomeSuggestedProduct";
+import HotSalesProducts from "@/component/user/HotSalesProducts";
+import HotSaleCarousel from "@/component/user/HotSalesProducts";
 import { Flex } from "antd";
 
 
@@ -16,6 +18,7 @@ export default function Home() {
         <HomeFlashSales />
         <HomeSuggestedProduct />
         <HomeCategoryCarousel />
+        <HotSalesProducts />
       </Flex>
     </>
   );

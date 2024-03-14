@@ -73,6 +73,9 @@ export default function SimpleProductCard({info}:SimpleProductCardProps)
                             {currencyFormater.format(info.finalPrice)}
                         </Typography.Text>
                     }
+                    <button className="bg-orange-500 mt-2 hover:bg-orange-600 hover:text-white px-2 py-1 rounded-md text-base">
+                        Thêm vào giỏ hàng
+                    </button>
                 </Flex>
             </Card>
         </>

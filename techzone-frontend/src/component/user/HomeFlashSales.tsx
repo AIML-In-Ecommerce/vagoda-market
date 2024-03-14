@@ -5,6 +5,7 @@ import SimpleProductCard from "./utils/SimpleProductCard"
 import { Button, Card, Carousel, Col, Flex, Row, Skeleton, Typography } from "antd"
 import Link from "next/link"
 import {AiOutlineRight} from "react-icons/ai"
+import { Arrow } from "./utils/CarouselArrow"
 
 interface HomeFlashSalesProps
 {
@@ -415,25 +416,26 @@ export default function HomeFlashSales({}: HomeFlashSalesProps)
                             </Typography.Text>
                             <Flex className="w-full px-4" justify="end" align="center">
                                 <Link href={flashSaleMoreDetailHref} prefetch={false}>
-                                    <Typography.Text className="text-base underline">
-                                        more details
+                                    <Typography.Text className="text-base">
+                                        Xem thêm
                                     </Typography.Text>
                                 </Link>
-                                <Typography.Text className="text-base underline">
+                                <Typography.Text className="text-base">
                                     <AiOutlineRight size={"16px"}/>
                                 </Typography.Text>
                             </Flex>
                         </Flex>
                         <div>
-                            {PrevButton}
                             <div className="block">
                                 <Carousel
                                 autoplay={true}
+                                arrows
+                                nextArrow={<Arrow direction="right"/>}
+                                prevArrow={<Arrow direction="left"/>}
                                 >
                                     {productDisplay()}
                                 </Carousel>
                             </div>
-                            {NextButton}
                         </div>
                     </Card>
                     <div className="invisible h-10 w-full">

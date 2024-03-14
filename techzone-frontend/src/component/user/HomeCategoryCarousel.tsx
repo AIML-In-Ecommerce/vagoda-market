@@ -143,8 +143,8 @@ interface CategoryProps
 
 export default function HomeCategoryCarousel({}: HomeCategoryCarouselProps)
 {
-    const SHOW_MORE = "Show more"
-    const SHOW_LESS = "Show less"
+    const SHOW_MORE = "Xem thêm"
+    const SHOW_LESS = "Ẩn đi"
 
     const [categories, setCategories] = useState<CategoryProps[]>([])
     
@@ -265,11 +265,11 @@ export default function HomeCategoryCarousel({}: HomeCategoryCarouselProps)
 
     return(
         <>
-            <div className="w-full flex justify-center items-center bg-blue-50">
+            <div className="w-full flex justify-center items-center bg-blue-50 py-4">
                 <div className="w-9/12">
                     {categoryDisplay}
                     <div className="w-full flex justify-center">
-                        <Button onClick={handleSeeMoreButtonClick}>
+                        <Button onClick={handleSeeMoreButtonClick} className="border-none">
                             {buttonContent}
                         </Button>
                     </div>
