@@ -21,8 +21,39 @@ import ReviewList from "./ReviewList";
 import FloatingCartForm from "./FloatingCartForm";
 import { GiShoppingCart } from "react-icons/gi";
 import ComboList from "./ComboList";
+import { ProductDetailType } from "@/model/ProductType";
 
 export default function ProductDetail() {
+  const productInfo = {
+    _id: "string",
+    name: "ROBOT HÚT BỤI LAU NHÀ THÔNG MINH ECOVACS DEEBOT OZMO T8 NEO BẢN NỘI ĐỊA",
+    // attribute: {
+    //   ....
+    // }
+    description: "string",
+    originalPrice: 8900000,
+    finalPrice: 4900000,
+    category: "string",
+    shopId: "string",
+    // status: ENUM[AVAILABLE, SOLD_OUT, SALE];
+    images: [
+      {
+        url: "https://i.insider.com/5f835d4ebab422001979aaeb",
+      },
+      {
+        url: "https://bizweb.dktcdn.net/thumb/medium/100/391/225/products/t8max-1.jpg?v=1598201886260",
+      },
+      {
+        url: "https://product.hstatic.net/200000805527/product/z3994157810128_ac5e199adba96c46d6d7282b2bfdcdc5-scaled_843ed368395649f6a68bc7c08dd20524_master.jpg",
+      },
+      {
+        url: "https://product.hstatic.net/200000805527/product/z3994157835398_2b54a80e46f44a6d57b7a7500a87e49e-scaled_37202a4918fa4f03a6e275b8312f0587_master.jpg",
+      },
+    ],
+    avgRating: 4.5,
+    createdAt: "string",
+  };
+
   const items: DescriptionsProps["items"] = [
     {
       key: "1",
@@ -208,22 +239,17 @@ export default function ProductDetail() {
   ];
 
   // images
-  const images = [
-    {
-      url: "https://i.insider.com/5f835d4ebab422001979aaeb",
-    },
-    {
-      url: "https://bizweb.dktcdn.net/thumb/medium/100/391/225/products/t8max-1.jpg?v=1598201886260",
-    },
-    {
-      url: "https://product.hstatic.net/200000805527/product/z3994157810128_ac5e199adba96c46d6d7282b2bfdcdc5-scaled_843ed368395649f6a68bc7c08dd20524_master.jpg",
-    },
-    {
-      url: "https://product.hstatic.net/200000805527/product/z3994157835398_2b54a80e46f44a6d57b7a7500a87e49e-scaled_37202a4918fa4f03a6e275b8312f0587_master.jpg",
-    },
-  ];
+  const [mainImage, setMainImage] = useState(productInfo.images[0].url);
 
-  const [mainImage, setMainImage] = useState(images[0].url);
+  // price
+  // initial price before adding the combo price
+  const [initialPrice, setInitialPrice] = useState(productInfo.finalPrice);
+
+  // total combo price
+  const [totalComboPrice, setTotalComboPrice] = useState(0);
+
+  // combo id list
+  const [comboIdList, setComboIdList] = useState<string[]>([]);
 
   // modal
   const [loading, setLoading] = useState(false);
@@ -252,13 +278,6 @@ export default function ProductDetail() {
     setOpen(false);
   };
 
-  // button group
-  const [openButton, setOpenButton] = useState(true);
-  const onChange = (checked: boolean) => {
-    console.log("Clicked open group button");
-    setOpenButton(checked);
-  };
-
   return (
     <div className="justify-between mx-10 lg:mx-20 gap-10 grid grid-cols-8">
       <div className="col-span-5 lg:col-span-6">
@@ -276,7 +295,7 @@ export default function ProductDetail() {
             <div className="m-2">
               <List
                 grid={{ gutter: 16, column: 4 }}
-                dataSource={images}
+                dataSource={productInfo.images}
                 renderItem={(item) => (
                   <List.Item>
                     <div
@@ -297,8 +316,7 @@ export default function ProductDetail() {
           {/* desc */}
           <div className="p-4">
             <div className="font-bold uppercase text-lg">
-              ROBOT HÚT BỤI LAU NHÀ THÔNG MINH ECOVACS DEEBOT OZMO T8 NEO BẢN
-              NỘI ĐỊA
+              {productInfo.name}
             </div>
 
             <Flex gap="small">
@@ -308,19 +326,23 @@ export default function ProductDetail() {
                 defaultValue={4.5}
                 style={{ padding: 5 }}
               />
-              <div className="font-bold uppercase text-xl">4.5</div>
+              <div className="font-bold uppercase text-xl">
+                {productInfo.avgRating}
+              </div>
             </Flex>
 
             <div className="flex flex-row gap-3 my-2">
               <div className="line-through text-gray-600 uppercase text-xl md:text-2xl lg:text-2xl">
-                8,900,000 Đ
+                {/* {productInfo.originalPrice} Đ */}
+                {priceIndex(productInfo.originalPrice)}
               </div>
               <div className="font-bold text-red-500 uppercase text-xl md:text-2xl lg:text-2xl">
-                4,900,000 Đ
+                {priceIndex(productInfo.finalPrice)}
               </div>
               <div className="text-red-500 uppercase text-xs mt-1">-50%</div>
             </div>
-            <div className="capitalize text-xs mt-5">Sub-category:</div>
+            {/* sub category tags */}
+            {/* <div className="capitalize text-xs mt-5">Sub-category:</div>
             <Tag>
               <a href="https://github.com/ant-design/ant-design/issues/1862">
                 Điện máy - Điện gia dụng
@@ -330,13 +352,34 @@ export default function ProductDetail() {
               <a href="https://github.com/ant-design/ant-design/issues/1862">
                 Thiết bị văn phòng
               </a>
-            </Tag>
+            </Tag> */}
+            {/* sub category tags */}
+
+            <div className="font-bold pt-5">TechZone Assistant 🤖</div>
+
+            <div className="font-semibold pt-5">
+              Tổng quan đánh giá khách hàng:
+            </div>
+            <div className="pt-2 text-xs max-w-lg">
+              Tổng thể, iRobot Roomba 980 là một sự lựa chọn tốt cho người tiêu
+              dùng muốn đầu tư vào một robot hút bụi thông minh và hiệu quả. Với
+              hiệu suất hút bụi mạnh mẽ, tính năng thông minh và khả năng vận
+              hành linh hoạt, Roomba 980 sẽ giúp giảm bớt công việc lau chùi và
+              mang lại một không gian sống sạch sẽ hơn.
+            </div>
           </div>
         </div>
         {/* related products to buy with  */}
-        <div className="font-semibold p-5 text-md">Sản phẩm có thể kết hợp</div>
+        <div className="font-semibold px-5 text-md">
+          Sản phẩm có thể kết hợp
+        </div>
 
-        <ComboList />
+        <ComboList
+          initialPrice={initialPrice}
+          updateTotalComboPrice={(price) => {
+            setTotalComboPrice(price);
+          }}
+        />
 
         {/* tabs, descriptions and review summary */}
         <div className="my-5">
@@ -355,7 +398,15 @@ export default function ProductDetail() {
         </div>
       </div>
       <div className="col-span-3 my-10 lg:col-span-2">
-        <FloatingCartForm />
+        <FloatingCartForm
+          mainProductId={productInfo._id}
+          mainProductPrice={productInfo.finalPrice}
+          comboIdList={comboIdList}
+          totalComboPrice={totalComboPrice}
+          updateInitialPrice={(price) => {
+            setInitialPrice(price);
+          }}
+        />
       </div>
       <div className="col-span-5 lg:col-span-6">
         {/* reviews */}
@@ -402,22 +453,7 @@ export default function ProductDetail() {
             </Button>,
           ]}
         >
-          {/* <div className="mx-2">
-            <Flex gap="small">
-              <div className="mt-1"> Số lượng: </div>
-              <InputNumber
-                min={0}
-                max={999}
-                defaultValue={0}
-                // onChange={onChange}
-                changeOnWheel
-              />
-            </Flex>
-          </div>
-
-          <Flex gap="small">
-            <div className="m-2 my-5 text-xl"> {modalText} </div>
-          </Flex> */}
+          {/* put cart summary here? */}
 
           <InputNumber
             min={0}
@@ -432,3 +468,12 @@ export default function ProductDetail() {
     </div>
   );
 }
+
+// price
+export const priceIndex = (price: number) => {
+  return price.toLocaleString("vi-VN", {
+    style: "currency",
+    currency: "VND",
+    minimumFractionDigits: 0,
+  });
+};
