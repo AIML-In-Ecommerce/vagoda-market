@@ -586,11 +586,11 @@ export default function HomeSuggestedProduct({}: HomeSuggestedProductProps)
                 )
             })
             
-            const rowWrapper = <Flex key={startIndex.toString()+endIndex.toString()} justify="center" align="center">
+            const rowWrapper = <Flex key={startIndex.toString()+endIndex.toString()} justify="center" align="center" gap={6}>
                 {row}
             </Flex>
 
-            result = result.concat(<div key={i.toString()+startIndex.toString()+endIndex.toString()}>{rowWrapper}</div>)
+            result = result.concat(<div key={i.toString()+startIndex.toString()+endIndex.toString()} className="py-3 px-6">{rowWrapper}</div>)
         }
 
         return result
@@ -599,10 +599,10 @@ export default function HomeSuggestedProduct({}: HomeSuggestedProductProps)
     return(
         <>
             <div className="w-full flex justify-center items-center">
-                <div className="w-10/12">
+                <div className="w-11/12">
                     <div className="invisible h-10 w-full">
                     </div>
-                    <Card>
+                    <Card className="w-full">
                         <Flex className="w-full mb-4" align="center">
                             <Typography.Text className="text-3xl font-semibold w-full">
                                 Sản phẩm bạn có thể thích

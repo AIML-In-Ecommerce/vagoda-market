@@ -6,6 +6,7 @@ import "../globals.css";
 import { ReactNode } from "react";
 import { NextIntlClientProvider, useMessages } from "next-intl";
 import Navbar from "@/component/customer/Navbar";
+import CategoryDrawer from "@/component/user/utils/CategoryDrawer";
 // import UserLayout from "@/component/UserLayout";
 
 interface RootLayoutProps {
@@ -36,6 +37,7 @@ export default function RootLayout({
           {/* </AuthProvider> */}
           <div className="bg-cover bg-slate-50 min-h-screen">
             <Navbar />
+            <CategoryDrawer />
             {children}
           </div>
         </NextIntlClientProvider>

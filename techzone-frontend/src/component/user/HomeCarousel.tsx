@@ -1,6 +1,6 @@
 'use client'
-import { Card, Carousel, Flex, Image, Skeleton } from "antd"
-import { log } from "console"
+
+import { Carousel, Flex, Image, Skeleton } from "antd"
 import React, { useEffect, useState } from "react"
 
 
@@ -78,11 +78,11 @@ export default function HomeCarousel({}:HomeCarouselProps)
     },
     [])
 
-    const SmallEventCardStyle: React.CSSProperties = 
-    {
-        width: "300px",
-        height:"169px"
-    }
+    // const SmallEventCardStyle: React.CSSProperties = 
+    // {
+    //     width: "60%",
+    //     height:"169px"
+    // }
 
     const CarouselDisplay: any = carouselImages.map((value: CarouselImageProps) =>
     {
@@ -108,8 +108,8 @@ export default function HomeCarousel({}:HomeCarouselProps)
             {
                 return(
                     <div key={value._id}
-                        style={SmallEventCardStyle}
-                        className="shadow-sm rounded-md shadow-black hover:shadow-lg hover:shadow-black"
+                        // style={SmallEventCardStyle}
+                        className="shadow-sm rounded-md shadow-black hover:shadow-lg hover:shadow-black lg:w-56 lg:h-36"
                     >
                         <Image
                             preview={false}
@@ -140,8 +140,8 @@ export default function HomeCarousel({}:HomeCarouselProps)
             {
                 return(
                     <div key={value._id}
-                        style={SmallEventCardStyle}
-                        className="shadow-sm rounded-md shadow-black hover:shadow-lg hover:shadow-black"
+                        // style={SmallEventCardStyle}
+                        className="shadow-sm rounded-md shadow-black hover:shadow-lg hover:shadow-black lg:w-56 lg:h-36"
                     >
                         <Image
                             preview={false}
@@ -181,12 +181,12 @@ export default function HomeCarousel({}:HomeCarouselProps)
 
     return(
         <>
-            <div className="w-full flex flex-col justify-end items-center" style={LargeBackground}>
-                <div className="flex flex-col relative justify-center items-center backdrop-blur-md w-full h-full">
+            <div className="w-full flex flex-col justify-end items-center relative" style={LargeBackground}>
+                <div className="flex flex-col justify-center items-center backdrop-blur-md w-full h-full">
                     <div className="invisible h-10">
                         hidden block
                     </div>
-                    <div className="container w-2/3 h-1/2">
+                    <div className="w-2/3 h-1/2">
                         <Carousel autoplay={true} style={{height:"100%"}}
                             afterChange={afterCarouselChange}
                         >
@@ -198,8 +198,8 @@ export default function HomeCarousel({}:HomeCarouselProps)
                     </div>
                 </div>
             </div>
-            <div className="absolute z-10 bottom-60">
-                <div className="w-full h-40 flex flex-col justify-start">
+            <div className="absolute z-10 bottom-10 w-full">
+                <div className="flex flex-row justify-center">
                     <div className="w-full">
                         <Flex justify="center" className="w-full">
                             <Flex justify="evenly" gap={"8px"}>

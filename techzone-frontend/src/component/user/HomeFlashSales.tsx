@@ -406,7 +406,7 @@ export default function HomeFlashSales({}: HomeFlashSalesProps)
     return(
         <>
             <div className="w-full bg-blue-50 flex justify-center">
-                <div className="w-10/12">
+                <div className="w-11/12">
                     <div className="invisible h-10 w-full">
                     </div>
                     <Card>
