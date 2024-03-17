@@ -3,6 +3,8 @@ import React, { useState, useEffect } from "react";
 import { Affix, Button, Card, Divider, InputNumber, Modal, Radio, Space, Table, Tag, Image, Flex } from 'antd';
 import type { TableColumnsType } from 'antd';
 import { FaRegTrashCan, FaPlus, FaMinus, FaRegCircleQuestion } from "react-icons/fa6";
+import { Currency } from "@/component/user/utils/CurrencyDisplay";
+import { QuantityControl } from "@/component/user/utils/QuantityControl";
 
 interface DataType {
     key: React.Key;
@@ -20,7 +22,7 @@ export default function Home() {
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
     const [selectedKey, setSelectedKey] = useState<React.Key | null>(null)
     const [loading, setLoading] = useState(false);
-    const [top, setTop] = React.useState<number>(10);
+    const [top, setTop] = React.useState<number>();
     const [provisional, setProvisional] = useState(0);
     const [discount, setDiscount] = useState(0);
     const [total, setTotal] = useState(0);
@@ -123,8 +125,7 @@ export default function Home() {
         }
     }
 
-    const onIncrease = (key: React.Key, value: number) => {
-        // Update the 'amount' field of the product
+    const onIncrement = (key: React.Key, value: number) => {
         if (value === 100) return;
         if (products) {
             const updatedProducts = products.map((product: { key: React.Key; }) => {
@@ -137,8 +138,7 @@ export default function Home() {
         }
     }
 
-    const onDecrease = (key: React.Key, value: number) => {
-        // Update the 'amount' field of the product
+    const onDecrement = (key: React.Key, value: number) => {
         if (value === 1) return handleShowDeleteOneModal(key)
 
         if (products) {
@@ -195,41 +195,25 @@ export default function Home() {
                     <span className="text-lg font-normal">{text}</span>
 
                 </Space>
-
-
         },
         {
             title: <span className="text-lg">Đơn giá</span>,
             dataIndex: 'unit_price',
             render: (value: number) => <a className="text-lg">
-                {value.toLocaleString("vi-VN", {
-                    style: "currency",
-                    currency: "VND",
-                    minimumFractionDigits: 0,
-                })}</a>,
+                <Currency value={value} />
+            </a>,
         },
         {
             title: <span className="text-lg">Số lượng</span>,
             dataIndex: 'amount',
             render: (value: number, record: DataType) =>
-                <Space size={5} className="flex">
-                    <Button onClick={() => onDecrease(record.key, value)}>
-                        <FaMinus />
-                    </Button>
-                    <InputNumber
-                        className="w-16 justify-center"
-                        controls={false}
-                        min={1}
-                        max={100}
-                        defaultValue={1}
-                        width={10}
-                        onChange={(value: any) =>
-                            onQuantityChange(record.key, value)}
-                        value={value} />
-                    <Button onClick={() => onIncrease(record.key, value)}>
-                        <FaPlus />
-                    </Button>
-                </Space>
+                <QuantityControl componentSize={5} keyProp={record.key} value={value}
+                    minValue={1} maxValue={100} defaultValue={1}
+                    inputWidth={75}
+                    onIncrement={onIncrement}
+                    onDecrement={onDecrement}
+                    onQuantityChange={onQuantityChange}
+                />
 
         },
         {
@@ -237,11 +221,10 @@ export default function Home() {
             dataIndex: 'final_price',
             render: (value: number, record: DataType) => (
                 <span className="text-red-500 font-bold text-lg ">
-                    {(record.unit_price * (record.amount || 1)).toLocaleString("vi-VN", {
-                        style: "currency",
-                        currency: "VND",
-                        minimumFractionDigits: 0,
-                    })}
+                    <Currency value={(record.unit_price * (record.amount || 1))}
+                        locales={"vi-VN"}
+                        currency={"VND"}
+                        minimumFractionDigits={0} />
                 </span>
             ),
             width: "16%"
@@ -288,6 +271,7 @@ export default function Home() {
                             columns={columns}
                             dataSource={products}
                             loading={loading}
+                            pagination={{pageSize: 5}}
 
                         />
                     </div>
@@ -327,30 +311,27 @@ export default function Home() {
                                 <Card size="small">
                                     <div className="flex justify-between">
                                         <p>Tạm tính</p>
-                                        <p>{provisional.toLocaleString("vi-VN", {
-                                            style: "currency",
-                                            currency: "VND",
-                                            minimumFractionDigits: 0,
-                                        })}</p>
+                                        <Currency value={provisional}
+                                            locales={"vi-VN"}
+                                            currency={"VND"}
+                                            minimumFractionDigits={0} />
                                     </div>
                                     <div className="flex justify-between">
                                         <p>Giảm giá</p>
-                                        <p>- {discount.toLocaleString("vi-VN", {
-                                            style: "currency",
-                                            currency: "VND",
-                                            minimumFractionDigits: 0,
-                                        })}</p>
+                                        <p>- <Currency value={discount}
+                                            locales={"vi-VN"}
+                                            currency={"VND"}
+                                            minimumFractionDigits={0} /></p>
                                     </div>
                                     <Divider></Divider>
                                     <div className="flex justify-between">
                                         <p>Tổng tiền</p>
                                         <p className="flex flex-col space-y-3 grid">
                                             <p className="text-red-400 text-lg font-bold justify-self-end">
-                                                {total.toLocaleString("vi-VN", {
-                                                    style: "currency",
-                                                    currency: "VND",
-                                                    minimumFractionDigits: 0,
-                                                })}</p>
+                                                <Currency value={total}
+                                                    locales={"vi-VN"}
+                                                    currency={"VND"}
+                                                    minimumFractionDigits={0} /></p>
                                             <p className="text-slate-400 text-lg justify-self-end">(Đã bao gồm VAT nếu có)</p>
                                         </p>
 
