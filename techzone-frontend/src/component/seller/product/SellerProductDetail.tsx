@@ -1,10 +1,12 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
   Badge,
+  Button,
   Descriptions,
   DescriptionsProps,
   Divider,
+  Empty,
   Flex,
   FloatButton,
   List,
@@ -13,14 +15,12 @@ import {
   Skeleton,
   Tabs,
 } from "antd";
-import ReviewList from "./ReviewList";
-import FloatingCartForm from "./FloatingCartForm";
-import { GiShoppingCart } from "react-icons/gi";
-import ComboList from "./ComboList";
 import Link from "next/link";
-import CartSummaryModal from "./ProductSummaryModal";
+import { priceIndex } from "@/component/customer/product/ProductDetail";
+// import ReviewList from "./ReviewList";
+// import ComboList from "./ComboList";
 
-export default function ProductDetail() {
+export default function SellerProductDetail() {
   const productInfo = {
     _id: "string",
     name: "ROBOT HÚT BỤI LAU NHÀ THÔNG MINH ECOVACS DEEBOT OZMO T8 NEO BẢN NỘI ĐỊA",
@@ -241,24 +241,58 @@ export default function ProductDetail() {
   // images
   const [mainImage, setMainImage] = useState(productInfo.images[0].url);
 
-  // price
-  // number of main item
-  const [numberOfItem, setNumberOfItem] = useState(1);
-
-  // total combo price
-  const [totalComboPrice, setTotalComboPrice] = useState(0);
-
-  // combo id list
-  const [comboIdList, setComboIdList] = useState<Array<string>>([]);
-
-  const totalPrice = useMemo(() => {
-    return numberOfItem * productInfo.finalPrice + totalComboPrice;
-  }, [totalComboPrice, numberOfItem]);
+  // combo
+  const [combo, setCombo] = useState([]);
 
   // modal
-  const [open, setOpen] = useState(false);
-  const showModal = () => {
-    setOpen(true);
+  // const [open, setOpen] = useState(false);
+  // const showModal = () => {
+  //   setOpen(true);
+  // };
+
+  // toggle edit mode
+  const [editableImage, setEditableImage] = useState(false);
+  const [editableOverview, setEditableOverview] = useState(false);
+  const [editableCombo, setEditableCombo] = useState(false);
+  const [editableDescription, setEditableDescription] = useState(false);
+
+  const [currentEditMode, setCurrentEditMode] = useState("");
+
+  // display UI elements that are not editable
+  const [visible, setVisible] = useState(true);
+
+  // methods
+  const edit = (mode: string) => {
+    setCurrentEditMode(mode);
+    setVisible(false);
+
+    switch (mode) {
+      case "image":
+        setEditableImage(true);
+      case "overview":
+        setEditableOverview(true);
+      case "combo":
+        setEditableCombo(true);
+      case "description":
+        setEditableDescription(true);
+    }
+  };
+
+  const save = () => {
+    switch (currentEditMode) {
+      case "image":
+      //save
+      case "overview":
+      //save
+
+      case "combo":
+      //save
+      case "description":
+      //save
+    }
+
+    setCurrentEditMode("");
+    setVisible(true);
   };
 
   return (
@@ -301,6 +335,7 @@ export default function ProductDetail() {
           <div className="p-4">
             {productInfo._id == null && <Skeleton active />}
 
+            {/* visible? */}
             <div className="text-sm">
               Thương hiệu / Shop:{" "}
               <Link href="" className="text-blue-500">
@@ -312,26 +347,28 @@ export default function ProductDetail() {
               {productInfo.name}
             </div>
 
-            <Flex
-              gap="small"
-              style={{ lineHeight: 2, marginTop: 2, alignContent: "center" }}
-            >
-              <Rate
-                disabled
-                allowHalf
-                defaultValue={4.5}
-                style={{ padding: 5 }}
-              />
-              <div className="font-bold uppercase text-xl">
-                {productInfo.avgRating}
-              </div>
-              <div className="text-xs font-light mt-2">(10 đánh giá)</div>
-              <Divider
-                type="vertical"
-                style={{ height: "auto", border: "0.25px solid silver" }}
-              />
-              <div className="font-light">Đã bán 5000+</div>
-            </Flex>
+            {visible == true && (
+              <Flex
+                gap="small"
+                style={{ lineHeight: 2, marginTop: 2, alignContent: "center" }}
+              >
+                <Rate
+                  disabled
+                  allowHalf
+                  defaultValue={4.5}
+                  style={{ padding: 5 }}
+                />
+                <div className="font-bold uppercase text-xl">
+                  {productInfo.avgRating}
+                </div>
+                <div className="text-xs font-light mt-2">(10 đánh giá)</div>
+                <Divider
+                  type="vertical"
+                  style={{ height: "auto", border: "0.25px solid silver" }}
+                />
+                <div className="font-light">Đã bán 5000+</div>
+              </Flex>
+            )}
 
             <div className="flex flex-row gap-3 my-2">
               <div className="line-through text-gray-600 uppercase text-xl md:text-2xl lg:text-2xl">
@@ -357,16 +394,18 @@ export default function ProductDetail() {
             </Tag> */}
             {/* sub category tags */}
 
-            <div className="flex flex-col gap-3">
-              <div className="font-semibold pt-5">Dịch vụ bổ sung</div>
-              {/* add Link later if use */}
-              <div className="bg-white shadow-md max-w-1/4 h-fit p-4 cursor-pointer">
-                Thay đổi Thông tin vận chuyển
+            {visible == true && (
+              <div className="flex flex-col gap-3">
+                <div className="font-semibold pt-5">Dịch vụ bổ sung</div>
+                {/* add Link later if use */}
+                <div className="bg-white shadow-md max-w-1/4 h-fit p-4">
+                  Thay đổi Thông tin vận chuyển
+                </div>
+                <div className="bg-white shadow-md max-w-1/4 h-fit p-4">
+                  Ưu đãi, mã giảm giá
+                </div>
               </div>
-              <div className="bg-white shadow-md max-w-1/4 h-fit p-4 cursor-pointer">
-                Ưu đãi, mã giảm giá
-              </div>
-            </div>
+            )}
           </div>
         </div>
         {/* related products to buy with  */}
@@ -374,7 +413,14 @@ export default function ProductDetail() {
           Sản phẩm có thể kết hợp
         </div>
 
-        <ComboList
+        {combo.length == 0 && (
+          <Empty
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
+            description={<span>Không có</span>}
+          />
+        )}
+
+        {/* <ComboList
           totalPrice={totalPrice}
           totalComboPrice={totalComboPrice}
           updateTotalComboPrice={(price) => {
@@ -382,7 +428,7 @@ export default function ProductDetail() {
           }}
           comboIdList={comboIdList}
           setComboIdList={setComboIdList}
-        />
+        /> */}
 
         {/* tabs, descriptions and review summary */}
         <div className="my-5">
@@ -400,50 +446,57 @@ export default function ProductDetail() {
           />
         </div>
       </div>
-      <div className="col-span-3 my-10 lg:col-span-2">
-        <FloatingCartForm
-          handleCartDetail={setOpen}
-          numberOfItem={numberOfItem}
-          updateItemNumber={setNumberOfItem}
-          totalPrice={totalPrice}
-        />
+      <div className="bg-white shadow-md rounded-md h-fit col-span-3 lg:col-span-2 my-10">
+        {(visible == true && (
+          <Flex vertical gap="small">
+            <div className="m-2 font-semibold"> Cập nhật </div>
+
+            <Button type="primary" ghost block onClick={() => edit("image")}>
+              Hình ảnh
+            </Button>
+            <Button type="primary" ghost block onClick={() => edit("overview")}>
+              Thông tin chung
+            </Button>
+            <Button type="primary" ghost block onClick={() => edit("combo")}>
+              Sản phẩm kết hợp
+            </Button>
+            <Button
+              type="primary"
+              ghost
+              block
+              onClick={() => edit("description")}
+            >
+              Thông tin chi tiết
+            </Button>
+          </Flex>
+        )) || (
+          <Flex vertical gap="small">
+            <Button type="primary" ghost block onClick={() => save()}>
+              Lưu thay đổi
+            </Button>
+            <Button
+              type="primary"
+              danger
+              ghost
+              block
+              onClick={() => setVisible(true)}
+              //create method to clear data?
+            >
+              Hủy thay đổi
+            </Button>
+          </Flex>
+        )}
       </div>
       <div className="col-span-5 lg:col-span-6">
         {/* reviews */}
-        <Divider>Khách hàng đánh giá</Divider>
+        <Divider>Phân tích đánh giá khách hàng</Divider>
 
-        <ReviewList />
+        {/* <ReviewList /> */}
 
         <FloatButton.Group>
-          <FloatButton
-            icon={<GiShoppingCart />}
-            tooltip={<div>Xem chi tiết</div>}
-            // badge={{ count: 23, overflowCount: 999 }}
-            onClick={showModal}
-          />
           <FloatButton.BackTop tooltip={<div>Move to Top</div>} />
         </FloatButton.Group>
-
-        <CartSummaryModal
-          open={open}
-          setOpen={setOpen}
-          totalPrice={totalPrice}
-          mainProductId={productInfo._id}
-          mainProductPrice={productInfo.finalPrice}
-          numberOfItem={numberOfItem}
-          comboIdList={comboIdList}
-          totalComboPrice={totalComboPrice}
-        />
       </div>
     </div>
   );
 }
-
-// price
-export const priceIndex = (price: number) => {
-  return price.toLocaleString("vi-VN", {
-    style: "currency",
-    currency: "VND",
-    minimumFractionDigits: 0,
-  });
-};

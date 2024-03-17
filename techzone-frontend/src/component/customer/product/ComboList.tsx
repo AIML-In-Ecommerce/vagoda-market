@@ -2,6 +2,7 @@
 import {
   Button,
   Carousel,
+  Empty,
   Flex,
   List,
   Pagination,
@@ -10,7 +11,7 @@ import {
 } from "antd";
 // import { useTranslations } from "next-intl";
 import ComboItem, { ComboItemProps } from "./ComboItem";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import React from "react";
 import { CarouselArrow } from "@/component/user/utils/CarouselArrow";
 import { priceIndex } from "./ProductDetail";
@@ -238,9 +239,18 @@ const ComboList = (comboListData: ComboListProps) => {
 
   return (
     <div className="align-middle grid grid-cols-5 gap-5">
-      <div className="lg:col-span-4 col-span-5">
-        {/* pagination */}
-        {/* <Flex vertical>
+      {combo.length == 0 && (
+        <Empty
+          image={Empty.PRESENTED_IMAGE_SIMPLE}
+          description={<span>Không có</span>}
+        />
+      )}
+
+      {combo.length > 0 && (
+        <div>
+          <div className="lg:col-span-4 col-span-5">
+            {/* pagination */}
+            {/* <Flex vertical>
           <List
             grid={{ gutter: 16, column: 3 }}
             dataSource={filterData}
@@ -274,31 +284,33 @@ const ComboList = (comboListData: ComboListProps) => {
           </div>
         </Flex> */}
 
-        <Carousel
-          // autoplay
-          // autoplaySpeed={autoPlayCarouselSpeed}
-          arrows
-          prevArrow={<CarouselArrow direction="left" />}
-          nextArrow={<CarouselArrow direction="right" />}
-          style={{ padding: 40 }}
-        >
-          {productDisplay()}
-        </Carousel>
-      </div>
+            <Carousel
+              // autoplay
+              // autoplaySpeed={autoPlayCarouselSpeed}
+              arrows
+              prevArrow={<CarouselArrow direction="left" />}
+              nextArrow={<CarouselArrow direction="right" />}
+              style={{ padding: 40 }}
+            >
+              {productDisplay()}
+            </Carousel>
+          </div>
 
-      <div className="col-span-1 lg:col-start-5 lg:col-end-6 md:col-start-1 sm:col-start-1">
-        <div className="my-5 min-w-40">
-          <Flex vertical gap="small">
-            <div className="font-semibold">Tổng cộng:</div>
-            <div className="text-xl">
-              {priceIndex(comboListData.totalPrice)}
+          <div className="col-span-1 lg:col-start-5 lg:col-end-6 md:col-start-1 sm:col-start-1">
+            <div className="my-5 min-w-40">
+              <Flex vertical gap="small">
+                <div className="font-semibold">Tổng cộng:</div>
+                <div className="text-xl">
+                  {priceIndex(comboListData.totalPrice)}
+                </div>
+                <Button type="primary" danger block size="large">
+                  Mua ngay
+                </Button>
+              </Flex>
             </div>
-            <Button type="primary" danger block size="large">
-              Mua ngay
-            </Button>
-          </Flex>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
