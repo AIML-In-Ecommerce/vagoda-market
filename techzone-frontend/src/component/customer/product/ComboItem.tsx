@@ -11,7 +11,7 @@ export interface ComboItemProps {
   name: string;
   price: number;
   productUrl: string;
-  handleCheckbox: (isChecked: boolean, price: number) => void;
+  handleCheckbox: (isChecked: boolean, id: string, price: number) => void;
 }
 
 const ComboItem = (combo: ComboItemProps) => {
@@ -22,7 +22,9 @@ const ComboItem = (combo: ComboItemProps) => {
       <PlusOutlined />
       <Checkbox
         style={{ marginRight: 3, marginLeft: 10 }}
-        onChange={(e) => combo.handleCheckbox(e.target.checked, combo.price)}
+        onChange={(e) =>
+          combo.handleCheckbox(e.target.checked, combo._id, combo.price)
+        }
       >
         <div className="max-w-[240px] bg-white rounded-xl overflow-hidden md:max-w-2xl relative">
           <div className="flex flex-col">
@@ -37,7 +39,8 @@ const ComboItem = (combo: ComboItemProps) => {
             </Link>
             <div className="p-3">
               <Link href={`/${combo.productUrl}`}>
-                <div className="mt-1 leading-tight font-medium text-black hover:underline overflow-hidden roboto-bold line-clamp-2">
+                <div className="mt-1 leading-tight font-medium text-black overflow-hidden roboto-bold line-clamp-2">
+                  {/* hover:underline */}
                   {combo.name}
                 </div>
               </Link>

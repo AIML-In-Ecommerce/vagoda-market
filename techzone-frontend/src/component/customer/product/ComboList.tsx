@@ -16,8 +16,12 @@ import { CarouselArrow } from "@/component/user/utils/CarouselArrow";
 import { priceIndex } from "./ProductDetail";
 
 interface ComboListProps {
-  initialPrice: number;
+  // initial price before adding the combo price
+  totalPrice: number;
+  totalComboPrice: number;
   updateTotalComboPrice: (price: number) => void;
+  comboIdList: Array<string>;
+  setComboIdList: (list: Array<string>) => void;
 }
 
 const ComboList = (comboListData: ComboListProps) => {
@@ -26,7 +30,7 @@ const ComboList = (comboListData: ComboListProps) => {
 
   const combo = [
     {
-      _id: "string",
+      _id: "1",
       imageUrl:
         "https://salt.tikicdn.com/cache/750x750/ts/product/48/b8/5b/cb7defa29b848116d60917e6ce789047.jpg.webp",
 
@@ -36,7 +40,7 @@ const ComboList = (comboListData: ComboListProps) => {
       handleCheckbox: () => {},
     },
     {
-      _id: "string",
+      _id: "2",
       imageUrl:
         "https://salt.tikicdn.com/cache/750x750/ts/product/48/b8/5b/cb7defa29b848116d60917e6ce789047.jpg.webp",
 
@@ -46,7 +50,7 @@ const ComboList = (comboListData: ComboListProps) => {
       handleCheckbox: () => {},
     },
     {
-      _id: "string",
+      _id: "3",
       imageUrl:
         "https://salt.tikicdn.com/cache/750x750/ts/product/48/b8/5b/cb7defa29b848116d60917e6ce789047.jpg.webp",
 
@@ -56,7 +60,7 @@ const ComboList = (comboListData: ComboListProps) => {
       handleCheckbox: () => {},
     },
     {
-      _id: "string",
+      _id: "4",
       imageUrl:
         "https://salt.tikicdn.com/cache/750x750/ts/product/48/b8/5b/cb7defa29b848116d60917e6ce789047.jpg.webp",
 
@@ -66,7 +70,7 @@ const ComboList = (comboListData: ComboListProps) => {
       handleCheckbox: () => {},
     },
     {
-      _id: "string",
+      _id: "5",
       imageUrl:
         "https://salt.tikicdn.com/cache/750x750/ts/product/48/b8/5b/cb7defa29b848116d60917e6ce789047.jpg.webp",
 
@@ -218,22 +222,19 @@ const ComboList = (comboListData: ComboListProps) => {
     return result;
   };
 
-  const [totalComboPrice, setTotalComboPrice] = useState(0);
-
-  const handleCheckbox = (isChecked: boolean, price: number) => {
-    let tempTotalPrice = totalComboPrice;
+  const handleCheckbox = (isChecked: boolean, id: string, price: number) => {
+    let tempTotalPrice = comboListData.totalComboPrice;
     if (isChecked) {
       tempTotalPrice += price;
+      comboListData.comboIdList.push(id);
     } else {
       tempTotalPrice -= price;
+      comboListData.setComboIdList(
+        comboListData.comboIdList.filter((i) => i !== id)
+      );
     }
-    setTotalComboPrice(tempTotalPrice);
     comboListData.updateTotalComboPrice(tempTotalPrice);
   };
-
-  const totalPrice = useMemo(() => {
-    return comboListData.initialPrice + totalComboPrice;
-  }, [comboListData.initialPrice, totalComboPrice]);
 
   return (
     <div className="align-middle grid grid-cols-5 gap-5">
@@ -289,7 +290,9 @@ const ComboList = (comboListData: ComboListProps) => {
         <div className="my-5 min-w-40">
           <Flex vertical gap="small">
             <div className="font-semibold">Tổng cộng:</div>
-            <div className="text-xl">{priceIndex(totalPrice)}</div>
+            <div className="text-xl">
+              {priceIndex(comboListData.totalPrice)}
+            </div>
             <Button type="primary" danger block size="large">
               Mua ngay
             </Button>

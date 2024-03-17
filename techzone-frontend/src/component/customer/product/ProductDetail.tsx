@@ -1,27 +1,24 @@
 "use client";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Badge,
-  Button,
   Descriptions,
   DescriptionsProps,
   Divider,
   Flex,
   FloatButton,
-  InputNumber,
   List,
-  Modal,
   Progress,
   Rate,
-  Spin,
+  Skeleton,
   Tabs,
-  Tag,
 } from "antd";
 import ReviewList from "./ReviewList";
 import FloatingCartForm from "./FloatingCartForm";
 import { GiShoppingCart } from "react-icons/gi";
 import ComboList from "./ComboList";
-import { ProductDetailType } from "@/model/ProductType";
+import Link from "next/link";
+import CartSummaryModal from "./ProductSummaryModal";
 
 export default function ProductDetail() {
   const productInfo = {
@@ -55,6 +52,8 @@ export default function ProductDetail() {
   };
 
   const items: DescriptionsProps["items"] = [
+    // key can be index, label is title, children is content
+    // TODO: make span configurable?
     {
       key: "1",
       label: "Product",
@@ -168,7 +167,7 @@ export default function ProductDetail() {
           </Flex>
 
           <div className="font-light pb-5">(10 đánh giá)</div>
-
+          {/* overview */}
           <Flex vertical gap="small" style={{ width: 300 }}>
             <Flex gap="small">
               <Rate
@@ -221,6 +220,7 @@ export default function ProductDetail() {
               </Flex>
             </Flex>
           </Flex>
+
           <div className="font-bold pt-5 text-lg">TechZone Assistant 🤖</div>
 
           <div className="font-semibold pt-5">
@@ -242,40 +242,23 @@ export default function ProductDetail() {
   const [mainImage, setMainImage] = useState(productInfo.images[0].url);
 
   // price
-  // initial price before adding the combo price
-  const [initialPrice, setInitialPrice] = useState(productInfo.finalPrice);
+  // number of main item
+  const [numberOfItem, setNumberOfItem] = useState(1);
 
   // total combo price
   const [totalComboPrice, setTotalComboPrice] = useState(0);
 
   // combo id list
-  const [comboIdList, setComboIdList] = useState<string[]>([]);
+  const [comboIdList, setComboIdList] = useState<Array<string>>([]);
+
+  const totalPrice = useMemo(() => {
+    return numberOfItem * productInfo.finalPrice + totalComboPrice;
+  }, [totalComboPrice, numberOfItem]);
 
   // modal
-  const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
-  const [confirmLoading, setConfirmLoading] = useState(false);
-  const [modalText, setModalText] = useState(<>Estimated price: 0</>);
   const showModal = () => {
     setOpen(true);
-  };
-  const handleOk = () => {
-    setModalText(
-      <Flex gap="small">
-        <Spin />
-        Adding to cart...
-      </Flex>
-    );
-    setConfirmLoading(true);
-    setTimeout(() => {
-      setOpen(false);
-      setConfirmLoading(false);
-      setModalText(<>Add to cart?</>);
-    }, 2000);
-  };
-  const handleCancel = () => {
-    console.log("Clicked cancel button");
-    setOpen(false);
   };
 
   return (
@@ -314,12 +297,25 @@ export default function ProductDetail() {
             </div>
           </Flex>
           {/* desc */}
+
           <div className="p-4">
+            {productInfo._id == null && <Skeleton active />}
+
+            <div className="text-sm">
+              Thương hiệu / Shop:{" "}
+              <Link href="" className="text-blue-500">
+                Ecovacs
+              </Link>
+            </div>
+
             <div className="font-bold uppercase text-lg">
               {productInfo.name}
             </div>
 
-            <Flex gap="small">
+            <Flex
+              gap="small"
+              style={{ lineHeight: 2, marginTop: 2, alignContent: "center" }}
+            >
               <Rate
                 disabled
                 allowHalf
@@ -329,6 +325,12 @@ export default function ProductDetail() {
               <div className="font-bold uppercase text-xl">
                 {productInfo.avgRating}
               </div>
+              <div className="text-xs font-light mt-2">(10 đánh giá)</div>
+              <Divider
+                type="vertical"
+                style={{ height: "auto", border: "0.25px solid silver" }}
+              />
+              <div className="font-light">Đã bán 5000+</div>
             </Flex>
 
             <div className="flex flex-row gap-3 my-2">
@@ -355,17 +357,15 @@ export default function ProductDetail() {
             </Tag> */}
             {/* sub category tags */}
 
-            <div className="font-bold pt-5">TechZone Assistant 🤖</div>
-
-            <div className="font-semibold pt-5">
-              Tổng quan đánh giá khách hàng:
-            </div>
-            <div className="pt-2 text-xs max-w-lg">
-              Tổng thể, iRobot Roomba 980 là một sự lựa chọn tốt cho người tiêu
-              dùng muốn đầu tư vào một robot hút bụi thông minh và hiệu quả. Với
-              hiệu suất hút bụi mạnh mẽ, tính năng thông minh và khả năng vận
-              hành linh hoạt, Roomba 980 sẽ giúp giảm bớt công việc lau chùi và
-              mang lại một không gian sống sạch sẽ hơn.
+            <div className="flex flex-col gap-3">
+              <div className="font-semibold pt-5">Dịch vụ bổ sung</div>
+              {/* add Link later if use */}
+              <div className="bg-white shadow-md max-w-1/4 h-fit p-4 cursor-pointer">
+                Thay đổi Thông tin vận chuyển
+              </div>
+              <div className="bg-white shadow-md max-w-1/4 h-fit p-4 cursor-pointer">
+                Ưu đãi, mã giảm giá
+              </div>
             </div>
           </div>
         </div>
@@ -375,10 +375,13 @@ export default function ProductDetail() {
         </div>
 
         <ComboList
-          initialPrice={initialPrice}
+          totalPrice={totalPrice}
+          totalComboPrice={totalComboPrice}
           updateTotalComboPrice={(price) => {
             setTotalComboPrice(price);
           }}
+          comboIdList={comboIdList}
+          setComboIdList={setComboIdList}
         />
 
         {/* tabs, descriptions and review summary */}
@@ -399,13 +402,10 @@ export default function ProductDetail() {
       </div>
       <div className="col-span-3 my-10 lg:col-span-2">
         <FloatingCartForm
-          mainProductId={productInfo._id}
-          mainProductPrice={productInfo.finalPrice}
-          comboIdList={comboIdList}
-          totalComboPrice={totalComboPrice}
-          updateInitialPrice={(price) => {
-            setInitialPrice(price);
-          }}
+          handleCartDetail={setOpen}
+          numberOfItem={numberOfItem}
+          updateItemNumber={setNumberOfItem}
+          totalPrice={totalPrice}
         />
       </div>
       <div className="col-span-5 lg:col-span-6">
@@ -417,53 +417,23 @@ export default function ProductDetail() {
         <FloatButton.Group>
           <FloatButton
             icon={<GiShoppingCart />}
-            tooltip={<div>Add to Cart</div>}
-            badge={{ count: 23, overflowCount: 999 }}
+            tooltip={<div>Xem chi tiết</div>}
+            // badge={{ count: 23, overflowCount: 999 }}
             onClick={showModal}
           />
           <FloatButton.BackTop tooltip={<div>Move to Top</div>} />
         </FloatButton.Group>
 
-        <Modal
+        <CartSummaryModal
           open={open}
-          title="Cart Details"
-          onOk={handleOk}
-          confirmLoading={confirmLoading}
-          onCancel={handleCancel}
-          footer={[
-            <Button key="back" onClick={handleCancel}>
-              Return
-            </Button>,
-            <Button
-              key="submit"
-              // type="primary"
-              loading={loading}
-              onClick={handleOk}
-            >
-              Add to Cart
-            </Button>,
-            <Button
-              key="link"
-              href="https://google.com"
-              type="primary"
-              loading={loading}
-              onClick={handleOk}
-            >
-              Move to Checkout
-            </Button>,
-          ]}
-        >
-          {/* put cart summary here? */}
-
-          <InputNumber
-            min={0}
-            max={999}
-            defaultValue={0}
-            // onChange={onChange}
-            changeOnWheel
-          />
-          <p>{modalText}</p>
-        </Modal>
+          setOpen={setOpen}
+          totalPrice={totalPrice}
+          mainProductId={productInfo._id}
+          mainProductPrice={productInfo.finalPrice}
+          numberOfItem={numberOfItem}
+          comboIdList={comboIdList}
+          totalComboPrice={totalComboPrice}
+        />
       </div>
     </div>
   );
