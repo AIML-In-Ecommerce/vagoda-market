@@ -17,6 +17,9 @@ import {
 } from "antd";
 import Link from "next/link";
 import { priceIndex } from "@/component/customer/product/ProductDetail";
+import ImageForm from "./ImageForm";
+import DescriptionForm from "./DescriptionForm";
+import OverviewForm from "./OverviewForm";
 // import ReviewList from "./ReviewList";
 // import ComboList from "./ComboList";
 
@@ -238,9 +241,6 @@ export default function SellerProductDetail() {
     },
   ];
 
-  // images
-  const [mainImage, setMainImage] = useState(productInfo.images[0].url);
-
   // combo
   const [combo, setCombo] = useState([]);
 
@@ -251,162 +251,86 @@ export default function SellerProductDetail() {
   // };
 
   // toggle edit mode
-  const [editableImage, setEditableImage] = useState(false);
-  const [editableOverview, setEditableOverview] = useState(false);
-  const [editableCombo, setEditableCombo] = useState(false);
-  const [editableDescription, setEditableDescription] = useState(false);
+  const [editable, setEditable] = useState(false);
 
   const [currentEditMode, setCurrentEditMode] = useState("");
-
-  // display UI elements that are not editable
-  const [visible, setVisible] = useState(true);
 
   // methods
   const edit = (mode: string) => {
     setCurrentEditMode(mode);
-    setVisible(false);
-
-    switch (mode) {
-      case "image":
-        setEditableImage(true);
-      case "overview":
-        setEditableOverview(true);
-      case "combo":
-        setEditableCombo(true);
-      case "description":
-        setEditableDescription(true);
-    }
+    setEditable(true);
   };
 
   const save = () => {
     switch (currentEditMode) {
       case "image":
-      //save
-      case "overview":
-      //save
+        //save
 
+        break;
+      case "overview":
+        //save
+
+        break;
       case "combo":
-      //save
+        //save
+
+        break;
       case "description":
-      //save
+        //save
+
+        break;
+      default:
+        break;
     }
 
+    setEditable(false);
     setCurrentEditMode("");
-    setVisible(true);
   };
 
+  const cancel = () => {
+    setEditable(false);
+    //create method to clear data?
+
+    // switch (currentEditMode) {
+    //   case "image":
+    //     break;
+    //   case "overview":
+    //     break;
+    //   case "combo":
+    //     break;
+    //   case "description":
+    //     break;
+    //   default:
+    //     break;
+    // }
+    setCurrentEditMode("");
+  };
   return (
     <div className="justify-between mx-10 lg:mx-20 gap-10 grid grid-cols-8">
       <div className="col-span-5 lg:col-span-6">
         {/* about product */}
         <div className="bg-white shadow-md flex lg:flex-row md:flex-row flex-col my-10">
-          <Flex vertical>
-            <div className="bg-white shadow-md max-w-1/4 h-fit p-4">
-              <img
-                className="h-80 w-80 object-contain"
-                src={mainImage}
-                alt={productInfo.name}
-              />
-            </div>
+          {/* image */}
+          <ImageForm
+            editable={editable}
+            currentEditMode={currentEditMode}
+            images={productInfo.images}
+            name={productInfo.name}
+          />
 
-            <div className="m-2">
-              <List
-                grid={{ gutter: 16, column: 4 }}
-                dataSource={productInfo.images}
-                renderItem={(item) => (
-                  <List.Item>
-                    <div
-                      className="cursor-pointer border-2"
-                      onClick={() => setMainImage(item.url)}
-                    >
-                      <img
-                        className="h-14 w-full object-contain"
-                        src={item.url}
-                        alt={item.url}
-                      />
-                    </div>
-                  </List.Item>
-                )}
-              />
-            </div>
-          </Flex>
           {/* desc */}
-
-          <div className="p-4">
-            {productInfo._id == null && <Skeleton active />}
-
-            {/* visible? */}
-            <div className="text-sm">
-              Thương hiệu / Shop:{" "}
-              <Link href="" className="text-blue-500">
-                Ecovacs
-              </Link>
-            </div>
-
-            <div className="font-bold uppercase text-lg">
-              {productInfo.name}
-            </div>
-
-            {visible == true && (
-              <Flex
-                gap="small"
-                style={{ lineHeight: 2, marginTop: 2, alignContent: "center" }}
-              >
-                <Rate
-                  disabled
-                  allowHalf
-                  defaultValue={4.5}
-                  style={{ padding: 5 }}
-                />
-                <div className="font-bold uppercase text-xl">
-                  {productInfo.avgRating}
-                </div>
-                <div className="text-xs font-light mt-2">(10 đánh giá)</div>
-                <Divider
-                  type="vertical"
-                  style={{ height: "auto", border: "0.25px solid silver" }}
-                />
-                <div className="font-light">Đã bán 5000+</div>
-              </Flex>
-            )}
-
-            <div className="flex flex-row gap-3 my-2">
-              <div className="line-through text-gray-600 uppercase text-xl md:text-2xl lg:text-2xl">
-                {/* {productInfo.originalPrice} Đ */}
-                {priceIndex(productInfo.originalPrice)}
-              </div>
-              <div className="font-bold text-red-500 uppercase text-xl md:text-2xl lg:text-2xl">
-                {priceIndex(productInfo.finalPrice)}
-              </div>
-              <div className="text-red-500 uppercase text-xs mt-1">-50%</div>
-            </div>
-            {/* sub category tags */}
-            {/* <div className="capitalize text-xs mt-5">Sub-category:</div>
-            <Tag>
-              <a href="https://github.com/ant-design/ant-design/issues/1862">
-                Điện máy - Điện gia dụng
-              </a>
-            </Tag>
-            <Tag>
-              <a href="https://github.com/ant-design/ant-design/issues/1862">
-                Thiết bị văn phòng
-              </a>
-            </Tag> */}
-            {/* sub category tags */}
-
-            {visible == true && (
-              <div className="flex flex-col gap-3">
-                <div className="font-semibold pt-5">Dịch vụ bổ sung</div>
-                {/* add Link later if use */}
-                <div className="bg-white shadow-md max-w-1/4 h-fit p-4">
-                  Thay đổi Thông tin vận chuyển
-                </div>
-                <div className="bg-white shadow-md max-w-1/4 h-fit p-4">
-                  Ưu đãi, mã giảm giá
-                </div>
-              </div>
-            )}
-          </div>
+          {(productInfo._id == null && (
+            <Skeleton active style={{ margin: 10 }} />
+          )) || (
+            <OverviewForm
+              editable={editable}
+              currentEditMode={currentEditMode}
+              name={productInfo.name}
+              avgRating={productInfo.avgRating}
+              originalPrice={productInfo.originalPrice}
+              finalPrice={productInfo.finalPrice}
+            />
+          )}
         </div>
         {/* related products to buy with  */}
         <div className="font-semibold px-5 text-md">
@@ -447,7 +371,7 @@ export default function SellerProductDetail() {
         </div>
       </div>
       <div className="bg-white shadow-md rounded-md h-fit col-span-3 lg:col-span-2 my-10">
-        {(visible == true && (
+        {(editable == false && (
           <Flex vertical gap="small">
             <div className="m-2 font-semibold"> Cập nhật </div>
 
@@ -474,14 +398,7 @@ export default function SellerProductDetail() {
             <Button type="primary" ghost block onClick={() => save()}>
               Lưu thay đổi
             </Button>
-            <Button
-              type="primary"
-              danger
-              ghost
-              block
-              onClick={() => setVisible(true)}
-              //create method to clear data?
-            >
+            <Button type="primary" danger ghost block onClick={() => cancel()}>
               Hủy thay đổi
             </Button>
           </Flex>
