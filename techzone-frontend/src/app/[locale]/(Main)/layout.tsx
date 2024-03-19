@@ -7,6 +7,7 @@ import { ReactNode } from "react";
 import { NextIntlClientProvider, useMessages } from "next-intl";
 import Navbar from "@/component/customer/Navbar";
 import CategoryDrawer from "@/component/user/utils/CategoryDrawer";
+import WebFooter from "@/component/user/WebFooter";
 // import UserLayout from "@/component/UserLayout";
 
 interface RootLayoutProps {
@@ -41,6 +42,7 @@ export default function RootLayout({
             {children}
           </div>
         </NextIntlClientProvider>
+        <WebFooter />
       </body>
     </html>
   );

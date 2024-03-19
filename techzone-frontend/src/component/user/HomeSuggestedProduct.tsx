@@ -602,7 +602,8 @@ export default function HomeSuggestedProduct({}: HomeSuggestedProductProps)
                 <div className="w-11/12">
                     <div className="invisible h-10 w-full">
                     </div>
-                    <Card className="w-full">
+                    {/* <Card className="w-full"> */}
+                    <div className="w-full">
                         <Flex className="w-full mb-4" align="center">
                             <Typography.Text className="text-3xl font-semibold w-full">
                                 Sản phẩm bạn có thể thích
@@ -627,7 +628,8 @@ export default function HomeSuggestedProduct({}: HomeSuggestedProductProps)
                         >
                             {productDisplay()}
                         </Carousel>
-                    </Card>
+                    </div>
+                    {/* </Card> */}
                     <div className="invisible h-10 w-full">
                     </div>
                 </div>

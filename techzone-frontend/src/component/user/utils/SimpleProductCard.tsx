@@ -44,7 +44,7 @@ export default function SimpleProductCard({info}:SimpleProductCardProps)
                         info.originalPrice !== undefined && info.originalPrice != null && info.originalPrice > 0?
                         <Typography.Text style={{borderTopLeftRadius: "25px", borderBottomLeftRadius: "25px"}} 
                             className="text-base bg-orange-500 w-1/4 text-center">
-                            {calculateDiscountPercentage(info.originalPrice, info.finalPrice)}%
+                            -{calculateDiscountPercentage(info.originalPrice, info.finalPrice)}%
                         </Typography.Text>:
                         <Typography.Text className="invisible">
                             No discount

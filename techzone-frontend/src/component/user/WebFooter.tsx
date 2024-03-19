@@ -1,9 +1,28 @@
 'use client'
 
+import { Flex, Image, Skeleton, Typography } from "antd"
+import Link from "next/link"
+import { useEffect, useState } from "react"
+
 
 interface WebFooterProps
 {
 
+}
+
+interface ServiceInfoTypeProps
+{
+    _id: string,
+    name: string,
+    child: ServiceInfoProps[]
+}
+
+interface ServiceInfoProps
+{
+    _id: string,
+    name: string,
+    link: string,
+    icon: string
 }
 
 const ServiceInfoTypeMockData = 
@@ -164,19 +183,19 @@ const ServiceInfoMockData =
         _id: "si-19",
         name: "Facebook TechZone",
         link: "#",
-        icon: "facebook.256x256.png"
+        icon: "@/asset/facebook.256x256.png"
     },
     {
         _id: "si-20",
         name: "TechZone Media",
         link: "#",
-        icon: "youtube.256x256.png"
+        icon: "\asset\youtube.256x180.png"
     },
     {
         _id: "si-21",
         name: "TechZone gmail",
         link: "#",
-        icon: "google.256x256.png"
+        icon: "@/asset/google.256x256.png"
     },
     {
         _id: "si-22",
@@ -212,9 +231,123 @@ const PaymentMethodMockData =
 export default function WebFooter({}: WebFooterProps)
 {
 
+    const [supportServices, setSupportService] = useState<ServiceInfoTypeProps[]>([])
+    const [supportPayments, setSupportPayments] = useState([])
+
+    useEffect(() =>
+    {
+        //fetch data here
+
+        //for testing
+
+        const ServiceInfoMap = new Map()
+        ServiceInfoMockData.forEach((value) =>
+        {
+            ServiceInfoMap.set(value._id, value)
+        })
+
+        const data = ServiceInfoTypeMockData.map((value) =>
+        {
+            const serviceInfos = value.child.map((valueId) =>
+            {
+                const value = ServiceInfoMap.get(valueId)
+                const item: ServiceInfoProps = {
+                    _id: value._id,
+                    name: value.name,
+                    link: value.link,
+                    icon: value.icon
+                }
+
+                return item;
+            }) 
+
+            const item: ServiceInfoTypeProps = 
+            {
+                _id: value._id,
+                name: value.name,
+                child: serviceInfos
+            }
+
+            return item;
+        })
+
+        setSupportService(data)
+    },
+    [])
+
+    useEffect(() =>
+    {
+
+    },
+    [])
+
+    const SupportServicesDisplay = supportServices.length < 1 ? <Skeleton active />:
+    <>
+        <Flex className="w-11/12" justify={"space-evenly"} align="start">
+            {
+                supportServices.map((value: ServiceInfoTypeProps) =>
+                {
+                    const childDisplay = value.child.map((item: ServiceInfoProps) =>
+                    {
+
+                        return(
+                            <Link key={item._id} href={item.link} prefetch={false}>
+                                <Typography.Text className="no-underline text-sm hover:text-blue-500">
+                                    {item.icon.length > 0 ? <Image className="mr-1" src={item.icon} preview={false}/> : <></>}
+                                    {item.name}
+                                </Typography.Text>
+                            </Link>
+                        )
+                    })
+
+                    return(
+                        <Flex key={value._id} vertical justify="center" align="start">
+                            <Typography.Text className="text-blue-800 mb-1 font-semibold">
+                                {value.name}
+                            </Typography.Text>
+                            {childDisplay}
+                        </Flex>
+                    )
+                })
+            }
+        </Flex>
+    </>
+
     return(
         <>
-
+            <div className="w-full h-0.5 invisible">
+                hidden block
+            </div>
+            <div className="w-full">
+                <div className="bg-blue-800 h-0.5"></div>
+                <div className="w-full h-7 invisible">
+                    hidden block
+                </div>
+                <Flex justify="center" align="center" className="w-full">
+                    {
+                        SupportServicesDisplay
+                    }
+                </Flex>
+                <div className="w-full h-7 invisible">
+                    hidden block
+                </div>
+                <div className="w-full flex justify-evenly items-center">
+                    <Flex justify="center" className="w-1/2">
+                        <Image src={"@asset/logo.png"} />
+                        <Typography.Text className="text-grey-300 text-base">
+                            CÔNG TY CỔ PHẦN THƯƠNG MẠI - DỊCH VỤ TECHZONE
+                        </Typography.Text>
+                    </Flex>
+                    <Flex vertical justify="center" className="w-1/2">
+                        <Typography.Text className="text-black font-semibold text-sm">
+                            Địa chỉ trụ sở chính:
+                        </Typography.Text>
+                        <Typography.Text className="text-grey-200 text-sm">
+                            227 Đ.Nguyễn Văn Cừ, Phường 4, quận 5, thành phố Hồ Chí Minh
+                        </Typography.Text>
+                    </Flex>
+                </div>
+            </div>
         </>
     )
 }
