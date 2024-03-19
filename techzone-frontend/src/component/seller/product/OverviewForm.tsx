@@ -1,8 +1,7 @@
 "use client";
-import { Avatar, Button, Divider, Flex, InputNumber, Rate } from "antd";
+import { Divider, Flex, Rate } from "antd";
 // import { useTranslations } from "next-intl";
-import { AntDesignOutlined } from "@ant-design/icons";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { priceIndex } from "@/component/customer/product/ProductDetail";
 import Link from "next/link";
 

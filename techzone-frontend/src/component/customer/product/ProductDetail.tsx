@@ -265,11 +265,11 @@ export default function ProductDetail() {
     <div className="justify-between mx-10 lg:mx-20 gap-10 grid grid-cols-8">
       <div className="col-span-5 lg:col-span-6">
         {/* about product */}
-        <div className="bg-white shadow-md flex lg:flex-row md:flex-row flex-col my-10">
+        <div className="bg-white shadow-md flex lg:flex-row flex-col my-10">
           <Flex vertical>
-            <div className="bg-white shadow-md max-w-1/4 h-fit p-4">
+            <div className="bg-white shadow-md max-w-1/2 h-fit p-4">
               <img
-                className="h-80 w-80 object-contain"
+                className="h-[500px] w-[500px] object-contain"
                 src={mainImage}
                 alt={productInfo.name}
               />
@@ -357,16 +357,16 @@ export default function ProductDetail() {
             </Tag> */}
             {/* sub category tags */}
 
-            <div className="flex flex-col gap-3">
+            {/* add Link later if use */}
+            {/* <div className="flex flex-col gap-3">
               <div className="font-semibold pt-5">Dịch vụ bổ sung</div>
-              {/* add Link later if use */}
               <div className="bg-white shadow-md max-w-1/4 h-fit p-4 cursor-pointer">
                 Thay đổi Thông tin vận chuyển
               </div>
               <div className="bg-white shadow-md max-w-1/4 h-fit p-4 cursor-pointer">
                 Ưu đãi, mã giảm giá
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
         {/* related products to buy with  */}

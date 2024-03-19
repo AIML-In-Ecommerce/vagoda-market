@@ -63,7 +63,6 @@ const Review = (review: ReviewType) => {
           {review.desc}
         </div>
         <div className="col-span-3 flex flex-row gap-10 text-xs">
-          <div>Màu: Xanh Dương</div>
           <div>{review.createdAt}</div>
           <div>{review.useTime}</div>
         </div>

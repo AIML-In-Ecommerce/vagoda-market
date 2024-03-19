@@ -9,16 +9,12 @@ import {
   Empty,
   Flex,
   FloatButton,
-  List,
   Progress,
   Rate,
   Skeleton,
   Tabs,
 } from "antd";
-import Link from "next/link";
-import { priceIndex } from "@/component/customer/product/ProductDetail";
 import ImageForm from "./ImageForm";
-import DescriptionForm from "./DescriptionForm";
 import OverviewForm from "./OverviewForm";
 // import ReviewList from "./ReviewList";
 // import ComboList from "./ComboList";

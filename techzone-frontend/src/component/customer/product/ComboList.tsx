@@ -238,7 +238,7 @@ const ComboList = (comboListData: ComboListProps) => {
   };
 
   return (
-    <div className="align-middle grid grid-cols-5 gap-5">
+    <div>
       {combo.length == 0 && (
         <Empty
           image={Empty.PRESENTED_IMAGE_SIMPLE}
@@ -247,7 +247,7 @@ const ComboList = (comboListData: ComboListProps) => {
       )}
 
       {combo.length > 0 && (
-        <div>
+        <div className="align-middle grid grid-cols-5 gap-5">
           <div className="lg:col-span-4 col-span-5">
             {/* pagination */}
             {/* <Flex vertical>
@@ -297,7 +297,7 @@ const ComboList = (comboListData: ComboListProps) => {
           </div>
 
           <div className="col-span-1 lg:col-start-5 lg:col-end-6 md:col-start-1 sm:col-start-1">
-            <div className="my-5 min-w-40">
+            <div className="mx-5 my-10 min-w-32">
               <Flex vertical gap="small">
                 <div className="font-semibold">Tổng cộng:</div>
                 <div className="text-xl">
