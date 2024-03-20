@@ -24,7 +24,7 @@ const OverviewForm = (formData: FormProps) => {
   }, [formData.editable, formData.currentEditMode]);
 
   return (
-    <div className="p-4">
+    <div className="p-4 min-w-[450px]">
       {/* visible? */}
       <div className="text-sm">
         Thương hiệu / Shop:{" "}

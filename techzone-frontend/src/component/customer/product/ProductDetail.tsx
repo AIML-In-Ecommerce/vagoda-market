@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Badge,
   Descriptions,
@@ -19,6 +19,7 @@ import { GiShoppingCart } from "react-icons/gi";
 import ComboList from "./ComboList";
 import Link from "next/link";
 import CartSummaryModal from "./ProductSummaryModal";
+import ReactImageMagnify from "react-image-magnify";
 
 export default function ProductDetail() {
   const productInfo = {
@@ -38,13 +39,31 @@ export default function ProductDetail() {
         url: "https://i.insider.com/5f835d4ebab422001979aaeb",
       },
       {
-        url: "https://bizweb.dktcdn.net/thumb/medium/100/391/225/products/t8max-1.jpg?v=1598201886260",
+        url: "https://robothutbuisky.com/wp-content/uploads/2020/06/t8-max-100-1.jpg?v=1677693356",
       },
       {
         url: "https://product.hstatic.net/200000805527/product/z3994157810128_ac5e199adba96c46d6d7282b2bfdcdc5-scaled_843ed368395649f6a68bc7c08dd20524_master.jpg",
       },
       {
         url: "https://product.hstatic.net/200000805527/product/z3994157835398_2b54a80e46f44a6d57b7a7500a87e49e-scaled_37202a4918fa4f03a6e275b8312f0587_master.jpg",
+      },
+      {
+        url: "",
+      },
+      {
+        url: "",
+      },
+      {
+        url: "",
+      },
+      {
+        url: "",
+      },
+      {
+        url: "",
+      },
+      {
+        url: "",
       },
     ],
     avgRating: 4.5,
@@ -239,7 +258,31 @@ export default function ProductDetail() {
   ];
 
   // images
+  type ImageInfoType = {
+    width: number;
+    height: number;
+  };
+
   const [mainImage, setMainImage] = useState(productInfo.images[0].url);
+  const [mainImageInfo, setMainImageInfo] = useState<ImageInfoType>({
+    width: 0,
+    height: 0,
+  });
+
+  useEffect(() => {
+    function getMeta(url: string, callback: any) {
+      const img = new Image();
+      img.src = url;
+      img.onload = function () {
+        callback(img.width, img.height);
+      };
+    }
+    getMeta(mainImage, (width: number, height: number) => {
+      // alert(width + "px " + height + "px");
+      let imageInfo = { width, height };
+      setMainImageInfo(imageInfo);
+    });
+  }, [mainImage]);
 
   // price
   // number of main item
@@ -262,28 +305,26 @@ export default function ProductDetail() {
   };
 
   return (
-    <div className="justify-between mx-10 lg:mx-20 gap-10 grid grid-cols-8">
+    <div className="justify-between mx-10 lg:mx-20 gap-10 grid grid-cols-8 h-fit pb-10">
       <div className="col-span-5 lg:col-span-6">
         {/* about product */}
         <div className="bg-white shadow-md flex lg:flex-row flex-col my-10">
           <Flex vertical>
-            <div className="bg-white shadow-md max-w-1/2 h-fit p-4">
-              <img
-                className="h-[500px] w-[500px] object-contain"
-                src={mainImage}
-                alt={productInfo.name}
-              />
-            </div>
-
             <div className="m-2">
               <List
-                grid={{ gutter: 16, column: 4 }}
+                grid={{ gutter: 16, column: 5 }}
                 dataSource={productInfo.images}
                 renderItem={(item) => (
                   <List.Item>
                     <div
-                      className="cursor-pointer border-2"
-                      onClick={() => setMainImage(item.url)}
+                      className={`cursor-pointer ${
+                        mainImage == item.url
+                          ? "border-4 border-blue-400"
+                          : "border-2"
+                      }`}
+                      onClick={() => {
+                        setMainImage(item.url);
+                      }}
                     >
                       <img
                         className="h-14 w-full object-contain"
@@ -295,10 +336,51 @@ export default function ProductDetail() {
                 )}
               />
             </div>
+
+            <div className="bg-white h-fit shadow-md p-4 z-50">
+              {/* <img
+                className="h-[500px] w-[500px] object-contain"
+                src={mainImage}
+                alt={productInfo.name}
+              /> */}
+
+              <ReactImageMagnify
+                {...{
+                  smallImage: {
+                    alt: productInfo.name,
+                    isFluidWidth: true,
+                    width: 500,
+                    height: 500,
+                    src: mainImage,
+                    // src: mainImage + "?width=500&height=500",
+                  },
+                  largeImage: {
+                    src: mainImage,
+                    // width: mainImageInfo.width * 0.8,
+                    // height: mainImageInfo.height * 0.8,
+                    width: mainImageInfo.width,
+                    height: mainImageInfo.height,
+                  },
+                  enlargedImageContainerDimensions: {
+                    // width: "160%",
+                    // height: "120%",
+                    width: "200%",
+                    height: "100%",
+                  },
+                  isHintEnabled: true,
+                  // Hover to Zoom
+                  hintTextMouse: "Trỏ để phóng to",
+                  shouldHideHintAfterFirstActivation: false,
+                  // imageClassName: "max-w-[550px]",
+                  // enlargedImageContainerClassName:
+                  //   "h-[500px] w-[500px] object-fill",
+                }}
+              />
+            </div>
           </Flex>
           {/* desc */}
 
-          <div className="p-4">
+          <div className="p-4 min-w-[450px]">
             {productInfo._id == null && <Skeleton active />}
 
             <div className="text-sm">
@@ -367,6 +449,17 @@ export default function ProductDetail() {
                 Ưu đãi, mã giảm giá
               </div>
             </div> */}
+
+            <div className="grid grid-cols-4">
+              <div className="col-span-1 col-start-1 font-bold pt-5">
+                Tình trạng:{" "}
+              </div>
+              <div className="col-span-1 col-start-2 pt-5">Còn hàng</div>
+              <div className="col-span-1 col-start-1 font-bold pt-5">
+                Số lượng:{" "}
+              </div>
+              <div className="col-span-1 col-start-2 pt-5">124332</div>
+            </div>
           </div>
         </div>
         {/* related products to buy with  */}

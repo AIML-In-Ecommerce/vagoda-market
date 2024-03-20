@@ -1,5 +1,5 @@
 "use client";
-import { Avatar, Flex, Rate } from "antd";
+import { Avatar, Button, Flex, Rate } from "antd";
 // import { useTranslations } from "next-intl";
 import CommentContainer from "./comment/CommentContainer";
 import { ReviewType } from "@/model/ReviewType";
@@ -59,10 +59,15 @@ const Review = (review: ReviewType) => {
               <div className="font-bold ">Cực kì hài lòng</div>
             )}
           </Flex>
-          <b>Góp ý: </b>
           {review.desc}
         </div>
-        <div className="col-span-3 flex flex-row gap-10 text-xs">
+        <div className="col-span-1 flex flex-col gap-2">
+          <Button type="primary" ghost>
+            Hữu ích
+          </Button>
+          <Button danger>Báo cáo</Button>
+        </div>
+        <div className="col-start-2 col-span-3 flex flex-row gap-10 text-xs">
           <div>{review.createdAt}</div>
           <div>{review.useTime}</div>
         </div>
