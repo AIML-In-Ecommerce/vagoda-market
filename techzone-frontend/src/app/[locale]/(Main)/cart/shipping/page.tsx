@@ -1,40 +1,37 @@
 "use client";
-import { Button, Card, Checkbox, CheckboxProps, Divider, Input, Radio, RadioChangeEvent, Select, Space, Form } from "antd";
-import TextArea from "antd/es/input/TextArea";
+import { Button, Card, Space } from "antd";
 import React, { useEffect, useState } from "react";
 import { FaPlus } from "react-icons/fa6"
 import { useRouter } from "next/navigation"
+import { AddressForm } from "@/component/customer/shipping/AddressForm";
+import { AddressType } from "@/model/AddressType";
 
-type Address = {
-    receiverName: string,
-    address: string,
-    phoneNumber: string,
-    addressType: string,
-    selectedAsDefault: boolean // is selected as default address
+//utils for testing process
+//source: https://stackoverflow.com/questions/6860853/generate-random-string-for-div-id
+function guidGenerator() {
+    var S4 = function () {
+        return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+    };
+    return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
 }
 
-const addressTypeOptions = [
-    { label: 'Nhà riêng / Chung cư', value: 'residential' },
-    { label: 'Cơ quan / Công ty', value: 'workplace' },
-];
-
-const getAddressTypeLabel = (value: string) => {
-    const addressType = addressTypeOptions.find(option => option.value === value);
-    return addressType ? addressType.label : '';
-};
 
 export default function ShippingAddressPage() {
-    const [formVisibility, setFormVisibility] = useState<boolean>(false)
-    const [address, setAddress] = useState<Address[]>([]);
-    const [addressType, setAddressType] = useState();
+    const [formVisibility, setFormVisibility] = useState<boolean>(false);
+    const [address, setAddress] = useState<AddressType[]>([]);
+    const [isEditMode, setIsEditMode] = useState<boolean>(false);
+    const [currentAddress, setCurrentAddress] = useState<AddressType | undefined>(undefined);
+
     const router = useRouter();
 
-    const onAddressTypeChange = (e: RadioChangeEvent) => {
-        console.log('radio checked', e.target.value);
-        setAddressType(e.target.value);
-    };
-    const onDefaultAddressChange: CheckboxProps['onChange'] = (e) => {
-        console.log('checkbox checked', e.target.checked);
+    const addressTypeOptions = [
+        { label: 'Nhà riêng / Chung cư', value: 'residential' },
+        { label: 'Cơ quan / Công ty', value: 'workplace' },
+    ];
+
+    const getAddressTypeLabel = (value: string) => {
+        const addressType = addressTypeOptions.find(option => option.value === value);
+        return addressType ? addressType.label : '';
     };
 
     //Scroll to the bottom of the screen when the user clicks on the "add address button"
@@ -44,11 +41,12 @@ export default function ShippingAddressPage() {
             top: document.body.scrollHeight,
             behavior: 'smooth',
         });
-    }, [formVisibility])
+    }, [formVisibility, currentAddress])
 
     const fetchAddress = async () => {
-        const userAddresses: Address[] = [
+        const userAddresses: AddressType[] = [
             {
+                _id: '1',
                 receiverName: 'Nguyễn Minh Quang',
                 address: "135B Trần Hưng Đạo, Phường Cầu Ông Lãnh, Quận 1, Hồ Chí Minh, Việt Nam",
                 phoneNumber: "0839994856",
@@ -56,6 +54,7 @@ export default function ShippingAddressPage() {
                 selectedAsDefault: true
             },
             {
+                _id: '2',
                 receiverName: 'Nguyễn Minh Quang',
                 address: "227, đường Nguyễn Văn Cừ, Phường 4, Quận 5, Hồ Chí Minh, Việt Nam",
                 phoneNumber: "0839994856",
@@ -63,6 +62,7 @@ export default function ShippingAddressPage() {
                 selectedAsDefault: false
             },
             {
+                _id: '3',
                 receiverName: 'Lê Hoàng Khanh Nguyên',
                 address: "106, đường Phạm Viết Chánh, Phường Nguyễn Cư Trinh, Quận 1, Hồ Chí Minh, Việt Nam",
                 phoneNumber: "0773969851",
@@ -73,9 +73,62 @@ export default function ShippingAddressPage() {
         setAddress(userAddresses);
     }
 
+    const handleSetDefaultShippingAddress = (_address: AddressType) => {
+        const updatedAddresses = address.map(item => {
+            if (item._id === _address._id) {
+                return { ...item, selectedAsDefault: true }
+            }
+            return { ...item, selectedAsDefault: false }
+        });
+        setAddress(updatedAddresses);
+    }
+
+    const handleCreateShippingAddress = (_address: AddressType | undefined) => {
+        if (!_address) return;
+        let new_id = guidGenerator();
+        let new_address: AddressType = { ..._address, _id: new_id }
+        let updatedAddress = address.slice();
+        updatedAddress.push(new_address)
+        setAddress(updatedAddress);
+
+        if (_address.selectedAsDefault === true) {
+            handleSetDefaultShippingAddress(_address)
+        }
+    }
+
+    const handleUpdateShippingAddress = (_address: AddressType | undefined) => {
+        if (!_address) return;
+
+        const updatedAddresses = address.map(item => {
+            if (item._id === _address._id) {
+                return { ..._address, _id: item._id };
+            }
+            return item;
+        });
+        setAddress(updatedAddresses);
+
+        if (_address.selectedAsDefault === true) {
+            handleSetDefaultShippingAddress(_address)
+        }
+
+        console.log("handleUpdateShippingAddress", _address);
+    }
+
+    const handleRemoveShippingAddress = (_id: string) => {
+        const updatedAddresses = address.filter(item => item._id !== _id);
+        setAddress(updatedAddresses);
+    }
+
+    const goToCartPage = (_address: AddressType) => {
+        localStorage.setItem('shippingAddress', JSON.stringify(_address));
+        router.push('/cart');
+    }
+
     useEffect(() => {
         fetchAddress();
     }, []);
+
+    
 
     return (
         <React.Fragment>
@@ -84,7 +137,7 @@ export default function ShippingAddressPage() {
                 <div className="text-base mb-10">Chọn địa chỉ giao hàng có sẵn bên dưới:</div>
                 <Space direction="vertical" size="middle" className="grid lg:grid-cols-2 grid-cols-1">
                     {
-                        address.map((item: Address) => {
+                        address.map((item: AddressType) => {
                             return (
                                 <Card size="small" className={item.selectedAsDefault ? `border-dashed border-green-600` : `border`}>
                                     <div className="flex flex-col relative">
@@ -101,13 +154,22 @@ export default function ShippingAddressPage() {
                                         }
                                         <div className="mt-3 flex flex-row space-x-5">
                                             <Button className="bg-sky-400 text-white font-semibold"
-                                                    onClick={() => router.push('/cart')}
+                                                onClick={() => goToCartPage(item)}
                                             >Giao đến địa chỉ này
                                             </Button>
-                                            <Button className="bg-slate-400 text-white border font-medium">Sửa</Button>
+                                            <Button className="bg-slate-400 text-white border font-medium"
+                                                onClick={() => {
+                                                    setIsEditMode(true);
+                                                    setCurrentAddress(item);
+                                                    console.log("Edit Mode", currentAddress);
+                                                    setFormVisibility(true);
+                                                }}>
+                                                Sửa
+                                            </Button>
                                             {
                                                 item.selectedAsDefault ? null :
-                                                    <Button className="bg-red-400 text-white border font-medium">Xóa</Button>
+                                                    <Button className="bg-red-400 text-white border font-medium"
+                                                    onClick={() => handleRemoveShippingAddress(item._id)}>Xóa</Button>
                                             }
                                         </div>
                                     </div>
@@ -121,51 +183,25 @@ export default function ShippingAddressPage() {
                     <Button
                         icon={<FaPlus />}
                         onClick={() => {
+                            setIsEditMode(false);
+                            setCurrentAddress(undefined);
+                            console.log("Create Address", currentAddress)
                             setFormVisibility(true);
                         }}
                         className="border-dashed border-gray-500">
                         Thêm địa chỉ giao hàng mới
                     </Button>
                 </div>
-                <div className={`my-10 bg-gray-100 border ${formVisibility ? 'transition duration-150 ease-in-out' : 'hidden'}`}>
-                    <div className="grid grid-cols-2 gap-4 lg:w-3/5 p-5 lg:p-0 mx-auto">
-                        <div className="mt-5 font-semibold self-center">Họ tên</div>
-                        <Input className="mt-5" placeholder="Nhập họ tên" />
-                        <div className="font-semibold self-center">Điện thoại di động</div>
-                        <Input placeholder="Nhập số điện thoại" />
-                        <div className="font-semibold self-center">Tỉnh/Thành phố</div>
-                        <Select placeholder="Chọn Tỉnh/Thành phố" />
-                        <div className="font-semibold self-center">Quận/Huyện</div>
-                        <Select placeholder="Chọn Quận/Huyện" />
-                        <div className="font-semibold self-center">Phường/Xã</div>
-                        <Select placeholder="Chọn Phường/Xã" />
-                        <div className="font-semibold self-center">Địa chỉ</div>
-                        <TextArea
-                            // showCount
-                            maxLength={100}
-                            // onChange={onChange}
-                            placeholder="Ví dụ: 227, đường Nguyễn Văn Cừ"
-                            style={{ height: 100, resize: 'none' }}
-                        />
-                        <div className="font-semibold self-center">Loại địa chỉ</div>
-                        <Radio.Group options={addressTypeOptions}
-                            onChange={onAddressTypeChange}
-                            value={addressType} />
-                        <Checkbox className="col-start-2"
-                            onChange={onDefaultAddressChange}>
-                            Sử dụng địa chỉ này làm mặc định
-                        </Checkbox>
-                        <div className="col-start-2 flex flex-row gap-5 mb-5">
-                            <Button className="bg-slate-400 text-white border font-medium"
-                                onClick={() => setFormVisibility(false)}>
-                                Hủy bỏ
-                            </Button>
-                            <Button className="bg-sky-400 text-white font-semibold">
-                                Lưu thông tin
-                            </Button>
-                        </div>
-                    </div>
-                </div>
+                {
+                    formVisibility ?
+                        <AddressForm
+                            setFormVisibility={setFormVisibility}
+                            isEditMode={isEditMode}
+                            currentAddress={currentAddress}
+                            handleCreate={handleCreateShippingAddress}
+                            handleUpdate={handleUpdateShippingAddress} />
+                        : <div></div>
+                }
             </div>
         </React.Fragment>
     )

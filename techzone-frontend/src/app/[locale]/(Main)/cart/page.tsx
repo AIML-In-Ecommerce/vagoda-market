@@ -7,8 +7,10 @@ import { TiTicket } from "react-icons/ti";
 import { Currency } from "@/component/user/utils/CurrencyDisplay";
 import { QuantityControl } from "@/component/user/utils/QuantityControl";
 import Link from "next/link";
+import { AddressType } from "@/model/AddressType";
+import { useRouter } from "next/navigation";
 
-interface DataType {
+type DataType = {
     key: React.Key;
     image: string;
     name: string;
@@ -49,6 +51,15 @@ export default function CartPage() {
     const [showDeleteManyModal, setShowDeleteManyModal] = useState(false);
     const [showPromotionModal, setShowPromotionModal] = useState(false);
     const promotion_help = "Áp dụng tối đa 1 Mã giảm giá Sản Phẩm và 1 Mã Vận Chuyển"
+    const [currentAddress, setCurrentAddress] = useState<AddressType>({
+        _id: '1',
+        receiverName: 'Nguyễn Minh Quang',
+        address: "135B Trần Hưng Đạo, Phường Cầu Ông Lãnh, Quận 1, Hồ Chí Minh, Việt Nam",
+        phoneNumber: "0839994856",
+        addressType: "residential",
+        selectedAsDefault: true
+    });
+    const router = useRouter();
 
     const handleShowDeleteOneModal = (key: any) => {
         setSelectedKey(key);
@@ -80,8 +91,6 @@ export default function CartPage() {
     const handleCancelPromotionModal = () => {
         setShowPromotionModal(false);
     }
-
-
 
     const fetchProducts = async () => {
         const data: DataType[] = [
@@ -291,16 +300,25 @@ export default function CartPage() {
         handleTotalPrice();
     }, [products, provisional, discount, total, selectedRowKeys])
 
+    useEffect(() => {
+        const storedAddress = localStorage.getItem('shippingAddress');
+        if (!storedAddress) return;
+        setCurrentAddress(JSON.parse(storedAddress) as AddressType);
+      }, []);
 
     const isEmpty = (quantity: number) => {
         return quantity === 0 ? true : false;
+    }
+
+    const goToShippingAddressPage = () => {
+        localStorage.setItem('shippingAddress', JSON.stringify(currentAddress));
     }
 
     return (
         <React.Fragment>
             <div className="container flex flex-col p-5 mx-auto">
                 <div className="text-xl font-bold">GIỎ HÀNG</div>
-                <div className="mt-5 flex lg:flex-row lg:grid lg:grid-cols-6 lg:gap-20 sm:flex-col">
+                <div className="mt-5 flex xs:flex-col sm:flex-col md:flex-col lg:flex-row lg:grid lg:grid-cols-6 space-x-20">
                     <div className="col-start-1 col-span-4 border rounded-lg lg:mb-0 mb-10">
                         <Table
                             rowSelection={{
@@ -319,25 +337,29 @@ export default function CartPage() {
                         />
                     </div>
 
-                    <div className="lg:col-start-5 lg:col-span-2 lg:w-10/12">
+                    <div className="col-start-1 lg:col-start-5 lg:col-span-2 lg:w-10/12">
                         <Affix offsetTop={top}>
                             <Space direction="vertical" size="middle" className="flex">
                                 <Card title={
                                     <div className="flex flex-row justify-between">
                                         <span className="text-slate-400 text-lg">Giao tới</span>
-                                        <Link className="text-sky-500 hover:text-blue-700 self-center" href={"/cart/shipping"}>
+                                        <Link className="text-sky-500 hover:text-blue-700 self-center" href={"/cart/shipping"}
+                                                onClick={goToShippingAddressPage}>
                                             Thay đổi
                                         </Link>
                                     </div>
                                 } size="small">
                                     <div className="flex flex-row font-bold space-x-5">
-                                        <p>NGUYỄN MINH QUANG</p>
+                                        <p className="lg:text-base text-sm uppercase">{currentAddress.receiverName}</p>
                                         <Divider type="vertical" style={{ height: "auto", border: "0.25px solid silver" }}></Divider>
-                                        <p className="mx-5">0839994855</p>
+                                        <p className="lg:text-base text-sm lg:mx-5">{currentAddress.phoneNumber}</p>
                                     </div>
                                     <div className="flex flex-row">
-                                        <span><Tag color="#87d068">Home</Tag></span>
-                                        <p className="mx-3 text-slate-500">135B Trần Hưng Đạo, Phường Cầu Ông Lãnh, Quận 1, Hồ Chí Minh</p>
+                                        {currentAddress.addressType === "residential" ?
+                                            <span><Tag color="#87d068">Nhà</Tag></span> :
+                                            <span><Tag color="#b168d0">Văn phòng</Tag></span>
+                                        }
+                                        <p className="mx-3 text-slate-500">{currentAddress.address}</p>
                                     </div>
                                 </Card>
                                 <Card size="small">
@@ -435,7 +457,7 @@ export default function CartPage() {
                 footer={null}
                 centered
             >
-                
+
             </Modal>
 
         </React.Fragment>
