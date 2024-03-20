@@ -1,10 +1,18 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Affix, Button, Card, Divider, InputNumber, Modal, Radio, Space, Table, Tag, Image, Flex } from 'antd';
+import { Affix, Button, Card, Divider, InputNumber, Modal, Radio, Space, Table, Tag, Image, Flex, Tooltip } from 'antd';
 import type { TableColumnsType } from 'antd';
-import { FaRegTrashCan, FaPlus, FaMinus, FaRegCircleQuestion } from "react-icons/fa6";
+import { FaRegTrashCan, FaRegCircleQuestion } from "react-icons/fa6";
+import { TiTicket } from "react-icons/ti";
+import { Currency } from "@/component/user/utils/CurrencyDisplay";
+import { QuantityControl } from "@/component/user/utils/QuantityControl";
+import Link from "next/link";
+import { AddressType } from "@/model/AddressType";
+import { useRouter } from "next/navigation";
+import TICKET_BG from "D:\\STUDY\\ĐỒ_ÁN_TỐT_NGHIỆP\\techzone-market\\techzone-frontend\\public\\asset\\coupon-png-206056.png"
+import LOGO from "D:\\STUDY\\ĐỒ_ÁN_TỐT_NGHIỆP\\techzone-market\\techzone-frontend\\public\\asset\\logo.png"
 
-interface DataType {
+type DataType = {
     key: React.Key;
     image: string;
     name: string;
@@ -13,19 +21,97 @@ interface DataType {
     final_price?: number;
 }
 
+enum DiscountType {
+    PERCENTAGE,
+    DIRECT_PRICE,
+}
 
-export default function Home() {
+type Promotion = {
+    _id: string,
+    name: string,
+    description: string
+    discountType: DiscountType
+    discountValue?: number
+    quantity: number
+    activeDate?: string
+    expiredDate?: string
+    // saleCategory: [ObjectId, ...]
+    createdAt?: string
+}
+
+const promotions: Promotion[] = [
+    {
+        _id: '1',
+        name: "Giảm 50% tối đa 100k",
+        description: "Áp dụng cho thanh toán qua ví điện tử MoMo",
+        discountType: DiscountType.PERCENTAGE,
+        discountValue: 50,
+        quantity: 6,
+        expiredDate: new Date().toLocaleDateString("vi-VN", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) // 
+    },
+    {
+        _id: '2',
+        name: "Giảm 200k cho sản phẩm Màn hình",
+        description: "Áp dụng cho mọi đối tượng khách hàng",
+        discountType: DiscountType.DIRECT_PRICE,
+        discountValue: 200000,
+        quantity: 20,
+        expiredDate: new Date().toLocaleDateString("vi-VN", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+    },
+    {
+        _id: '3',
+        name: "Giảm 20% cho sản phẩm Điện thoại",
+        description: "Áp dụng cho tất cả khách hàng",
+        discountType: DiscountType.PERCENTAGE,
+        discountValue: 20,
+        quantity: 15,
+        expiredDate: new Date().toLocaleDateString("vi-VN", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+    },
+    {
+        _id: '4',
+        name: "Giảm 50k cho sản phẩm Tai nghe",
+        description: "Chỉ áp dụng cho khách hàng VIP",
+        discountType: DiscountType.DIRECT_PRICE,
+        discountValue: 50000,
+        quantity: 10,
+        expiredDate: new Date().toLocaleDateString("vi-VN", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+    },
+    {
+        _id: '5',
+        name: "Giảm 10% tối đa 300k cho sản phẩm Laptop",
+        description: "Áp dụng cho thanh toán qua thẻ tín dụng",
+        discountType: DiscountType.PERCENTAGE,
+        discountValue: 10,
+        quantity: 8,
+        expiredDate: new Date().toLocaleDateString("vi-VN", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+    }
+
+]
+
+
+export default function CartPage() {
     const [selectionType, setSelectionType] = useState<'checkbox' | 'radio'>('checkbox');
     const [products, setProducts] = useState<any>(null);
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
     const [selectedKey, setSelectedKey] = useState<React.Key | null>(null)
     const [loading, setLoading] = useState(false);
-    const [top, setTop] = React.useState<number>(10);
+    const [top, setTop] = React.useState<number>(50);
     const [provisional, setProvisional] = useState(0);
     const [discount, setDiscount] = useState(0);
+    const [discounts, setDiscounts] = useState<Promotion[]>([]);
     const [total, setTotal] = useState(0);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showDeleteManyModal, setShowDeleteManyModal] = useState(false);
+    const [showPromotionModal, setShowPromotionModal] = useState(false);
+    const promotion_help = "Áp dụng tối đa 1 Mã giảm giá Sản Phẩm và 1 Mã Vận Chuyển"
+    const [currentAddress, setCurrentAddress] = useState<AddressType>({
+        _id: '1',
+        receiverName: 'Nguyễn Minh Quang',
+        address: "135B Trần Hưng Đạo, Phường Cầu Ông Lãnh, Quận 1, Hồ Chí Minh, Việt Nam",
+        phoneNumber: "0839994856",
+        addressType: "residential",
+        selectedAsDefault: true
+    });
 
     const handleShowDeleteOneModal = (key: any) => {
         setSelectedKey(key);
@@ -48,6 +134,14 @@ export default function Home() {
     }
     const handleCancelManyModal = () => {
         setShowDeleteManyModal(false);
+    }
+
+    const handleShowPromotionModal = () => {
+        setShowPromotionModal(true);
+    }
+
+    const handleCancelPromotionModal = () => {
+        setShowPromotionModal(false);
     }
 
     const fetchProducts = async () => {
@@ -123,8 +217,7 @@ export default function Home() {
         }
     }
 
-    const onIncrease = (key: React.Key, value: number) => {
-        // Update the 'amount' field of the product
+    const onIncrement = (key: React.Key, value: number) => {
         if (value === 100) return;
         if (products) {
             const updatedProducts = products.map((product: { key: React.Key; }) => {
@@ -137,8 +230,7 @@ export default function Home() {
         }
     }
 
-    const onDecrease = (key: React.Key, value: number) => {
-        // Update the 'amount' field of the product
+    const onDecrement = (key: React.Key, value: number) => {
         if (value === 1) return handleShowDeleteOneModal(key)
 
         if (products) {
@@ -169,12 +261,41 @@ export default function Home() {
         setSelectedRowKeys([]);
     };
 
+    // const handleRowClick = (record: any) => {
+    //     // Toggle selection for clicked row
+    //     const selected = !selectedRowKeys.includes(record.key);
+    //     const newSelectedRowKeys = selected
+    //         ? [...selectedRowKeys, record.key]
+    //         : selectedRowKeys.filter((key) => key !== record.key);
+    //     setSelectedRowKeys(newSelectedRowKeys);
+    // };
+
+    const applyDiscount = (promotion: Promotion) => {
+        let updatedDiscounts = discounts.slice();
+        updatedDiscounts.push(promotion);
+        setDiscounts(updatedDiscounts);
+    }
+
+
     const handleProvisional = () => {
         const selectedProducts = products ? products.filter((product: { key: React.Key; }) => selectedRowKeys.includes(product.key)) : [];
         const provisional = selectedProducts ? selectedProducts.reduce((total: number, product: { unit_price: number; amount: any; }) => {
             return total + (product.unit_price * (product.amount || 1));
         }, 0) : 0;
         setProvisional(provisional);
+    }
+
+    const handleDiscount = () => {
+        let totalDiscount = 0;
+        discounts.forEach((item: Promotion) => {
+            if (item.discountType === DiscountType.DIRECT_PRICE) {
+                totalDiscount += item.discountValue ?? 0;
+            }
+            else if (item.discountType === DiscountType.PERCENTAGE) {
+                totalDiscount += (item.discountValue ? item.discountValue * provisional / 100 : 0);
+            }
+        })
+        setDiscount(totalDiscount);
     }
 
     const handleTotalPrice = () => {
@@ -184,64 +305,46 @@ export default function Home() {
 
     const columns: TableColumnsType<DataType> = [
         {
-            title: <span className="text-lg">Sản phẩm ({selectedRowKeys.length})</span>,
+            title: <span className="text-base">Sản phẩm ({selectedRowKeys.length})</span>,
             dataIndex: 'name',
             render: (text: string, record: DataType) =>
-                <Space size={12} className="flex">
+                <Space size={12} className="flex lg:flex-row flex-col lg:text-start text-center">
                     <Image
-                        width={160}
+                        width={120}
                         src={record.image}
                         alt={""} />
-                    <span className="text-lg font-normal">{text}</span>
-
+                    <span className="text-sm font-normal">{text}</span>
                 </Space>
-
-
         },
         {
-            title: <span className="text-lg">Đơn giá</span>,
+            title: <span className="text-base">Đơn giá</span>,
             dataIndex: 'unit_price',
-            render: (value: number) => <a className="text-lg">
-                {value.toLocaleString("vi-VN", {
-                    style: "currency",
-                    currency: "VND",
-                    minimumFractionDigits: 0,
-                })}</a>,
+            render: (value: number) => <a className="text-base">
+                <Currency value={value} />
+            </a>,
         },
         {
-            title: <span className="text-lg">Số lượng</span>,
+            title: <span className="text-base">Số lượng</span>,
             dataIndex: 'amount',
             render: (value: number, record: DataType) =>
-                <Space size={5} className="flex">
-                    <Button onClick={() => onDecrease(record.key, value)}>
-                        <FaMinus />
-                    </Button>
-                    <InputNumber
-                        className="w-16 justify-center"
-                        controls={false}
-                        min={1}
-                        max={100}
-                        defaultValue={1}
-                        width={10}
-                        onChange={(value: any) =>
-                            onQuantityChange(record.key, value)}
-                        value={value} />
-                    <Button onClick={() => onIncrease(record.key, value)}>
-                        <FaPlus />
-                    </Button>
-                </Space>
+                <QuantityControl componentSize={5} keyProp={record.key} value={value}
+                    minValue={1} maxValue={100} defaultValue={1}
+                    inputWidth={75}
+                    onIncrement={onIncrement}
+                    onDecrement={onDecrement}
+                    onQuantityChange={onQuantityChange}
+                />
 
         },
         {
-            title: <span className="text-lg">Thành tiền</span>,
+            title: <span className="text-base">Thành tiền</span>,
             dataIndex: 'final_price',
             render: (value: number, record: DataType) => (
-                <span className="text-red-500 font-bold text-lg ">
-                    {(record.unit_price * (record.amount || 1)).toLocaleString("vi-VN", {
-                        style: "currency",
-                        currency: "VND",
-                        minimumFractionDigits: 0,
-                    })}
+                <span className="text-red-500 font-bold text-base ">
+                    <Currency value={(record.unit_price * (record.amount || 1))}
+                        locales={"vi-VN"}
+                        currency={"VND"}
+                        minimumFractionDigits={0} />
                 </span>
             ),
             width: "16%"
@@ -266,92 +369,115 @@ export default function Home() {
 
     useEffect(() => {
         handleProvisional();
+        handleDiscount();
         handleTotalPrice();
     }, [products, provisional, discount, total, selectedRowKeys])
 
+    useEffect(() => {
+        const storedAddress = localStorage.getItem('shippingAddress');
+        if (!storedAddress) return;
+        setCurrentAddress(JSON.parse(storedAddress) as AddressType);
+    }, []);
 
     const isEmpty = (quantity: number) => {
         return quantity === 0 ? true : false;
+    }
+
+    const goToShippingAddressPage = () => {
+        localStorage.setItem('shippingAddress', JSON.stringify(currentAddress));
     }
 
     return (
         <React.Fragment>
             <div className="container flex flex-col p-5 mx-auto">
                 <div className="text-xl font-bold">GIỎ HÀNG</div>
-                <div className="mt-5 flex lg:flex-row lg:grid lg:grid-cols-6 lg:gap-20 sm:flex-col">
-                    <div className="col-start-1 col-span-4">
+                <div className="mt-5 flex xs:flex-col sm:flex-col md:flex-col lg:flex-row lg:grid lg:grid-cols-6 space-x-20">
+                    <div className="col-start-1 col-span-4 border rounded-lg lg:mb-0 mb-10">
                         <Table
                             rowSelection={{
                                 type: selectionType,
                                 ...rowSelection,
+
                             }}
                             columns={columns}
                             dataSource={products}
+                            // onRow={(record) => ({
+                            //         onClick: () => handleRowClick(record),
+                            //       })}
                             loading={loading}
+                            pagination={{ pageSize: 4 }}
 
                         />
                     </div>
 
-                    <div className="lg:col-start-5 lg:col-span-2 w-10/12">
+                    <div className="col-start-1 lg:col-start-5 lg:col-span-2 lg:w-10/12">
                         <Affix offsetTop={top}>
                             <Space direction="vertical" size="middle" className="flex">
                                 <Card title={
                                     <div className="flex flex-row justify-between">
-                                        <span className="text-slate-400">Giao tới</span>
-                                        <a className="text-blue-400 hover:underline">Thay đổi</a>
+                                        <span className="text-slate-400 text-lg">Giao tới</span>
+                                        <Link className="text-sky-500 hover:text-blue-700 self-center" href={"/cart/shipping"}
+                                            onClick={goToShippingAddressPage}>
+                                            Thay đổi
+                                        </Link>
                                     </div>
                                 } size="small">
                                     <div className="flex flex-row font-bold space-x-5">
-                                        <p>NGUYỄN MINH QUANG</p>
-                                        <Divider type="vertical"></Divider>
-                                        <p className="mx-5">0839994855</p>
+                                        <p className="lg:text-base text-sm uppercase">{currentAddress.receiverName}</p>
+                                        <Divider type="vertical" style={{ height: "auto", border: "0.25px solid silver" }}></Divider>
+                                        <p className="lg:text-base text-sm lg:mx-5">{currentAddress.phoneNumber}</p>
                                     </div>
-                                    <div className="flex flex-row">
-                                        <span><Tag color="#87d068">Home</Tag></span>
-                                        <p className="mx-3 text-slate-500">135B Trần Hưng Đạo, Phường Cầu Ông Lãnh, Quận 1, Hồ Chí Minh</p>
+                                    <div>
+                                        {currentAddress.addressType === "residential" ?
+                                            <span><Tag color="#87d068">Nhà</Tag></span> :
+                                            <span><Tag color="#b168d0">Văn phòng</Tag></span>
+                                        }
+                                        <span className="mx-2 text-slate-500">{currentAddress.address}</span>
                                     </div>
                                 </Card>
                                 <Card size="small">
                                     <div className="flex flex-col">
-
                                         <div className="flex flex-row justify-between">
                                             <div className="font-semibold">Techzone Khuyến Mãi</div>
                                             <div className="flex flex-row space-x-2">
                                                 <div className="text-slate-500">Có thể chọn 2</div>
-                                                <div className="text-slate-500"><FaRegCircleQuestion /></div>
+                                                <Tooltip placement="bottom" title={promotion_help}>
+                                                    <div className="text-slate-500"><FaRegCircleQuestion /></div>
+                                                </Tooltip>
                                             </div>
                                         </div>
-                                        <a className="mt-10">Chọn hoặc nhập mã khuyến mãi khác</a>
+                                        <div className="mt-10 flex gap-2 text-sky-500 hover:text-blue-700 font-semibold"
+                                            onClick={() => handleShowPromotionModal()}>
+                                            <TiTicket className="text-lg self-center" />
+                                            <div>Chọn hoặc nhập Khuyến mãi khác</div>
+                                        </div>
                                     </div>
                                 </Card>
                                 <Card size="small">
                                     <div className="flex justify-between">
                                         <p>Tạm tính</p>
-                                        <p>{provisional.toLocaleString("vi-VN", {
-                                            style: "currency",
-                                            currency: "VND",
-                                            minimumFractionDigits: 0,
-                                        })}</p>
+                                        <Currency value={provisional}
+                                            locales={"vi-VN"}
+                                            currency={"VND"}
+                                            minimumFractionDigits={0} />
                                     </div>
                                     <div className="flex justify-between">
                                         <p>Giảm giá</p>
-                                        <p>- {discount.toLocaleString("vi-VN", {
-                                            style: "currency",
-                                            currency: "VND",
-                                            minimumFractionDigits: 0,
-                                        })}</p>
+                                        <p>- <Currency value={discount}
+                                            locales={"vi-VN"}
+                                            currency={"VND"}
+                                            minimumFractionDigits={0} /></p>
                                     </div>
                                     <Divider></Divider>
                                     <div className="flex justify-between">
                                         <p>Tổng tiền</p>
                                         <p className="flex flex-col space-y-3 grid">
                                             <p className="text-red-400 text-lg font-bold justify-self-end">
-                                                {total.toLocaleString("vi-VN", {
-                                                    style: "currency",
-                                                    currency: "VND",
-                                                    minimumFractionDigits: 0,
-                                                })}</p>
-                                            <p className="text-slate-400 text-lg justify-self-end">(Đã bao gồm VAT nếu có)</p>
+                                                <Currency value={total}
+                                                    locales={"vi-VN"}
+                                                    currency={"VND"}
+                                                    minimumFractionDigits={0} /></p>
+                                            <p className="text-slate-400 text-base justify-self-end">(Đã bao gồm VAT nếu có)</p>
                                         </p>
 
                                     </div>
@@ -396,6 +522,48 @@ export default function Home() {
             >
                 Bạn có muốn xóa các sản phẩm đã chọn khỏi giỏ hàng không?
             </Modal>
+            <Modal
+                width={600}
+                open={showPromotionModal}
+                onCancel={handleCancelPromotionModal}
+                title={<span className="text-xl">Techzone Khuyến Mãi</span>}
+                footer={null}
+                centered
+            >
+                {
+                    <div className="flex flex-col mt-2">
+                        <Space direction="vertical">
+                            {
+                                promotions.map(item => {
+                                    return <Card className="my-5 w-full h-full bg-[#F0F8FF]"
+                                        
+                                        style={{
+                                            backgroundImage: `url(${TICKET_BG.src})`,
+                                            backgroundSize: "100% 100%"
+                                        }}>
+                                        <div className="grid grid-cols-10">
+                                            <img className="z-10 row-span-3 col-span-2" alt="logo" src={LOGO.src}></img>
+                                            <div className="z-10 col-start-4 col-span-7 text-2xl font-semibold">{item.name}</div>
+                                            {/* <div className="z-10 col-start-1 col-span-2 text-center font-bold">TechZone</div> */}
+                                            <div className="z-10 col-start-4 col-span-7 text-base">&nbsp;</div>
+                                            <div className="z-10 col-start-4 col-span-7 text-lg">{item.description}</div>
+                                            <div className="z-10 col-start-4 col-span-7 text-base">&nbsp;</div>
+                                            <div className="z-10 col-start-4 col-span-5 text-base">HSD: {item.expiredDate}</div>
+                                            <div className="z-10 col-start-9 col-span-2 text-base">
+                                                <Button className="w-full bg-sky-500 text-white font-semibold" onClick={() => applyDiscount(item)}>
+                                                    Áp dụng
+                                                </Button>
+                                            </div>
+                                        </div>
+
+                                    </Card>
+                                })
+                            }
+                        </Space>
+                    </div>
+                }
+            </Modal>
+
         </React.Fragment>
     );
 }

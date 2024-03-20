@@ -12,7 +12,6 @@ const arrow: CSSProperties = {
 
 }
 
-
 // Arrow.jsx
 import { LeftOutlined, RightOutlined } from '@ant-design/icons'
 
