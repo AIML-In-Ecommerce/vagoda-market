@@ -9,6 +9,8 @@ import { QuantityControl } from "@/component/user/utils/QuantityControl";
 import Link from "next/link";
 import { AddressType } from "@/model/AddressType";
 import { useRouter } from "next/navigation";
+import TICKET_BG from "D:\\STUDY\\ĐỒ_ÁN_TỐT_NGHIỆP\\techzone-market\\techzone-frontend\\public\\asset\\coupon-png-206056.png"
+import LOGO from "D:\\STUDY\\ĐỒ_ÁN_TỐT_NGHIỆP\\techzone-market\\techzone-frontend\\public\\asset\\logo.png"
 
 type DataType = {
     key: React.Key;
@@ -37,6 +39,56 @@ type Promotion = {
     createdAt?: string
 }
 
+const promotions: Promotion[] = [
+    {
+        _id: '1',
+        name: "Giảm 50% tối đa 100k",
+        description: "Áp dụng cho thanh toán qua ví điện tử MoMo",
+        discountType: DiscountType.PERCENTAGE,
+        discountValue: 50,
+        quantity: 6,
+        expiredDate: new Date().toLocaleDateString("vi-VN", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) // 
+    },
+    {
+        _id: '2',
+        name: "Giảm 200k cho sản phẩm Màn hình",
+        description: "Áp dụng cho mọi đối tượng khách hàng",
+        discountType: DiscountType.DIRECT_PRICE,
+        discountValue: 200000,
+        quantity: 20,
+        expiredDate: new Date().toLocaleDateString("vi-VN", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+    },
+    {
+        _id: '3',
+        name: "Giảm 20% cho sản phẩm Điện thoại",
+        description: "Áp dụng cho tất cả khách hàng",
+        discountType: DiscountType.PERCENTAGE,
+        discountValue: 20,
+        quantity: 15,
+        expiredDate: new Date().toLocaleDateString("vi-VN", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+    },
+    {
+        _id: '4',
+        name: "Giảm 50k cho sản phẩm Tai nghe",
+        description: "Chỉ áp dụng cho khách hàng VIP",
+        discountType: DiscountType.DIRECT_PRICE,
+        discountValue: 50000,
+        quantity: 10,
+        expiredDate: new Date().toLocaleDateString("vi-VN", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+    },
+    {
+        _id: '5',
+        name: "Giảm 10% tối đa 300k cho sản phẩm Laptop",
+        description: "Áp dụng cho thanh toán qua thẻ tín dụng",
+        discountType: DiscountType.PERCENTAGE,
+        discountValue: 10,
+        quantity: 8,
+        expiredDate: new Date().toLocaleDateString("vi-VN", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+    }
+
+]
+
+
 export default function CartPage() {
     const [selectionType, setSelectionType] = useState<'checkbox' | 'radio'>('checkbox');
     const [products, setProducts] = useState<any>(null);
@@ -46,6 +98,7 @@ export default function CartPage() {
     const [top, setTop] = React.useState<number>(50);
     const [provisional, setProvisional] = useState(0);
     const [discount, setDiscount] = useState(0);
+    const [discounts, setDiscounts] = useState<Promotion[]>([]);
     const [total, setTotal] = useState(0);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showDeleteManyModal, setShowDeleteManyModal] = useState(false);
@@ -59,7 +112,6 @@ export default function CartPage() {
         addressType: "residential",
         selectedAsDefault: true
     });
-    const router = useRouter();
 
     const handleShowDeleteOneModal = (key: any) => {
         setSelectedKey(key);
@@ -209,14 +261,21 @@ export default function CartPage() {
         setSelectedRowKeys([]);
     };
 
-    const handleRowClick = (record: any) => {
-        // Toggle selection for clicked row
-        const selected = !selectedRowKeys.includes(record.key);
-        const newSelectedRowKeys = selected
-            ? [...selectedRowKeys, record.key]
-            : selectedRowKeys.filter((key) => key !== record.key);
-        setSelectedRowKeys(newSelectedRowKeys);
-    };
+    // const handleRowClick = (record: any) => {
+    //     // Toggle selection for clicked row
+    //     const selected = !selectedRowKeys.includes(record.key);
+    //     const newSelectedRowKeys = selected
+    //         ? [...selectedRowKeys, record.key]
+    //         : selectedRowKeys.filter((key) => key !== record.key);
+    //     setSelectedRowKeys(newSelectedRowKeys);
+    // };
+
+    const applyDiscount = (promotion: Promotion) => {
+        let updatedDiscounts = discounts.slice();
+        updatedDiscounts.push(promotion);
+        setDiscounts(updatedDiscounts);
+    }
+
 
     const handleProvisional = () => {
         const selectedProducts = products ? products.filter((product: { key: React.Key; }) => selectedRowKeys.includes(product.key)) : [];
@@ -224,6 +283,19 @@ export default function CartPage() {
             return total + (product.unit_price * (product.amount || 1));
         }, 0) : 0;
         setProvisional(provisional);
+    }
+
+    const handleDiscount = () => {
+        let totalDiscount = 0;
+        discounts.forEach((item: Promotion) => {
+            if (item.discountType === DiscountType.DIRECT_PRICE) {
+                totalDiscount += item.discountValue ?? 0;
+            }
+            else if (item.discountType === DiscountType.PERCENTAGE) {
+                totalDiscount += (item.discountValue ? item.discountValue * provisional / 100 : 0);
+            }
+        })
+        setDiscount(totalDiscount);
     }
 
     const handleTotalPrice = () => {
@@ -297,6 +369,7 @@ export default function CartPage() {
 
     useEffect(() => {
         handleProvisional();
+        handleDiscount();
         handleTotalPrice();
     }, [products, provisional, discount, total, selectedRowKeys])
 
@@ -304,7 +377,7 @@ export default function CartPage() {
         const storedAddress = localStorage.getItem('shippingAddress');
         if (!storedAddress) return;
         setCurrentAddress(JSON.parse(storedAddress) as AddressType);
-      }, []);
+    }, []);
 
     const isEmpty = (quantity: number) => {
         return quantity === 0 ? true : false;
@@ -344,7 +417,7 @@ export default function CartPage() {
                                     <div className="flex flex-row justify-between">
                                         <span className="text-slate-400 text-lg">Giao tới</span>
                                         <Link className="text-sky-500 hover:text-blue-700 self-center" href={"/cart/shipping"}
-                                                onClick={goToShippingAddressPage}>
+                                            onClick={goToShippingAddressPage}>
                                             Thay đổi
                                         </Link>
                                     </div>
@@ -354,12 +427,12 @@ export default function CartPage() {
                                         <Divider type="vertical" style={{ height: "auto", border: "0.25px solid silver" }}></Divider>
                                         <p className="lg:text-base text-sm lg:mx-5">{currentAddress.phoneNumber}</p>
                                     </div>
-                                    <div className="flex flex-row">
+                                    <div>
                                         {currentAddress.addressType === "residential" ?
                                             <span><Tag color="#87d068">Nhà</Tag></span> :
                                             <span><Tag color="#b168d0">Văn phòng</Tag></span>
                                         }
-                                        <p className="mx-3 text-slate-500">{currentAddress.address}</p>
+                                        <span className="mx-2 text-slate-500">{currentAddress.address}</span>
                                     </div>
                                 </Card>
                                 <Card size="small">
@@ -457,7 +530,38 @@ export default function CartPage() {
                 footer={null}
                 centered
             >
+                {
+                    <div className="flex flex-col mt-2">
+                        <Space direction="vertical">
+                            {
+                                promotions.map(item => {
+                                    return <Card className="my-5 w-full h-full bg-[#F0F8FF]"
+                                        
+                                        style={{
+                                            backgroundImage: `url(${TICKET_BG.src})`,
+                                            backgroundSize: "100% 100%"
+                                        }}>
+                                        <div className="grid grid-cols-10">
+                                            <img className="z-10 row-span-3 col-span-2" alt="logo" src={LOGO.src}></img>
+                                            <div className="z-10 col-start-4 col-span-7 text-2xl font-semibold">{item.name}</div>
+                                            {/* <div className="z-10 col-start-1 col-span-2 text-center font-bold">TechZone</div> */}
+                                            <div className="z-10 col-start-4 col-span-7 text-base">&nbsp;</div>
+                                            <div className="z-10 col-start-4 col-span-7 text-lg">{item.description}</div>
+                                            <div className="z-10 col-start-4 col-span-7 text-base">&nbsp;</div>
+                                            <div className="z-10 col-start-4 col-span-5 text-base">HSD: {item.expiredDate}</div>
+                                            <div className="z-10 col-start-9 col-span-2 text-base">
+                                                <Button className="w-full bg-sky-500 text-white font-semibold" onClick={() => applyDiscount(item)}>
+                                                    Áp dụng
+                                                </Button>
+                                            </div>
+                                        </div>
 
+                                    </Card>
+                                })
+                            }
+                        </Space>
+                    </div>
+                }
             </Modal>
 
         </React.Fragment>

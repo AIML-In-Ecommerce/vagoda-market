@@ -15,7 +15,6 @@ function guidGenerator() {
     return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
 }
 
-
 export default function ShippingAddressPage() {
     const [formVisibility, setFormVisibility] = useState<boolean>(false);
     const [address, setAddress] = useState<AddressType[]>([]);
@@ -127,8 +126,6 @@ export default function ShippingAddressPage() {
     useEffect(() => {
         fetchAddress();
     }, []);
-
-    
 
     return (
         <React.Fragment>
