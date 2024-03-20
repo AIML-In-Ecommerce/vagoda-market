@@ -40,7 +40,7 @@ export default function ShippingAddressPage() {
             top: document.body.scrollHeight,
             behavior: 'smooth',
         });
-    }, [formVisibility, currentAddress])
+    }, [formVisibility, currentAddress, address])
 
     const fetchAddress = async () => {
         const userAddresses: AddressType[] = [
@@ -72,12 +72,14 @@ export default function ShippingAddressPage() {
         setAddress(userAddresses);
     }
 
-    const handleSetDefaultShippingAddress = (_address: AddressType) => {
+    const handleSetDefaultShippingAddress = (_address: AddressType | undefined) => {
+        if (!_address) return;
+
         const updatedAddresses = address.map(item => {
-            if (item._id === _address._id) {
-                return { ...item, selectedAsDefault: true }
+            if (item._id !== _address._id) {
+                return { ...item, selectedAsDefault: false };
             }
-            return { ...item, selectedAsDefault: false }
+            return item;
         });
         setAddress(updatedAddresses);
     }
@@ -90,9 +92,10 @@ export default function ShippingAddressPage() {
         updatedAddress.push(new_address)
         setAddress(updatedAddress);
 
-        if (_address.selectedAsDefault === true) {
+        if (_address.selectedAsDefault) {
             handleSetDefaultShippingAddress(_address)
         }
+        console.log("handleCreateShippingAddress", address)
     }
 
     const handleUpdateShippingAddress = (_address: AddressType | undefined) => {
@@ -100,17 +103,12 @@ export default function ShippingAddressPage() {
 
         const updatedAddresses = address.map(item => {
             if (item._id === _address._id) {
-                return { ..._address, _id: item._id };
+                return { ..._address };
             }
-            return item;
+            else if (_address.selectedAsDefault) return {...item, selectedAsDefault: false};
+            else return item;
         });
         setAddress(updatedAddresses);
-
-        if (_address.selectedAsDefault === true) {
-            handleSetDefaultShippingAddress(_address)
-        }
-
-        console.log("handleUpdateShippingAddress", _address);
     }
 
     const handleRemoveShippingAddress = (_id: string) => {
@@ -196,7 +194,8 @@ export default function ShippingAddressPage() {
                             isEditMode={isEditMode}
                             currentAddress={currentAddress}
                             handleCreate={handleCreateShippingAddress}
-                            handleUpdate={handleUpdateShippingAddress} />
+                            handleUpdate={handleUpdateShippingAddress}                             
+                            />
                         : <div></div>
                 }
             </div>

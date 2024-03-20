@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Affix, Button, Card, Divider, InputNumber, Modal, Radio, Space, Table, Tag, Image, Flex, Tooltip } from 'antd';
+import { Affix, Button, Card, Divider, InputNumber, Modal, Radio, Space, Table, Tag, Image, Flex, Tooltip, Skeleton } from 'antd';
 import type { TableColumnsType } from 'antd';
 import { FaRegTrashCan, FaRegCircleQuestion } from "react-icons/fa6";
 import { TiTicket } from "react-icons/ti";
@@ -9,8 +9,10 @@ import { QuantityControl } from "@/component/user/utils/QuantityControl";
 import Link from "next/link";
 import { AddressType } from "@/model/AddressType";
 import { useRouter } from "next/navigation";
-import TICKET_BG from "D:\\STUDY\\ĐỒ_ÁN_TỐT_NGHIỆP\\techzone-market\\techzone-frontend\\public\\asset\\coupon-png-206056.png"
+import TICKET_UNSELECTED from "@/app/[locale]/(Main)/cart/(asset)/coupon_unselected_short_fill.png"
+import TICKET_SELECTED from "@/app/[locale]/(Main)/cart/(asset)/coupon_selected_short_fill.png"
 import LOGO from "D:\\STUDY\\ĐỒ_ÁN_TỐT_NGHIỆP\\techzone-market\\techzone-frontend\\public\\asset\\logo.png"
+import Search from "antd/es/transfer/search";
 
 type DataType = {
     key: React.Key;
@@ -29,12 +31,12 @@ enum DiscountType {
 type Promotion = {
     _id: string,
     name: string,
-    description: string
-    discountType: DiscountType
-    discountValue?: number
-    quantity: number
-    activeDate?: string
-    expiredDate?: string
+    description: string,
+    discountType: DiscountType,
+    discountValue?: number,
+    quantity: number,
+    activeDate?: string,
+    expiredDate?: string,
     // saleCategory: [ObjectId, ...]
     createdAt?: string
 }
@@ -104,6 +106,7 @@ export default function CartPage() {
     const [showDeleteManyModal, setShowDeleteManyModal] = useState(false);
     const [showPromotionModal, setShowPromotionModal] = useState(false);
     const promotion_help = "Áp dụng tối đa 1 Mã giảm giá Sản Phẩm và 1 Mã Vận Chuyển"
+    const router = useRouter();
     const [currentAddress, setCurrentAddress] = useState<AddressType>({
         _id: '1',
         receiverName: 'Nguyễn Minh Quang',
@@ -165,7 +168,7 @@ export default function CartPage() {
                 key: '3',
                 image: 'https://product.hstatic.net/200000722513/product/g502x-plus-gallery-2-white_69229c9ba5534ad5bfae7d827037a28f_365394a31b6342e4949249099adb755e_1024x1024.png',
                 name: 'Chuột Logitech G502 X Plus LightSpeed White',
-                unit_price: 3090000,
+                unit_price: 309000,
                 amount: 1
             },
             {
@@ -185,7 +188,6 @@ export default function CartPage() {
 
         ];
         setTimeout(() => {
-            setSelectedRowKeys([]);
             setLoading(false);
         }, 1000);
         setProducts(data);
@@ -276,6 +278,11 @@ export default function CartPage() {
         setDiscounts(updatedDiscounts);
     }
 
+    const removeDiscount = (promotion: Promotion) => {
+        let updatedDiscounts = discounts.filter(discount => discount._id !== promotion._id)
+        setDiscounts(updatedDiscounts);
+    }
+
 
     const handleProvisional = () => {
         const selectedProducts = products ? products.filter((product: { key: React.Key; }) => selectedRowKeys.includes(product.key)) : [];
@@ -299,7 +306,7 @@ export default function CartPage() {
     }
 
     const handleTotalPrice = () => {
-        const total = provisional - discount;
+        const total = provisional !== 0 ? provisional - discount : 0;
         setTotal(total);
     }
 
@@ -309,43 +316,52 @@ export default function CartPage() {
             dataIndex: 'name',
             render: (text: string, record: DataType) =>
                 <Space size={12} className="flex lg:flex-row flex-col lg:text-start text-center">
-                    <Image
-                        width={120}
-                        src={record.image}
-                        alt={""} />
-                    <span className="text-sm font-normal">{text}</span>
+                    {
+                        loading ? <Skeleton.Image active /> :
+                            <Image
+                                width={120}
+                                src={record.image}
+                                alt={""} />
+                    }
+                    {
+                        loading ? <Skeleton paragraph={{ rows: 2 }} active /> : (
+                            <span className="text-sm font-normal">{text}</span>
+                        )
+                    }
                 </Space>
         },
         {
             title: <span className="text-base">Đơn giá</span>,
             dataIndex: 'unit_price',
-            render: (value: number) => <a className="text-base">
+            render: (value: number) => loading ? <Skeleton.Input active /> : (<a className="text-base">
                 <Currency value={value} />
-            </a>,
+            </a>),
         },
         {
             title: <span className="text-base">Số lượng</span>,
             dataIndex: 'amount',
             render: (value: number, record: DataType) =>
-                <QuantityControl componentSize={5} keyProp={record.key} value={value}
-                    minValue={1} maxValue={100} defaultValue={1}
-                    inputWidth={75}
-                    onIncrement={onIncrement}
-                    onDecrement={onDecrement}
-                    onQuantityChange={onQuantityChange}
-                />
+                loading ? <Skeleton.Input active /> : (
+                    <QuantityControl componentSize={5} keyProp={record.key} value={value}
+                        minValue={1} maxValue={100} defaultValue={1}
+                        inputWidth={75}
+                        onIncrement={onIncrement}
+                        onDecrement={onDecrement}
+                        onQuantityChange={onQuantityChange}
+                    />)
 
         },
         {
             title: <span className="text-base">Thành tiền</span>,
             dataIndex: 'final_price',
             render: (value: number, record: DataType) => (
-                <span className="text-red-500 font-bold text-base ">
-                    <Currency value={(record.unit_price * (record.amount || 1))}
-                        locales={"vi-VN"}
-                        currency={"VND"}
-                        minimumFractionDigits={0} />
-                </span>
+                loading ? <Skeleton.Input active /> : (
+                    <span className="text-red-500 font-bold text-base ">
+                        <Currency value={(record.unit_price * (record.amount || 1))}
+                            locales={"vi-VN"}
+                            currency={"VND"}
+                            minimumFractionDigits={0} />
+                    </span>)
             ),
             width: "16%"
         },
@@ -371,7 +387,7 @@ export default function CartPage() {
         handleProvisional();
         handleDiscount();
         handleTotalPrice();
-    }, [products, provisional, discount, total, selectedRowKeys])
+    }, [products, provisional, discount, total, selectedRowKeys, discounts])
 
     useEffect(() => {
         const storedAddress = localStorage.getItem('shippingAddress');
@@ -422,68 +438,82 @@ export default function CartPage() {
                                         </Link>
                                     </div>
                                 } size="small">
-                                    <div className="flex flex-row font-bold space-x-5">
-                                        <p className="lg:text-base text-sm uppercase">{currentAddress.receiverName}</p>
-                                        <Divider type="vertical" style={{ height: "auto", border: "0.25px solid silver" }}></Divider>
-                                        <p className="lg:text-base text-sm lg:mx-5">{currentAddress.phoneNumber}</p>
-                                    </div>
-                                    <div>
-                                        {currentAddress.addressType === "residential" ?
-                                            <span><Tag color="#87d068">Nhà</Tag></span> :
-                                            <span><Tag color="#b168d0">Văn phòng</Tag></span>
-                                        }
-                                        <span className="mx-2 text-slate-500">{currentAddress.address}</span>
-                                    </div>
+                                    {/* Skeleton for current address */}
+                                    {loading ? (
+                                        <Skeleton active />
+                                    ) : (
+                                        <>
+                                            <div className="flex flex-row font-bold space-x-5">
+                                                <div className="lg:text-base text-sm uppercase">{currentAddress.receiverName}</div>
+                                                <Divider type="vertical" style={{ height: "auto", border: "0.25px solid silver" }}></Divider>
+                                                <div className="lg:text-base text-sm lg:mx-5">{currentAddress.phoneNumber}</div>
+                                            </div>
+                                            <div>
+                                                {currentAddress.addressType === "residential" ?
+                                                    <span><Tag color="#87d068">Nhà</Tag></span> :
+                                                    <span><Tag color="#b168d0">Văn phòng</Tag></span>
+                                                }
+                                                <span className="mx-2 text-slate-500">{currentAddress.address}</span>
+                                            </div>
+                                        </>
+                                    )}
                                 </Card>
                                 <Card size="small">
                                     <div className="flex flex-col">
-                                        <div className="flex flex-row justify-between">
-                                            <div className="font-semibold">Techzone Khuyến Mãi</div>
-                                            <div className="flex flex-row space-x-2">
-                                                <div className="text-slate-500">Có thể chọn 2</div>
-                                                <Tooltip placement="bottom" title={promotion_help}>
-                                                    <div className="text-slate-500"><FaRegCircleQuestion /></div>
-                                                </Tooltip>
+                                        {loading ? <Skeleton active /> : (<>
+                                            <div className="flex flex-row justify-between">
+
+                                                <div className="font-semibold">Techzone Khuyến Mãi</div>
+                                                <div className="flex flex-row space-x-2">
+                                                    <div className="text-slate-500">Có thể chọn 2</div>
+                                                    <Tooltip placement="bottom" title={promotion_help}>
+                                                        <div className="text-slate-500"><FaRegCircleQuestion /></div>
+                                                    </Tooltip>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div className="mt-10 flex gap-2 text-sky-500 hover:text-blue-700 font-semibold"
-                                            onClick={() => handleShowPromotionModal()}>
-                                            <TiTicket className="text-lg self-center" />
-                                            <div>Chọn hoặc nhập Khuyến mãi khác</div>
-                                        </div>
+                                            <div className="mt-10 flex gap-2 text-sky-500 hover:text-blue-700 font-semibold"
+                                                onClick={() => handleShowPromotionModal()}>
+                                                <TiTicket className="text-lg self-center" />
+                                                <div>Chọn hoặc nhập Khuyến mãi khác</div>
+                                            </div>
+                                        </>
+                                        )}
                                     </div>
                                 </Card>
                                 <Card size="small">
-                                    <div className="flex justify-between">
-                                        <p>Tạm tính</p>
-                                        <Currency value={provisional}
-                                            locales={"vi-VN"}
-                                            currency={"VND"}
-                                            minimumFractionDigits={0} />
-                                    </div>
-                                    <div className="flex justify-between">
-                                        <p>Giảm giá</p>
-                                        <p>- <Currency value={discount}
-                                            locales={"vi-VN"}
-                                            currency={"VND"}
-                                            minimumFractionDigits={0} /></p>
-                                    </div>
-                                    <Divider></Divider>
-                                    <div className="flex justify-between">
-                                        <p>Tổng tiền</p>
-                                        <p className="flex flex-col space-y-3 grid">
-                                            <p className="text-red-400 text-lg font-bold justify-self-end">
-                                                <Currency value={total}
-                                                    locales={"vi-VN"}
-                                                    currency={"VND"}
-                                                    minimumFractionDigits={0} /></p>
-                                            <p className="text-slate-400 text-base justify-self-end">(Đã bao gồm VAT nếu có)</p>
-                                        </p>
-
-                                    </div>
+                                    {loading ? <Skeleton active /> : (<>
+                                        <div className="flex justify-between">
+                                            <div>Tạm tính</div>
+                                            <Currency value={provisional}
+                                                locales={"vi-VN"}
+                                                currency={"VND"}
+                                                minimumFractionDigits={0} />
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <div>Giảm giá</div>
+                                            <div>- <Currency value={discount}
+                                                locales={"vi-VN"}
+                                                currency={"VND"}
+                                                minimumFractionDigits={0} /></div>
+                                        </div>
+                                        <Divider></Divider>
+                                        <div className="flex justify-between">
+                                            <div>Tổng tiền</div>
+                                            <div className="flex flex-col space-y-3 grid">
+                                                <div className="text-red-400 text-lg font-bold justify-self-end">
+                                                    <Currency value={total}
+                                                        locales={"vi-VN"}
+                                                        currency={"VND"}
+                                                        minimumFractionDigits={0} /></div>
+                                                <div className="text-slate-400 text-base justify-self-end">(Đã bao gồm VAT nếu có)</div>
+                                            </div>
+                                        </div>
+                                    </>
+                                    )}
                                 </Card>
                                 <Button type="primary" size="large" danger block
-                                    disabled={isEmpty(selectedRowKeys.length)}>
+                                    disabled={isEmpty(selectedRowKeys.length)}
+                                    onClick={() => { router.push('/cart/payment') }}>
                                     Mua Hàng ({selectedRowKeys.length})
                                 </Button>
                             </Space>
@@ -531,14 +561,30 @@ export default function CartPage() {
                 centered
             >
                 {
-                    <div className="flex flex-col mt-2">
+                    <div className="flex flex-col">
                         <Space direction="vertical">
+                            <div className="flex space-x-6">
+                                <Search placeholder="Nhập để tìm mã"></Search>
+                                <Button>Áp dụng</Button>
+                            </div>
+                            <div className="my-5 flex flex-row justify-center items-center">
+                                <div>Bạn đã chọn &nbsp;</div>
+                                <div className={`${discounts.length > 0 ? "text-red-500" : ""} font-bold text-2xl`}>
+                                    {discounts.length}
+                                </div>
+                                <div>&nbsp; mã giảm giá Sản Phẩm &nbsp;</div>
+                                <Tooltip title={promotion_help}>
+                                    <div className="text-slate-500"><FaRegCircleQuestion /></div>
+                                </Tooltip>
+
+                            </div>
+
                             {
                                 promotions.map(item => {
-                                    return <Card className="my-5 w-full h-full bg-[#F0F8FF]"
-                                        
+                                    return <Card className="my-5 w-full h-full"
+                                        hoverable
                                         style={{
-                                            backgroundImage: `url(${TICKET_BG.src})`,
+                                            backgroundImage: `${discounts.includes(item) ? `url(${TICKET_SELECTED.src})` : `url(${TICKET_UNSELECTED.src})`}`,
                                             backgroundSize: "100% 100%"
                                         }}>
                                         <div className="grid grid-cols-10">
@@ -550,9 +596,17 @@ export default function CartPage() {
                                             <div className="z-10 col-start-4 col-span-7 text-base">&nbsp;</div>
                                             <div className="z-10 col-start-4 col-span-5 text-base">HSD: {item.expiredDate}</div>
                                             <div className="z-10 col-start-9 col-span-2 text-base">
-                                                <Button className="w-full bg-sky-500 text-white font-semibold" onClick={() => applyDiscount(item)}>
-                                                    Áp dụng
-                                                </Button>
+                                                {
+                                                    !discounts.includes(item) ?
+                                                        <Button className="w-full bg-sky-500 text-white font-semibold text-center"
+                                                            onClick={() => applyDiscount(item)}>
+                                                            Áp dụng
+                                                        </Button> :
+                                                        <Button className="w-full bg-gray-500 text-white font-semibold text-center"
+                                                            onClick={() => removeDiscount(item)}>
+                                                            Hủy
+                                                        </Button>
+                                                }
                                             </div>
                                         </div>
 
@@ -563,7 +617,6 @@ export default function CartPage() {
                     </div>
                 }
             </Modal>
-
         </React.Fragment>
     );
 }
