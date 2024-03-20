@@ -9,6 +9,7 @@ import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 // import { UserType } from "@/model/UserType";
 import { useTranslations } from "next-intl";
 import { Divider } from "antd";
+import { LocalSignIn } from "@/app/apis/auth/SignInAPI";
 // import { useRecoveryContext } from "@/context/RecoveryContext";
 // import { signIn as signInWithGoogle } from "next-auth/react";
 // import { io } from "socket.io-client";
@@ -55,16 +56,16 @@ export default function AuthForm(props: AuthFormProps) {
   };
 
   const handleLogin = async () => {
-    // if (!isValidAuth(email, password)) return;
+    if (!isValidAuth(email, password)) return;
 
     // try {
-    //   const response = await axios.post(
-    //     `${process.env.NEXT_PUBLIC_BACKEND_PREFIX}auth/login`,
-    //     {
-    //       email: email,
-    //       password: password,
-    //     }
-    //   );
+      const response = await LocalSignIn(email, password)
+
+      if(response.status == 200)
+      {
+        //redirect to
+        // router.push("/")
+      }
     //   if (response.status === 201) {
     //     const cur_user: UserType = response.data;
     //     console.log("Current user: ", response.data);
