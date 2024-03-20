@@ -77,10 +77,10 @@ const OverviewForm = (formData: FormProps) => {
             </Tag> */}
       {/* sub category tags */}
 
-      {visible == false && (
+      {/* add Link later if use */}
+      {/* {visible == false && (
         <div className="flex flex-col gap-3">
           <div className="font-semibold pt-5">Dịch vụ bổ sung</div>
-          {/* add Link later if use */}
           <div className="bg-white shadow-md max-w-1/4 h-fit p-4">
             Thay đổi Thông tin vận chuyển
           </div>
@@ -88,7 +88,7 @@ const OverviewForm = (formData: FormProps) => {
             Ưu đãi, mã giảm giá
           </div>
         </div>
-      )}
+      )} */}
     </div>
   );
 };

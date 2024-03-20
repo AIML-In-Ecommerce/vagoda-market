@@ -30,9 +30,9 @@ const ImageForm = (formData: FormProps) => {
     <>
       {(!visible && (
         <Flex vertical>
-          <div className="bg-white shadow-md max-w-1/4 h-fit p-4">
+          <div className="bg-white shadow-md max-w-1/2 h-fit p-4">
             <img
-              className="h-80 w-80 object-contain"
+              className="h-[500px] w-[500px] object-contain"
               src={mainImage}
               alt={formData.name}
             />
