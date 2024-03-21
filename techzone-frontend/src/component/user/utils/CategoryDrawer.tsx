@@ -472,7 +472,7 @@ export default function CategoryDrawer({}: CategoryDrawerProps)
     return(
         <>
             <div className="relative w-1/4 bg-blue-500 left-0"></div>
-            <div className="absolute z-10 top-20">
+            <div className="absolute z-10">
                 <Button className="fixed w-16 min-w-16 h-16 min-h-16 rounded-full border-0 shadow-md ml-2" onClick={handleOpenDrawer}>
                     <BiSolidCategory className="w-full h-full text-lg"/>
                 </Button>

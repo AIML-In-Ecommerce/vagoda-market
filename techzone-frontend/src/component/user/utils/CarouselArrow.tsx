@@ -36,6 +36,7 @@ const StyleSheet = {
   }
 }
 
+
 // Antd is doing some interesting things here. Using LeftOutlined and RightOutlined
 // directly without wrapping them in this component doesn't work. Additionally, if
 // we don't add currentSlide and slideCount to the pops, we get console errors.
