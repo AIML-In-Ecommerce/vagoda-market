@@ -1,11 +1,29 @@
 "use client";
-import { Avatar, Button, Flex, Rate } from "antd";
+import { Avatar, Button, Divider, Flex, List, Image, Rate, Modal } from "antd";
 // import { useTranslations } from "next-intl";
 import CommentContainer from "./comment/CommentContainer";
 import { ReviewType } from "@/model/ReviewType";
+import { useMemo, useState } from "react";
 
 const Review = (review: ReviewType) => {
   //   const t = useTranslations("Review");
+
+  const [isLiked, setIsLiked] = useState(false);
+  const handleLike = () => {
+    setIsLiked(!isLiked);
+  };
+
+  const like = useMemo(() => {
+    // update db with axios
+
+    if (isLiked) {
+      let newLike = [...review.like];
+      newLike.push("my id");
+      return newLike;
+    } else return review.like.filter((likeId) => likeId !== "my id"); // ? revise this later
+  }, [isLiked]);
+
+  const [open, setOpen] = useState(false);
 
   return (
     <div className="m-2 bg-white rounded-xl border-2 overflow-hidden relative">
@@ -61,19 +79,73 @@ const Review = (review: ReviewType) => {
           </Flex>
           {review.desc}
         </div>
-        <div className="col-span-1 flex flex-col gap-2">
-          <Button type="primary" ghost>
-            Hữu ích
+        <div className="col-span-1">
+          <Button danger onClick={() => setOpen(true)}>
+            Báo cáo
           </Button>
-          <Button danger>Báo cáo</Button>
         </div>
+        {review.asset.length > 0 && (
+          <div className="col-start-2 col-span-3 mx-2">
+            <List
+              grid={{ gutter: 5, column: 10 }}
+              dataSource={review.asset}
+              renderItem={(item) => (
+                <List.Item>
+                  <Image
+                    width={50}
+                    height={50}
+                    src={item}
+                    preview={{
+                      title: "Xem ảnh",
+                    }}
+                  />
+                </List.Item>
+              )}
+            />
+          </div>
+        )}
         <div className="col-start-2 col-span-3 flex flex-row gap-10 text-xs">
           <div>{review.createdAt}</div>
-          <div>{review.useTime}</div>
+          {/* <div>{review.useTime}</div> */}
+        </div>
+
+        <div className="col-start-2 col-span-3 flex flex-row gap-2 align-middle h-auto">
+          {(isLiked && (
+            <Button
+              type="primary"
+              style={{ background: "dodgerblue", borderColor: "dodgerblue" }}
+              onClick={handleLike}
+              size="small"
+            >
+              Hữu ích
+            </Button>
+          )) || (
+            <Button type="primary" ghost onClick={handleLike} size="small">
+              Hữu ích
+            </Button>
+          )}
+          <Divider
+            type="vertical"
+            style={{ height: "auto", border: "0.25px solid silver" }}
+          />
+          <div className="text-gray-600 text-sm">
+            {like.length} người cảm thấy hữu ích
+          </div>
         </div>
       </div>
       {/* <CommentContainer productId={review._id} customerId={review.customerId} /> */}
       <CommentContainer />
+
+      <Modal
+        title="Thông báo"
+        centered
+        open={open}
+        onOk={() => setOpen(false)}
+        onCancel={() => setOpen(false)}
+        // width={1000}
+      >
+        <p>Banned...</p>
+      </Modal>
     </div>
   );
 };

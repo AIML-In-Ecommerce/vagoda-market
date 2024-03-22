@@ -284,6 +284,9 @@ export default function ProductDetail() {
     });
   }, [mainImage]);
 
+  // number of reviews
+  const [numberOfReview, setNumberOfReview] = useState(0);
+
   // price
   // number of main item
   const [numberOfItem, setNumberOfItem] = useState(1);
@@ -312,7 +315,7 @@ export default function ProductDetail() {
           <Flex vertical>
             <div className="m-2">
               <List
-                grid={{ gutter: 16, column: 5 }}
+                grid={{ gutter: 20, column: 5 }}
                 dataSource={productInfo.images}
                 renderItem={(item) => (
                   <List.Item>
@@ -349,8 +352,8 @@ export default function ProductDetail() {
                   smallImage: {
                     alt: productInfo.name,
                     isFluidWidth: true,
-                    width: 500,
-                    height: 500,
+                    // width: 500,
+                    // height: 500,
                     src: mainImage,
                     // src: mainImage + "?width=500&height=500",
                   },
@@ -380,7 +383,7 @@ export default function ProductDetail() {
           </Flex>
           {/* desc */}
 
-          <div className="p-4 min-w-[450px]">
+          <div className="p-4 min-w-[450px] lg:w-[600px]">
             {productInfo._id == null && <Skeleton active />}
 
             <div className="text-sm">
@@ -407,7 +410,9 @@ export default function ProductDetail() {
               <div className="font-bold uppercase text-xl">
                 {productInfo.avgRating}
               </div>
-              <div className="text-xs font-light mt-2">(10 đánh giá)</div>
+              <div className="text-xs font-light mt-2">
+                ({numberOfReview} đánh giá)
+              </div>
               <Divider
                 type="vertical"
                 style={{ height: "auto", border: "0.25px solid silver" }}
@@ -505,7 +510,7 @@ export default function ProductDetail() {
         {/* reviews */}
         <Divider>Khách hàng đánh giá</Divider>
 
-        <ReviewList />
+        <ReviewList setNumberOfReview={setNumberOfReview} />
 
         <FloatButton.Group>
           <FloatButton

@@ -387,7 +387,7 @@ const CommentContainer = () => {
           formCancelHandler={() => {}}
           initialText=""
         />
-        <div className="overflow-auto h-24 space-y-2">
+        <div className="overflow-auto h-32 space-y-2">
           {mainComments.map((comment) => (
             <Comment
               key={comment.id}
