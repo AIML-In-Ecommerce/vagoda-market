@@ -85,7 +85,7 @@ const Review = (review: ReviewType) => {
           </Button>
         </div>
         {review.asset.length > 0 && (
-          <div className="col-start-2 col-span-3 mx-2">
+          <div className="col-start-2 col-span-2 mx-2">
             <List
               grid={{ gutter: 5, column: 10 }}
               dataSource={review.asset}
@@ -133,8 +133,7 @@ const Review = (review: ReviewType) => {
           </div>
         </div>
       </div>
-      {/* <CommentContainer productId={review._id} customerId={review.customerId} /> */}
-      <CommentContainer />
+      <CommentContainer reviewId={review.id} customerId={review.user.id} />
 
       <Modal
         title="Thông báo"

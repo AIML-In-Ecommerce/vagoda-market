@@ -1,1 +1,41 @@
-{}
+{
+  "ProductDetailPage": {
+    "tab_descriptions": "Mô tả",
+    "tab_technical_specifications": "Thông số kĩ thuật",
+    "tab_review_summary": "Tổng quan đánh giá",
+    "techzone_assistant": "Trợ lý TechZone 🤖",
+    "review_summary": "Tổng quan đánh giá khách hàng:",
+    "brand_seller": "Thương hiệu / Shop: ",
+    "review_number": " đánh giá",
+    "sold": "Đã bán ",
+    "status": "Tình trạng: ",
+    "number": "Số lượng: ",
+    "combo_items": "Sản phẩm có thể kết hợp",
+    "customer_review": "Khách hàng đánh giá",
+    "view_details": "Xem chi tiết",
+    "move_to_top": "Lướt đến đầu",
+    "fcf_estimated_total": "Tạm tính",
+    "fcf_buy_now": "Mua ngay",
+    "fcf_add_to_cart": "Thêm vào giỏ",
+    "cl_no_data": "Không có",
+    "cl_total": "Tổng cộng: "
+  },
+  "Review": {
+    "strongly_dissatisfied": "Không hài lòng",
+    "dissatisfied": "Hơi kém",
+    "neutral": "Bình thường",
+    "satisfied": "Hài lòng",
+    "strongly_satisfied": "Cực kì hài lòng",
+    "report": "Báo cáo",
+    "helpful": "Hữu ích",
+    "helpful_number": " người cảm thấy hữu ích",
+    "notification": "Thông báo"
+  },
+  "Comment": {
+    "comment_number": " bình luận",
+    "edit": "Chỉnh sửa",
+    "delete": "Xóa",
+    "delete_modal": "Bạn chắc chắn muốn xóa bình luận?",
+    "cancel": "Hủy"
+  }
+}

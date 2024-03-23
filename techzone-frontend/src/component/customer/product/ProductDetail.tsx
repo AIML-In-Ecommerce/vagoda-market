@@ -428,7 +428,7 @@ export default function ProductDetail() {
               <div className="font-bold text-red-500 uppercase text-xl md:text-2xl lg:text-2xl">
                 {priceIndex(productInfo.finalPrice)}
               </div>
-              <div className="text-red-500 uppercase text-xs mt-1">-50%</div>
+              {/* <div className="text-red-500 uppercase text-xs mt-1">-50%</div> */}
             </div>
             {/* sub category tags */}
             {/* <div className="capitalize text-xs mt-5">Sub-category:</div>
