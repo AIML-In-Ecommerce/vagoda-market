@@ -1,4 +1,5 @@
 'use client'
+import { message } from 'antd'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 
@@ -9,6 +10,8 @@ interface Reply
     accessToken: string,
     refreshToken: string,
     refreshTokenExpiry: number
+    role: string,
+    userId: string
 }
 
 interface SignInResponse
@@ -18,26 +21,42 @@ interface SignInResponse
     message: string
 }
 
-export async function LocalSignIn(email:string, password:string)
+export async function POST_LocalSignIn(email:string, password:string)
 {
-    const url = NEXT_PUBLIC_BACKEND_PREFIX + "/auth/sign_in"
+    const url = NEXT_PUBLIC_BACKEND_PREFIX + "/api/auth/sign_in"
     const data = {
         email: email,
         password: password
     }
 
-    const response = await axios.post(url, data)
-
-    if(response.status == 200)
+    try
     {
+        const response = await axios.post(url, data)
         const responseData: SignInResponse = response.data
-        const accessToken = responseData.reply.accessToken
-        const refreshToken = responseData.reply.refreshToken
-        const refExpiry = responseData.reply.refreshTokenExpiry
-        
-        Cookies.set('accessToken', `${accessToken}`)
-        Cookies.set('refreshToken', `${refreshToken}`, {expires: new Date(refExpiry).getUTCMilliseconds()})
-    }
+
+        if(responseData.status == 200)
+        {
+            // const accessToken = responseData.reply.accessToken
+            // const refreshToken = responseData.reply.refreshToken
+            // const refExpiry = responseData.reply.refreshTokenExpiry
+            // const userId = responseData.reply.userId
+            
+            // Cookies.set('accessToken', `${accessToken}`)
+            // Cookies.set('refreshToken', `${refreshToken}`, {expires: new Date(refExpiry).getUTCMilliseconds()})
+            // localStorage.setItem("userId", `${userId}`)
     
-    return response
+            return {isDenied: false, message: "Sign in successfully", status: responseData.status, data: responseData.reply}
+    
+        }
+        else
+        {
+            return {isDenied: true, message: "Failed to sign in", status: responseData.status, data: responseData.reply}
+        }
+    }
+    catch(err)
+    {
+        console.error(err)
+        return {isDenied: true, message: "Failed to sign in", status: 500 ,data: undefined}
+    }
+
 }

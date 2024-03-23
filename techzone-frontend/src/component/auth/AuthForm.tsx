@@ -9,10 +9,14 @@ import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 // import { UserType } from "@/model/UserType";
 import { useTranslations } from "next-intl";
 import { Divider } from "antd";
-import { LocalSignIn } from "@/app/apis/auth/SignInAPI";
+import { POST_LocalSignIn } from "@/app/apis/auth/SignInAPI";
+import { GetUserInfoResponse, POST_getUserInfo } from "@/app/apis/user/UserInfoAPI";
+import { userInfo } from "os";
 // import { useRecoveryContext } from "@/context/RecoveryContext";
 // import { signIn as signInWithGoogle } from "next-auth/react";
 // import { io } from "socket.io-client";
+
+const Cookies = require('js-cookie')
 
 interface AuthFormProps {
   showSuccessMsg: (show: boolean) => void;
@@ -59,29 +63,46 @@ export default function AuthForm(props: AuthFormProps) {
     if (!isValidAuth(email, password)) return;
 
     // try {
-      const response = await LocalSignIn(email, password)
+      const response1 = await POST_LocalSignIn(email, password)
 
-      if(response.status == 200)
+      if(response1.isDenied == true)
       {
-        //redirect to
-        // router.push("/")
+        setValidAuthMsg(response1.message)
+        return;
       }
-    //   if (response.status === 201) {
-    //     const cur_user: UserType = response.data;
-    //     console.log("Current user: ", response.data);
 
-    //     localStorage.setItem("user", JSON.stringify(cur_user));
-    //   }
-    //   router.push("/");
-    // } catch (error: any) {
-    //   const errorMessage =
-    //     error.response && error.response.data
-    //       ? error.response.data.message
-    //       : "Failed to login";
-    //   setValidAuthMsg(errorMessage);
+      if(response1.status == 200)
+      {
+        if(response1.data)
+        {
+          const reply = response1.data
+          
+          sessionStorage.setItem('accessToken', `${reply.accessToken}`)
+          Cookies.set('refreshToken', `${reply.refreshToken}`, {expires: new Date(reply.refreshTokenExpiry).getUTCMilliseconds()})
+          Cookies.set("userId", `${reply.userId}`, {expires: new Date(reply.refreshTokenExpiry).getUTCMilliseconds()})
 
-    //   console.error("Failed to login:", error);
-    // }
+          setValidAuthMsg(response1.message)
+          
+          const responseUserInfo = await POST_getUserInfo(reply.userId)
+
+          if(responseUserInfo.isDenied == true)
+          {
+            setValidAuthMsg(responseUserInfo.message)
+            return
+          }
+          
+          if(responseUserInfo.status == 200 && responseUserInfo.data)
+          {
+            sessionStorage.setItem("userInfo", JSON.stringify(responseUserInfo.data))
+          }
+
+        }
+        else
+        {
+          setValidAuthMsg(response1.message)
+        }
+      }
+
   };
 
   const handleSignup = async () => {
