@@ -1,20 +1,17 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import { Affix, Button, Card, Divider, InputNumber, Modal, Radio, Space, Table, Tag, Image, Flex, Tooltip, Skeleton } from 'antd';
+import React, { useState, useEffect, useRef } from "react";
+import { Button, Card, Modal, Space, Table, Image, Tooltip, Skeleton } from 'antd';
 import type { TableColumnsType } from 'antd';
 import { FaRegTrashCan, FaRegCircleQuestion } from "react-icons/fa6";
-import { TiTicket } from "react-icons/ti";
 import { Currency } from "@/component/user/utils/CurrencyDisplay";
 import { QuantityControl } from "@/component/user/utils/QuantityControl";
-import Link from "next/link";
 import { AddressType } from "@/model/AddressType";
-import { useRouter } from "next/navigation";
-import TICKET_UNSELECTED from "@/app/[locale]/(Main)/cart/(asset)/coupon_unselected_short_fill.png"
-import TICKET_SELECTED from "@/app/[locale]/(Main)/cart/(asset)/coupon_selected_short_fill.png"
-import LOGO from "D:\\STUDY\\ĐỒ_ÁN_TỐT_NGHIỆP\\techzone-market\\techzone-frontend\\public\\asset\\logo.png"
 import Search from "antd/es/transfer/search";
+import FloatingCartSummary from "@/component/customer/product/FloatingCartSummary";
+import { DiscountType, PromotionType } from "@/model/PromotionType";
+import PromotionCard from "@/component/customer/product/PromotionCard";
 
-type DataType = {
+type CartPageType = {
     key: React.Key;
     image: string;
     name: string;
@@ -23,69 +20,66 @@ type DataType = {
     final_price?: number;
 }
 
-enum DiscountType {
-    PERCENTAGE,
-    DIRECT_PRICE,
-}
+const formatDate = (date: Date) => {
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+  
+    return `${hours}:${minutes} ${day}/${month}/${year}`;
+};
 
-type Promotion = {
-    _id: string,
-    name: string,
-    description: string,
-    discountType: DiscountType,
-    discountValue?: number,
-    quantity: number,
-    activeDate?: string,
-    expiredDate?: string,
-    // saleCategory: [ObjectId, ...]
-    createdAt?: string
-}
-
-const promotions: Promotion[] = [
+const promotions: PromotionType[] = [
     {
         _id: '1',
-        name: "Giảm 50% tối đa 100k",
-        description: "Áp dụng cho thanh toán qua ví điện tử MoMo",
+        name: "Giảm 50%",
+        description: "Áp dụng cho thanh toán qua ví điện tử MoMo (tối đa 100k)",
         discountType: DiscountType.PERCENTAGE,
         discountValue: 50,
         quantity: 6,
-        expiredDate: new Date().toLocaleDateString("vi-VN", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) // 
+        upperBound: 100000,
+        expiredDate: formatDate(new Date('2024-03-24T12:30:00')) // 
     },
     {
         _id: '2',
-        name: "Giảm 200k cho sản phẩm Màn hình",
-        description: "Áp dụng cho mọi đối tượng khách hàng",
+        name: "Giảm 200k",
+        description: "Áp dụng cho mọi đối tượng khách hàng (cho đơn tối thiểu 400k)",
         discountType: DiscountType.DIRECT_PRICE,
         discountValue: 200000,
         quantity: 20,
-        expiredDate: new Date().toLocaleDateString("vi-VN", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+        lowerBound: 400000,
+        expiredDate: formatDate(new Date('2024-03-27T12:30:00'))
     },
     {
         _id: '3',
-        name: "Giảm 20% cho sản phẩm Điện thoại",
-        description: "Áp dụng cho tất cả khách hàng",
+        name: "Giảm 20%",
+        description: "Áp dụng cho tất cả khách hàng (tối đa 50k)",
         discountType: DiscountType.PERCENTAGE,
         discountValue: 20,
         quantity: 15,
-        expiredDate: new Date().toLocaleDateString("vi-VN", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+        upperBound: 50000,
+        expiredDate: formatDate(new Date('2024-03-22T12:30:00'))
     },
     {
         _id: '4',
-        name: "Giảm 50k cho sản phẩm Tai nghe",
+        name: "Giảm 50k",
         description: "Chỉ áp dụng cho khách hàng VIP",
         discountType: DiscountType.DIRECT_PRICE,
         discountValue: 50000,
         quantity: 10,
-        expiredDate: new Date().toLocaleDateString("vi-VN", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+        lowerBound: 0,
+        expiredDate: formatDate(new Date('2024-04-30T12:30:00'))
     },
     {
         _id: '5',
-        name: "Giảm 10% tối đa 300k cho sản phẩm Laptop",
-        description: "Áp dụng cho thanh toán qua thẻ tín dụng",
+        name: "Giảm 10%",
+        description: "Áp dụng cho thanh toán qua thẻ tín dụng (tối đa 50k)",
         discountType: DiscountType.PERCENTAGE,
         discountValue: 10,
         quantity: 8,
-        expiredDate: new Date().toLocaleDateString("vi-VN", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+        upperBound: 50000,
+        expiredDate: formatDate(new Date('2024-03-25T12:30:00'))
     }
 
 ]
@@ -100,13 +94,14 @@ export default function CartPage() {
     const [top, setTop] = React.useState<number>(50);
     const [provisional, setProvisional] = useState(0);
     const [discount, setDiscount] = useState(0);
-    const [discounts, setDiscounts] = useState<Promotion[]>([]);
+    const [discounts, setDiscounts] = useState<PromotionType[]>([]);
     const [total, setTotal] = useState(0);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showDeleteManyModal, setShowDeleteManyModal] = useState(false);
     const [showPromotionModal, setShowPromotionModal] = useState(false);
     const promotion_help = "Áp dụng tối đa 1 Mã giảm giá Sản Phẩm và 1 Mã Vận Chuyển"
-    const router = useRouter();
+    const floatingRef = useRef(null);
+
     const [currentAddress, setCurrentAddress] = useState<AddressType>({
         _id: '1',
         receiverName: 'Nguyễn Minh Quang',
@@ -148,7 +143,7 @@ export default function CartPage() {
     }
 
     const fetchProducts = async () => {
-        const data: DataType[] = [
+        const data: CartPageType[] = [
             {
                 key: '1',
                 image: 'https://akko.vn/wp-content/uploads/2023/07/3098-RF-Dracula-Castle-01.png',
@@ -272,13 +267,17 @@ export default function CartPage() {
     //     setSelectedRowKeys(newSelectedRowKeys);
     // };
 
-    const applyDiscount = (promotion: Promotion) => {
+    const applyDiscount = (promotion: PromotionType) => {
+        if (discounts.length === 1) {
+            alert("Giới hạn Áp dụng Mã Sản Phẩm!")
+            return;
+        }
         let updatedDiscounts = discounts.slice();
         updatedDiscounts.push(promotion);
         setDiscounts(updatedDiscounts);
     }
 
-    const removeDiscount = (promotion: Promotion) => {
+    const removeDiscount = (promotion: PromotionType) => {
         let updatedDiscounts = discounts.filter(discount => discount._id !== promotion._id)
         setDiscounts(updatedDiscounts);
     }
@@ -292,14 +291,26 @@ export default function CartPage() {
         setProvisional(provisional);
     }
 
+    const calculateDirectPricePromotion = (value: number, lowerBound: number, upperBound: number) => {
+        if (!!lowerBound) return (provisional >= lowerBound) ? value : 0;
+        else if (!!upperBound !== undefined) return (provisional < upperBound) ? 0 : value;
+    }
+
+    const calculatePercentagePromotion = (value: number, upperBound: number) => {
+        const discountValue = value * provisional / 100;
+        return (!!upperBound && (discountValue <= upperBound)) ? discountValue : upperBound;
+    }
+
     const handleDiscount = () => {
         let totalDiscount = 0;
-        discounts.forEach((item: Promotion) => {
+        discounts.forEach((item: PromotionType) => {
             if (item.discountType === DiscountType.DIRECT_PRICE) {
-                totalDiscount += item.discountValue ?? 0;
+                if (item.discountValue)
+                    totalDiscount += calculateDirectPricePromotion(item.discountValue, item.lowerBound!, item.upperBound!) ?? 0;
             }
             else if (item.discountType === DiscountType.PERCENTAGE) {
-                totalDiscount += (item.discountValue ? item.discountValue * provisional / 100 : 0);
+                if (item.discountValue)
+                    totalDiscount += calculatePercentagePromotion(item.discountValue, item.upperBound!);
             }
         })
         setDiscount(totalDiscount);
@@ -310,11 +321,11 @@ export default function CartPage() {
         setTotal(total);
     }
 
-    const columns: TableColumnsType<DataType> = [
+    const columns: TableColumnsType<CartPageType> = [
         {
             title: <span className="text-base">Sản phẩm ({selectedRowKeys.length})</span>,
             dataIndex: 'name',
-            render: (text: string, record: DataType) =>
+            render: (text: string, record: CartPageType) =>
                 <Space size={12} className="flex lg:flex-row flex-col lg:text-start text-center">
                     {
                         loading ? <Skeleton.Image active /> :
@@ -340,7 +351,7 @@ export default function CartPage() {
         {
             title: <span className="text-base">Số lượng</span>,
             dataIndex: 'amount',
-            render: (value: number, record: DataType) =>
+            render: (value: number, record: CartPageType) =>
                 loading ? <Skeleton.Input active /> : (
                     <QuantityControl componentSize={5} keyProp={record.key} value={value}
                         minValue={1} maxValue={100} defaultValue={1}
@@ -354,7 +365,7 @@ export default function CartPage() {
         {
             title: <span className="text-base">Thành tiền</span>,
             dataIndex: 'final_price',
-            render: (value: number, record: DataType) => (
+            render: (value: number, record: CartPageType) => (
                 loading ? <Skeleton.Input active /> : (
                     <span className="text-red-500 font-bold text-base ">
                         <Currency value={(record.unit_price * (record.amount || 1))}
@@ -371,7 +382,7 @@ export default function CartPage() {
                     <FaRegTrashCan />
                 </Button>,
             dataIndex: 'remove',
-            render: (value: number, record: DataType) => (
+            render: (value: number, record: CartPageType) => (
                 <Button onClick={() => handleShowDeleteOneModal(record.key)}><FaRegTrashCan /></Button>
             ),
             fixed: 'right'
@@ -395,9 +406,7 @@ export default function CartPage() {
         setCurrentAddress(JSON.parse(storedAddress) as AddressType);
     }, []);
 
-    const isEmpty = (quantity: number) => {
-        return quantity === 0 ? true : false;
-    }
+
 
     const goToShippingAddressPage = () => {
         localStorage.setItem('shippingAddress', JSON.stringify(currentAddress));
@@ -405,10 +414,10 @@ export default function CartPage() {
 
     return (
         <React.Fragment>
-            <div className="container flex flex-col p-5 mx-auto">
+            <div className="lg:container flex flex-col p-5 mx-auto my-5">
                 <div className="text-xl font-bold">GIỎ HÀNG</div>
-                <div className="mt-5 flex xs:flex-col sm:flex-col md:flex-col lg:flex-row lg:grid lg:grid-cols-6 space-x-20">
-                    <div className="col-start-1 col-span-4 border rounded-lg lg:mb-0 mb-10">
+                <div className="mt-5 flex xs:flex-col sm:flex-col md:flex-col lg:grid lg:grid-cols-3 gap-5 relative">
+                    <div className="lg:col-start-1 lg:col-span-2 border rounded-lg lg:mb-0 mb-10 lg:w-auto w-full">
                         <Table
                             rowSelection={{
                                 type: selectionType,
@@ -426,101 +435,19 @@ export default function CartPage() {
                         />
                     </div>
 
-                    <div className="col-start-1 lg:col-start-5 lg:col-span-2 lg:w-10/12">
-                        <Affix offsetTop={top}>
-                            <Space direction="vertical" size="middle" className="flex">
-                                <Card title={
-                                    <div className="flex flex-row justify-between">
-                                        <span className="text-slate-400 text-lg">Giao tới</span>
-                                        <Link className="text-sky-500 hover:text-blue-700 self-center" href={"/cart/shipping"}
-                                            onClick={goToShippingAddressPage}>
-                                            Thay đổi
-                                        </Link>
-                                    </div>
-                                } size="small">
-                                    {/* Skeleton for current address */}
-                                    {loading ? (
-                                        <Skeleton active />
-                                    ) : (
-                                        <>
-                                            <div className="flex flex-row font-bold space-x-5">
-                                                <div className="lg:text-base text-sm uppercase">{currentAddress.receiverName}</div>
-                                                <Divider type="vertical" style={{ height: "auto", border: "0.25px solid silver" }}></Divider>
-                                                <div className="lg:text-base text-sm lg:mx-5">{currentAddress.phoneNumber}</div>
-                                            </div>
-                                            <div>
-                                                {currentAddress.addressType === "residential" ?
-                                                    <span><Tag color="#87d068">Nhà</Tag></span> :
-                                                    <span><Tag color="#b168d0">Văn phòng</Tag></span>
-                                                }
-                                                <span className="mx-2 text-slate-500">{currentAddress.address}</span>
-                                            </div>
-                                        </>
-                                    )}
-                                </Card>
-                                <Card size="small">
-                                    <div className="flex flex-col">
-                                        {loading ? <Skeleton active /> : (<>
-                                            <div className="flex flex-row justify-between">
-
-                                                <div className="font-semibold">Techzone Khuyến Mãi</div>
-                                                <div className="flex flex-row space-x-2">
-                                                    <div className="text-slate-500">Có thể chọn 2</div>
-                                                    <Tooltip placement="bottom" title={promotion_help}>
-                                                        <div className="text-slate-500"><FaRegCircleQuestion /></div>
-                                                    </Tooltip>
-                                                </div>
-                                            </div>
-                                            <div className="mt-10 flex gap-2 text-sky-500 hover:text-blue-700 font-semibold"
-                                                onClick={() => handleShowPromotionModal()}>
-                                                <TiTicket className="text-lg self-center" />
-                                                <div>Chọn hoặc nhập Khuyến mãi khác</div>
-                                            </div>
-                                        </>
-                                        )}
-                                    </div>
-                                </Card>
-                                <Card size="small">
-                                    {loading ? <Skeleton active /> : (<>
-                                        <div className="flex justify-between">
-                                            <div>Tạm tính</div>
-                                            <Currency value={provisional}
-                                                locales={"vi-VN"}
-                                                currency={"VND"}
-                                                minimumFractionDigits={0} />
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <div>Giảm giá</div>
-                                            <div>- <Currency value={discount}
-                                                locales={"vi-VN"}
-                                                currency={"VND"}
-                                                minimumFractionDigits={0} /></div>
-                                        </div>
-                                        <Divider></Divider>
-                                        <div className="flex justify-between">
-                                            <div>Tổng tiền</div>
-                                            <div className="flex flex-col space-y-3 grid">
-                                                <div className="text-red-400 text-lg font-bold justify-self-end">
-                                                    <Currency value={total}
-                                                        locales={"vi-VN"}
-                                                        currency={"VND"}
-                                                        minimumFractionDigits={0} /></div>
-                                                <div className="text-slate-400 text-base justify-self-end">(Đã bao gồm VAT nếu có)</div>
-                                            </div>
-                                        </div>
-                                    </>
-                                    )}
-                                </Card>
-                                <Button type="primary" size="large" danger block
-                                    disabled={isEmpty(selectedRowKeys.length)}
-                                    onClick={() => { router.push('/cart/payment') }}>
-                                    Mua Hàng ({selectedRowKeys.length})
-                                </Button>
-                            </Space>
-                        </Affix>
+                    <div className="lg:col-start-3 lg:col-span-1 lg:w-auto w-full">
+                        <FloatingCartSummary offsetTop={top}
+                            goToShippingAddressPage={goToShippingAddressPage}
+                            loading={loading} selectedRowKeys={selectedRowKeys}
+                            provisional={provisional} discount={discount} total={total}
+                            currentAddress={currentAddress}
+                            showPromotionModal={handleShowPromotionModal}
+                            floatingRef={floatingRef}
+                        />
                     </div>
                 </div>
             </div>
+
             <Modal
                 width={400}
                 open={showDeleteModal}
@@ -536,7 +463,6 @@ export default function CartPage() {
             >
                 Bạn có muốn xóa sản phẩm này khỏi giỏ hàng không?
             </Modal>
-
             <Modal
                 width={400}
                 open={showDeleteManyModal}
@@ -553,20 +479,31 @@ export default function CartPage() {
                 Bạn có muốn xóa các sản phẩm đã chọn khỏi giỏ hàng không?
             </Modal>
             <Modal
-                width={600}
+                width={550}
                 open={showPromotionModal}
                 onCancel={handleCancelPromotionModal}
                 title={<span className="text-xl">Techzone Khuyến Mãi</span>}
                 footer={null}
-                centered
-            >
+                centered>
                 {
                     <div className="flex flex-col">
                         <Space direction="vertical">
-                            <div className="flex space-x-6">
+                            <div className="flex gap-5 mt-5 border rounded bg-slate-100 p-5">
                                 <Search placeholder="Nhập để tìm mã"></Search>
-                                <Button>Áp dụng</Button>
+                                <Button className="bg-blue-500 font-semibold text-white">Áp dụng</Button>
                             </div>
+                            <Card className="overflow-auto h-96">
+                                {
+                                    promotions.map(item => {
+                                        return (
+                                            <PromotionCard item={item} 
+                                            promotions={discounts} 
+                                            applyDiscount={applyDiscount} 
+                                            removeDiscount={removeDiscount} />
+                                        )
+                                    })
+                                }
+                            </Card>
                             <div className="my-5 flex flex-row justify-center items-center">
                                 <div>Bạn đã chọn &nbsp;</div>
                                 <div className={`${discounts.length > 0 ? "text-red-500" : ""} font-bold text-2xl`}>
@@ -576,47 +513,12 @@ export default function CartPage() {
                                 <Tooltip title={promotion_help}>
                                     <div className="text-slate-500"><FaRegCircleQuestion /></div>
                                 </Tooltip>
-
                             </div>
-
-                            {
-                                promotions.map(item => {
-                                    return <Card className="my-5 w-full h-full"
-                                        hoverable
-                                        style={{
-                                            backgroundImage: `${discounts.includes(item) ? `url(${TICKET_SELECTED.src})` : `url(${TICKET_UNSELECTED.src})`}`,
-                                            backgroundSize: "100% 100%"
-                                        }}>
-                                        <div className="grid grid-cols-10">
-                                            <img className="z-10 row-span-3 col-span-2" alt="logo" src={LOGO.src}></img>
-                                            <div className="z-10 col-start-4 col-span-7 text-2xl font-semibold">{item.name}</div>
-                                            {/* <div className="z-10 col-start-1 col-span-2 text-center font-bold">TechZone</div> */}
-                                            <div className="z-10 col-start-4 col-span-7 text-base">&nbsp;</div>
-                                            <div className="z-10 col-start-4 col-span-7 text-lg">{item.description}</div>
-                                            <div className="z-10 col-start-4 col-span-7 text-base">&nbsp;</div>
-                                            <div className="z-10 col-start-4 col-span-5 text-base">HSD: {item.expiredDate}</div>
-                                            <div className="z-10 col-start-9 col-span-2 text-base">
-                                                {
-                                                    !discounts.includes(item) ?
-                                                        <Button className="w-full bg-sky-500 text-white font-semibold text-center"
-                                                            onClick={() => applyDiscount(item)}>
-                                                            Áp dụng
-                                                        </Button> :
-                                                        <Button className="w-full bg-gray-500 text-white font-semibold text-center"
-                                                            onClick={() => removeDiscount(item)}>
-                                                            Hủy
-                                                        </Button>
-                                                }
-                                            </div>
-                                        </div>
-
-                                    </Card>
-                                })
-                            }
                         </Space>
                     </div>
                 }
             </Modal>
+
         </React.Fragment>
     );
 }

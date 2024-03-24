@@ -1,6 +1,6 @@
 "use client";
 import { Button, Card, Space } from "antd";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FaPlus } from "react-icons/fa6"
 import { useRouter } from "next/navigation"
 import { AddressForm } from "@/component/customer/shipping/AddressForm";
@@ -20,7 +20,7 @@ export default function ShippingAddressPage() {
     const [address, setAddress] = useState<AddressType[]>([]);
     const [isEditMode, setIsEditMode] = useState<boolean>(false);
     const [currentAddress, setCurrentAddress] = useState<AddressType | undefined>(undefined);
-
+    const componentRef = useRef<HTMLDivElement | null>(null);
     const router = useRouter();
 
     const addressTypeOptions = [
@@ -33,13 +33,16 @@ export default function ShippingAddressPage() {
         return addressType ? addressType.label : '';
     };
 
+    const scrollToComponent = () => {
+        if (componentRef.current === null) return;
+        componentRef.current.scrollIntoView({ behavior: 'smooth'});
+        
+    };
+
     //Scroll to the bottom of the screen when the user clicks on the "add address button"
     useEffect(() => {
         if (!formVisibility) return;
-        window.scroll({
-            top: document.body.scrollHeight,
-            behavior: 'smooth',
-        });
+        scrollToComponent();
     }, [formVisibility, currentAddress, address])
 
     const fetchAddress = async () => {
@@ -105,7 +108,7 @@ export default function ShippingAddressPage() {
             if (item._id === _address._id) {
                 return { ..._address };
             }
-            else if (_address.selectedAsDefault) return {...item, selectedAsDefault: false};
+            else if (_address.selectedAsDefault) return { ...item, selectedAsDefault: false };
             else return item;
         });
         setAddress(updatedAddresses);
@@ -164,7 +167,7 @@ export default function ShippingAddressPage() {
                                             {
                                                 item.selectedAsDefault ? null :
                                                     <Button className="bg-red-400 text-white border font-medium"
-                                                    onClick={() => handleRemoveShippingAddress(item._id)}>Xóa</Button>
+                                                        onClick={() => handleRemoveShippingAddress(item._id)}>Xóa</Button>
                                             }
                                         </div>
                                     </div>
@@ -182,22 +185,25 @@ export default function ShippingAddressPage() {
                             setCurrentAddress(undefined);
                             console.log("Create Address", currentAddress)
                             setFormVisibility(true);
+                            scrollToComponent();
                         }}
                         className="border-dashed border-gray-500">
                         Thêm địa chỉ giao hàng mới
                     </Button>
                 </div>
-                {
-                    formVisibility ?
-                        <AddressForm
-                            setFormVisibility={setFormVisibility}
-                            isEditMode={isEditMode}
-                            currentAddress={currentAddress}
-                            handleCreate={handleCreateShippingAddress}
-                            handleUpdate={handleUpdateShippingAddress}                             
+                <div ref={componentRef}>
+                    {
+                        formVisibility ?
+                            <AddressForm
+                                setFormVisibility={setFormVisibility}
+                                isEditMode={isEditMode}
+                                currentAddress={currentAddress}
+                                handleCreate={handleCreateShippingAddress}
+                                handleUpdate={handleUpdateShippingAddress}
                             />
-                        : <div></div>
-                }
+                            : <div></div>
+                    }
+                </div>
             </div>
         </React.Fragment>
     )
