@@ -37,5 +37,18 @@
     "delete": "Xóa",
     "delete_modal": "Bạn chắc chắn muốn xóa bình luận?",
     "cancel": "Hủy"
+  },
+  "ShopPage": {
+    "shop": "Cửu hàng",
+    "all_products": "Tất Cả Sản Phẩm",
+    "collections": "Bộ sưu tập",
+    "search_placeholder": "Tìm tại cửa hàng",
+    "banner_chat": "Phản hồi chat: ",
+    "about_shop": "Hồ Sơ Cửa Hàng",
+    "as_member_since": "Thành viên từ năm: ",
+    "as_number_of_products": "Số sản phẩm: ",
+    "as_description": "Mô tả cửa hàng: ",
+    "as_review": "Đánh giá: ",
+    "as_address": "Địa chỉ: "
   }
 }
