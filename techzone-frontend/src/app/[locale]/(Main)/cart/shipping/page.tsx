@@ -1,6 +1,6 @@
 "use client";
 import { Button, Card, Space } from "antd";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FaPlus } from "react-icons/fa6"
 import { useRouter } from "next/navigation"
 import { AddressForm } from "@/component/customer/shipping/AddressForm";
@@ -20,7 +20,7 @@ export default function ShippingAddressPage() {
     const [address, setAddress] = useState<AddressType[]>([]);
     const [isEditMode, setIsEditMode] = useState<boolean>(false);
     const [currentAddress, setCurrentAddress] = useState<AddressType | undefined>(undefined);
-
+    const componentRef = useRef<HTMLDivElement | null>(null);
     const router = useRouter();
 
     const addressTypeOptions = [
@@ -33,14 +33,17 @@ export default function ShippingAddressPage() {
         return addressType ? addressType.label : '';
     };
 
+    const scrollToComponent = () => {
+        if (componentRef.current === null) return;
+        componentRef.current.scrollIntoView({ behavior: 'smooth'});
+        
+    };
+
     //Scroll to the bottom of the screen when the user clicks on the "add address button"
     useEffect(() => {
         if (!formVisibility) return;
-        window.scroll({
-            top: document.body.scrollHeight,
-            behavior: 'smooth',
-        });
-    }, [formVisibility, currentAddress])
+        scrollToComponent();
+    }, [formVisibility, currentAddress, address])
 
     const fetchAddress = async () => {
         const userAddresses: AddressType[] = [
@@ -72,12 +75,14 @@ export default function ShippingAddressPage() {
         setAddress(userAddresses);
     }
 
-    const handleSetDefaultShippingAddress = (_address: AddressType) => {
+    const handleSetDefaultShippingAddress = (_address: AddressType | undefined) => {
+        if (!_address) return;
+
         const updatedAddresses = address.map(item => {
-            if (item._id === _address._id) {
-                return { ...item, selectedAsDefault: true }
+            if (item._id !== _address._id) {
+                return { ...item, selectedAsDefault: false };
             }
-            return { ...item, selectedAsDefault: false }
+            return item;
         });
         setAddress(updatedAddresses);
     }
@@ -90,9 +95,10 @@ export default function ShippingAddressPage() {
         updatedAddress.push(new_address)
         setAddress(updatedAddress);
 
-        if (_address.selectedAsDefault === true) {
+        if (_address.selectedAsDefault) {
             handleSetDefaultShippingAddress(_address)
         }
+        console.log("handleCreateShippingAddress", address)
     }
 
     const handleUpdateShippingAddress = (_address: AddressType | undefined) => {
@@ -100,17 +106,12 @@ export default function ShippingAddressPage() {
 
         const updatedAddresses = address.map(item => {
             if (item._id === _address._id) {
-                return { ..._address, _id: item._id };
+                return { ..._address };
             }
-            return item;
+            else if (_address.selectedAsDefault) return { ...item, selectedAsDefault: false };
+            else return item;
         });
         setAddress(updatedAddresses);
-
-        if (_address.selectedAsDefault === true) {
-            handleSetDefaultShippingAddress(_address)
-        }
-
-        console.log("handleUpdateShippingAddress", _address);
     }
 
     const handleRemoveShippingAddress = (_id: string) => {
@@ -166,7 +167,7 @@ export default function ShippingAddressPage() {
                                             {
                                                 item.selectedAsDefault ? null :
                                                     <Button className="bg-red-400 text-white border font-medium"
-                                                    onClick={() => handleRemoveShippingAddress(item._id)}>Xóa</Button>
+                                                        onClick={() => handleRemoveShippingAddress(item._id)}>Xóa</Button>
                                             }
                                         </div>
                                     </div>
@@ -184,21 +185,25 @@ export default function ShippingAddressPage() {
                             setCurrentAddress(undefined);
                             console.log("Create Address", currentAddress)
                             setFormVisibility(true);
+                            scrollToComponent();
                         }}
                         className="border-dashed border-gray-500">
                         Thêm địa chỉ giao hàng mới
                     </Button>
                 </div>
-                {
-                    formVisibility ?
-                        <AddressForm
-                            setFormVisibility={setFormVisibility}
-                            isEditMode={isEditMode}
-                            currentAddress={currentAddress}
-                            handleCreate={handleCreateShippingAddress}
-                            handleUpdate={handleUpdateShippingAddress} />
-                        : <div></div>
-                }
+                <div ref={componentRef}>
+                    {
+                        formVisibility ?
+                            <AddressForm
+                                setFormVisibility={setFormVisibility}
+                                isEditMode={isEditMode}
+                                currentAddress={currentAddress}
+                                handleCreate={handleCreateShippingAddress}
+                                handleUpdate={handleUpdateShippingAddress}
+                            />
+                            : <div></div>
+                    }
+                </div>
             </div>
         </React.Fragment>
     )
