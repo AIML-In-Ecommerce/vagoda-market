@@ -3,17 +3,16 @@ import ProductList from "../../product-list/page";
 import { Tabs } from "antd";
 import AboutShop from "@/component/customer/shop/AboutShop";
 import Search from "antd/es/transfer/search";
+import ProductItemList from "@/component/customer/ProductItemList";
 
 export default function ShopPage() {
   const tabItems = [
     {
       label: "Cửa Hàng",
-      key: "1",
       children: <div className="p-2"></div>,
     },
     {
       label: "Tất Cả Sản Phẩm",
-      key: "2",
       children: (
         <div className="p-2">
           {/* temp */}
@@ -23,12 +22,20 @@ export default function ShopPage() {
     },
     {
       label: "Bộ sưu tập",
-      key: "3",
-      children: <div className="p-2"></div>,
+      children: (
+        <div className="p-2">
+          {/* temp */}
+          {/* <ProductItemList
+            isFilterOpened={isFilterOpened}
+            setIsFilterOpened={setIsFilterOpened}
+            filterList={filterList}
+            products={products}
+          /> */}
+        </div>
+      ),
     },
     {
       label: "Hồ Sơ Cửa Hàng",
-      key: "4",
       children: (
         <div className="p-2">
           <AboutShop />
@@ -52,10 +59,9 @@ export default function ShopPage() {
         size="middle"
         style={{ marginLeft: 10, marginRight: 10, marginTop: 10 }}
         items={tabItems.map((item, i) => {
-          //   const id = String(i + 1);
           return {
             label: item.label,
-            key: item.key,
+            key: i.toString(),
             children: item.children,
           };
         })}

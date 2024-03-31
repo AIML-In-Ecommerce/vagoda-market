@@ -15,11 +15,11 @@ export type ReviewType = {
 type ConversationType = {
   user: string; //user id
   content: string;
-  asset: string; // can we not
+  asset: string[]; // can we not
 };
 
 export type RawReviewType = {
-  id: string;
+  _id: string;
   product: string; //product id
   user: string; //user id
   rating: number;
