@@ -1,5 +1,5 @@
 "use client";
-import { Affix, Avatar, Button, Divider, Flex, InputNumber } from "antd";
+import { Avatar, Button, Divider, Flex } from "antd";
 // import { useTranslations } from "next-intl";
 import { AntDesignOutlined } from "@ant-design/icons";
 import { priceIndex } from "./ProductDetail";
@@ -39,85 +39,71 @@ const FloatingCartForm = (formData: FormProps) => {
   };
 
   return (
-    <Affix offsetTop={50} offsetBottom={50}>
-      <div className="lg:w-72 min-w-40 mr-10 p-3 bg-white rounded-xl border-2 overflow-hidden">
-        <Flex gap="small">
-          <div className="m-1">
-            <Avatar
-              size="large"
-              style={{ backgroundColor: "#1677ff" }}
-              icon={<AntDesignOutlined />}
-            />
-          </div>
-          <div className="m-1">
-            <Flex vertical>
-              <b>TechZone ® </b>
-              <div className="text-gray-600 font-light text-xs">Official</div>
-            </Flex>
-          </div>
-        </Flex>
+    <div className="sticky top-10 lg:w-72 min-w-40 mr-10 p-3 bg-white rounded-xl border-2 overflow-hidden">
+      <Flex gap="small">
+        <div className="m-1">
+          <Avatar
+            size="large"
+            style={{ backgroundColor: "#1677ff" }}
+            icon={<AntDesignOutlined />}
+          />
+        </div>
+        <div className="m-1">
+          <Flex vertical>
+            <b>TechZone ® </b>
+            <div className="text-gray-600 font-light text-xs">Official</div>
+          </Flex>
+        </div>
+      </Flex>
 
-        <Divider />
+      <Divider />
 
-        <Flex vertical gap="small">
-          <div className="mx-2">
-            {/* test */}
-            {/* <div>{formData.mainProductPrice}</div>
+      <Flex vertical gap="small">
+        <div className="mx-2">
+          {/* test */}
+          {/* <div>{formData.mainProductPrice}</div>
           <div>{formData.totalComboPrice}</div> */}
 
-            <div className="mb-2 font-semibold"> Số lượng: </div>
+          <div className="mb-2 font-semibold"> Số lượng: </div>
 
-            <QuantityControl
-              componentSize={5}
-              keyProp={0}
-              value={formData.numberOfItem}
-              minValue={1}
-              maxValue={100}
-              defaultValue={1}
-              inputWidth={75}
-              onIncrement={onIncrement}
-              onDecrement={onDecrement}
-              onQuantityChange={onQuantityChange}
-            />
+          <QuantityControl
+            componentSize={5}
+            keyProp={0}
+            value={formData.numberOfItem}
+            minValue={1}
+            maxValue={100}
+            defaultValue={1}
+            inputWidth={75}
+            onIncrement={onIncrement}
+            onDecrement={onDecrement}
+            onQuantityChange={onQuantityChange}
+          />
 
-            {/* <InputNumber
-              min={1}
-              max={999}
-              defaultValue={formData.numberOfItem}
-              onChange={(value) => {
-                if (value) {
-                  formData.updateItemNumber(value);
-                }
-              }}
-              changeOnWheel
-            /> */}
-
-            <div className="my-5">
-              <div className="font-semibold">Tạm tính:</div>
-              <div className="text-xl">{priceIndex(formData.totalPrice)}</div>
-            </div>
+          <div className="my-5">
+            <div className="font-semibold">Tạm tính:</div>
+            <div className="text-xl">{priceIndex(formData.totalPrice)}</div>
           </div>
+        </div>
 
-          <Button type="primary" href="/cart" danger block size="large">
-            Mua ngay
-          </Button>
-          {/* <Button type="primary" ghost block disabled>
+        <Button type="primary" href="/cart" danger block size="large">
+          Mua ngay
+        </Button>
+        {/* <Button type="primary" ghost block disabled>
             Mua trả góp - trả sau
           </Button> */}
-          <Button type="primary" ghost block>
-            Thêm vào giỏ
-          </Button>
-          <Button
-            type="primary"
-            ghost
-            block
-            onClick={() => formData.handleCartDetail(true)}
-          >
-            Xem chi tiết
-          </Button>
-        </Flex>
-      </div>
-    </Affix>
+        <Button type="primary" ghost block>
+          Thêm vào giỏ
+        </Button>
+        <Button
+          type="primary"
+          ghost
+          block
+          onClick={() => formData.handleCartDetail(true)}
+        >
+          Xem chi tiết
+        </Button>
+      </Flex>
+    </div>
   );
 };
 

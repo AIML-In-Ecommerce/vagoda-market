@@ -41,10 +41,7 @@ export default function ProductItem(props: ProductItemProps) {
     } else if (value >= 1000) {
       return (value / 1000).toFixed(0) + "k";
     } else {
-      return value.toLocaleString("vi-VN", {
-        style: "currency",
-        currency: "VND",
-      });
+      return value.toString();
     }
   }
   const animationDuration = 1000;

@@ -498,7 +498,7 @@ export default function ProductDetail() {
           />
         </div>
       </div>
-      <div className="col-span-3 my-10 lg:col-span-2">
+      <div className="col-span-3 my-10 lg:col-span-2 row-span-2">
         <FloatingCartForm
           handleCartDetail={setOpen}
           numberOfItem={numberOfItem}

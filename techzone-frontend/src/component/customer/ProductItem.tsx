@@ -1,6 +1,6 @@
-import React, { useRef, useState } from "react";
 import Image from "next/image";
-import { Button, Rate, Tooltip } from "antd";
+import { Button } from "antd";
+
 interface ProductItemProps {
   imageLink: string;
   name: string;
@@ -9,8 +9,8 @@ interface ProductItemProps {
   price: number;
   isFlashSale: boolean;
   originalPrice: number;
-  inWishlist: boolean;
 }
+
 import { PiShoppingCart } from "react-icons/pi";
 export default function ProductItem(props: ProductItemProps) {
   function formatAmountSold(value: number): string {
@@ -19,10 +19,7 @@ export default function ProductItem(props: ProductItemProps) {
     } else if (value >= 1000) {
       return (value / 1000).toFixed(0) + "k";
     } else {
-      return value.toLocaleString("vi-VN", {
-        style: "currency",
-        currency: "VND",
-      });
+      return value.toString();
     }
   }
 

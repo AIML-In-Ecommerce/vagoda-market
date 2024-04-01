@@ -57,10 +57,10 @@ export default function ProductItemList(props: ProductListProps) {
             We found 231 items for you !
           </div>
         </div>
-        <Space className=" items-end border rounded-lg p-2  m-2 text-sm items-center bg-white">
+        <Space className=" items-end border rounded-lg p-2  m-2 text-sm bg-white">
           Sort by:
           <Select
-            defaultValue="Hight rating"
+            defaultValue="High rating"
             style={{ width: 150 }}
             options={sortOptions}
             className="text-xs"
@@ -114,7 +114,6 @@ export default function ProductItemList(props: ProductListProps) {
                   isFlashSale={product.flashSale}
                   imageLink={product.imageLink}
                   originalPrice={product.originalPrice}
-                  inWishlist={true}
                 />
               </div>
             )
