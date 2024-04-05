@@ -1,8 +1,11 @@
 "use client";
+import { WidgetType } from "@/model/WidgetType";
 import { Carousel, Image, Skeleton } from "antd";
 import React, { useEffect, useState } from "react";
 
-interface BannerCarouselProps {}
+interface BannerCarouselProps {
+  widget: WidgetType;
+}
 
 interface CarouselImageProps {
   _id: string;
@@ -47,7 +50,7 @@ const MockPictures: CarouselImageProps[] = [
   },
 ];
 
-export default function BannerCarousel({}: BannerCarouselProps) {
+export default function BannerCarousel(props: BannerCarouselProps) {
   const [largeBackgroundUrl, setLargeBackgroundUrl] = useState<string>("");
   const [carouselImages, setCarouselImages] = useState<CarouselImageProps[]>(
     []

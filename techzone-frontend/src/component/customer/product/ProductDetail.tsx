@@ -5,6 +5,7 @@ import {
   Descriptions,
   DescriptionsProps,
   Divider,
+  Empty,
   Flex,
   FloatButton,
   List,
@@ -317,6 +318,14 @@ export default function ProductDetail() {
               <List
                 grid={{ gutter: 20, column: 5 }}
                 dataSource={productInfo.images}
+                locale={{
+                  emptyText: (
+                    <Empty
+                      image={Empty.PRESENTED_IMAGE_SIMPLE}
+                      description={<span>Không có</span>}
+                    />
+                  ),
+                }}
                 renderItem={(item) => (
                   <List.Item>
                     <div

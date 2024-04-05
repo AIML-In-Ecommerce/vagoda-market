@@ -2,6 +2,7 @@
 import { List, Typography } from "antd";
 import MiniPromotionTicket, { TempPromotion } from "../../MiniPromotionTicket";
 import { DiscountType } from "@/model/PromotionType";
+import { PromotionElement, WidgetType } from "@/model/WidgetType";
 
 const formatDate = (date: Date) => {
   const hours = date.getHours().toString().padStart(2, "0");
@@ -13,7 +14,11 @@ const formatDate = (date: Date) => {
   return `${hours}:${minutes} ${day}/${month}/${year}`;
 };
 
-export default function PromotionGrid() {
+interface PromotionGridProps {
+  widget: WidgetType;
+}
+
+export default function PromotionGrid(props: PromotionGridProps) {
   // TODO: replace this w model
   const promotions: TempPromotion[] = [
     {
@@ -74,10 +79,13 @@ export default function PromotionGrid() {
     },
   ];
 
+  // var
+  const element = props.widget.element as PromotionElement;
+
   return (
     <div className="bg-white my-5 py-5 px-10 ">
       <Typography.Text className="text-2xl font-semibold w-full">
-        Voucher trao tay
+        {element.title}
       </Typography.Text>
       <List
         grid={{ gutter: 16, column: 6 }}

@@ -1,17 +1,17 @@
 "use client";
+import { CategoryElement, WidgetType } from "@/model/WidgetType";
 import { Empty, List, Typography } from "antd";
-import ProductItem from "../../ProductItem";
-import { ProductType } from "@/model/ProductType";
-import { ProductElement, WidgetType } from "@/model/WidgetType";
+import Link from "next/link";
 
-interface ProductGridProps {
-  products: ProductType[];
+interface CategoryGridProps {
   widget: WidgetType;
 }
 
-export default function ProductGrid(props: ProductGridProps) {
+export default function CategoryGrid(props: CategoryGridProps) {
+  const tempData = ["example 1", "example 2", "example 3", "example 4"];
+
   // var
-  const element = props.widget.element as ProductElement;
+  const element = props.widget.element as CategoryElement;
 
   return (
     <div className="bg-white my-5 py-5 px-10 ">
@@ -21,7 +21,7 @@ export default function ProductGrid(props: ProductGridProps) {
       <div className="invisible h-5">hidden block</div>
       <List
         grid={{ gutter: 16, column: 4 }}
-        dataSource={props.products}
+        dataSource={tempData}
         locale={{
           emptyText: (
             <Empty
@@ -32,15 +32,11 @@ export default function ProductGrid(props: ProductGridProps) {
         }}
         renderItem={(item) => (
           <List.Item>
-            <ProductItem
-              imageLink={item.imageLink}
-              name={item.name}
-              rating={item.rating}
-              soldAmount={item.soldAmount}
-              price={item.price}
-              isFlashSale={item.flashSale}
-              originalPrice={item.originalPrice}
-            />
+            <Link href={""}>
+              <div className="text-center text-xl text-semibold line-clamp-2">
+                {item}
+              </div>
+            </Link>
           </List.Item>
         )}
       />

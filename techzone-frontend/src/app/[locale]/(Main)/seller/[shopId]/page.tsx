@@ -1,3 +1,4 @@
+"use client";
 import Banner from "@/component/customer/shop/Banner";
 import ProductList from "../../product-list/page";
 import { Tabs } from "antd";
@@ -7,165 +8,105 @@ import ProductCarousel from "@/component/customer/shop/boothPattern/ProductCarou
 import BannerCarousel from "@/component/customer/shop/boothPattern/BannerCarousel";
 import PromotionGrid from "@/component/customer/shop/boothPattern/PromotionGrid";
 import ProductGrid from "@/component/customer/shop/boothPattern/ProductGrid";
-
-const MockData = [
-  {
-    _id: "sp-01",
-    imageLink:
-      "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    name: "Lenovo 15i",
-    rating: 4.5,
-    soldAmount: 20,
-    price: 15000000,
-    flashSale: true,
-    originalPrice: 17000000,
-    category: "",
-  },
-  {
-    _id: "sp-02",
-    imageLink:
-      "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    name: "Dell Vostro",
-    rating: 4.5,
-    soldAmount: 32,
-    price: 17000000,
-    flashSale: false,
-    originalPrice: 17000000,
-    category: "",
-  },
-  {
-    _id: "sp-03",
-    imageLink:
-      "https://images.unsplash.com/photo-1593642702821-c8da6771f0c6?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    name: "Dell SuperLight",
-    rating: 4.5,
-    soldAmount: 10,
-    price: 22000000,
-    flashSale: true,
-    originalPrice: 20000000,
-    category: "",
-  },
-  {
-    _id: "sp-04",
-    imageLink:
-      "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    name: "Lenovo 15i",
-    rating: 4.5,
-    soldAmount: 20,
-    price: 15000000,
-    flashSale: true,
-    originalPrice: 17000000,
-    category: "",
-  },
-  {
-    _id: "sp-05",
-    imageLink:
-      "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    name: "Dell Vostro",
-    rating: 4.5,
-    soldAmount: 32,
-    price: 17000000,
-    flashSale: false,
-    originalPrice: 17000000,
-    category: "",
-  },
-  {
-    _id: "sp-06",
-    imageLink:
-      "https://images.unsplash.com/photo-1593642702821-c8da6771f0c6?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    name: "Dell SuperLight",
-    rating: 4.5,
-    soldAmount: 10,
-    price: 22000000,
-    flashSale: true,
-    originalPrice: 20000000,
-    category: "",
-  },
-  {
-    _id: "sp-07",
-    imageLink:
-      "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    name: "Lenovo 15i",
-    rating: 4.5,
-    soldAmount: 20,
-    price: 15000000,
-    flashSale: true,
-    originalPrice: 17000000,
-    category: "",
-  },
-  {
-    _id: "sp-08",
-    imageLink:
-      "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    name: "Dell Vostro",
-    rating: 4.5,
-    soldAmount: 32,
-    price: 17000000,
-    flashSale: false,
-    originalPrice: 17000000,
-    category: "",
-  },
-  {
-    _id: "sp-09",
-    imageLink:
-      "https://images.unsplash.com/photo-1593642702821-c8da6771f0c6?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    name: "Dell SuperLight",
-    rating: 4.5,
-    soldAmount: 10,
-    price: 22000000,
-    flashSale: true,
-    originalPrice: 20000000,
-    category: "",
-  },
-  {
-    _id: "sp-10",
-    imageLink:
-      "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    name: "Lenovo 15i",
-    rating: 4.5,
-    soldAmount: 20,
-    price: 15000000,
-    flashSale: true,
-    originalPrice: 17000000,
-    category: "",
-  },
-  {
-    _id: "sp-11",
-    imageLink:
-      "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    name: "Dell Vostro",
-    rating: 4.5,
-    soldAmount: 32,
-    price: 17000000,
-    flashSale: false,
-    originalPrice: 17000000,
-    category: "",
-  },
-  {
-    _id: "sp-12",
-    imageLink:
-      "https://images.unsplash.com/photo-1593642702821-c8da6771f0c6?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    name: "Dell SuperLight",
-    rating: 4.5,
-    soldAmount: 10,
-    price: 22000000,
-    flashSale: true,
-    originalPrice: 20000000,
-    category: "",
-  },
-];
+import {
+  WidgetType,
+  WidgetCategoryType,
+  CategoryPatternType,
+  ProductPatternType,
+  PromotionPatternType,
+  BannerPatternType,
+} from "@/model/WidgetType";
+import { useState } from "react";
+import WidgetList from "@/component/customer/shop/WidgetList";
 
 export default function ShopPage() {
+  // shop mock data and get pattern list from widgetList variable
+  const [widgets, setWidgets] = useState<WidgetType[]>([
+    {
+      _id: "category_ID",
+      type: WidgetCategoryType.CATEGORY,
+      order: 1,
+      visibility: false,
+      element: {
+        pattern: CategoryPatternType.GRID,
+        title: "Danh mục nổi bật",
+        categoryIdList: [],
+      },
+    },
+    {
+      _id: "product_ID",
+      type: WidgetCategoryType.PRODUCT,
+      order: 2,
+      visibility: true,
+      element: {
+        pattern: ProductPatternType.GRID,
+        title: "Sản phẩm mới",
+        collectionId: "",
+      },
+    },
+    {
+      _id: "product_ID2",
+      type: WidgetCategoryType.PRODUCT,
+      order: 4,
+      visibility: true,
+      element: {
+        pattern: ProductPatternType.CAROUSEL,
+        title: "Sản phẩm giá hời",
+        collectionId: "",
+      },
+    },
+    {
+      _id: "product_ID3",
+      type: WidgetCategoryType.PRODUCT,
+      order: 5,
+      visibility: true,
+      element: {
+        pattern: ProductPatternType.GRID,
+        title: "Sản phẩm nổi bật",
+        collectionId: "",
+      },
+    },
+    {
+      _id: "product_ID4",
+      type: WidgetCategoryType.PRODUCT,
+      order: 6,
+      visibility: true,
+      element: {
+        pattern: ProductPatternType.CAROUSEL,
+        title: "Sản phẩm cho bạn",
+        collectionId: "",
+      },
+    },
+    {
+      _id: "promotion_ID",
+      type: WidgetCategoryType.PROMOTION,
+      order: 3,
+      visibility: false,
+      element: {
+        pattern: PromotionPatternType.GRID,
+        title: "Voucher trao tay",
+        promotionIdList: [],
+      },
+    },
+    {
+      _id: "banner_ID",
+      type: WidgetCategoryType.BANNER,
+      order: 0,
+      visibility: true,
+      element: {
+        pattern: BannerPatternType.CAROUSEL,
+        images: [],
+      },
+    },
+  ]);
+
   const tabItems = [
     {
       label: "Cửa Hàng",
       children: (
         <div className="p-2">
           {/* pattern list here */}
-          <BannerCarousel />
-          <PromotionGrid />
-          <ProductCarousel products={MockData} />
-          <ProductGrid products={MockData} />
+          <WidgetList widgets={widgets} />
         </div>
       ),
     },
@@ -179,7 +120,7 @@ export default function ShopPage() {
       ),
     },
     {
-      label: "Bộ sưu tập",
+      label: "Bộ Sưu Tập",
       children: (
         <div className="p-2">
           {/* temp */}

@@ -1,14 +1,16 @@
 "use client";
-import { Carousel, Flex, Skeleton, Typography } from "antd";
+import { Carousel, Empty, Flex, Skeleton, Typography } from "antd";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { AiOutlineRight } from "react-icons/ai";
 import { CarouselArrow } from "@/component/user/utils/CarouselArrow";
 import ProductItem from "@/component/customer/ProductItem";
 import { ProductType } from "@/model/ProductType";
+import { ProductElement, WidgetType } from "@/model/WidgetType";
 
 interface ProductCarouselProps {
   products: ProductType[];
+  widget: WidgetType;
 }
 
 interface ProductItemProps {
@@ -74,7 +76,13 @@ export default function ProductCarousel(props: ProductCarouselProps) {
 
   const productDisplay = () => {
     if (products.length < 1) {
-      return <Skeleton active />;
+      // return <Skeleton active />;
+      return (
+        <Empty
+          image={Empty.PRESENTED_IMAGE_SIMPLE}
+          description={<span>Không có</span>}
+        />
+      );
     }
 
     let result: JSX.Element[] = [];
@@ -166,12 +174,15 @@ export default function ProductCarousel(props: ProductCarouselProps) {
     return result;
   };
 
+  // var
+  const element = props.widget.element as ProductElement;
+
   return (
     <div className="w-full flex justify-center items-center bg-white py-10 my-5">
       <div className="w-full px-10">
         <Flex className="w-full mb-4" align="center">
           <Typography.Text className="text-2xl font-semibold w-full">
-            Sản phẩm dạng băng chuyền
+            {element.title}
           </Typography.Text>
           <Flex className="w-full px-4" justify="end" align="center" gap={6}>
             <Link href={SuggestionProductsMoreDetailHref} prefetch={false}>
