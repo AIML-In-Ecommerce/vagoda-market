@@ -3,6 +3,9 @@
 import { Flex, Image, Skeleton, Typography } from "antd"
 import Link from "next/link"
 import { useEffect, useState } from "react"
+import facebookImgLocalLink from '../../../public/asset/facebook.256x256.png'
+import mediaImgLocalLink from '../../../public/asset/youtube.256x180.png'
+import googleImgLocalLink from '../../../public/asset/google.256x256.png'
 
 
 interface WebFooterProps
@@ -183,19 +186,19 @@ const ServiceInfoMockData =
         _id: "si-19",
         name: "Facebook TechZone",
         link: "#",
-        icon: "@/asset/facebook.256x256.png"
+        icon: facebookImgLocalLink
     },
     {
         _id: "si-20",
         name: "TechZone Media",
         link: "#",
-        icon: "\asset\youtube.256x180.png"
+        icon: mediaImgLocalLink
     },
     {
         _id: "si-21",
         name: "TechZone gmail",
         link: "#",
-        icon: "@/asset/google.256x256.png"
+        icon: googleImgLocalLink
     },
     {
         _id: "si-22",

@@ -1,9 +1,9 @@
 'use client'
 
-import { Button, Drawer, Flex, Popover, Typography } from "antd";
+import { Button, Drawer, Flex, Popover, Tooltip, Typography } from "antd";
 import Link from "next/link";
 import { MouseEvent, useEffect, useState } from "react";
-import { BiSolidCategory } from "react-icons/bi";
+import { IoIosArrowForward } from "react-icons/io";
 
 
 interface CategoryDrawerProps
@@ -472,10 +472,16 @@ export default function CategoryDrawer({}: CategoryDrawerProps)
     return(
         <>
             <div className="relative w-1/4 bg-blue-500 left-0"></div>
-            <div className="absolute z-10">
-                <Button className="fixed w-16 min-w-16 h-16 min-h-16 rounded-full border-0 shadow-md ml-2" onClick={handleOpenDrawer}>
-                    <BiSolidCategory className="w-full h-full text-lg"/>
-                </Button>
+            <div className="absolute z-10 top-0">
+                <Flex vertical className="h-svh bg-green-500" align="center" justify="center">
+                    <Tooltip trigger={"hover"} title={"Open Category"} placement="right">
+                        <Button className="fixed w-14 min-w-14 h-16 min-h-16 rounded-r-full border-0 ml-2 bg-transparent" onClick={handleOpenDrawer}>
+                            <Flex className="w-full h-full ml-2" justify="end">
+                                <IoIosArrowForward className="w-full h-full text-lg" size={"large"}/>
+                            </Flex>
+                    </Button>
+                    </Tooltip>
+                </Flex>
             </div>
             <Drawer open={drawerOpen} closable={true} onClose={handleCloseDrawer}
                 

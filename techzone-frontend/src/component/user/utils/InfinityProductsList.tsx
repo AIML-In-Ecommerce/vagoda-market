@@ -1,14 +1,19 @@
-'use client'
+import { ProductType } from "@/model/ProductType"
+import { Button, Flex, Image, Pagination, Skeleton, Typography } from "antd"
+import React, { useEffect, useRef, useState } from "react"
+import ProductItem, { ProductItemScaleSize } from "./ProductItem";
 
-import { Divider, Flex, Pagination, Skeleton, Typography } from "antd";
-import { useEffect, useState } from "react";
-import ProductItem, { ProductItemScaleSize } from "./utils/ProductItem";
-
-
-
-interface SpecifiedProductsCarouselProp
+interface SetupProps
 {
-    
+    // fetchDataFuntion: (page: number) => Promise<any>
+    setup: InfinityScrollProductsProps
+}
+
+export interface InfinityScrollProductsProps
+{
+    productsPerSlide: number,
+    productsPerRow: number,
+    overFlowMaxHeight: string
 }
 
 interface ProductItemProps 
@@ -35,7 +40,7 @@ interface ProductItemPropsWrapper
     productInfo: ProductItemProps
 }
 
-const MockData = 
+const MockData: ProductType[] = 
 [
     {
         _id: "sp-01",
@@ -44,9 +49,9 @@ const MockData =
         rating: 4.5,
         soldAmount: 20,
         price: 15000000,
-        isFlashSale: true,
+        flashSale: true,
         originalPrice: 17000000,
-        inWishlist: false
+        category: "CA"
     },
     {
         _id: "sp-02",
@@ -55,9 +60,9 @@ const MockData =
         rating: 4.5,
         soldAmount: 32,
         price: 17000000,
-        isFlashSale: false,
+        flashSale: false,
         originalPrice: 17000000,
-        inWishlist: false
+        category: "C2"
     },
     {
         _id: "sp-03",
@@ -66,9 +71,9 @@ const MockData =
         rating: 4.5,
         soldAmount: 10,
         price: 22000000,
-        isFlashSale: true,
+        flashSale: true,
         originalPrice: 20000000,
-        inWishlist: false
+        category: "C1"
     },
     {
         _id: "sp-04",
@@ -77,9 +82,9 @@ const MockData =
         rating: 4.5,
         soldAmount: 20,
         price: 15000000,
-        isFlashSale: true,
+        flashSale: true,
         originalPrice: 17000000,
-        inWishlist: false
+        category: "CA"
     },
     {
         _id: "sp-05",
@@ -88,9 +93,9 @@ const MockData =
         rating: 4.5,
         soldAmount: 32,
         price: 17000000,
-        isFlashSale: false,
+        flashSale: false,
         originalPrice: 17000000,
-        inWishlist: false
+        category: "C2"
     },
     {
         _id: "sp-06",
@@ -99,9 +104,9 @@ const MockData =
         rating: 4.5,
         soldAmount: 10,
         price: 22000000,
-        isFlashSale: true,
+        flashSale: true,
         originalPrice: 20000000,
-        inWishlist: false
+        category: "C3"
     },
     {
         _id: "sp-07",
@@ -110,9 +115,9 @@ const MockData =
         rating: 4.5,
         soldAmount: 20,
         price: 15000000,
-        isFlashSale: true,
+        flashSale: true,
         originalPrice: 17000000,
-        inWishlist: false
+        category: "CA"
     },
     {
         _id: "sp-08",
@@ -121,9 +126,9 @@ const MockData =
         rating: 4.5,
         soldAmount: 32,
         price: 17000000,
-        isFlashSale: false,
+        flashSale: false,
         originalPrice: 17000000,
-        inWishlist: false
+        category: "C2"
     },
     {
         _id: "sp-09",
@@ -132,9 +137,9 @@ const MockData =
         rating: 4.5,
         soldAmount: 10,
         price: 22000000,
-        isFlashSale: true,
+        flashSale: true,
         originalPrice: 20000000,
-        inWishlist: false
+        category: "CA"
     },
     {
         _id: "sp-10",
@@ -143,9 +148,9 @@ const MockData =
         rating: 4.5,
         soldAmount: 20,
         price: 15000000,
-        isFlashSale: true,
+        flashSale: true,
         originalPrice: 17000000,
-        inWishlist: false
+        category: "C2"
     },
     {
         _id: "sp-11",
@@ -154,24 +159,24 @@ const MockData =
         rating: 4.5,
         soldAmount: 32,
         price: 17000000,
-        isFlashSale: false,
+        flashSale: false,
         originalPrice: 17000000,
-        inWishlist: false
+        category: "CA"
     },
-    {
-        _id: "sp-12",
-        imageLink: "https://images.unsplash.com/photo-1593642702821-c8da6771f0c6?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-        name: "Dell SuperLight",
-        rating: 4.5,
-        soldAmount: 10,
-        price: 22000000,
-        isFlashSale: true,
-        originalPrice: 20000000,
-        inWishlist: false
-    }
+    // {
+    //     _id: "sp-12",
+    //     imageLink: "https://images.unsplash.com/photo-1593642702821-c8da6771f0c6?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    //     name: "Dell SuperLight",
+    //     rating: 4.5,
+    //     soldAmount: 10,
+    //     price: 22000000,
+    //     flashSale: true,
+    //     originalPrice: 20000000,
+    //     category: "C2"
+    // }
 ]
 
-const paddingBlockProps: ProductItemProps =
+const paddingBlockProps: ProductType =
 {
     _id: "",
     imageLink: "",
@@ -179,24 +184,40 @@ const paddingBlockProps: ProductItemProps =
     rating: 0.0,
     soldAmount: 0,
     price: 0,
-    isFlashSale: false,
+    flashSale: false,
     originalPrice: 0,
-    inWishlist: false
+    category: "Unknown"
 }
 
-export default function HotSalesProducts({}: SpecifiedProductsCarouselProp)
+export default function InfinityProductsList(setupProps: SetupProps)
 {
     const [products, setProducts] = useState<ProductItemProps[]>([])
     const [mainDisplay, setMainDisplay] = useState<JSX.Element>(<Skeleton active />)
     const [currentPagination, setCurrentPagination] = useState<number>(1)
-    const [totalPage, setTotalPage] = useState<number>(4);
+    const [isLoadingItems, setIsLoadingItems] = useState<boolean>(false)
 
-    const productsPerSlide = 10
-    const productsPerRow = 5
-
+    const ref = useRef(null);
+    React.useEffect(() => {
+      require("@lottiefiles/lottie-player");
+    });
+    const lottie =
+        <lottie-player
+          id="firstLottie"
+          ref={ref}
+          autoPlay
+          loop
+          mode="normal"
+          src="https://lottie.host/db240567-c95f-4ada-816c-1edf9286f14e/0QXuCKuchC.json"
+          style={{height: "60px"}}
+        ></lottie-player>
 
     useEffect(() =>
     {
+        setIsLoadingItems(true)
+        setTimeout(() =>
+        {
+            setIsLoadingItems(false)
+        }, 3000)
         //fetch data here
 
         //for testing
@@ -210,9 +231,10 @@ export default function HotSalesProducts({}: SpecifiedProductsCarouselProp)
                 rating: value.rating,
                 soldAmount: value.soldAmount,
                 price: value.price,
-                isFlashSale: value.isFlashSale,
+                isFlashSale: value.flashSale,
                 originalPrice: value.originalPrice,
-                inWishlist: value.inWishlist
+                inWishlist: false,
+                //TODO: fix the inWishlist variable assignment
             }
 
             return item
@@ -224,25 +246,49 @@ export default function HotSalesProducts({}: SpecifiedProductsCarouselProp)
 
     useEffect(() =>
     {
-        const newDisplay = getSlideOfProductsDisplay(currentPagination - 1)
+        const newDisplay = getSlideOfProductsDisplay()
         setMainDisplay(newDisplay)
-
-        const newTotalPage = Math.round(products.length / productsPerSlide)
-        const remainder = products.length % productsPerSlide
-
-        if(remainder != 0)
-        {
-            setTotalPage(newTotalPage + 1)
-        }
-        else
-        {
-            setTotalPage(newTotalPage)
-        }
     },
     [products])
 
 
-    function getSlideOfProductsDisplay(index: number)
+    function handleLoadMoreOnClick()
+    {
+        setIsLoadingItems(true)
+        setTimeout(() =>
+        {
+            setIsLoadingItems(false)
+        }, 3000)
+        //TODO: fetch more data here
+        //await fetchDataFunction(currentPage)
+
+        setCurrentPagination(currentPagination + 1)
+        const data = [...MockData]
+        const mappedData =  data.map((value: ProductType) =>
+        {
+            const item:ProductItemProps = 
+            {
+                _id: value._id,
+                imageLink: value.imageLink,
+                name: value.name,
+                rating: value.rating,
+                soldAmount: value.soldAmount,
+                price: value.price,
+                isFlashSale: value.flashSale,
+                originalPrice: value.originalPrice,
+                inWishlist: false,
+                //TODO: fix the inWishlist variable assignment
+            }
+
+            return item
+        })
+
+        const newProductsItems = [...products].concat(mappedData)
+        setProducts(newProductsItems)
+    }
+
+
+    function getSlideOfProductsDisplay()
     {
         if(products.length < 1)
         {
@@ -251,9 +297,7 @@ export default function HotSalesProducts({}: SpecifiedProductsCarouselProp)
 
         let result: JSX.Element = <></>
 
-        const startIndex = (index) * productsPerSlide
-        const endIndex = (startIndex + productsPerSlide) > products.length ? products.length : (startIndex + productsPerSlide)
-        let data = products.slice(startIndex, endIndex).map((value: ProductItemProps) =>
+        let data = products.map((value: ProductItemProps) =>
         {
             const item: ProductItemPropsWrapper =
             {
@@ -264,10 +308,13 @@ export default function HotSalesProducts({}: SpecifiedProductsCarouselProp)
             return item
         })
 
+        let numOfRows = data.length / setupProps.setup.productsPerRow
+
+        const remainder = data.length % setupProps.setup.productsPerRow
         //insert padding blocks
-        if(data.length < productsPerSlide)
+        if(remainder != 0 && remainder < setupProps.setup.productsPerRow)
         {
-            const paddingBlocks = new Array(productsPerSlide - data.length).fill(paddingBlockProps).map((value) =>
+            const paddingBlocks = new Array(setupProps.setup.productsPerRow - remainder).fill(paddingBlockProps).map((value) =>
             {
                 const item: ProductItemPropsWrapper =
                 {
@@ -277,15 +324,16 @@ export default function HotSalesProducts({}: SpecifiedProductsCarouselProp)
                 return item
             })
             data = data.concat(paddingBlocks)
+
+            numOfRows = numOfRows + 1
         }
 
-        const numOfRows = productsPerSlide / productsPerRow
-
         const wrapper:JSX.Element[] = []
+        
         for(let i = 0; i < numOfRows; i++)
         {
-            const left = i*productsPerRow
-            const right = ((left + productsPerRow) > data.length ? data.length : (left + productsPerRow))
+            const left = i* setupProps.setup.productsPerRow
+            const right = ((left + setupProps.setup.productsPerRow) > data.length ? data.length : (left + setupProps.setup.productsPerRow))
 
             const slicedData = data.slice(left, right)
 
@@ -301,7 +349,7 @@ export default function HotSalesProducts({}: SpecifiedProductsCarouselProp)
                     <>
                         <div className={isVisible} key={value._id}>
                             <ProductItem
-                            size={ProductItemScaleSize.large}
+                            size={ProductItemScaleSize.small}
                             imageLink={value.imageLink} name={value.name} rating={value.rating} 
                             soldAmount={value.soldAmount} price={value.price} isFlashSale={value.isFlashSale} 
                             originalPrice={value.originalPrice} inWishlist={value.inWishlist}/>
@@ -322,35 +370,29 @@ export default function HotSalesProducts({}: SpecifiedProductsCarouselProp)
         //     {wrapper}
         // </Flex>
 
-        result = <div className="w-10/12">
+        result = <Flex vertical className="w-full" justify="center" align="center" gap={20}>
             {wrapper}
-        </div>
+        </Flex>
 
         return result
     }
 
-    function handlePageChange(page: number, pageSize: number)
-    {
-        const newDisplay = getSlideOfProductsDisplay(page - 1)
-        setCurrentPagination(page)
-        setMainDisplay(newDisplay)
-    }
+    const LoadMoreButton = isLoadingItems == false ?
+    <Button className="border-none" onClick={handleLoadMoreOnClick}>
+        Xem thêm
+    </Button> :
+    <div>{lottie}</div>
 
     return(
         <>
-            <div className="w-full bg-indigo-300 flex flex-col justify-center items-center rounded-lg py-4">
-                <div className="w-10/12 pb-4">
-                    <Flex justify="start" align="center">
-                        <Typography.Text className="text-3xl font-semibold w-full pt-4 text-white text-center">
-                            Sản phẩm bán chạy
-                        </Typography.Text>
-                    </Flex>
-                    <div className="w-full h-px bg-white mt-3 mb-4"></div>
+            <Flex className="w-full h-full" vertical justify="center" align="center">
+                <div className="overflow-y-auto py-4 w-full" style={{maxHeight: `${setupProps.setup.overFlowMaxHeight}`}}>
+                    {mainDisplay}
                 </div>
-                {mainDisplay}
-                <Pagination defaultCurrent={1} current={currentPagination} total={totalPage*10} showPrevNextJumpers onChange={handlePageChange}
-                />
-            </div>
+                <Flex className="w-full" justify="center" align="center">
+                    {LoadMoreButton}
+                </Flex>
+            </Flex>
         </>
     )
 }

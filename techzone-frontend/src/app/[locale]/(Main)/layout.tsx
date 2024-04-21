@@ -3,11 +3,14 @@ import type { Metadata } from "next";
 import "../globals.css";
 // import { AuthProvider } from "@/context/AuthContext";
 // import StyledComponentsRegistry from "../../../lib/AntdRegistry";
-import { ReactNode } from "react";
+import { ReactNode, Suspense } from "react";
 import { NextIntlClientProvider, useMessages } from "next-intl";
 import Navbar from "@/component/customer/Navbar";
 import CategoryDrawer from "@/component/user/utils/CategoryDrawer";
 import WebFooter from "@/component/user/WebFooter";
+import RootLoading from "./loading";
+import AssistantFloatingButtonGroup from "@/component/user/AssistantFloatingButtonGroup";
+
 // import UserLayout from "@/component/UserLayout";
 
 interface RootLayoutProps {
@@ -36,11 +39,14 @@ export default function RootLayout({
           {/* <UserLayout children={children} locale={locale} /> */}
           {/* <UserLayout locale={locale}>{children}</UserLayout> */}
           {/* </AuthProvider> */}
-          <div className="bg-cover bg-slate-50 min-h-screen">
-            <Navbar />
-            <CategoryDrawer />
-            {children}
-          </div>
+          <Suspense fallback={<RootLoading />}>
+            <div className="bg-cover bg-slate-50 min-h-screen">
+              <Navbar />
+              <CategoryDrawer />
+              {children}
+              <AssistantFloatingButtonGroup />
+            </div>
+          </Suspense>
         </NextIntlClientProvider>
         <WebFooter />
       </body>
