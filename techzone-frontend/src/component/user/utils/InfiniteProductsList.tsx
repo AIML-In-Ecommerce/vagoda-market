@@ -1,3 +1,5 @@
+'use client'
+
 import { ProductType } from "@/model/ProductType"
 import { Button, Flex, Image, Pagination, Skeleton, Typography } from "antd"
 import React, { useEffect, useRef, useState } from "react"
@@ -6,14 +8,14 @@ import ProductItem, { ProductItemScaleSize } from "./ProductItem";
 interface SetupProps
 {
     // fetchDataFuntion: (page: number) => Promise<any>
-    setup: InfinityScrollProductsProps
+    setup: InfiniteScrollProductsProps
 }
 
-export interface InfinityScrollProductsProps
+export interface InfiniteScrollProductsProps
 {
-    productsPerSlide: number,
     productsPerRow: number,
-    overFlowMaxHeight: string
+    overFlowMaxHeight: string,
+    productItemSize: string
 }
 
 interface ProductItemProps 
@@ -246,8 +248,13 @@ export default function InfinityProductsList(setupProps: SetupProps)
 
     useEffect(() =>
     {
-        const newDisplay = getSlideOfProductsDisplay()
-        setMainDisplay(newDisplay)
+        setIsLoadingItems(true)
+        setTimeout(() =>
+        {
+            const newDisplay = getSlideOfProductsDisplay()
+            setMainDisplay(newDisplay)
+            setIsLoadingItems(false)
+        }, 3000)
     },
     [products])
 
@@ -258,33 +265,33 @@ export default function InfinityProductsList(setupProps: SetupProps)
         setTimeout(() =>
         {
             setIsLoadingItems(false)
+            setCurrentPagination(currentPagination + 1)
+            const data = [...MockData]
+            const mappedData =  data.map((value: ProductType) =>
+            {
+                const item:ProductItemProps = 
+                {
+                    _id: value._id,
+                    imageLink: value.imageLink,
+                    name: value.name,
+                    rating: value.rating,
+                    soldAmount: value.soldAmount,
+                    price: value.price,
+                    isFlashSale: value.flashSale,
+                    originalPrice: value.originalPrice,
+                    inWishlist: false,
+                    //TODO: fix the inWishlist variable assignment
+                }
+    
+                return item
+            })
+    
+            const newProductsItems = [...products].concat(mappedData)
+            setProducts(newProductsItems)
         }, 3000)
         //TODO: fetch more data here
         //await fetchDataFunction(currentPage)
 
-        setCurrentPagination(currentPagination + 1)
-        const data = [...MockData]
-        const mappedData =  data.map((value: ProductType) =>
-        {
-            const item:ProductItemProps = 
-            {
-                _id: value._id,
-                imageLink: value.imageLink,
-                name: value.name,
-                rating: value.rating,
-                soldAmount: value.soldAmount,
-                price: value.price,
-                isFlashSale: value.flashSale,
-                originalPrice: value.originalPrice,
-                inWishlist: false,
-                //TODO: fix the inWishlist variable assignment
-            }
-
-            return item
-        })
-
-        const newProductsItems = [...products].concat(mappedData)
-        setProducts(newProductsItems)
     }
 
 
@@ -349,7 +356,7 @@ export default function InfinityProductsList(setupProps: SetupProps)
                     <>
                         <div className={isVisible} key={value._id}>
                             <ProductItem
-                            size={ProductItemScaleSize.small}
+                            size={setupProps.setup.productItemSize}
                             imageLink={value.imageLink} name={value.name} rating={value.rating} 
                             soldAmount={value.soldAmount} price={value.price} isFlashSale={value.isFlashSale} 
                             originalPrice={value.originalPrice} inWishlist={value.inWishlist}/>
@@ -385,7 +392,7 @@ export default function InfinityProductsList(setupProps: SetupProps)
 
     return(
         <>
-            <Flex className="w-full h-full" vertical justify="center" align="center">
+            <Flex className="w-full h-full bg-white" vertical justify="center" align="center">
                 <div className="overflow-y-auto py-4 w-full" style={{maxHeight: `${setupProps.setup.overFlowMaxHeight}`}}>
                     {mainDisplay}
                 </div>

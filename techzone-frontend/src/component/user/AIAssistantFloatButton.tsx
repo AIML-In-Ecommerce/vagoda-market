@@ -2,12 +2,14 @@
 
 import { Button, Card, Flex, Image, Modal, Popover, Tag, Tooltip, Typography } from "antd"
 import TextArea from "antd/es/input/TextArea"
-import { ChangeEvent, useState } from "react"
-import { BiSupport } from "react-icons/bi"
+import { ChangeEvent, useEffect, useRef, useState } from "react"
+import { BiRefresh, BiSupport } from "react-icons/bi"
 import { IoCloseOutline, IoExpandOutline, IoTrashBinOutline } from "react-icons/io5"
 import { LuSendHorizonal, LuShrink } from "react-icons/lu"
 import '@/component/user/custom_css/AntdFullscreenModal.css'
-import InfinityProductsList, { InfinityScrollProductsProps } from "./utils/InfinityProductsList"
+import InfiniteProductsList, { InfiniteScrollProductsProps } from "./utils/InfiniteProductsList"
+import InfinitePromotionList, { InfinitePromotionListProps } from "./utils/InfinitePromotionList"
+import { BsChatDots } from "react-icons/bs"
 
 interface AIAssistantFloatButtonProps
 {
@@ -26,6 +28,15 @@ interface AssistantMessageProps
     content: string,
     actionCode: string | null
 }
+
+const GreetingMessage: AssistantMessageProps =
+{
+    type: AssistantMessageTypes.Assistant,
+    content: "Xin chào! Mình là trợ lý AI của TechZone.\nMình sẵn sàng giúp đỡ bạn những câu hỏi về tư vấn, tìm kiếm sản phẩm.\n Hôm nay bạn cần mình hỗ trợ gì hông? ^^",
+    actionCode: null
+}
+
+const AIAssistantLocalStorageKeyword = "ai_assistant"
 
 const AssistantMockData: AssistantMessageProps[] = 
 [
@@ -55,21 +66,22 @@ function getRandomAnswer()
     return AssistantMockData[index]
 }
 
-const GreetingMessage: AssistantMessageProps =
-{
-    type: AssistantMessageTypes.Assistant,
-    content: "Xin chào! Mình là trợ lý AI của TechZone.\nMình sẵn sàng giúp đỡ bạn những câu hỏi về tư vấn, tìm kiếm sản phẩm.\n Hôm nay bạn cần mình hỗ trợ gì hông? ^^",
-    actionCode: null
-}
-
 const AIAssistantImageLink = "https://cdn-icons-png.freepik.com/512/9732/9732800.png"
 
-const InfinityProductsListSetup: InfinityScrollProductsProps =
+const InfiniteProductsListSetup: InfiniteScrollProductsProps =
 {
-    productsPerSlide: 12,
     productsPerRow: 4,
-    overFlowMaxHeight: "100dvh"
+    overFlowMaxHeight: "100dvh",
+    productItemSize: "small"
 }
+
+const InfinitePromotionListSetup: InfinitePromotionListProps =
+{
+    overflowMaxHeight: "100dvh"
+}
+
+const testCaseNumber = 3 
+
 
 export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps)
 {
@@ -80,6 +92,86 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps)
     const [bigModalOpen, setBigModalOpen] = useState<boolean>(false)
 
     const [userInput, setUserInput] = useState<string| undefined>(undefined)
+
+    const ref = useRef(null);
+    useEffect(() => {
+      require("@lottiefiles/lottie-player");
+    });
+    const greetingLottie =
+        <lottie-player
+          id="firstLottie"
+          ref={ref}
+          autoPlay
+          loop
+          mode="normal"
+          src="https://lottie.host/d3a73d67-08a9-479a-8701-e520c58a41c2/e9YSew8NYj.json"
+          style={{height: "100%"}}
+        ></lottie-player>
+
+    const notFoundLottie =
+        <lottie-player
+        id="firstLottie"
+        ref={ref}
+        autoPlay
+        loop
+        mode="normal"
+        src="https://lottie.host/4cc4d748-fec0-409d-b71a-5d2bf0823eb2/4jt7N8Ajrd.json"
+        style={{height: "60%"}}
+    ></lottie-player>
+
+    const greetingReactNode = 
+    <Flex className="w-full h-full bg-white" vertical justify="start" align="center">
+        <div className="w-3/5 h-3/5">{greetingLottie}</div>
+        <Typography className="text-blue-700 font-semibold">
+            <Flex justify="center" align="center" gap={4}>
+                <BsChatDots className="text-lg"/>
+                Mình đã sẵn sàng để hỗ trợ bạn ^^
+            </Flex>
+        </Typography>
+    </Flex>
+
+    const [extraSupportDisplay, setExtraSupportDisplay] = useState<JSX.Element>(greetingReactNode)
+
+    //get cached messages of the previous conversation
+    useEffect(() =>
+    {
+
+        if(localStorage)
+        {
+            const jsonStringifiedMessages = localStorage.getItem(AIAssistantLocalStorageKeyword)
+
+            if(jsonStringifiedMessages != null)
+            {
+                const initMessages = JSON.parse(jsonStringifiedMessages) as AssistantMessageProps[]
+                setMessages(initMessages)
+            }
+            else
+            {
+                setMessages([GreetingMessage])
+            }
+        }
+    },
+    [])
+
+    //the function used for testing
+    function getRamdomDisplay()
+    {
+        const randomNumber = Math.round(Math.random()*1000)
+        if(randomNumber % testCaseNumber == 0)
+        {
+            return <InfiniteProductsList setup={InfiniteProductsListSetup}/>
+        }
+        else if(randomNumber % testCaseNumber == 1)
+        {
+            return <InfinitePromotionList setup={InfinitePromotionListSetup}/>
+        }
+        else if(randomNumber % testCaseNumber == 2)
+        {
+            return greetingReactNode
+        }
+
+        return greetingReactNode
+    }
 
     function handleOpenAssistant()
     {
@@ -109,6 +201,11 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps)
     {
         const newMessages = messages.slice(0,1)
         setMessages(newMessages)       
+        if(localStorage)
+        {
+            const stringifiedMessages = JSON.stringify(newMessages)
+            localStorage.setItem(AIAssistantLocalStorageKeyword, stringifiedMessages)
+        }
     }
 
     ////////////////////////////////////////////////////////////////////////
@@ -184,6 +281,20 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps)
         setOpen(true)
     }
 
+    function handleRefreshMessages()
+    {
+        if(localStorage)
+        {
+            const stringifiedMessages = localStorage.getItem(AIAssistantLocalStorageKeyword)
+            
+            if(stringifiedMessages != null)
+            {
+                const newMessages = JSON.parse(stringifiedMessages) as AssistantMessageProps[]
+                setMessages(newMessages)
+            }
+        }
+    }
+
     
     function handleSendButtonOnClick()
     {
@@ -210,9 +321,19 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps)
         setMessages(newMessages)
 
         setUserInput(undefined)
+
+        setExtraSupportDisplay(getRamdomDisplay())
+
+        if(localStorage)
+        {
+            const stringifiedMessages = JSON.stringify(newMessages)
+            localStorage.setItem(AIAssistantLocalStorageKeyword, stringifiedMessages)
+        }
         //TODO: call API here
         
     }
+    
+
 
     const ExpandOrShrinkButton = isExpandedPopUp == false ? 
     <Tooltip placement="top" title="Mở rộng">
@@ -228,6 +349,11 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps)
 
     const extraAiAssistantPopoverContentButton = 
     <Flex className="w-full h-full" justify="end" align="center" gap={6}>
+        <Tooltip placement="top" title="Làm mới">
+            <Button size="small" className="rounded-full border-transparent" onClick={handleRefreshMessages}>
+                <BiRefresh />
+            </Button>
+        </Tooltip>        
         {ExpandOrShrinkButton}
         <Tooltip placement="top" title="Xoá đoạn chat">
             <Button size="small" className="rounded-full border-transparent" onClick={handleDeleteMessages}>
@@ -317,7 +443,8 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps)
                         </Flex>
                     </Card>
                     <div className="w-3/5">
-                        <InfinityProductsList setup={InfinityProductsListSetup}/>
+                        {/* <InfiniteProductsList setup={InfinityProductsListSetup}/> */}
+                        {extraSupportDisplay}
                     </div>
                 </Flex>
             </Modal>

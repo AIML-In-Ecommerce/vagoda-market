@@ -186,19 +186,19 @@ const ServiceInfoMockData =
         _id: "si-19",
         name: "Facebook TechZone",
         link: "#",
-        icon: facebookImgLocalLink
+        icon: facebookImgLocalLink.src
     },
     {
         _id: "si-20",
         name: "TechZone Media",
         link: "#",
-        icon: mediaImgLocalLink
+        icon: mediaImgLocalLink.src
     },
     {
         _id: "si-21",
         name: "TechZone gmail",
         link: "#",
-        icon: googleImgLocalLink
+        icon: googleImgLocalLink.src
     },
     {
         _id: "si-22",
@@ -296,8 +296,10 @@ export default function WebFooter({}: WebFooterProps)
                         return(
                             <Link key={item._id} href={item.link} prefetch={false}>
                                 <Typography.Text className="no-underline text-sm hover:text-blue-500">
-                                    {item.icon.length > 0 ? <Image className="mr-1" src={item.icon} preview={false}/> : <></>}
-                                    {item.name}
+                                    <Flex justify="start" align="center">
+                                        {item.icon.length > 0 ? <img className="w-4 h-4" src={item.icon} alt="icon"></img>: <></>}
+                                        {item.name}
+                                    </Flex>
                                 </Typography.Text>
                             </Link>
                         )

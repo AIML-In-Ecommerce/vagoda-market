@@ -3,6 +3,7 @@
 import { Button, Drawer, Flex, Popover, Tooltip, Typography } from "antd";
 import Link from "next/link";
 import { MouseEvent, useEffect, useState } from "react";
+import { BiCategory } from "react-icons/bi";
 import { IoIosArrowForward } from "react-icons/io";
 
 
@@ -455,6 +456,7 @@ export default function CategoryDrawer({}: CategoryDrawerProps)
                                 content={getPopoverContent(value.subCategoryType)}
                                 placement={popoverPlacement}
                                 arrow={popoverArrow}
+                                style={{boxShadow: "none"}}
                             >
                                 <div className="w-full px-3 py-2 rounded-lg hover:bg-blue-50">
                                     <Typography.Text className="text-black font-semibold text-lg">
@@ -474,18 +476,19 @@ export default function CategoryDrawer({}: CategoryDrawerProps)
             <div className="relative w-1/4 bg-blue-500 left-0"></div>
             <div className="absolute z-10 top-0">
                 <Flex vertical className="h-svh bg-green-500" align="center" justify="center">
-                    <Tooltip trigger={"hover"} title={"Open Category"} placement="right">
-                        <Button className="fixed w-14 min-w-14 h-16 min-h-16 rounded-r-full border-0 ml-2 bg-transparent" onClick={handleOpenDrawer}>
+                    <Tooltip trigger={"hover"} title={"Danh mục"} placement="right">
+                        <Button className="fixed w-14 min-w-12 h-16 min-h-16 rounded-r-full border-0 ml-2 bg-white" onClick={handleOpenDrawer}>
                             <Flex className="w-full h-full ml-2" justify="end">
-                                <IoIosArrowForward className="w-full h-full text-lg" size={"large"}/>
+                               {/* <BiCategory className="w-full h-full text-base"/> */}
+                               <IoIosArrowForward className="w-full h-full text-lg" size={"large"}/>
                             </Flex>
-                    </Button>
+                        </Button>
                     </Tooltip>
                 </Flex>
             </div>
             <Drawer open={drawerOpen} closable={true} onClose={handleCloseDrawer}
                 
-                title="Category"
+                title="Danh mục"
                 placement={drawerPlacement}
             >
                 {categoryDisplay}
