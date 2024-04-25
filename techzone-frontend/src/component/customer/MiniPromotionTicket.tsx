@@ -1,30 +1,17 @@
-import { Card, ConfigProvider, Flex, Tooltip } from "antd";
+"use client";
+import { Card, ConfigProvider, Tooltip } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import { priceIndex } from "./product/ProductDetail";
+import { PromotionType } from "@/model/PromotionType";
+import { useState } from "react";
 
 export interface PromotionProps {
-  // TODO: replace this w PromotionType from model
-  item: TempPromotion;
+  item: PromotionType;
 }
 
-// TODO: delete this
-export type TempPromotion = {
-  _id: string;
-  name: string;
-  description: string;
-  discountType: number;
-  discountValue?: number;
-  upperBound?: number;
-  lowerBound?: number;
-  quantity: number;
-  activeDate?: string;
-  expiredDate?: string;
-  // saleCategory: [ObjectId, ...]
-  createdAt?: string;
-  code: string;
-};
-
 export default function MiniPromotionTicket(props: PromotionProps) {
+  const [isSaved, setIsSaved] = useState(false);
+
   return (
     <div className="m-5 shadow-lg w-fit rounded-lg ">
       <ConfigProvider
@@ -47,7 +34,7 @@ export default function MiniPromotionTicket(props: PromotionProps) {
           // hoverable
           title={<div className="text-center">{props.item.name}</div>}
           style={{
-            width: 200,
+            width: 160,
             height: 185,
           }}
         >
@@ -57,7 +44,7 @@ export default function MiniPromotionTicket(props: PromotionProps) {
               title={<div className="m-5 w-fit">{props.item.description}</div>}
               placement="top"
             >
-              <div className="mb-2 overflow-hidden line-clamp-1">
+              <div className="mb-2 overflow-hidden line-clamp-1 cursor-help">
                 {props.item.description}
               </div>
             </Tooltip>
@@ -94,9 +81,21 @@ export default function MiniPromotionTicket(props: PromotionProps) {
                 style={{ color: "#1677ff", padding: 5, cursor: "pointer" }}
               />
             </Tooltip>
-            <div className="uppercase font-semibold text-blue-400 cursor-pointer m-2">
-              lưu
-            </div>
+            {(isSaved && (
+              <div
+                className="uppercase font-semibold text-red-400 cursor-pointer m-2"
+                onClick={() => setIsSaved(false)}
+              >
+                đã lưu
+              </div>
+            )) || (
+              <div
+                className="uppercase font-semibold text-blue-400 cursor-pointer m-2"
+                onClick={() => setIsSaved(true)}
+              >
+                lưu
+              </div>
+            )}
           </div>
         </Card>
       </ConfigProvider>

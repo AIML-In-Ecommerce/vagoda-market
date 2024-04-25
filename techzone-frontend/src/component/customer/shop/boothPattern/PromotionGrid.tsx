@@ -1,7 +1,7 @@
 "use client";
 import { List, Typography } from "antd";
-import MiniPromotionTicket, { TempPromotion } from "../../MiniPromotionTicket";
-import { DiscountType } from "@/model/PromotionType";
+import MiniPromotionTicket from "../../MiniPromotionTicket";
+import { DiscountType, PromotionType } from "@/model/PromotionType";
 import { PromotionElement, WidgetType } from "@/model/WidgetType";
 
 const formatDate = (date: Date) => {
@@ -19,8 +19,7 @@ interface PromotionGridProps {
 }
 
 export default function PromotionGrid(props: PromotionGridProps) {
-  // TODO: replace this w model
-  const promotions: TempPromotion[] = [
+  const promotions: PromotionType[] = [
     {
       _id: "1",
       name: "Giảm 50%",

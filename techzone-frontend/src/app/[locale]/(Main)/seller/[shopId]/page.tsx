@@ -4,10 +4,6 @@ import ProductList from "../../product-list/page";
 import { Tabs } from "antd";
 import AboutShop from "@/component/customer/shop/AboutShop";
 import Search from "antd/es/transfer/search";
-import ProductCarousel from "@/component/customer/shop/boothPattern/ProductCarousel";
-import BannerCarousel from "@/component/customer/shop/boothPattern/BannerCarousel";
-import PromotionGrid from "@/component/customer/shop/boothPattern/PromotionGrid";
-import ProductGrid from "@/component/customer/shop/boothPattern/ProductGrid";
 import {
   WidgetType,
   WidgetCategoryType,
@@ -20,7 +16,6 @@ import { useState } from "react";
 import WidgetList from "@/component/customer/shop/WidgetList";
 
 export default function ShopPage() {
-  // shop mock data and get pattern list from widgetList variable
   const [widgets, setWidgets] = useState<WidgetType[]>([
     {
       _id: "category_ID",

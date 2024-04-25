@@ -141,9 +141,10 @@ const Review = (review: ReviewType) => {
         open={open}
         onOk={() => setOpen(false)}
         onCancel={() => setOpen(false)}
-        // width={1000}
+        width={200}
+        footer={null}
       >
-        <p>Banned...</p>
+        <p>Tin nhắn đã bị khóa</p>
       </Modal>
     </div>
   );
