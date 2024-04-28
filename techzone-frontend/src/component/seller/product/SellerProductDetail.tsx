@@ -407,7 +407,7 @@ export default function SellerProductDetail() {
         {/* <ReviewList /> */}
 
         <FloatButton.Group>
-          <FloatButton.BackTop tooltip={<div>Move to Top</div>} />
+          <FloatButton.BackTop tooltip={<div>Lướt lên đầu</div>} />
         </FloatButton.Group>
       </div>
     </div>

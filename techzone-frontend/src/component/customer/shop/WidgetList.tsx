@@ -3,6 +3,8 @@ import {
   BannerPatternType,
   CategoryElement,
   CategoryPatternType,
+  CollectionElement,
+  CollectionPatternType,
   ProductElement,
   ProductPatternType,
   PromotionElement,
@@ -15,6 +17,8 @@ import ProductCarousel from "./boothPattern/ProductCarousel";
 import ProductGrid from "./boothPattern/ProductGrid";
 import PromotionGrid from "./boothPattern/PromotionGrid";
 import CategoryGrid from "./boothPattern/CategoryGrid";
+import CollectionGrid from "./boothPattern/CollectionGrid";
+import CollectionCarousel from "./boothPattern/CollectionCarousel";
 
 const MockData = [
   {
@@ -204,6 +208,10 @@ function Widget(props: WidgetProps) {
       {props.widget.type === WidgetCategoryType.PROMOTION && (
         <PromotionWidget widget={props.widget} />
       )}
+
+      {props.widget.type === WidgetCategoryType.COLLECTION && (
+        <CollectionWidget widget={props.widget} />
+      )}
     </div>
   );
 }
@@ -254,6 +262,22 @@ function PromotionWidget(props: WidgetProps) {
     <div>
       {element && element.pattern === PromotionPatternType.GRID && (
         <PromotionGrid widget={props.widget} />
+      )}
+    </div>
+  );
+}
+
+function CollectionWidget(props: WidgetProps) {
+  const element = props.widget.element as CollectionElement;
+
+  return (
+    <div>
+      {element && element.pattern === CollectionPatternType.GRID && (
+        <CollectionGrid widget={props.widget} />
+      )}
+
+      {element && element.pattern === CollectionPatternType.CAROUSEL && (
+        <CollectionCarousel widget={props.widget} />
       )}
     </div>
   );

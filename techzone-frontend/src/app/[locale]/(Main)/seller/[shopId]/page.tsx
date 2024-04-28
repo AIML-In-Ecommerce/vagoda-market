@@ -11,12 +11,33 @@ import {
   ProductPatternType,
   PromotionPatternType,
   BannerPatternType,
+  CollectionPatternType,
 } from "@/model/WidgetType";
 import { useState } from "react";
 import WidgetList from "@/component/customer/shop/WidgetList";
 
 export default function ShopPage() {
   const [widgets, setWidgets] = useState<WidgetType[]>([
+    {
+      _id: "collection_ID1",
+      type: WidgetCategoryType.COLLECTION,
+      order: 7,
+      visibility: true,
+      element: {
+        pattern: CollectionPatternType.GRID,
+        collectionIdList: [],
+      },
+    },
+    {
+      _id: "collection_ID2",
+      type: WidgetCategoryType.COLLECTION,
+      order: 8,
+      visibility: true,
+      element: {
+        pattern: CollectionPatternType.CAROUSEL,
+        collectionIdList: [],
+      },
+    },
     {
       _id: "category_ID",
       type: WidgetCategoryType.CATEGORY,

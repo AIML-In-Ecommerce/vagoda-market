@@ -528,7 +528,7 @@ export default function ProductDetail() {
             // badge={{ count: 23, overflowCount: 999 }}
             onClick={showModal}
           />
-          <FloatButton.BackTop tooltip={<div>Move to Top</div>} />
+          <FloatButton.BackTop tooltip={<div>Lướt lên đầu</div>} />
         </FloatButton.Group>
 
         <CartSummaryModal

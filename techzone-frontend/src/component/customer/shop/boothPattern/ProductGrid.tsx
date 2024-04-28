@@ -5,7 +5,7 @@ import { ProductType } from "@/model/ProductType";
 import { ProductElement, WidgetType } from "@/model/WidgetType";
 
 interface ProductGridProps {
-  products: ProductType[];
+  products: ProductType[]; // TODO: get this from collection id
   widget: WidgetType;
 }
 

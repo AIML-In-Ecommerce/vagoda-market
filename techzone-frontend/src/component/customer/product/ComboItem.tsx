@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { PlusOutlined } from "@ant-design/icons";
-import { Checkbox, CheckboxProps } from "antd";
+import { Checkbox } from "antd";
 import { priceIndex } from "./ProductDetail";
 
 export interface ComboItemProps {
