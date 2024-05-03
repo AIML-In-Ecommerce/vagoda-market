@@ -33,10 +33,7 @@ export default function MiniPromotionTicket(props: PromotionProps) {
         <Card
           // hoverable
           title={<div className="text-center">{props.item.name}</div>}
-          style={{
-            width: 160,
-            height: 185,
-          }}
+          className="w-[160px] h-[185px] lg:w-[220px]"
         >
           <div className="text-center">
             {/* <div className="mb-2">Cho đơn từ 200K</div> */}

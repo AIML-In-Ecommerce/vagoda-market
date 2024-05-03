@@ -182,25 +182,29 @@ export default function BannerCarousel(props: BannerCarouselProps) {
   }
 
   return (
-    <div className="mb-10">
-      <div
-        className="w-full flex flex-col justify-end items-center relative"
-        style={LargeBackground}
-      >
-        <div className="flex flex-col justify-center items-center backdrop-blur-md w-full h-1/2">
-          <div className="invisible h-10">hidden block</div>
-          <div className="w-3/4 h-1/2">
-            <Carousel
-              autoplay={true}
-              style={{ height: "100%" }}
-              afterChange={afterCarouselChange}
-            >
-              {CarouselDisplay}
-            </Carousel>
+    <div>
+      {carouselImages.length > 0 && (
+        <div className="mb-10">
+          <div
+            className="w-full flex flex-col justify-end items-center relative"
+            style={LargeBackground}
+          >
+            <div className="flex flex-col justify-center items-center backdrop-blur-md w-full h-1/2">
+              <div className="invisible h-10">hidden block</div>
+              <div className="w-3/4 h-1/2">
+                <Carousel
+                  autoplay={true}
+                  style={{ height: "100%" }}
+                  afterChange={afterCarouselChange}
+                >
+                  {CarouselDisplay}
+                </Carousel>
+              </div>
+              <div className="invisible h-10">hidden block</div>
+            </div>
           </div>
-          <div className="invisible h-10">hidden block</div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

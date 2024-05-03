@@ -3,6 +3,7 @@ import { List, Typography } from "antd";
 import MiniPromotionTicket from "../../MiniPromotionTicket";
 import { DiscountType, PromotionType } from "@/model/PromotionType";
 import { PromotionElement, WidgetType } from "@/model/WidgetType";
+import CustomEmpty from "../mini/CustomEmpty";
 
 const formatDate = (date: Date) => {
   const hours = date.getHours().toString().padStart(2, "0");
@@ -87,8 +88,19 @@ export default function PromotionGrid(props: PromotionGridProps) {
         {element.title}
       </Typography.Text>
       <List
-        grid={{ gutter: 16, column: 6 }}
+        grid={{
+          gutter: 16,
+          xs: 0,
+          sm: 1,
+          md: 2,
+          lg: 3,
+          xl: 4,
+          xxl: 5,
+        }}
         dataSource={promotions}
+        locale={{
+          emptyText: <CustomEmpty />,
+        }}
         renderItem={(item, i) => (
           <div key={i}>
             <List.Item>

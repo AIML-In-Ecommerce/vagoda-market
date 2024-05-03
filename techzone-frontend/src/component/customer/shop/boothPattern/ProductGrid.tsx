@@ -1,8 +1,9 @@
 "use client";
-import { Empty, List, Typography } from "antd";
+import { List, Typography } from "antd";
 import ProductItem from "../../ProductItem";
 import { ProductType } from "@/model/ProductType";
 import { ProductElement, WidgetType } from "@/model/WidgetType";
+import CustomEmpty from "../mini/CustomEmpty";
 
 interface ProductGridProps {
   products: ProductType[]; // TODO: get this from collection id
@@ -20,15 +21,18 @@ export default function ProductGrid(props: ProductGridProps) {
       </Typography.Text>
       <div className="invisible h-5">hidden block</div>
       <List
-        grid={{ gutter: 16, column: 4 }}
+        grid={{
+          gutter: 5,
+          xs: 0,
+          sm: 1,
+          md: 2,
+          lg: 3,
+          xl: 4,
+          xxl: 4,
+        }}
         dataSource={props.products}
         locale={{
-          emptyText: (
-            <Empty
-              image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description={<span>Không có</span>}
-            />
-          ),
+          emptyText: <CustomEmpty />,
         }}
         renderItem={(item) => (
           <List.Item>

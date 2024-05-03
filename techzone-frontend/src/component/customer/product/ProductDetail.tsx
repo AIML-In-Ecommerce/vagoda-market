@@ -71,6 +71,7 @@ export default function ProductDetail() {
     createdAt: "string",
   };
 
+  // replace this with html component from seller page
   const items: DescriptionsProps["items"] = [
     // key can be index, label is title, children is content
     // TODO: make span configurable?
