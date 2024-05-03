@@ -28,7 +28,7 @@ const Review = (review: ReviewType) => {
   return (
     <div className="m-2 bg-white rounded-xl border-2 overflow-hidden relative">
       <div className="m-2 grid grid-cols-3 gap-4">
-        <div className="col-span-1 flex flex-row">
+        <div className="col-span-1 flex flex-col md:flex-row lg:flex-row">
           <div className="m-3">
             {(review.user.avatar === "" && (
               <Avatar size="large">{review.user.name}</Avatar>
@@ -42,7 +42,6 @@ const Review = (review: ReviewType) => {
           </div>
           <div className="m-3">
             <Flex vertical>
-              {/* <b>Lê Quốc Dũng</b> */}
               <b>{review.user.name}</b>
               <div className="text-gray-600 font-light text-xs">
                 Đã tham gia 7 năm
@@ -87,7 +86,7 @@ const Review = (review: ReviewType) => {
         {review.asset.length > 0 && (
           <div className="col-start-2 col-span-2 mx-2">
             <List
-              grid={{ gutter: 5, column: 10 }}
+              grid={{ gutter: 5, xs: 5, sm: 5, md: 6, lg: 8, xl: 10, xxl: 10 }}
               dataSource={review.asset}
               renderItem={(item) => (
                 <List.Item>

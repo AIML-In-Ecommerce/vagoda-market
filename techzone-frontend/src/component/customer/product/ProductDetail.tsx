@@ -13,6 +13,7 @@ import {
   Rate,
   Skeleton,
   Tabs,
+  Image as AntdImage,
 } from "antd";
 import ReviewList from "./ReviewList";
 import FloatingCartForm from "./FloatingCartForm";
@@ -40,32 +41,29 @@ export default function ProductDetail() {
         url: "https://i.insider.com/5f835d4ebab422001979aaeb",
       },
       {
-        url: "https://robothutbuisky.com/wp-content/uploads/2020/06/t8-max-100-1.jpg?v=1677693356",
-      },
-      {
         url: "https://product.hstatic.net/200000805527/product/z3994157810128_ac5e199adba96c46d6d7282b2bfdcdc5-scaled_843ed368395649f6a68bc7c08dd20524_master.jpg",
       },
       {
         url: "https://product.hstatic.net/200000805527/product/z3994157835398_2b54a80e46f44a6d57b7a7500a87e49e-scaled_37202a4918fa4f03a6e275b8312f0587_master.jpg",
       },
-      {
-        url: "",
-      },
-      {
-        url: "",
-      },
-      {
-        url: "",
-      },
-      {
-        url: "",
-      },
-      {
-        url: "",
-      },
-      {
-        url: "",
-      },
+      // {
+      //   url: "",
+      // },
+      // {
+      //   url: "",
+      // },
+      // {
+      //   url: "",
+      // },
+      // {
+      //   url: "",
+      // },
+      // {
+      //   url: "",
+      // },
+      // {
+      //   url: "",
+      // },
     ],
     avgRating: 4.5,
     createdAt: "string",
@@ -167,7 +165,7 @@ export default function ProductDetail() {
     },
     {
       // label: `Technical Specifications`,
-      label: "Thông số kĩ thuật",
+      label: "Đặc điểm nổi bật",
       key: "2",
       children: <Descriptions bordered items={items} />,
     },
@@ -310,14 +308,14 @@ export default function ProductDetail() {
   };
 
   return (
-    <div className="justify-between mx-10 lg:mx-20 gap-10 grid grid-cols-8 h-fit pb-10">
+    <div className="justify-between mx-10 lg:px-20 gap-10 grid grid-cols-8 h-fit pb-10 overflow-hidden">
       <div className="col-span-5 lg:col-span-6">
         {/* about product */}
         <div className="bg-white shadow-md flex lg:flex-row flex-col my-10">
-          <Flex vertical>
+          <Flex>
             <div className="m-2">
               <List
-                grid={{ gutter: 20, column: 5 }}
+                grid={{ gutter: 20, column: 1 }}
                 dataSource={productInfo.images}
                 locale={{
                   emptyText: (
@@ -350,12 +348,15 @@ export default function ProductDetail() {
               />
             </div>
 
-            <div className="bg-white h-fit shadow-md p-4 z-50">
-              {/* <img
-                className="h-[500px] w-[500px] object-contain"
-                src={mainImage}
-                alt={productInfo.name}
-              /> */}
+            <div className="bg-white h-fit shadow-md p-4 z-50 relative">
+              <AntdImage
+                width={50}
+                src="https://cdn-icons-png.flaticon.com/512/12034/12034789.png"
+                preview={{
+                  src: mainImage,
+                }}
+                className="absolute top-0 z-50 cursor-pointer"
+              />
 
               <ReactImageMagnify
                 {...{
@@ -377,12 +378,12 @@ export default function ProductDetail() {
                   enlargedImageContainerDimensions: {
                     // width: "160%",
                     // height: "120%",
-                    width: "200%",
+                    width: "250%",
                     height: "100%",
                   },
                   isHintEnabled: true,
                   // Hover to Zoom
-                  hintTextMouse: "Trỏ để phóng to",
+                  hintTextMouse: "Trỏ để phóng to hoặc nhấn vào kính lúp",
                   shouldHideHintAfterFirstActivation: false,
                   // imageClassName: "max-w-[550px]",
                   // enlargedImageContainerClassName:
@@ -393,7 +394,7 @@ export default function ProductDetail() {
           </Flex>
           {/* desc */}
 
-          <div className="p-4 min-w-[450px] lg:w-[600px]">
+          <div className="p-4 md:w-[450px] lg:min-w-[400px] overflow-hidden">
             {productInfo._id == null && <Skeleton active />}
 
             <div className="text-sm">
@@ -427,7 +428,7 @@ export default function ProductDetail() {
                 type="vertical"
                 style={{ height: "auto", border: "0.25px solid silver" }}
               />
-              <div className="font-light">Đã bán 5000+</div>
+              <div className="mt-1 text-sm font-light">Đã bán 5000+</div>
             </Flex>
 
             <div className="flex flex-row gap-3 my-2">
@@ -508,7 +509,7 @@ export default function ProductDetail() {
           />
         </div>
       </div>
-      <div className="col-span-3 my-10 lg:col-span-2 row-span-2">
+      <div className="col-span-3 my-10 lg:col-span-2 row-span-2 overflow-visible">
         <FloatingCartForm
           handleCartDetail={setOpen}
           numberOfItem={numberOfItem}
