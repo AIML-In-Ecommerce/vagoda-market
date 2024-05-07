@@ -6,10 +6,12 @@ import { ChangeEvent, useEffect, useRef, useState } from "react"
 import { BiRefresh, BiSupport } from "react-icons/bi"
 import { IoCloseOutline, IoExpandOutline, IoTrashBinOutline } from "react-icons/io5"
 import { LuSendHorizonal, LuShrink } from "react-icons/lu"
-import '@/component/user/custom_css/AntdFullscreenModal.css'
+
 import InfiniteProductsList, { InfiniteScrollProductsProps } from "./utils/InfiniteProductsList"
 import InfinitePromotionList, { InfinitePromotionListProps } from "./utils/InfinitePromotionList"
 import { BsChatDots } from "react-icons/bs"
+
+import '@/custom_css/AntdFullscreenModal.css'
 
 interface AIAssistantFloatButtonProps
 {
@@ -80,6 +82,7 @@ const InfinitePromotionListSetup: InfinitePromotionListProps =
     overflowMaxHeight: "100dvh"
 }
 
+
 const testCaseNumber = 3 
 
 
@@ -97,6 +100,11 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps)
     useEffect(() => {
       require("@lottiefiles/lottie-player");
     });
+
+    //ref: https://stackoverflow.com/questions/37620694/how-to-scroll-to-bottom-in-react
+    const messageEndRef = useRef<null|HTMLDivElement>(null)
+    const extendMessagesEndRef = useRef<null|HTMLDivElement>(null)
+
     const greetingLottie =
         <lottie-player
           id="firstLottie"
@@ -122,7 +130,7 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps)
     const greetingReactNode = 
     <Flex className="w-full h-full bg-white" vertical justify="start" align="center">
         <div className="w-3/5 h-3/5">{greetingLottie}</div>
-        <Typography className="text-blue-700 font-semibold">
+        <Typography className="text-blue-800 font-semibold">
             <Flex justify="center" align="center" gap={4}>
                 <BsChatDots className="text-lg"/>
                 Mình đã sẵn sàng để hỗ trợ bạn ^^
@@ -152,6 +160,31 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps)
         }
     },
     [])
+
+    function scrollToBottom()
+    {
+        if(messageEndRef.current)
+            {
+                messageEndRef.current.scrollTop = messageEndRef.current.scrollHeight
+            }
+    
+            if(extendMessagesEndRef.current)
+            {
+                extendMessagesEndRef.current.scrollTop = extendMessagesEndRef.current.scrollHeight
+            }
+    }
+
+    useEffect(() =>
+    {
+        scrollToBottom()
+    },
+    [messages])
+
+    useEffect(() =>
+    {
+        scrollToBottom()
+    },
+    [open, bigModalOpen])
 
     //the function used for testing
     function getRamdomDisplay()
@@ -219,9 +252,9 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps)
                         <Image className="rounded-full" width={35} height={35} src={AIAssistantImageLink} preview={false}/>
                     </Flex>
                     <Flex className="w-9/12" justify="start" align="center">
-                        <Tag bordered={false} color={"cyan"}>
+                        <Tag bordered={false} color={"#f5f5f4"}>
                             <Flex className="px-1 pt-2" vertical justify="center" align="start">
-                                <Typography.Text className="text-blue-500 text-sm font-semibold mb-1">
+                                <Typography.Text className="text-amber-900 text-sm font-semibold mb-1">
                                     Trợ lý
                                 </Typography.Text>
                                 <Typography.Paragraph className="text-wrap text-sm">
@@ -241,7 +274,7 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps)
         return(
             <Flex className="w-full" key={Date.now().toString() + index.toString()} justify="end" align="center">
                 <Flex className="w-7/12" justify="end" align="center">
-                    <Tag color={"blue-inverse"}>
+                    <Tag color={"#92400e"}>
                         <Typography.Paragraph className="text-wrap text-sm text-white">
                             {message.content}
                         </Typography.Paragraph>
@@ -395,7 +428,9 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps)
     <Card 
     style={{boxShadow:"none"}}
     title={cardTitle} bordered={false} extra={extraAiAssistantPopoverContentButton} actions={CardActions}>
-        <Flex className="overflow-y-auto h-96 max-h-96 max-w-screen-md" vertical justify="start" align="center" gap={4}>
+        <Flex className="overflow-y-auto h-96 max-h-96 max-w-screen-md" vertical justify="start" align="center" gap={4}
+            ref={messageEndRef}
+        >
             {
                 messages.map((message: AssistantMessageProps, index: number) =>
                 {
@@ -416,38 +451,43 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps)
             <Popover open={open} trigger={"click"} placement="leftBottom" content={AIAssistantPopoverContent}>
                 <Flex vertical align="center" justify="end">
                     <Tooltip trigger={"hover"} title={""} placement="left">
-                        <Button type="primary" className="w-16 min-w-16 h-20 min-h-16 rounded-md border-0 bg-blue-600 hover:bg-blue-400" onClick={handleOpenAssistant}>
+                        <button type="button" className="bg-stone-600 hover:bg-stone-500 w-16 min-w-16 h-20 min-h-16 rounded-md border-0 bg-blue-600 hover:bg-blue-400" onClick={handleOpenAssistant}>
                             <Flex vertical className="w-full h-full py-4" justify="center" align="center">
-                                <BiSupport className="w-full h-full text-sm"/>
+                                <BiSupport className="w-full h-full text-sm text-white"/>
                                 <Typography.Text className="text-xs text-white font-medium">
                                     Trợ lý
                                 </Typography.Text>
                             </Flex>
-                        </Button>
+                        </button>
                     </Tooltip>
                 </Flex>
             </Popover>
-            <Modal open={bigModalOpen} closable={false} footer={[]}> 
-                <Flex className="w-full h-full bg-gray-200">
-                    <Card 
-                    className="w-2/5 h-full"
-                    style={{boxShadow:"none", borderRadius:"0 0 0 0"}}
-                    title={cardTitle} bordered={false} extra={extraAiAssistantPopoverContentButton} actions={CardActions}>
-                        <Flex style={{maxHeight:"550px"}} className="overflow-y-auto" vertical justify="start" align="center" gap={4}>
-                            {
-                                messages.map((message: AssistantMessageProps, index: number) =>
+                <Modal
+                className="fullscreen-modal"
+                // style={{height: "100vh", width: "100vw", top: 0, left: 0, margin: 0}} width={"100%"}
+                    open={bigModalOpen} closable={false} footer={[]}> 
+                    <Flex className="w-full h-full bg-gray-200">
+                        <Card 
+                        className="w-2/5 h-full"
+                        style={{boxShadow:"none", borderRadius:"0 0 0 0"}}
+                        title={cardTitle} bordered={false} extra={extraAiAssistantPopoverContentButton} actions={CardActions}>
+                            <Flex key={"modal-conversation-content"} style={{maxHeight:"550px", height:"100dvh"}} className="overflow-y-auto" vertical justify="start" align="center" gap={4}
+                                ref={extendMessagesEndRef}
+                            >
                                 {
-                                    return getMessageDisplay(message, index)
-                                })
-                            }
-                        </Flex>
-                    </Card>
-                    <div className="w-3/5">
-                        {/* <InfiniteProductsList setup={InfinityProductsListSetup}/> */}
-                        {extraSupportDisplay}
-                    </div>
-                </Flex>
-            </Modal>
+                                    messages.map((message: AssistantMessageProps, index: number) =>
+                                    {
+                                        return getMessageDisplay(message, index)
+                                    })
+                                }
+                            </Flex>
+                        </Card>
+                        <div className="w-3/5">
+                            {/* <InfiniteProductsList setup={InfinityProductsListSetup}/> */}
+                            {extraSupportDisplay}
+                        </div>
+                    </Flex>
+                </Modal>
             {/* <FloatButton className="w-full h-full" shape="square" icon={<BiSupport />} type="primary"/> */}
         </>
     )

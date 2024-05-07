@@ -191,7 +191,7 @@ const paddingBlockProps: ProductType =
     category: "Unknown"
 }
 
-export default function InfinityProductsList(setupProps: SetupProps)
+export default function InfiniteProductsList(setupProps: SetupProps)
 {
     const [products, setProducts] = useState<ProductItemProps[]>([])
     const [mainDisplay, setMainDisplay] = useState<JSX.Element>(<Skeleton active />)
