@@ -1,5 +1,5 @@
 "use client";
-import { Card, Col, Divider, Flex, Row, Statistic, Tooltip } from "antd";
+import { Card, Col, Divider, Flex, Row, Spin, Statistic, Tooltip } from "antd";
 import { FaCopy } from "react-icons/fa";
 import {
   StarFilled,
@@ -11,12 +11,27 @@ import {
   AppstoreOutlined,
   InfoCircleOutlined,
 } from "@ant-design/icons";
+import { useState } from "react";
 
-// interface AboutProps {}
+export interface shopDetailType {
+  cancelPercentage: number;
+  refundPercentage: number;
+  sinceYear: number;
+  totalProductNumber: number;
+  description: string;
+  rating: number;
+  replyPercentage: number;
+  address: string;
+}
 
-// export default function AboutShop(aboutProps: AboutProps) {
-export default function AboutShop() {
+interface AboutProps {
+  shopDetail: shopDetailType;
+}
+
+export default function AboutShop(aboutProps: AboutProps) {
   // copy to clipboard -->
+  const [isCopied, setIsCopied] = useState(true);
+
   const WriteToClipboard = async (text: string) => {
     const param = "clipboard-write" as PermissionName;
     const result = await navigator.permissions.query({ name: param });
@@ -30,6 +45,7 @@ export default function AboutShop() {
   };
 
   const CopyText = (text: string = "") => {
+    setIsCopied(false);
     // Asynchronously call
     WriteToClipboard(text)
       .then((result) => {
@@ -37,6 +53,7 @@ export default function AboutShop() {
         if (result) {
           //   toast
           //   bannerProps.toast.success("Copy thành công!");
+          setIsCopied(true);
         }
       })
       .catch((err) => {
@@ -69,7 +86,7 @@ export default function AboutShop() {
                     </Tooltip>
                   </div>
                 }
-                value={11.28}
+                value={aboutProps.shopDetail.cancelPercentage}
                 precision={2}
                 valueStyle={{ color: "#3f8600" }}
                 // prefix={<ArrowUpOutlined />}
@@ -97,7 +114,7 @@ export default function AboutShop() {
                     </Tooltip>
                   </div>
                 }
-                value={9.3}
+                value={aboutProps.shopDetail.refundPercentage}
                 precision={2}
                 valueStyle={{ color: "#3f8600" }}
                 // prefix={<ArrowDownOutlined />}
@@ -118,44 +135,50 @@ export default function AboutShop() {
       <div className="m-2 col-span-2 col-start-5 font-semibold text-gray-600">
         <CalendarOutlined /> Thành viên từ năm:{" "}
       </div>
-      <div className="m-2 col-span-4 col-start-7">2024</div>
+      <div className="m-2 col-span-4 col-start-7">
+        {aboutProps.shopDetail.sinceYear}
+      </div>
 
       <div className="m-2 col-span-2 col-start-5 font-semibold text-gray-600">
         <AppstoreOutlined /> Số sản phẩm:{" "}
       </div>
-      <div className="m-2 col-span-4 col-start-7">515</div>
+      <div className="m-2 col-span-4 col-start-7">
+        {aboutProps.shopDetail.totalProductNumber}
+      </div>
 
       <div className="m-2 col-span-2 col-start-5 font-semibold text-gray-600">
         <ShopOutlined /> Mô tả cửa hàng:{" "}
       </div>
       <div className="m-2 col-span-4 col-start-7">
-        Mua online sản phẩm của cửa hàng TechZone Trading trên TechZone.vn. ✓
-        chất lượng cao, uy tín, giá tốt ✓ Chính hãng ✓ Giao hàng toàn quốc
+        {aboutProps.shopDetail.description}
       </div>
 
       <div className="m-2 col-span-2 col-start-5 font-semibold text-gray-600">
         <StarOutlined /> Đánh giá:{" "}
       </div>
       <div className="m-2 col-span-4 col-start-7">
-        <StarFilled style={{ color: "gold" }} /> 4.5 / 5
+        <StarFilled style={{ color: "gold" }} /> {aboutProps.shopDetail.rating}{" "}
+        / 5
       </div>
 
       <div className="m-2 col-span-2 col-start-5 font-semibold text-gray-600">
         <MessageOutlined /> Phản hồi chat:{" "}
       </div>
-      <div className="m-2 col-span-4 col-start-7">100%</div>
+      <div className="m-2 col-span-4 col-start-7">
+        {aboutProps.shopDetail.replyPercentage}%
+      </div>
 
       <div className="m-2 col-span-2 col-start-5 font-semibold text-gray-600">
         <AimOutlined /> Địa chỉ:{" "}
       </div>
       <div className="m-2 col-span-4 col-start-7">
         <Flex>
-          abc
+          {aboutProps.shopDetail.address}
           <div
             className="m-2 cursor-pointer"
             onClick={() => CopyText("dia chi abc")}
           >
-            <FaCopy />
+            {isCopied ? <FaCopy /> : <Spin />}
           </div>
         </Flex>
       </div>

@@ -8,6 +8,7 @@ import { useState } from "react";
 
 interface CollectionGridProps {
   widget: WidgetType;
+  setCollectionId: (id: string) => void;
 }
 
 export default function CollectionGrid(props: CollectionGridProps) {
@@ -75,7 +76,10 @@ export default function CollectionGrid(props: CollectionGridProps) {
         }}
         renderItem={(item) => (
           <List.Item>
-            <CollectionItem collection={item} />
+            <CollectionItem
+              collection={item}
+              setCollectionId={props.setCollectionId}
+            />
           </List.Item>
         )}
       />

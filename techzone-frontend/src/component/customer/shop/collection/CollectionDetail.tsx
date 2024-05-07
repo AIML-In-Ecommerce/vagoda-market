@@ -1,24 +1,8 @@
-import {
-  BannerElement,
-  BannerPatternType,
-  CategoryElement,
-  CategoryPatternType,
-  CollectionElement,
-  CollectionPatternType,
-  ProductElement,
-  ProductPatternType,
-  PromotionElement,
-  PromotionPatternType,
-  WidgetCategoryType,
-  WidgetType,
-} from "@/model/WidgetType";
-import BannerCarousel from "./boothPattern/BannerCarousel";
-import ProductCarousel from "./boothPattern/ProductCarousel";
-import ProductGrid from "./boothPattern/ProductGrid";
-import PromotionGrid from "./boothPattern/PromotionGrid";
-import CategoryGrid from "./boothPattern/CategoryGrid";
-import CollectionGrid from "./boothPattern/CollectionGrid";
-import CollectionCarousel from "./boothPattern/CollectionCarousel";
+import { Typography, Divider, List } from "antd";
+import React, { useState } from "react";
+import CustomEmpty from "../mini/CustomEmpty";
+import ProductItem from "../../ProductItem";
+import { ProductType } from "@/model/ProductType";
 
 const MockData = [
   {
@@ -52,7 +36,7 @@ const MockData = [
     name: "Dell SuperLight",
     rating: 4.5,
     soldAmount: 10,
-    price: 22000000,
+    price: 18000000,
     flashSale: true,
     originalPrice: 20000000,
     category: "",
@@ -88,7 +72,7 @@ const MockData = [
     name: "Dell SuperLight",
     rating: 4.5,
     soldAmount: 10,
-    price: 22000000,
+    price: 18000000,
     flashSale: true,
     originalPrice: 20000000,
     category: "",
@@ -124,7 +108,7 @@ const MockData = [
     name: "Dell SuperLight",
     rating: 4.5,
     soldAmount: 10,
-    price: 22000000,
+    price: 18000000,
     flashSale: true,
     originalPrice: 20000000,
     category: "",
@@ -160,145 +144,54 @@ const MockData = [
     name: "Dell SuperLight",
     rating: 4.5,
     soldAmount: 10,
-    price: 22000000,
+    price: 18000000,
     flashSale: true,
     originalPrice: 20000000,
     category: "",
   },
 ];
 
-interface WidgetListProps {
-  widgets: WidgetType[];
-  setCollectionId: (id: string) => void;
+interface CollectionDetailProps {
+  collectionId: string;
 }
 
-export default function WidgetList(props: WidgetListProps) {
-  return (
-    <div>
-      {props.widgets
-        .sort((a, b) => a.order - b.order)
-        .map((item, index) => (
-          <div key={index}>
-            <Widget widget={item} setCollectionId={props.setCollectionId} />
-          </div>
-        ))}
-    </div>
-  );
-}
-
-interface BaseWidgetProps {
-  widget: WidgetType;
-  setCollectionId: (id: string) => void;
-}
-
-// filtering types
-function Widget(props: BaseWidgetProps) {
-  return (
-    <div>
-      {props.widget.type === WidgetCategoryType.BANNER && (
-        <BannerWidget widget={props.widget} />
-      )}
-
-      {props.widget.type === WidgetCategoryType.PRODUCT && (
-        <ProductWidget widget={props.widget} />
-      )}
-
-      {props.widget.type === WidgetCategoryType.CATEGORY && (
-        <CategoryWidget widget={props.widget} />
-      )}
-
-      {props.widget.type === WidgetCategoryType.PROMOTION && (
-        <PromotionWidget widget={props.widget} />
-      )}
-
-      {props.widget.type === WidgetCategoryType.COLLECTION && (
-        <CollectionWidget
-          widget={props.widget}
-          setCollectionId={props.setCollectionId}
-        />
-      )}
-    </div>
-  );
-}
-
-interface WidgetProps {
-  widget: WidgetType;
-}
-
-function ProductWidget(props: WidgetProps) {
-  const element = props.widget.element as ProductElement;
+export default function CollectionDetail(props: CollectionDetailProps) {
+  const [products, setProducts] = useState<ProductType[]>(MockData);
 
   return (
     <div>
-      {element && element.pattern === ProductPatternType.CAROUSEL && (
-        <ProductCarousel products={MockData} widget={props.widget} />
-      )}
-      {element && element.pattern === ProductPatternType.GRID && (
-        <ProductGrid products={MockData} widget={props.widget} />
-      )}
-    </div>
-  );
-}
-
-function BannerWidget(props: WidgetProps) {
-  const element = props.widget.element as BannerElement;
-
-  return (
-    <div>
-      {element && element.pattern === BannerPatternType.CAROUSEL && (
-        <BannerCarousel widget={props.widget} />
-      )}
-    </div>
-  );
-}
-
-function CategoryWidget(props: WidgetProps) {
-  const element = props.widget.element as CategoryElement;
-
-  return (
-    <div>
-      {element && element.pattern === CategoryPatternType.GRID && (
-        <CategoryGrid widget={props.widget} />
-      )}
-    </div>
-  );
-}
-
-function PromotionWidget(props: WidgetProps) {
-  const element = props.widget.element as PromotionElement;
-
-  return (
-    <div>
-      {element && element.pattern === PromotionPatternType.GRID && (
-        <PromotionGrid widget={props.widget} />
-      )}
-    </div>
-  );
-}
-
-interface CollectionWidgetProps {
-  widget: WidgetType;
-  setCollectionId: (id: string) => void;
-}
-
-function CollectionWidget(props: CollectionWidgetProps) {
-  const element = props.widget.element as CollectionElement;
-
-  return (
-    <div>
-      {element && element.pattern === CollectionPatternType.GRID && (
-        <CollectionGrid
-          widget={props.widget}
-          setCollectionId={props.setCollectionId}
-        />
-      )}
-
-      {element && element.pattern === CollectionPatternType.CAROUSEL && (
-        <CollectionCarousel
-          widget={props.widget}
-          setCollectionId={props.setCollectionId}
-        />
-      )}
+      <Typography.Text className="text-xl font-semibold w-full">
+        Số sản phẩm: {products.length}
+      </Typography.Text>
+      <Divider />
+      <List
+        grid={{
+          gutter: 5,
+          xs: 1,
+          sm: 1,
+          md: 2,
+          lg: 2,
+          xl: 3,
+          xxl: 3,
+        }}
+        dataSource={products} // TODO: get data from collectionId
+        locale={{
+          emptyText: <CustomEmpty />,
+        }}
+        renderItem={(item) => (
+          <List.Item>
+            <ProductItem
+              imageLink={item.imageLink}
+              name={item.name}
+              rating={item.rating}
+              soldAmount={item.soldAmount}
+              price={item.price}
+              isFlashSale={item.flashSale}
+              originalPrice={item.originalPrice}
+            />
+          </List.Item>
+        )}
+      />
     </div>
   );
 }

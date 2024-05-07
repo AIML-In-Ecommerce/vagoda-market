@@ -9,6 +9,7 @@ import CustomEmpty from "../mini/CustomEmpty";
 
 interface CollectionCarouselProps {
   widget: WidgetType;
+  setCollectionId: (id: string) => void;
 }
 
 export default function CollectionCarousel(props: CollectionCarouselProps) {
@@ -92,14 +93,14 @@ export default function CollectionCarousel(props: CollectionCarouselProps) {
               prevArrow={<CarouselArrow direction="left" />}
               nextArrow={<CarouselArrow direction="right" />}
               slidesToShow={3}
-              slidesToScroll={3}
+              slidesToScroll={1}
               initialSlide={0}
               responsive={[
                 {
                   breakpoint: 1280,
                   settings: {
                     slidesToShow: 2,
-                    slidesToScroll: 2,
+                    slidesToScroll: 1,
                     infinite: true,
                     dots: true,
                   },
@@ -117,7 +118,10 @@ export default function CollectionCarousel(props: CollectionCarouselProps) {
               {collections.length > 0 &&
                 collections.map((collection, index) => (
                   <div key={index} className="pl-5">
-                    <CollectionItem collection={collection} />
+                    <CollectionItem
+                      collection={collection}
+                      setCollectionId={props.setCollectionId}
+                    />
                   </div>
                 ))}
             </Carousel>

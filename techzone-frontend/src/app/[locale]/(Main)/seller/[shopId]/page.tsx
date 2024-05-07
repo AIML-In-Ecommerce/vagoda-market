@@ -2,7 +2,7 @@
 import Banner from "@/component/customer/shop/Banner";
 import ProductList from "../../product-list/page";
 import { Tabs } from "antd";
-import AboutShop from "@/component/customer/shop/AboutShop";
+import AboutShop, { shopDetailType } from "@/component/customer/shop/AboutShop";
 import Search from "antd/es/transfer/search";
 import {
   WidgetType,
@@ -13,11 +13,20 @@ import {
   BannerPatternType,
   CollectionPatternType,
 } from "@/model/WidgetType";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import WidgetList from "@/component/customer/shop/WidgetList";
+import Collections from "@/component/customer/shop/collection/Collections";
+
+interface ShopInfoProps {
+  color: string;
+  name: string;
+  avatarUrl: string;
+  bannerUrl: string;
+}
 
 export default function ShopPage() {
-  const [widgets, setWidgets] = useState<WidgetType[]>([
+  //mock data
+  const widgetList = [
     {
       _id: "collection_ID1",
       type: WidgetCategoryType.COLLECTION,
@@ -114,7 +123,33 @@ export default function ShopPage() {
         images: [],
       },
     },
-  ]);
+  ];
+
+  const shopInfoData = {
+    color: "white",
+    name: "TechZone Shop",
+    avatarUrl: "",
+    bannerUrl: "",
+  };
+
+  const shopDetailData = {
+    cancelPercentage: 11.29,
+    refundPercentage: 9.4,
+    sinceYear: 2023,
+    totalProductNumber: 510,
+    description:
+      "Mua ngay online sản phẩm của cửa hàng TechZone Trading trên TechZone.vn. ✓ chất lượng cao, uy tín, giá tốt ✓ Chính hãng ✓ Giao hàng toàn quốc",
+    rating: 4.6,
+    replyPercentage: 99,
+    address: "4820 Hilltop Haven Drive",
+  };
+
+  //variables
+  const [widgets, setWidgets] = useState<WidgetType[]>(widgetList);
+  const [shopInfo, setShopInfo] = useState<ShopInfoProps>(shopInfoData);
+  const [shopDetail, setShopDetail] = useState<shopDetailType>(shopDetailData);
+  const [tab, setTab] = useState<string>("0");
+  const [selectedCollectionId, setSelectedCollectionId] = useState("");
 
   const tabItems = [
     {
@@ -122,7 +157,10 @@ export default function ShopPage() {
       children: (
         <div className="p-2">
           {/* pattern list here */}
-          <WidgetList widgets={widgets} />
+          <WidgetList
+            widgets={widgets}
+            setCollectionId={setSelectedCollectionId}
+          />
         </div>
       ),
     },
@@ -139,8 +177,8 @@ export default function ShopPage() {
       label: "Bộ Sưu Tập",
       children: (
         <div className="p-2">
-          {/* temp */}
-          <ProductList />
+          {/* key = 2 */}
+          <Collections selectedId={selectedCollectionId} />
         </div>
       ),
     },
@@ -148,24 +186,35 @@ export default function ShopPage() {
       label: "Hồ Sơ Cửa Hàng",
       children: (
         <div className="p-2">
-          <AboutShop />
+          <AboutShop shopDetail={shopDetail} />
         </div>
       ),
     },
   ];
 
-  const shopInfo = { color: "white", name: "TechZone Shop", avatarUrl: "" };
+  useEffect(() => {
+    setTab("2");
+    window.scrollTo(0, 0);
+  }, [selectedCollectionId]);
+
+  useEffect(() => {
+    setTab("0");
+  }, []);
 
   return (
     <div className="mx-20 pb-10 h-fit">
+      <section id="top-content" />
       <Banner
         color={shopInfo.color}
         name={shopInfo.name}
         avatarUrl={shopInfo.avatarUrl}
+        bannerUrl={shopInfo.bannerUrl}
       />
 
       <Tabs
         defaultActiveKey="0"
+        activeKey={tab}
+        onChange={(key) => setTab(key)}
         size="middle"
         style={{ marginLeft: 10, marginRight: 10, marginTop: 10 }}
         items={tabItems.map((item, i) => {

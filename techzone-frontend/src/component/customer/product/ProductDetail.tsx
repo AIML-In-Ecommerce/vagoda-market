@@ -164,7 +164,7 @@ export default function ProductDetail() {
       ),
     },
     {
-      // label: `Technical Specifications`,
+      // label: `Specifications`,
       label: "Đặc điểm nổi bật",
       key: "2",
       children: <Descriptions bordered items={items} />,
@@ -301,6 +301,11 @@ export default function ProductDetail() {
     return numberOfItem * productInfo.finalPrice + totalComboPrice;
   }, [totalComboPrice, numberOfItem]);
 
+  // image col
+  const imageCol = useMemo(() => {
+    return productInfo.images.length > 5 ? 2 : 1;
+  }, []);
+
   // modal
   const [open, setOpen] = useState(false);
   const showModal = () => {
@@ -313,9 +318,9 @@ export default function ProductDetail() {
         {/* about product */}
         <div className="bg-white shadow-md flex lg:flex-row flex-col my-10">
           <Flex>
-            <div className="m-2">
+            <div className="m-2 flex flex-col">
               <List
-                grid={{ gutter: 20, column: 1 }}
+                grid={{ gutter: 20, column: imageCol }}
                 dataSource={productInfo.images}
                 locale={{
                   emptyText: (
