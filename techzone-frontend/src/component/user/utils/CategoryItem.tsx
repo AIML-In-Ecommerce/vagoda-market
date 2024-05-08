@@ -35,7 +35,7 @@ export default function CategoryItem(props: CategoryItemProps)
         {
             setImageOpacity(hiddenImageOpacity)
             setIsVisibleName(visibleNameState)
-        }, 500)
+        }, 400)
         // setIsVisibleName(visibleNameState)
 
     }
@@ -51,7 +51,7 @@ export default function CategoryItem(props: CategoryItemProps)
 
     return(
         <>
-            <div key={props.category._id} className="w-full h-full shadow-black hover:shadow-lg hover:shadow-black rounded-md" 
+            <div key={props.category._id} className="w-full h-full shadow-black rounded-md hover:scale-105 transition duration-500 cursor-pointer" 
                 onMouseEnter={() => {handleMouseEnter()}} onMouseLeave={() => {handleMouseLeave()}}
                 // style={{maxHeight: maxHeight, maxWidth: maxWidth}}
                 >
@@ -72,10 +72,12 @@ export default function CategoryItem(props: CategoryItemProps)
                     src={""}
                 />
                 }
-                <Flex className={`container absolute bg-gray-50 bottom-10 left-0 right-0 h-1/5 min-h-16 w-full ${isVisibleName}`} justify="center" align="center">
-                    <p className="font-semibold text-lg text-wrap">
-                        {props.category.name}
-                    </p>
+                <Flex className={`container absolute bg-stone-700 bottom-10 left-0 right-0 h-1/5 min-h-16 w-full p-1${isVisibleName}`} justify="center" align="center">
+                    <Flex className="w-full h-full border border-white" justify="center" align="center">
+                        <p className="font-semibold text-lg text-wrap text-white">
+                            {props.category.name}
+                        </p>
+                    </Flex>
                 </Flex>
             </div>
         </>

@@ -452,9 +452,9 @@ export default function HomeFlashSales({}: HomeFlashSalesProps)
                 <div className="container">
                     <div className="invisible h-10 w-full">
                     </div>
-                        <Flex className="w-full mb-2 bg-stone-600 py-4 px-2 rounded-md" align="center">
+                        <Flex className="w-full mb-2 bg-stone-700 py-4 px-2 rounded-md" align="center">
                             <Typography.Text className="text-3xl font-semibold w-full text-white">
-                                Flash sale
+                                Flash sales
                             </Typography.Text>
                             <Flex className="w-full" justify="end" align="baseline"> 
                                 <Link href={flashSaleMoreDetailHref} prefetch={false}>

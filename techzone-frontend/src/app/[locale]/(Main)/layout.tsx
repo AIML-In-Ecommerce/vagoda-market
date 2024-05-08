@@ -10,6 +10,7 @@ import CategoryDrawer from "@/component/user/utils/CategoryDrawer";
 import WebFooter from "@/component/user/WebFooter";
 import RootLoading from "./loading";
 import AssistantFloatingButtonGroup from "@/component/user/AssistantFloatingButtonGroup";
+import { Lato } from "next/font/google";
 
 // import UserLayout from "@/component/UserLayout";
 
@@ -19,6 +20,11 @@ interface RootLayoutProps {
 }
 
 // const inter = Inter({ subsets: ["latin"] });
+const lato = Lato({
+  subsets: ["latin"],
+  weight: ["100", "300", "400", "700", "900"],
+  style: ["italic", "normal"]
+});
 
 export const metadata: Metadata = {
   title: "Techzone",
@@ -33,7 +39,7 @@ export default function RootLayout({
   return (
     <html lang={"en"}>
       {/* <body className={inter.className}> */}
-      <body className="">
+      <body className={lato.className}>
         <NextIntlClientProvider locale={locale} messages={messages}>
           {/* <AuthProvider> */}
           {/* <UserLayout children={children} locale={locale} /> */}

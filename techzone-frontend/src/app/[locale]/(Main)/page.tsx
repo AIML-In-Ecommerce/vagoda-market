@@ -1,3 +1,4 @@
+import AdvertisementCarousel from "@/component/user/AdvertisementCarousel";
 import HomeCarousel from "@/component/user/HomeCarousel";
 import HomeFlashSales from "@/component/user/HomeFlashSales";
 import HomeSuggestedProduct from "@/component/user/HomeSuggestedProduct";
@@ -15,7 +16,8 @@ export default function Home() {
   return (
     <>
       <Flex vertical className="w-full h-full" align="center" justify="center">
-        <HomeCarousel />
+        <AdvertisementCarousel />
+        {/* <HomeCarousel /> */}
         <HotCategory />
         <HomeFlashSales />
         {/* <HomeSuggestedProduct /> */}
