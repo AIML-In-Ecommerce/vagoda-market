@@ -18,7 +18,6 @@ interface CardSummaryProps {
     total: number
     currentAddress: AddressType
     showPromotionModal: () => void
-    floatingRef: any
 }
 
 const isEmpty = (quantity: number) => {
@@ -32,8 +31,7 @@ export default function FloatingCartSummary(props: CardSummaryProps) {
     return (
         <div className="lg:sticky lg:mx-0 mx-auto w-4/5 lg:top-10 block">
             <Space direction="vertical" size="middle"
-                className="flex bg-slate-50"
-                ref={props.floatingRef}>
+                className="flex bg-slate-50">
                 <Card title={
                     <div className="flex flex-row justify-between">
                         <span className="text-slate-400 text-lg">Giao tới</span>
@@ -67,7 +65,6 @@ export default function FloatingCartSummary(props: CardSummaryProps) {
                     <div className="flex flex-col">
                         {props.loading ? <Skeleton active /> : (<>
                             <div className="flex flex-row justify-between">
-
                                 <div className="font-semibold">Techzone Khuyến Mãi</div>
                                 <div className="flex flex-row space-x-2">
                                     <div className="text-slate-500">Có thể chọn 2</div>

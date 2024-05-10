@@ -16,4 +16,5 @@ export type PromotionType = {
     expiredDate?: string,
     // saleCategory: [ObjectId, ...]
     createdAt?: string
+    code: string,
 }

@@ -10,6 +10,7 @@ import Search from "antd/es/transfer/search";
 import FloatingCartSummary from "@/component/customer/product/FloatingCartSummary";
 import { DiscountType, PromotionType } from "@/model/PromotionType";
 import PromotionCard from "@/component/customer/product/PromotionCard";
+import crypto from 'crypto';
 
 type CartPageType = {
     key: React.Key;
@@ -26,68 +27,44 @@ const formatDate = (date: Date) => {
     const day = date.getDate().toString().padStart(2, '0');
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const year = date.getFullYear();
-  
+
     return `${hours}:${minutes} ${day}/${month}/${year}`;
 };
 
-const promotions: PromotionType[] = [
-    {
-        _id: '1',
-        name: "Giảm 50%",
-        description: "Áp dụng cho thanh toán qua ví điện tử MoMo (tối đa 100k)",
-        discountType: DiscountType.PERCENTAGE,
-        discountValue: 50,
-        quantity: 6,
-        upperBound: 100000,
-        expiredDate: formatDate(new Date('2024-03-24T12:30:00')) // 
-    },
-    {
-        _id: '2',
-        name: "Giảm 200k",
-        description: "Áp dụng cho mọi đối tượng khách hàng (cho đơn tối thiểu 400k)",
-        discountType: DiscountType.DIRECT_PRICE,
-        discountValue: 200000,
-        quantity: 20,
-        lowerBound: 400000,
-        expiredDate: formatDate(new Date('2024-03-27T12:30:00'))
-    },
-    {
-        _id: '3',
-        name: "Giảm 20%",
-        description: "Áp dụng cho tất cả khách hàng (tối đa 50k)",
-        discountType: DiscountType.PERCENTAGE,
-        discountValue: 20,
-        quantity: 15,
-        upperBound: 50000,
-        expiredDate: formatDate(new Date('2024-03-22T12:30:00'))
-    },
-    {
-        _id: '4',
-        name: "Giảm 50k",
-        description: "Chỉ áp dụng cho khách hàng VIP",
-        discountType: DiscountType.DIRECT_PRICE,
-        discountValue: 50000,
-        quantity: 10,
-        lowerBound: 0,
-        expiredDate: formatDate(new Date('2024-04-30T12:30:00'))
-    },
-    {
-        _id: '5',
-        name: "Giảm 10%",
-        description: "Áp dụng cho thanh toán qua thẻ tín dụng (tối đa 50k)",
-        discountType: DiscountType.PERCENTAGE,
-        discountValue: 10,
-        quantity: 8,
-        upperBound: 50000,
-        expiredDate: formatDate(new Date('2024-03-25T12:30:00'))
-    }
+const parseDateString = (dateString: string) => {
+    const [timePart, datePart] = dateString.split(' ');
+    const [hours, minutes] = timePart.split(':').map(Number);
+    const [day, month, year] = datePart.split('/').map(Number);
 
-]
+    // JavaScript months are 0-indexed, so we subtract 1 from the month
+    return new Date(year, month - 1, day, hours, minutes);
+};
 
+const compareDateString = (dateString1: string, dateString2: string) => {
+    return parseDateString(dateString1) <= parseDateString(dateString2) ? 1 : -1;
+};
+
+//Function of testing..
+function generatePromotionCode(promotionName: string): string {
+    // Create a hash object using SHA-256 algorithm
+    const hash = crypto.createHash('sha256');
+
+    // Update the hash object with the product name
+    hash.update(promotionName);
+
+    // Get the hexadecimal digest of the hash
+    const hexDigest = hash.digest('hex');
+
+    // Take the first 8 characters of the hexadecimal digest
+    const hashedName = hexDigest.substring(0, 8);
+
+    return hashedName;
+}
 
 export default function CartPage() {
     const [selectionType, setSelectionType] = useState<'checkbox' | 'radio'>('checkbox');
     const [products, setProducts] = useState<any>(null);
+    const [promotions, setPromotions] = useState<PromotionType[]>([]);
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
     const [selectedKey, setSelectedKey] = useState<React.Key | null>(null)
     const [loading, setLoading] = useState(false);
@@ -100,7 +77,6 @@ export default function CartPage() {
     const [showDeleteManyModal, setShowDeleteManyModal] = useState(false);
     const [showPromotionModal, setShowPromotionModal] = useState(false);
     const promotion_help = "Áp dụng tối đa 1 Mã giảm giá Sản Phẩm và 1 Mã Vận Chuyển"
-    const floatingRef = useRef(null);
 
     const [currentAddress, setCurrentAddress] = useState<AddressType>({
         _id: '1',
@@ -140,6 +116,72 @@ export default function CartPage() {
 
     const handleCancelPromotionModal = () => {
         setShowPromotionModal(false);
+    }
+
+    const fetchPromotions = async () => {
+        const data: PromotionType[] = [
+            {
+                _id: '1',
+                name: "Giảm 50%",
+                description: "Áp dụng cho thanh toán qua ví điện tử MoMo (tối đa 100k)",
+                discountType: DiscountType.PERCENTAGE,
+                discountValue: 50,
+                quantity: 6,
+                upperBound: 100000,
+                expiredDate: formatDate(new Date('2024-03-24T12:30:00')), // 
+                code: ""
+            },
+            {
+                _id: '2',
+                name: "Giảm 200k",
+                description: "Áp dụng cho mọi đối tượng khách hàng (cho đơn tối thiểu 400k)",
+                discountType: DiscountType.DIRECT_PRICE,
+                discountValue: 200000,
+                quantity: 20,
+                lowerBound: 400000,
+                expiredDate: formatDate(new Date('2024-03-27T12:30:00')),
+                code: ""
+            },
+            {
+                _id: '3',
+                name: "Giảm 20%",
+                description: "Áp dụng cho tất cả khách hàng (tối đa 50k)",
+                discountType: DiscountType.PERCENTAGE,
+                discountValue: 20,
+                quantity: 15,
+                upperBound: 50000,
+                expiredDate: formatDate(new Date('2024-03-22T12:30:00')),
+                code: ""
+            },
+            {
+                _id: '4',
+                name: "Giảm 50k",
+                description: "Chỉ áp dụng cho khách hàng VIP",
+                discountType: DiscountType.DIRECT_PRICE,
+                discountValue: 50000,
+                quantity: 10,
+                lowerBound: 0,
+                expiredDate: formatDate(new Date('2024-04-30T12:30:00')),
+                code: ""
+            },
+            {
+                _id: '5',
+                name: "Giảm 10%",
+                description: "Áp dụng cho thanh toán qua thẻ tín dụng (tối đa 50k)",
+                discountType: DiscountType.PERCENTAGE,
+                discountValue: 10,
+                quantity: 8,
+                upperBound: 50000,
+                expiredDate: formatDate(new Date('2024-03-25T12:30:00')),
+                code: ""
+            }
+        ]
+        // Generate code for each promotion
+        const fixedData: PromotionType[] = data.map((promotion: PromotionType) => { return { ...promotion, code: generatePromotionCode(promotion.description).toUpperCase() } })
+        setTimeout(() => {
+            setLoading(false);
+        }, 1000);
+        setPromotions(fixedData);
     }
 
     const fetchProducts = async () => {
@@ -392,6 +434,7 @@ export default function CartPage() {
     useEffect(() => {
         setLoading(true);
         fetchProducts();
+        fetchPromotions();
     }, [])
 
     useEffect(() => {
@@ -442,7 +485,6 @@ export default function CartPage() {
                             provisional={provisional} discount={discount} total={total}
                             currentAddress={currentAddress}
                             showPromotionModal={handleShowPromotionModal}
-                            floatingRef={floatingRef}
                         />
                     </div>
                 </div>
@@ -494,12 +536,16 @@ export default function CartPage() {
                             </div>
                             <Card className="overflow-auto h-96">
                                 {
-                                    promotions.map(item => {
+                                    promotions.sort(
+                                        (a,b) => compareDateString(a.expiredDate!, b.expiredDate!)
+                                    ).map(item => {
                                         return (
-                                            <PromotionCard item={item} 
-                                            promotions={discounts} 
-                                            applyDiscount={applyDiscount} 
-                                            removeDiscount={removeDiscount} />
+                                            <PromotionCard                                             
+                                                key={item._id}
+                                                item={item}
+                                                promotions={discounts}
+                                                applyDiscount={applyDiscount}
+                                                removeDiscount={removeDiscount} />
                                         )
                                     })
                                 }

@@ -1,6 +1,7 @@
 import { Space, Button, InputNumber, ConfigProvider } from "antd";
 import React from "react";
 import { FaMinus, FaPlus } from "react-icons/fa";
+import styled from 'styled-components';
 
 interface QuantityControlProps {
     keyProp: React.Key,
@@ -67,38 +68,44 @@ interface QuantityControlProps {
 //     }
 // }
 
+const InputNumberWrapper = styled.div`
+    .ant-input-number-input-wrap {
+        padding: auto !important;
+    }
 
+    .ant-input-number-input-wrap > input.ant-input-number-input {
+        text-align: center;
+    }`
 
 export const QuantityControl = (props: QuantityControlProps) => {
 
     return (
         <React.Fragment>
-            <Space size={props.componentSize ?? 5} className="flex">
-                <Button onClick={() => props.onDecrement(props.keyProp, props.value)}>
-                    <FaMinus />
-                </Button>
-                <InputNumber
-                    min={props.minValue ?? 1}
-                    max={props.maxValue ?? 100}
-                    defaultValue={props.defaultValue ?? 1}
-                    style=
-                    {
+            <div className="relative w-24">
+                <InputNumberWrapper>
+                    <InputNumber
+                        className="border-2 border-black rounded-3xl text-center"
+                        min={props.minValue ?? 1}
+                        max={props.maxValue ?? 99}
+                        defaultValue={props.defaultValue ?? 1}
+                        style=
                         {
-                            width: props.inputWidth ? `${props.inputWidth}px` : `auto`,
-                            justifyContent: 'center',
-                            textAlign: 'center',
+                            {
+                                width: "auto",
+                            }
                         }
-                    }
-                    onChange={(value: any) =>
-                        props.onQuantityChange(props.keyProp, value)}
-                    value={props.value}
-                    controls={false}
-                    changeOnWheel
-                />
-                <Button onClick={() => props.onIncrement(props.keyProp, props.value)}>
-                    <FaPlus />
-                </Button>
-            </Space>
+                        onChange={(value: any) =>
+                            props.onQuantityChange(props.keyProp, value)}
+                        value={props.value}
+                        controls={false}
+                        changeOnWheel
+                    />
+                </InputNumberWrapper>
+                <Button type="text" shape="circle" className="absolute left-0 top-0.5" icon={<FaMinus />}
+                    onClick={() => props.onDecrement(props.keyProp, props.value)} />
+                <Button type="text" shape="circle" className="absolute right-0 top-0.5" icon={<FaPlus />}
+                    onClick={() => props.onIncrement(props.keyProp, props.value)} />
+            </div>
         </React.Fragment>
     )
 

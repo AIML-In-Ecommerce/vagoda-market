@@ -185,7 +185,6 @@ export default function ShippingAddressPage() {
                             setCurrentAddress(undefined);
                             console.log("Create Address", currentAddress)
                             setFormVisibility(true);
-                            scrollToComponent();
                         }}
                         className="border-dashed border-gray-500">
                         Thêm địa chỉ giao hàng mới
