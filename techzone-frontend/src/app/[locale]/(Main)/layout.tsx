@@ -3,9 +3,9 @@ import type { Metadata } from "next";
 import "../globals.css";
 // import { AuthProvider } from "@/context/AuthContext";
 // import StyledComponentsRegistry from "../../../lib/AntdRegistry";
-import { ReactNode } from "react";
-import { NextIntlClientProvider, useMessages } from "next-intl";
 import Navbar from "@/component/customer/Navbar";
+import { NextIntlClientProvider, useMessages } from "next-intl";
+import { ReactNode } from "react";
 // import UserLayout from "@/component/UserLayout";
 
 interface RootLayoutProps {
@@ -28,13 +28,13 @@ export default function RootLayout({
   return (
     <html lang={"en"}>
       {/* <body className={inter.className}> */}
-      <body className="">
+      <body className="w-full">
         <NextIntlClientProvider locale={locale} messages={messages}>
           {/* <AuthProvider> */}
           {/* <UserLayout children={children} locale={locale} /> */}
           {/* <UserLayout locale={locale}>{children}</UserLayout> */}
           {/* </AuthProvider> */}
-          <div className="bg-cover bg-slate-50 min-h-screen">
+          <div className="w-full bg-cover bg-[#f3f3f3] min-h-screen overflow-hidden">
             <Navbar />
             {children}
           </div>
