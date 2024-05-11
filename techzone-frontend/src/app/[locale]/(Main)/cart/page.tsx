@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
-import { Button, Card, Modal, Space, Table, Image, Tooltip, Skeleton } from 'antd';
+import { Button, Card, Modal, Space, Table, Image, Tooltip, Skeleton, Select } from 'antd';
 import type { TableColumnsType } from 'antd';
 import { FaRegTrashCan, FaRegCircleQuestion } from "react-icons/fa6";
 import { Currency } from "@/component/user/utils/CurrencyDisplay";
@@ -10,12 +10,15 @@ import Search from "antd/es/transfer/search";
 import FloatingCartSummary from "@/component/customer/product/FloatingCartSummary";
 import { DiscountType, PromotionType } from "@/model/PromotionType";
 import PromotionCard from "@/component/customer/product/PromotionCard";
+import crypto from 'crypto';
+import styled from 'styled-components'
 
 type CartPageType = {
     key: React.Key;
     image: string;
     name: string;
     unit_price: number;
+
     amount?: number;
     final_price?: number;
 }
@@ -26,68 +29,52 @@ const formatDate = (date: Date) => {
     const day = date.getDate().toString().padStart(2, '0');
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const year = date.getFullYear();
-  
+
     return `${hours}:${minutes} ${day}/${month}/${year}`;
 };
 
-const promotions: PromotionType[] = [
-    {
-        _id: '1',
-        name: "Giảm 50%",
-        description: "Áp dụng cho thanh toán qua ví điện tử MoMo (tối đa 100k)",
-        discountType: DiscountType.PERCENTAGE,
-        discountValue: 50,
-        quantity: 6,
-        upperBound: 100000,
-        expiredDate: formatDate(new Date('2024-03-24T12:30:00')) // 
-    },
-    {
-        _id: '2',
-        name: "Giảm 200k",
-        description: "Áp dụng cho mọi đối tượng khách hàng (cho đơn tối thiểu 400k)",
-        discountType: DiscountType.DIRECT_PRICE,
-        discountValue: 200000,
-        quantity: 20,
-        lowerBound: 400000,
-        expiredDate: formatDate(new Date('2024-03-27T12:30:00'))
-    },
-    {
-        _id: '3',
-        name: "Giảm 20%",
-        description: "Áp dụng cho tất cả khách hàng (tối đa 50k)",
-        discountType: DiscountType.PERCENTAGE,
-        discountValue: 20,
-        quantity: 15,
-        upperBound: 50000,
-        expiredDate: formatDate(new Date('2024-03-22T12:30:00'))
-    },
-    {
-        _id: '4',
-        name: "Giảm 50k",
-        description: "Chỉ áp dụng cho khách hàng VIP",
-        discountType: DiscountType.DIRECT_PRICE,
-        discountValue: 50000,
-        quantity: 10,
-        lowerBound: 0,
-        expiredDate: formatDate(new Date('2024-04-30T12:30:00'))
-    },
-    {
-        _id: '5',
-        name: "Giảm 10%",
-        description: "Áp dụng cho thanh toán qua thẻ tín dụng (tối đa 50k)",
-        discountType: DiscountType.PERCENTAGE,
-        discountValue: 10,
-        quantity: 8,
-        upperBound: 50000,
-        expiredDate: formatDate(new Date('2024-03-25T12:30:00'))
+const parseDateString = (dateString: string) => {
+    const [timePart, datePart] = dateString.split(' ');
+    const [hours, minutes] = timePart.split(':').map(Number);
+    const [day, month, year] = datePart.split('/').map(Number);
+
+    // JavaScript months are 0-indexed, so we subtract 1 from the month
+    return new Date(year, month - 1, day, hours, minutes);
+};
+
+const compareDateString = (dateString1: string, dateString2: string) => {
+    return parseDateString(dateString1) <= parseDateString(dateString2) ? 1 : -1;
+};
+
+//Function for testing..
+function generatePromotionCode(promotionName: string): string {
+    // Create a hash object using SHA-256 algorithm
+    const hash = crypto.createHash('sha256');
+
+    // Update the hash object with the product name
+    hash.update(promotionName);
+
+    // Get the hexadecimal digest of the hash
+    const hexDigest = hash.digest('hex');
+
+    // Take the first 8 characters of the hexadecimal digest
+    const hashedName = hexDigest.substring(0, 8);
+
+    return hashedName;
+}
+
+const SelectWrapper = styled.div`
+    .ant-select .ant-select-selector {
+        border-radius: 20px;
+        border-color: rgba(0, 0, 0);
+        border-width: 2px;
     }
-
-]
-
+`
 
 export default function CartPage() {
     const [selectionType, setSelectionType] = useState<'checkbox' | 'radio'>('checkbox');
     const [products, setProducts] = useState<any>(null);
+    const [promotions, setPromotions] = useState<PromotionType[]>([]);
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
     const [selectedKey, setSelectedKey] = useState<React.Key | null>(null)
     const [loading, setLoading] = useState(false);
@@ -100,7 +87,6 @@ export default function CartPage() {
     const [showDeleteManyModal, setShowDeleteManyModal] = useState(false);
     const [showPromotionModal, setShowPromotionModal] = useState(false);
     const promotion_help = "Áp dụng tối đa 1 Mã giảm giá Sản Phẩm và 1 Mã Vận Chuyển"
-    const floatingRef = useRef(null);
 
     const [currentAddress, setCurrentAddress] = useState<AddressType>({
         _id: '1',
@@ -140,6 +126,72 @@ export default function CartPage() {
 
     const handleCancelPromotionModal = () => {
         setShowPromotionModal(false);
+    }
+
+    const fetchPromotions = async () => {
+        const data: PromotionType[] = [
+            {
+                _id: '1',
+                name: "Giảm 50%",
+                description: "Áp dụng cho thanh toán qua ví điện tử MoMo (tối đa 100k)",
+                discountType: DiscountType.PERCENTAGE,
+                discountValue: 50,
+                quantity: 6,
+                upperBound: 100000,
+                expiredDate: formatDate(new Date('2024-03-24T12:30:00')), // 
+                code: ""
+            },
+            {
+                _id: '2',
+                name: "Giảm 200k",
+                description: "Áp dụng cho mọi đối tượng khách hàng (cho đơn tối thiểu 400k)",
+                discountType: DiscountType.DIRECT_PRICE,
+                discountValue: 200000,
+                quantity: 20,
+                lowerBound: 400000,
+                expiredDate: formatDate(new Date('2024-03-27T12:30:00')),
+                code: ""
+            },
+            {
+                _id: '3',
+                name: "Giảm 20%",
+                description: "Áp dụng cho tất cả khách hàng (tối đa 50k)",
+                discountType: DiscountType.PERCENTAGE,
+                discountValue: 20,
+                quantity: 15,
+                upperBound: 50000,
+                expiredDate: formatDate(new Date('2024-03-22T12:30:00')),
+                code: ""
+            },
+            {
+                _id: '4',
+                name: "Giảm 50k",
+                description: "Chỉ áp dụng cho khách hàng VIP",
+                discountType: DiscountType.DIRECT_PRICE,
+                discountValue: 50000,
+                quantity: 10,
+                lowerBound: 0,
+                expiredDate: formatDate(new Date('2024-04-30T12:30:00')),
+                code: ""
+            },
+            {
+                _id: '5',
+                name: "Giảm 10%",
+                description: "Áp dụng cho thanh toán qua thẻ tín dụng (tối đa 50k)",
+                discountType: DiscountType.PERCENTAGE,
+                discountValue: 10,
+                quantity: 8,
+                upperBound: 50000,
+                expiredDate: formatDate(new Date('2024-03-25T12:30:00')),
+                code: ""
+            }
+        ]
+        // Generate code for each promotion
+        const fixedData: PromotionType[] = data.map((promotion: PromotionType) => { return { ...promotion, code: generatePromotionCode(promotion.description).toUpperCase() } })
+        setTimeout(() => {
+            setLoading(false);
+        }, 1000);
+        setPromotions(fixedData);
     }
 
     const fetchProducts = async () => {
@@ -323,10 +375,15 @@ export default function CartPage() {
 
     const columns: TableColumnsType<CartPageType> = [
         {
-            title: <span className="text-base">Sản phẩm ({selectedRowKeys.length})</span>,
-            dataIndex: 'name',
-            render: (text: string, record: CartPageType) =>
-                <Space size={12} className="flex lg:flex-row flex-col lg:text-start text-center">
+            title: <div className="flex flex-row gap-1 items-center uppercase text-gray-400">
+                <div className="text-base">Sản phẩm ({selectedRowKeys.length})</div>
+                <Button type="text" onClick={() => handleShowDeleteManyModal()}>
+                    <FaRegTrashCan />
+                </Button>
+            </div>,
+            dataIndex: ['name'],
+            render: (text: string, record: CartPageType, index: number) =>
+                <Space align="start" size={12} className="flex flex-row">
                     {
                         loading ? <Skeleton.Image active /> :
                             <Image
@@ -335,35 +392,72 @@ export default function CartPage() {
                                 alt={""} />
                     }
                     {
-                        loading ? <Skeleton paragraph={{ rows: 2 }} active /> : (
-                            <span className="text-sm font-normal">{text}</span>
+                        loading ? <Skeleton paragraph={{ rows: 2 }
+                        } active /> : (
+                            <div className="flex flex-row">
+                                <div className="flex flex-col gap-1">
+                                    <div className="text-sm font-bold text-ellipsis overflow-hidden">{record.name}</div>
+                                    <div className="text-sm text-gray-500 mb-1">Category1 / Category2</div>
+                                    <SelectWrapper className="flex flex-row gap-2 mb-1">
+                                        <Select
+                                            defaultValue="yellow"
+                                            style={{ width: 75 }}
+                                            // onChange={handleChange}
+                                            options={[
+                                                { value: 'red', label: 'Đỏ' },
+                                                { value: 'green', label: 'Xanh' },
+                                                { value: 'yellow', label: 'Vàng' },
+                                            ]}
+                                        />
+                                        <Select
+                                            defaultValue="red"
+                                            style={{ width: 75 }}
+                                            // onChange={handleChange}
+                                            options={[
+                                                { value: 'red', label: 'Đỏ' },
+                                                { value: 'green', label: 'Xanh' },
+                                                { value: 'yellow', label: 'Vàng' },
+                                            ]}
+                                        />
+                                    </SelectWrapper>
+                                    <div style={{ width: 75 }} onClick={() => handleShowDeleteOneModal(record.key)}>
+                                        <div className="flex flex-row items-center gap-1 hover:font-semibold">
+                                            <FaRegTrashCan /> Xóa
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         )
                     }
-                </Space>
+
+
+                </Space >,
+            width: '65%',
+            align: 'start' as const,
         },
         {
-            title: <span className="text-base">Đơn giá</span>,
-            dataIndex: 'unit_price',
-            render: (value: number) => loading ? <Skeleton.Input active /> : (<a className="text-base">
-                <Currency value={value} />
-            </a>),
-        },
-        {
-            title: <span className="text-base">Số lượng</span>,
+            title: <span className="text-base uppercase text-gray-400">Số lượng</span>,
             dataIndex: 'amount',
             render: (value: number, record: CartPageType) =>
-                loading ? <Skeleton.Input active /> : (
-                    <QuantityControl componentSize={5} keyProp={record.key} value={value}
-                        minValue={1} maxValue={100} defaultValue={1}
-                        inputWidth={75}
-                        onIncrement={onIncrement}
-                        onDecrement={onDecrement}
-                        onQuantityChange={onQuantityChange}
-                    />)
+                <div className="flex justify-center">
+                    {
+                        loading ? <Skeleton.Input active /> : (
+                            <QuantityControl
+                                keyProp={record.key} value={value}
+                                minValue={1} maxValue={100} defaultValue={1}
+                                inputWidth={75}
+                                onIncrement={onIncrement}
+                                onDecrement={onDecrement}
+                                onQuantityChange={onQuantityChange}
+                            />)
+                    }
+                </div>,
+            width: '10%',
+            align: 'center' as const,
 
         },
         {
-            title: <span className="text-base">Thành tiền</span>,
+            title: <span className="text-base uppercase text-gray-400">Thành tiền</span>,
             dataIndex: 'final_price',
             render: (value: number, record: CartPageType) => (
                 loading ? <Skeleton.Input active /> : (
@@ -374,24 +468,15 @@ export default function CartPage() {
                             minimumFractionDigits={0} />
                     </span>)
             ),
-            width: "16%"
-        },
-        {
-            title:
-                <Button onClick={() => handleShowDeleteManyModal()}>
-                    <FaRegTrashCan />
-                </Button>,
-            dataIndex: 'remove',
-            render: (value: number, record: CartPageType) => (
-                <Button onClick={() => handleShowDeleteOneModal(record.key)}><FaRegTrashCan /></Button>
-            ),
-            fixed: 'right'
+            width: '25%',
+            align: 'center' as const,
         },
     ];
 
     useEffect(() => {
         setLoading(true);
         fetchProducts();
+        fetchPromotions();
     }, [])
 
     useEffect(() => {
@@ -414,11 +499,24 @@ export default function CartPage() {
 
     return (
         <React.Fragment>
-            <div className="lg:container flex flex-col p-5 mx-auto my-5">
-                <div className="text-xl font-bold">GIỎ HÀNG</div>
-                <div className="mt-5 flex xs:flex-col sm:flex-col md:flex-col lg:grid lg:grid-cols-3 gap-5 relative">
-                    <div className="lg:col-start-1 lg:col-span-2 border rounded-lg lg:mb-0 mb-10 lg:w-auto w-full">
+            <div className="container flex flex-col p-5 mx-auto my-5">
+                <div className="mt-5 flex xs:flex-col sm:flex-col md:flex-col lg:grid lg:grid-cols-6 gap-2 relative">
+                    <div className="lg:col-start-1 lg:col-span-3 lg:mb-0 mb-10">
+                        <div className="text-2xl font-bold normal-case p-2">Thông tin vận chuyển</div>
+                    </div>
+
+                    <div className="lg:col-start-4 lg:col-span-3 lg:w-auto w-full flex flex-col border-l-2 pl-3">
+                        {/* <FloatingCartSummary
+                            goToShippingAddressPage={goToShippingAddressPage}
+                            loading={loading} selectedRowKeys={selectedRowKeys}
+                            provisional={provisional} discount={discount} total={total}
+                            currentAddress={currentAddress}
+                            showPromotionModal={handleShowPromotionModal}
+                        /> */}
+                        
+                        <div className="text-2xl font-bold normal-case p-2">Giỏ hàng</div>
                         <Table
+                            tableLayout='auto'
                             rowSelection={{
                                 type: selectionType,
                                 ...rowSelection,
@@ -431,18 +529,8 @@ export default function CartPage() {
                             //       })}
                             loading={loading}
                             pagination={{ pageSize: 4 }}
+                            scroll={{ x: 'min-content' }}
 
-                        />
-                    </div>
-
-                    <div className="lg:col-start-3 lg:col-span-1 lg:w-auto w-full">
-                        <FloatingCartSummary offsetTop={top}
-                            goToShippingAddressPage={goToShippingAddressPage}
-                            loading={loading} selectedRowKeys={selectedRowKeys}
-                            provisional={provisional} discount={discount} total={total}
-                            currentAddress={currentAddress}
-                            showPromotionModal={handleShowPromotionModal}
-                            floatingRef={floatingRef}
                         />
                     </div>
                 </div>
@@ -494,12 +582,16 @@ export default function CartPage() {
                             </div>
                             <Card className="overflow-auto h-96">
                                 {
-                                    promotions.map(item => {
+                                    promotions.sort(
+                                        (a, b) => compareDateString(a.expiredDate!, b.expiredDate!)
+                                    ).map(item => {
                                         return (
-                                            <PromotionCard item={item} 
-                                            promotions={discounts} 
-                                            applyDiscount={applyDiscount} 
-                                            removeDiscount={removeDiscount} />
+                                            <PromotionCard
+                                                key={item._id}
+                                                item={item}
+                                                promotions={discounts}
+                                                applyDiscount={applyDiscount}
+                                                removeDiscount={removeDiscount} />
                                         )
                                     })
                                 }
@@ -518,7 +610,6 @@ export default function CartPage() {
                     </div>
                 }
             </Modal>
-
         </React.Fragment>
     );
 }
