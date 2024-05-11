@@ -1,6 +1,8 @@
 import React, { useRef, useState } from "react";
 // import Image from "next/image";
-import { Button, Image, Rate, Tooltip } from "antd";
+import { Button, Image, Tooltip } from "antd";
+import { HiHeart, HiOutlineHeart } from "react-icons/hi2";
+import { PiShoppingCart } from "react-icons/pi";
 
 interface ProductItemProps {
   imageLink: string;
@@ -12,10 +14,6 @@ interface ProductItemProps {
   originalPrice: number;
   inWishlist: boolean;
 }
-import { PiShoppingCart } from "react-icons/pi";
-import { CiStar } from "react-icons/ci";
-import { HiOutlineHeart } from "react-icons/hi2";
-import { HiHeart } from "react-icons/hi2";
 export default function ProductItem(props: ProductItemProps) {
   const [showAnimation, setShowAnimation] = useState(false);
   const ref = useRef(null);
@@ -41,10 +39,7 @@ export default function ProductItem(props: ProductItemProps) {
     } else if (value >= 1000) {
       return (value / 1000).toFixed(0) + "k";
     } else {
-      return value.toLocaleString("vi-VN", {
-        style: "currency",
-        currency: "VND",
-      });
+      return value.toString();
     }
   }
   const animationDuration = 1000;

@@ -1,7 +1,7 @@
 import { Button, InputNumber } from "antd";
 import { useState } from "react";
 import { IoRemoveOutline } from "react-icons/io5";
-import { formatAmountSold } from "../ProductItem";
+import { formatPrice } from "../ProductItem";
 
 export type PriceRange = {
   min: number | null;
@@ -44,9 +44,9 @@ export default function PriceFilter(props: PriceFilterProps) {
       {props.suggestedPrices.map((price, index) => {
         const description = price.min
           ? price.max
-            ? `${formatAmountSold(price.min)} - ${formatAmountSold(price.max)}`
-            : `Trên ${formatAmountSold(price.min)}`
-          : `Dưới ${formatAmountSold(price.max)}`;
+            ? `${formatPrice(price.min)} - ${formatPrice(price.max)}`
+            : `Trên ${formatPrice(price.min)}`
+          : `Dưới ${formatPrice(price.max)}`;
         return (
           <Button
             key={index}

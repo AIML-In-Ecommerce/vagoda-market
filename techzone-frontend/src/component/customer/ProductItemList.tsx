@@ -14,7 +14,7 @@ import { useEffect, useMemo, useState } from "react";
 import { CiCircleRemove } from "react-icons/ci";
 import { HiOutlineAdjustmentsHorizontal } from "react-icons/hi2";
 import { IoImageOutline } from "react-icons/io5";
-import ProductItem, { formatAmountSold } from "./ProductItem";
+import ProductItem, { formatPrice } from "./ProductItem";
 interface ProductListProps {
   isFilterOpened: boolean;
   setIsFilterOpened: (show: boolean) => void;
@@ -156,13 +156,13 @@ export default function ProductItemList(props: ProductListProps) {
                   className=" flex rounded-2xl  space-x-2 items-center  text-sm mx-2"
                 >
                   <p>
-                    {formatAmountSold(item.value.min)
-                      ? formatAmountSold(item.value.max)
-                        ? `${formatAmountSold(
-                            item.value.min
-                          )} - ${formatAmountSold(item.value.max)}`
-                        : `Trên ${formatAmountSold(item.value.min)}`
-                      : `Dưới ${formatAmountSold(item.value.max)}`}
+                    {formatPrice(item.value.min)
+                      ? formatPrice(item.value.max)
+                        ? `${formatPrice(item.value.min)} - ${formatPrice(
+                            item.value.max
+                          )}`
+                        : `Trên ${formatPrice(item.value.min)}`
+                      : `Dưới ${formatPrice(item.value.max)}`}
                   </p>
                   <div
                     className=""

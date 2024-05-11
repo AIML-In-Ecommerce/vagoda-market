@@ -150,7 +150,7 @@ const Comment = (props: CommentProps) => {
                     })
                   }
                 >
-                  <span>edit</span>
+                  <span>Chỉnh sửa</span>
                 </button>
                 <button
                   className="flex items-center space-x-2 text-[#F10000] hover:font-bold cursor-pointer"
@@ -159,7 +159,7 @@ const Comment = (props: CommentProps) => {
                     openModal(comment);
                   }}
                 >
-                  <span>delete</span>
+                  <span>Xoá</span>
                 </button>
               </>
             )}

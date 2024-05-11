@@ -108,7 +108,7 @@ const ReviewList = (reviewListProps: ReviewListProps) => {
   };
 
   return (
-    <div className="mt-10 justify-center align-middle">
+    <div className="justify-center align-middle">
       {filterData.map((item, index) => (
         <Review
           id={item.id}
@@ -137,6 +137,7 @@ const ReviewList = (reviewListProps: ReviewListProps) => {
           onChange={onChange}
           showLessItems={true}
           onShowSizeChange={onShowSizeChange}
+          locale={{ jump_to: "Nhảy đến trang", page: "" }}
         />
       </div>
     </div>
