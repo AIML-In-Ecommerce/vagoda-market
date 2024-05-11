@@ -1,8 +1,9 @@
 "use client";
-import { Button, Empty, Flex, InputNumber, Modal, Spin } from "antd";
+import { Flex, Modal, Spin } from "antd";
 // import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { priceIndex } from "./ProductDetail";
+import CustomEmpty from "../shop/mini/CustomEmpty";
 
 interface ModalProps {
   open: boolean;
@@ -93,8 +94,6 @@ const ProductSummaryModal = (modalData: ModalProps) => {
         null
       }
     >
-      {/* put cart summary here? */}
-
       <div className="flex flex-col gap-3 m-5">
         <div className="bg-white max-w-1/4 h-fit p-4 grid grid-cols-4">
           <div className="col-span-1 col-start-1">ID</div>
@@ -119,12 +118,7 @@ const ProductSummaryModal = (modalData: ModalProps) => {
         <div className="font-semibold px-5 text-md">
           Sản phẩm có thể kết hợp
         </div>
-        {modalData.comboIdList.length === 0 && (
-          <Empty
-            image={Empty.PRESENTED_IMAGE_SIMPLE}
-            description={<span>Không có</span>}
-          />
-        )}
+        {modalData.comboIdList.length === 0 && <CustomEmpty />}
 
         {modalData.comboIdList.length > 0 &&
           modalData.comboIdList.map((item, index) => (

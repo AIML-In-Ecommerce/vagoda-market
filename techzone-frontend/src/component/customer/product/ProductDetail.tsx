@@ -13,7 +13,6 @@ import {
   Descriptions,
   DescriptionsProps,
   Divider,
-  Empty,
   Flex,
   FloatButton,
   List,
@@ -33,9 +32,15 @@ import ComboList from "./ComboList";
 import Link from "next/link";
 import CartSummaryModal from "./ProductSummaryModal";
 import ReactImageMagnify from "react-image-magnify";
+import { POST_GetProductDetail } from "@/app/apis/product/ProductDetailAPI";
+import { useParams } from "next/navigation";
+import { ProductDetailType } from "@/model/ProductType";
+import CustomEmpty from "../shop/mini/CustomEmpty";
 
 export default function ProductDetail() {
-  const productInfo = {
+  const { productId } = useParams();
+
+  const productInfo: ProductDetailType = {
     _id: "string",
     name: "Áo Polo Nam Pique Cotton USA",
     // attribute: {
@@ -46,8 +51,8 @@ export default function ProductDetail() {
     finalPrice: 4900000,
     category: "string",
     shopId: "string",
-    // status: ENUM[AVAILABLE, SOLD_OUT, SALE];
-    images: [
+    status: 0,
+    image: [
       "https://cdn.shopify.com/s/files/1/0023/1342/0889/products/ClassicShirt_White_1_5cd5bf10-af18-4d0b-a477-bc3422d8401a.jpg?v=1688497040",
       // "https://dictionary.cambridge.org/images/thumb/shirt_noun_002_33400.jpg?version=6.0.11",
       "https://www.aristobrat.in/cdn/shop/files/ClassicShirt_White_1.jpg?v=1709556583&width=2048",
@@ -62,9 +67,11 @@ export default function ProductDetail() {
       // "https://www.aristobrat.in/cdn/shop/files/ClassicShirt_White_1.jpg?v=1709556583&width=2048",
       // "https://www.aristobrat.in/cdn/shop/files/ClassicShirt_White_1.jpg?v=1709556583&width=2048",
     ],
-    avgRating: 4.9,
-    createdAt: "string",
+    avgRating: 0,
+    soldQuantity: 0,
   };
+
+  const [product, setProduct] = useState<ProductDetailType>();
 
   // replace this with html component from seller page
   const items: DescriptionsProps["items"] = [
@@ -125,7 +132,7 @@ export default function ProductDetail() {
     height: number;
   };
 
-  const [mainImage, setMainImage] = useState(productInfo.images[0]);
+  const [mainImage, setMainImage] = useState<string>("");
   const [mainImageInfo, setMainImageInfo] = useState<ImageInfoType>({
     width: 0,
     height: 0,
@@ -160,129 +167,135 @@ export default function ProductDetail() {
   const [comboIdList, setComboIdList] = useState<Array<string>>([]);
 
   const totalPrice = useMemo(() => {
-    return numberOfItem * productInfo.finalPrice + totalComboPrice;
-  }, [totalComboPrice, numberOfItem]);
+    if (!product) return 0;
+    return numberOfItem * product.finalPrice + totalComboPrice;
+  }, [totalComboPrice, numberOfItem, product]);
 
   // image col
   const imageCol = useMemo(() => {
-    return productInfo.images.length > 5 ? 2 : 1;
-  }, []);
+    if (!product) return 1;
+    return product.image.length > 5 ? 2 : 1;
+  }, [product]);
 
-  // window size
-  const [width, setWidth] = useState(window.innerWidth);
-  // const [height, setHeight] = useState(window.innerHeight);
-  const updateDimensions = () => {
-    setWidth(window.innerWidth);
-    // setHeight(window.innerHeight);
-    console.log(window.innerWidth);
-  };
-  useEffect(() => {
-    window.addEventListener("resize", updateDimensions);
-    return () => window.removeEventListener("resize", updateDimensions);
-  }, []);
+  // window size _ ATTEMPT
+  // const [width, setWidth] = useState(window.innerWidth);
+  // // const [height, setHeight] = useState(window.innerHeight);
+  // const updateDimensions = () => {
+  //   setWidth(window.innerWidth);
+  //   // setHeight(window.innerHeight);
+  //   console.log(window.innerWidth);
+  // };
+  // useEffect(() => {
+  //   window.addEventListener("resize", updateDimensions);
+  //   return () => window.removeEventListener("resize", updateDimensions);
+  // }, []);
 
   // modal
   const [open, setOpen] = useState(false);
 
   // review summary
   const reviewSummary = (
-    <div className="sticky bg-white rounded-xl mt-2 border-2 top-0 p-3 flex flex-col md:flex-row lg:flex-col items-center">
-      <div id="star-review-summary">
-        <Popover
-          title="Thống kê chung"
-          content={
-            <div>
-              <Flex vertical gap="small" style={{ width: 300 }}>
-                <Flex gap="small">
-                  <Rate
-                    disabled
-                    defaultValue={5}
-                    style={{ padding: 5, fontSize: 10 }}
-                  />
-                  <Flex gap="small" style={{ width: 180 }}>
-                    <Progress percent={66} size="small" />
+    <div>
+      {product && (
+        <div className="sticky bg-white rounded-xl mt-2 border-2 top-0 p-3 flex flex-col md:flex-row lg:flex-col items-center">
+          <div id="star-review-summary">
+            <Popover
+              title="Thống kê chung"
+              content={
+                <div>
+                  <Flex vertical gap="small" style={{ width: 300 }}>
+                    <Flex gap="small">
+                      <Rate
+                        disabled
+                        defaultValue={5}
+                        style={{ padding: 5, fontSize: 10 }}
+                      />
+                      <Flex gap="small" style={{ width: 180 }}>
+                        <Progress percent={66} size="small" />
+                      </Flex>
+                    </Flex>
+                    <Flex gap="small">
+                      <Rate
+                        disabled
+                        defaultValue={4}
+                        style={{ padding: 5, fontSize: 10 }}
+                      />
+                      <Flex gap="small" style={{ width: 180 }}>
+                        <Progress percent={33} size="small" />
+                      </Flex>
+                    </Flex>
+                    <Flex gap="small">
+                      <Rate
+                        disabled
+                        defaultValue={3}
+                        style={{ padding: 5, fontSize: 10 }}
+                      />
+                      <Flex gap="small" style={{ width: 180 }}>
+                        <Progress percent={1} size="small" />
+                      </Flex>
+                    </Flex>
+                    <Flex gap="small">
+                      <Rate
+                        disabled
+                        defaultValue={2}
+                        style={{ padding: 5, fontSize: 10 }}
+                      />
+                      <Flex gap="small" style={{ width: 180 }}>
+                        <Progress percent={0} size="small" />
+                      </Flex>
+                    </Flex>
+                    <Flex gap="small">
+                      <Rate
+                        disabled
+                        defaultValue={1}
+                        style={{ padding: 5, fontSize: 10 }}
+                      />
+                      <Flex gap="small" style={{ width: 180 }}>
+                        <Progress percent={0} size="small" />
+                      </Flex>
+                    </Flex>
                   </Flex>
-                </Flex>
-                <Flex gap="small">
-                  <Rate
-                    disabled
-                    defaultValue={4}
-                    style={{ padding: 5, fontSize: 10 }}
-                  />
-                  <Flex gap="small" style={{ width: 180 }}>
-                    <Progress percent={33} size="small" />
-                  </Flex>
-                </Flex>
-                <Flex gap="small">
-                  <Rate
-                    disabled
-                    defaultValue={3}
-                    style={{ padding: 5, fontSize: 10 }}
-                  />
-                  <Flex gap="small" style={{ width: 180 }}>
-                    <Progress percent={1} size="small" />
-                  </Flex>
-                </Flex>
-                <Flex gap="small">
-                  <Rate
-                    disabled
-                    defaultValue={2}
-                    style={{ padding: 5, fontSize: 10 }}
-                  />
-                  <Flex gap="small" style={{ width: 180 }}>
-                    <Progress percent={0} size="small" />
-                  </Flex>
-                </Flex>
-                <Flex gap="small">
-                  <Rate
-                    disabled
-                    defaultValue={1}
-                    style={{ padding: 5, fontSize: 10 }}
-                  />
-                  <Flex gap="small" style={{ width: 180 }}>
-                    <Progress percent={0} size="small" />
-                  </Flex>
-                </Flex>
-              </Flex>
+                </div>
+              }
+            >
+              <div className="flex flex-col cursor-pointer items-center gap-2 w-max">
+                <div className="font-bold uppercase text-sm md:text-sm">
+                  đánh giá sản phẩm
+                </div>
+                <div className="font-extrabold uppercase text-2xl md:text-6xl">
+                  {product.avgRating}
+                </div>
+                <Rate
+                  disabled
+                  allowHalf
+                  defaultValue={product.avgRating}
+                  style={{ padding: 5, fontSize: 28 }}
+                />
+                <div className="italic pb-5 text-[9px] md:text-sm">
+                  {numberOfReview} đánh giá
+                </div>
+              </div>
+            </Popover>
+          </div>
+
+          <div id="ai-review-summary" className="mb-5 md:pl-5 lg:pl-0">
+            <div className="font-bold md:pt-5 text-sm md:text-lg">
+              TechZone Assistant 🤖
             </div>
-          }
-        >
-          <div className="flex flex-col cursor-pointer items-center gap-2 w-max">
-            <div className="font-bold uppercase text-sm md:text-sm">
-              đánh giá sản phẩm
+
+            <div className="font-semibold pt-5 text-xs md:text-sm">
+              Tổng quan đánh giá khách hàng:
             </div>
-            <div className="font-extrabold uppercase text-2xl md:text-6xl">
-              4.5
-            </div>
-            <Rate
-              disabled
-              allowHalf
-              defaultValue={4.5}
-              style={{ padding: 5, fontSize: 28 }}
-            />
-            <div className="italic pb-5 text-[9px] md:text-sm">
-              {numberOfReview} đánh giá
+            <div className="pt-2 text-xs md:text-sm">
+              Tổng thể, iRobot Roomba 980 là một sự lựa chọn tốt cho người tiêu
+              dùng muốn đầu tư vào một robot hút bụi thông minh và hiệu quả. Với
+              hiệu suất hút bụi mạnh mẽ, tính năng thông minh và khả năng vận
+              hành linh hoạt, Roomba 980 sẽ giúp giảm bớt công việc lau chùi và
+              mang lại một không gian sống sạch sẽ hơn.
             </div>
           </div>
-        </Popover>
-      </div>
-
-      <div id="ai-review-summary" className="mb-5 md:pl-5 lg:pl-0">
-        <div className="font-bold md:pt-5 text-sm md:text-lg">
-          TechZone Assistant 🤖
         </div>
-
-        <div className="font-semibold pt-5 text-xs md:text-sm">
-          Tổng quan đánh giá khách hàng:
-        </div>
-        <div className="pt-2 text-xs md:text-sm">
-          Tổng thể, iRobot Roomba 980 là một sự lựa chọn tốt cho người tiêu dùng
-          muốn đầu tư vào một robot hút bụi thông minh và hiệu quả. Với hiệu
-          suất hút bụi mạnh mẽ, tính năng thông minh và khả năng vận hành linh
-          hoạt, Roomba 980 sẽ giúp giảm bớt công việc lau chùi và mang lại một
-          không gian sống sạch sẽ hơn.
-        </div>
-      </div>
+      )}
     </div>
   );
 
@@ -403,63 +416,85 @@ export default function ProductDetail() {
     },
   ];
 
+  // functions
+
+  // call api
+  useEffect(() => {
+    handleGetProductDetail();
+  }, []);
+
+  useEffect(() => {
+    if (!product) return;
+    setMainImage(product.image[0]);
+  }, [product]);
+
+  const handleGetProductDetail = async () => {
+    const response = await POST_GetProductDetail(productId.toString());
+    if (response.status == 200) {
+      // console.log(response.message);
+
+      let data = response.data as ProductDetailType;
+      if (data) {
+        setProduct(data);
+        console.log("product", data);
+      }
+    }
+  };
+
   return (
-    <div className="justify-between mx-10 lg:px-10 pb-10 gap-5 h-fit overflow-hidden relative">
-      <div className="">
-        {/* about product */}
-        <div className="bg-white flex lg:flex-row flex-col my-5 lg:max-h-[450px] xl:max-h-[550px] overflow-y-clip">
-          <Flex>
-            <div
-              className={`m-2 flex flex-col min-w-14 ${
-                imageCol == 1 ? "max-w-14" : "max-w-28"
-              }`}
-            >
-              <List
-                grid={{ gutter: 20, column: imageCol }}
-                dataSource={productInfo.images}
-                locale={{
-                  emptyText: (
-                    <Empty
-                      image={Empty.PRESENTED_IMAGE_SIMPLE}
-                      description={<span>Không có</span>}
-                    />
-                  ),
-                }}
-                renderItem={(item) => (
-                  <List.Item>
-                    <div
-                      className={`cursor-pointer ${
-                        mainImage == item
-                          ? "border-4 border-blue-400"
-                          : "border-2"
-                      }`}
-                      onClick={() => {
-                        setMainImage(item);
-                      }}
-                    >
-                      <img
-                        className="h-12 w-12 object-fill"
-                        src={item}
-                        // alt={item}
-                      />
-                    </div>
-                  </List.Item>
-                )}
-              />
-            </div>
+    <div>
+      {product && (
+        <div className="justify-between mx-10 lg:px-10 pb-10 gap-5 h-fit overflow-hidden relative">
+          <div className="">
+            {/* about product */}
+            <div className="bg-white flex lg:flex-row flex-col my-5 lg:max-h-[450px] xl:max-h-[550px] overflow-y-clip">
+              <Flex>
+                <div
+                  className={`m-2 flex flex-col min-w-14 ${
+                    imageCol == 1 ? "max-w-14" : "max-w-28"
+                  }`}
+                >
+                  <List
+                    grid={{ gutter: 20, column: imageCol }}
+                    dataSource={product.image}
+                    locale={{
+                      emptyText: <CustomEmpty />,
+                    }}
+                    renderItem={(item) => (
+                      <List.Item>
+                        <div
+                          className={`cursor-pointer ${
+                            mainImage == item
+                              ? "border-4 border-blue-400"
+                              : "border-2"
+                          }`}
+                          onClick={() => {
+                            setMainImage(item);
+                          }}
+                        >
+                          <img
+                            className="h-12 w-12 object-fill"
+                            src={item}
+                            // alt={item}
+                          />
+                        </div>
+                      </List.Item>
+                    )}
+                  />
+                </div>
 
-            <div className="bg-white h-fit z-50">
-              <AntdImage
-                width={20}
-                src="https://cdn.icon-icons.com/icons2/1372/PNG/512/resize-3_91066.png"
-                preview={{
-                  src: mainImage,
-                }}
-                className="absolute top-2 left-2 z-50 cursor-pointer border-2 border-white mb-5"
-              />
+                <div className="bg-white h-fit z-50">
+                  <AntdImage
+                    width={20}
+                    src="https://cdn.icon-icons.com/icons2/1372/PNG/512/resize-3_91066.png"
+                    preview={{
+                      src: mainImage,
+                    }}
+                    className="absolute top-2 left-2 z-50 cursor-pointer border-2 border-white mb-5"
+                  />
 
-              {/* alt option */}
-              {/* <AntdImage
+                  {/* alt option */}
+                  {/* <AntdImage
                 width={500}
                 src={mainImage}
                 preview={{
@@ -468,73 +503,73 @@ export default function ProductDetail() {
                 className="border-2 border-white"
               /> */}
 
-              <ReactImageMagnify
-                {...{
-                  smallImage: {
-                    alt: productInfo.name,
-                    isFluidWidth: true,
-                    width: 500,
-                    height: 500,
-                    src: mainImage,
-                    // src: mainImage + "?width=500&height=500",
-                  },
-                  largeImage: {
-                    src: mainImage,
-                    // width: mainImageInfo.width * 0.8,
-                    // height: mainImageInfo.height * 0.8,
-                    width: mainImageInfo.width,
-                    height: mainImageInfo.height,
-                  },
-                  enlargedImageContainerDimensions: {
-                    // width: "160%",
-                    // height: "120%",
-                    // width: width > 1000 ? "180%" : "350%",
-                    width: "180%",
-                    height: "100%",
-                  },
-                  // isHintEnabled: true,
-                  // hintTextMouse: "Trỏ để phóng to hoặc nhấn vào kính lúp",
-                  shouldHideHintAfterFirstActivation: false,
-                  // imageClassName: "h-[500px] w-[500px] object-fill",
-                }}
-              />
-            </div>
-          </Flex>
+                  <ReactImageMagnify
+                    {...{
+                      smallImage: {
+                        alt: product.name,
+                        isFluidWidth: true,
+                        width: 500,
+                        height: 500,
+                        src: mainImage,
+                        // src: mainImage + "?width=500&height=500",
+                      },
+                      largeImage: {
+                        src: mainImage,
+                        // width: mainImageInfo.width * 0.8,
+                        // height: mainImageInfo.height * 0.8,
+                        width: mainImageInfo.width,
+                        height: mainImageInfo.height,
+                      },
+                      enlargedImageContainerDimensions: {
+                        // width: "160%",
+                        // height: "120%",
+                        // width: width > 1000 ? "180%" : "350%",
+                        width: "180%",
+                        height: "100%",
+                      },
+                      // isHintEnabled: true,
+                      // hintTextMouse: "Trỏ để phóng to hoặc nhấn vào kính lúp",
+                      shouldHideHintAfterFirstActivation: false,
+                      // imageClassName: "h-[500px] w-[500px] object-fill",
+                    }}
+                  />
+                </div>
+              </Flex>
 
-          {/* desc */}
-          <div className="p-4 ml-5 md:w-[700px] lg:min-w-[400px] xl:min-w-[600px] xl:min-w-4/7 overflow-hidden grid grid-rows-5 xl:grid-rows-6">
-            {productInfo._id == null && <Skeleton active />}
+              {/* desc */}
+              <div className="p-4 ml-5 md:w-[700px] lg:min-w-[400px] xl:min-w-[600px] xl:min-w-4/7 overflow-hidden grid grid-rows-5 xl:grid-rows-6">
+                {product._id == null && <Skeleton active />}
 
-            {/* name block */}
-            <div className="row-start-1 flex flex-col gap-2">
-              <div className="font-bold text-xl lg:text-2xl xl:text-3xl truncate">
-                {productInfo.name}
-              </div>
+                {/* name block */}
+                <div className="row-start-1 flex flex-col gap-2">
+                  <div className="font-bold text-xl lg:text-2xl xl:text-3xl truncate">
+                    {product.name}
+                  </div>
 
-              <div className="text-xs">
-                Thương hiệu / Shop:{" "}
-                <Link href="" className="text-blue-500">
-                  Ecovacs
-                </Link>
-              </div>
-            </div>
+                  <div className="text-xs">
+                    Thương hiệu / Shop:{" "}
+                    <Link href="" className="text-blue-500">
+                      Ecovacs
+                    </Link>
+                  </div>
+                </div>
 
-            {/* rating block */}
-            <Flex
-              gap="small"
-              style={{ alignContent: "center" }}
-              className="row-start-2 flex items-center"
-            >
-              <Rate
-                disabled
-                allowHalf
-                defaultValue={4.5}
-                style={{ padding: 5, fontSize: 30 }}
-              />
-              <div className="font-bold uppercase text-2xl xl:text-3xl">
-                {productInfo.avgRating}
-              </div>
-              {/* <div className="text-xs font-light mt-2">
+                {/* rating block */}
+                <Flex
+                  gap="small"
+                  style={{ alignContent: "center" }}
+                  className="row-start-2 flex items-center"
+                >
+                  <Rate
+                    disabled
+                    allowHalf
+                    defaultValue={product.avgRating}
+                    style={{ padding: 5, fontSize: 30 }}
+                  />
+                  <div className="font-bold uppercase text-2xl xl:text-3xl">
+                    {product.avgRating}
+                  </div>
+                  {/* <div className="text-xs font-light mt-2">
                 ({numberOfReview} đánh giá)
               </div>
               <Divider
@@ -542,108 +577,123 @@ export default function ProductDetail() {
                 style={{ height: "auto", border: "0.25px solid silver" }}
               />
               <div className="mt-1 text-sm font-light">Đã bán 5000+</div> */}
-            </Flex>
+                </Flex>
 
-            {/* price block */}
-            <div className="row-start-3 flex flex-col justify-center">
-              <div className="line-through text-slate-300 uppercase text-sm md:text-lg xl:text-xl">
-                {priceIndex(productInfo.originalPrice)}
-              </div>
-              <div className="flex flex-row gap-3">
-                <div className="font-bold text-red-500 uppercase text-xl md:text-2xl xl:text-4xl">
-                  {priceIndex(productInfo.finalPrice)}
+                {/* price block */}
+                <div className="row-start-3 flex flex-col justify-center">
+                  <div className="line-through text-slate-300 uppercase text-sm md:text-lg xl:text-xl">
+                    {priceIndex(product.originalPrice)}
+                  </div>
+                  <div className="flex flex-row gap-3">
+                    <div className="font-bold text-red-500 uppercase text-xl md:text-2xl xl:text-4xl">
+                      {priceIndex(product.finalPrice)}
+                    </div>
+                    <div className="text-red-500 uppercase text-xs mt-1">
+                      -50%
+                    </div>
+                  </div>
                 </div>
-                <div className="text-red-500 uppercase text-xs mt-1">-50%</div>
-              </div>
-            </div>
 
-            <div className="row-start-4 xl:row-span-2 h-1/2 items-center grid grid-cols-4 text-sm xl:text-lg">
-              <div className="col-span-1 col-start-1 font-bold pt-3">
-                Tình trạng:{" "}
-              </div>
-              <div className="col-span-1 col-start-2 pt-3">Còn hàng</div>
-              <div className="col-span-1 col-start-1 font-bold pt-3">
-                Số lượng:{" "}
-              </div>
-              <div className="col-span-1 col-start-2 pt-3">124332</div>
-            </div>
+                <div className="row-start-4 xl:row-span-2 h-1/2 items-center grid grid-cols-4 text-sm xl:text-lg">
+                  <div className="col-span-1 col-start-1 font-bold pt-3">
+                    Tình trạng:{" "}
+                  </div>
+                  <div className="col-span-1 col-start-2 pt-3">
+                    {product.status}
+                  </div>
+                  <div className="col-span-1 col-start-1 font-bold pt-3">
+                    Đã bán:{" "}
+                  </div>
+                  <div className="col-span-1 col-start-2 pt-3">
+                    {product.soldQuantity}
+                  </div>
+                </div>
 
-            {/* buttons block  */}
-            <div className="row-start-5 xl:row-start-6 items-center flex">
-              {/* temp */}
-              <InputNumber size="large" />
-              {/* <Button block size="large">
+                {/* buttons block  */}
+                <div className="row-start-5 xl:row-start-6 items-center flex">
+                  {/* temp */}
+                  <InputNumber size="large" />
+                  {/* <Button block size="large">
                 Thêm vào giỏ hàng
               </Button> */}
-              <Button type="primary" href="/cart" danger block size="large">
-                Mua ngay
-              </Button>
+                  <Button
+                    type="primary"
+                    href="/cart"
+                    danger
+                    block
+                    size="large"
+                    style={{ background: "#5c6856" }}
+                  >
+                    Mua ngay
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            <Affix offsetTop={0}>
+              <FloatingCartForm
+                handleCartDetail={setOpen}
+                numberOfItem={numberOfItem}
+                updateItemNumber={setNumberOfItem}
+                totalPrice={totalPrice}
+                product={{
+                  name: product.name,
+                  price: product.finalPrice,
+                  mainImage: product.image[0],
+                }}
+              />
+            </Affix>
+
+            {/* related products to buy with  */}
+            <div className="font-semibold px-5 mt-5 text-sm">
+              Sản phẩm có thể kết hợp
+            </div>
+
+            <ComboList
+              totalPrice={totalPrice}
+              totalComboPrice={totalComboPrice}
+              updateTotalComboPrice={(price) => {
+                setTotalComboPrice(price);
+              }}
+              comboIdList={comboIdList}
+              setComboIdList={setComboIdList}
+            />
+
+            {/* tabs, descriptions and review summary */}
+            <div className="my-5">
+              <Tabs
+                defaultActiveKey="1"
+                type="card"
+                items={tabItems.map((item, i) => {
+                  //   const id = String(i + 1);
+                  return {
+                    label: item.label,
+                    key: item.key,
+                    children: item.children,
+                  };
+                })}
+                className="overflow-y-hidden"
+              />
             </div>
           </div>
-        </div>
 
-        <Affix offsetTop={0}>
-          <FloatingCartForm
-            handleCartDetail={setOpen}
-            numberOfItem={numberOfItem}
-            updateItemNumber={setNumberOfItem}
+          {/* others */}
+          <FloatButton.Group>
+            <FloatButton.BackTop tooltip={<div>Lướt lên đầu</div>} />
+          </FloatButton.Group>
+
+          <CartSummaryModal
+            open={open}
+            setOpen={setOpen}
             totalPrice={totalPrice}
-            product={{
-              name: productInfo.name,
-              price: productInfo.finalPrice,
-              mainImage: productInfo.images[0],
-            }}
-          />
-        </Affix>
-
-        {/* related products to buy with  */}
-        <div className="font-semibold px-5 mt-5 text-sm">
-          Sản phẩm có thể kết hợp
-        </div>
-
-        <ComboList
-          totalPrice={totalPrice}
-          totalComboPrice={totalComboPrice}
-          updateTotalComboPrice={(price) => {
-            setTotalComboPrice(price);
-          }}
-          comboIdList={comboIdList}
-          setComboIdList={setComboIdList}
-        />
-
-        {/* tabs, descriptions and review summary */}
-        <div className="my-5">
-          <Tabs
-            defaultActiveKey="1"
-            type="card"
-            items={tabItems.map((item, i) => {
-              //   const id = String(i + 1);
-              return {
-                label: item.label,
-                key: item.key,
-                children: item.children,
-              };
-            })}
-            className="overflow-y-hidden"
+            mainProductId={product._id}
+            mainProductPrice={product.finalPrice}
+            numberOfItem={numberOfItem}
+            comboIdList={comboIdList}
+            totalComboPrice={totalComboPrice}
           />
         </div>
-      </div>
-
-      {/* others */}
-      <FloatButton.Group>
-        <FloatButton.BackTop tooltip={<div>Lướt lên đầu</div>} />
-      </FloatButton.Group>
-
-      <CartSummaryModal
-        open={open}
-        setOpen={setOpen}
-        totalPrice={totalPrice}
-        mainProductId={productInfo._id}
-        mainProductPrice={productInfo.finalPrice}
-        numberOfItem={numberOfItem}
-        comboIdList={comboIdList}
-        totalComboPrice={totalComboPrice}
-      />
+      )}
     </div>
   );
 }

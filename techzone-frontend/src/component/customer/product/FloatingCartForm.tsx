@@ -197,7 +197,14 @@ const FloatingCartForm = (formData: FormProps) => {
         </div>
 
         <div className="col-start-9 col-span-4 sm:col-start-10 sm:col-span-3 md:col-start-11 md:col-span-2 m-3">
-          <Button type="primary" href="/cart" danger block size="large">
+          <Button
+            type="primary"
+            href="/cart"
+            danger
+            block
+            size="large"
+            style={{ background: "#5c6856" }}
+          >
             Mua ngay
           </Button>
         </div>

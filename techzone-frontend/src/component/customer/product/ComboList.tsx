@@ -1,10 +1,11 @@
 "use client";
-import { Button, Carousel, Empty, Flex } from "antd";
+import { Button, Carousel, Flex } from "antd";
 // import { useTranslations } from "next-intl";
 import ComboItem from "./ComboItem";
 import React from "react";
 import { CarouselArrow } from "@/component/user/utils/CarouselArrow";
 import { priceIndex } from "./ProductDetail";
+import CustomEmpty from "../shop/mini/CustomEmpty";
 
 interface ComboListProps {
   // initial price before adding the combo price
@@ -130,12 +131,7 @@ const ComboList = (comboListData: ComboListProps) => {
 
   return (
     <div>
-      {combo.length == 0 && (
-        <Empty
-          image={Empty.PRESENTED_IMAGE_SIMPLE}
-          description={<span>Không có</span>}
-        />
-      )}
+      {combo.length == 0 && <CustomEmpty />}
 
       {combo.length > 0 && (
         <div className="align-middle grid grid-cols-5 gap-5">
@@ -236,7 +232,14 @@ const ComboList = (comboListData: ComboListProps) => {
                 <div className="text-xl">
                   {priceIndex(comboListData.totalPrice)}
                 </div>
-                <Button type="primary" danger block size="large" href="/cart">
+                <Button
+                  type="primary"
+                  danger
+                  block
+                  size="large"
+                  href="/cart"
+                  style={{ background: "#5c6856" }}
+                >
                   Mua ngay
                 </Button>
               </Flex>

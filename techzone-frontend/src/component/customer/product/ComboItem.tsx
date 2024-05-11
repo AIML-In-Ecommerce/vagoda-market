@@ -23,7 +23,7 @@ const ComboItem = (combo: ComboItemProps) => {
           combo.handleCheckbox(e.target.checked, combo._id, combo.price)
         }
       >
-        <div className="max-w-[240px] bg-white rounded-xl overflow-hidden md:max-w-2xl relative">
+        <div className="max-w-[240px] h-[250px] bg-white rounded-xl overflow-hidden md:max-w-2xl relative">
           <div className="flex flex-col">
             <Link href={`/${combo.productUrl}`}>
               <div className="md:shrink-0">
