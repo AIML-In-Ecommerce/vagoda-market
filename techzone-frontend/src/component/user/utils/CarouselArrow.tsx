@@ -43,7 +43,7 @@ const StyleSheet = {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const CarouselArrow = ({ currentSlide, direction, slideCount, ...carouselProps }: ArrowProps & AntdArrowProps) =>
   direction === 'left' ? (
-    <div >
+    <div>
         <LeftOutlined {...carouselProps} style={StyleSheet.leftArrow} />
     </div>
     ) : (

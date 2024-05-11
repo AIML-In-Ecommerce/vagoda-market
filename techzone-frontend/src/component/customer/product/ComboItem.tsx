@@ -1,8 +1,7 @@
 "use client";
 import Link from "next/link";
-import { useTranslations } from "next-intl";
 import { PlusOutlined } from "@ant-design/icons";
-import { Checkbox, CheckboxProps } from "antd";
+import { Checkbox } from "antd";
 import { priceIndex } from "./ProductDetail";
 
 export interface ComboItemProps {
@@ -15,8 +14,6 @@ export interface ComboItemProps {
 }
 
 const ComboItem = (combo: ComboItemProps) => {
-  // const t = useTranslations("Tabs");
-
   return (
     <div className="flex flex-row">
       <PlusOutlined />

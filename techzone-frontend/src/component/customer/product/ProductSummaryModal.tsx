@@ -1,7 +1,7 @@
 "use client";
 import { Button, Empty, Flex, InputNumber, Modal, Spin } from "antd";
 // import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { priceIndex } from "./ProductDetail";
 
 interface ModalProps {
@@ -49,6 +49,14 @@ const ProductSummaryModal = (modalData: ModalProps) => {
     modalData.setOpen(false);
   };
 
+  useEffect(() => {
+    setModalText(
+      <div className="font-bold">
+        Tạm tính: {priceIndex(modalData.totalPrice)}
+      </div>
+    );
+  }, [modalData.totalPrice]);
+
   return (
     <Modal
       open={modalData.open}
@@ -57,46 +65,45 @@ const ProductSummaryModal = (modalData: ModalProps) => {
       onOk={handleOk}
       confirmLoading={confirmLoading}
       onCancel={handleCancel}
-      footer={[
-        // <Button key="back" onClick={handleCancel}>
-        //   {/* Return */}
-        //   Quay về
-        // </Button>,
-        <Button
-          key="submit"
-          // type="primary"
-          loading={confirmLoading}
-          onClick={handleOk}
-          type="primary"
-          ghost
-        >
-          {/* Add to Cart */}
-          Thêm vào giỏ
-        </Button>,
-        <Button
-          key="link"
-          href="/cart"
-          type="primary"
-          loading={confirmLoading}
-          onClick={handleOk}
-          danger
-        >
-          {/* Move to Checkout */}
-          Thanh toán ngay
-        </Button>,
-      ]}
+      footer={
+        //   [
+        //   <Button
+        //     key="submit"
+        //     // type="primary"
+        //     loading={confirmLoading}
+        //     onClick={handleOk}
+        //     type="primary"
+        //     ghost
+        //   >
+        //     {/* Add to Cart */}
+        //     Thêm vào giỏ
+        //   </Button>,
+        //   <Button
+        //     key="link"
+        //     href="/cart"
+        //     type="primary"
+        //     loading={confirmLoading}
+        //     onClick={handleOk}
+        //     danger
+        //   >
+        //     {/* Move to Checkout */}
+        //     Thanh toán ngay
+        //   </Button>,
+        // ]
+        null
+      }
     >
       {/* put cart summary here? */}
 
       <div className="flex flex-col gap-3 m-5">
-        <div className="bg-white shadow-md max-w-1/4 h-fit p-4 grid grid-cols-4">
+        <div className="bg-white max-w-1/4 h-fit p-4 grid grid-cols-4">
           <div className="col-span-1 col-start-1">ID</div>
           <div className="col-span-1 col-start-2">Đơn giá</div>
           <div className="col-span-1 col-start-3">Số lượng</div>
           <div className="col-span-1 col-start-4">Thành tiền</div>
         </div>
 
-        <div className="bg-white shadow-md max-w-1/4 h-fit p-4 grid grid-cols-4">
+        <div className="bg-white border-2 rounded-xl max-w-1/4 h-fit p-4 grid grid-cols-4">
           <div className="col-span-1 col-start-1">
             {modalData.mainProductId}
           </div>
@@ -123,7 +130,7 @@ const ProductSummaryModal = (modalData: ModalProps) => {
           modalData.comboIdList.map((item, index) => (
             <div
               key={index}
-              className="bg-white shadow-md max-w-1/4 h-fit p-4 grid grid-cols-4"
+              className="bg-white border-2 rounded-xl max-w-1/4 h-fit p-4 grid grid-cols-4"
             >
               <div className="col-span-1 col-start-1">{item}</div>
               <div className="col-span-1 col-start-2"></div>
@@ -131,7 +138,7 @@ const ProductSummaryModal = (modalData: ModalProps) => {
             </div>
           ))}
         {modalData.comboIdList.length > 0 && (
-          <div className="bg-white shadow-md max-w-1/4 h-fit p-4 grid grid-cols-4">
+          <div className="bg-white max-w-1/4 h-fit p-4 grid grid-cols-4">
             <div className="col-span-3 col-start-1 font-bold">Tổng combo</div>
             <div className="col-span-1 col-start-4">
               {priceIndex(modalData.totalComboPrice)}
@@ -139,8 +146,9 @@ const ProductSummaryModal = (modalData: ModalProps) => {
           </div>
         )}
       </div>
-
-      <p>{modalText}</p>
+      <div className="flex flex-row-reverse mb-2 mr-2">
+        <p>{modalText}</p>
+      </div>
     </Modal>
   );
 };

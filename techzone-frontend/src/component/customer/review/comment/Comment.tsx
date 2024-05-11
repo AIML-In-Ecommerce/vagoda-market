@@ -1,11 +1,11 @@
 "use client";
 import React, { useState } from "react";
-import { FiSend } from "react-icons/fi";
-import { FaHeart, FaRegHeart } from "react-icons/fa";
-// import DeletePopupModal from "./DeletePopupModal";
+// import { FiSend } from "react-icons/fi";
+// import { FaHeart, FaRegHeart } from "react-icons/fa";
+import { IoIosSave } from "react-icons/io";
+import DeletePopupModal from "./DeletePopupModal";
 import CommentForm from "./CommentForm";
 import { AffectedCommentType, CommentType } from "@/model/CommentType";
-// import { useAuth } from "@/context/AuthContext";
 // import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import { Avatar } from "antd";
@@ -21,26 +21,29 @@ interface CommentProps {
   ) => void;
   updateComment: (value: string, commentId: string) => void;
   deleteComment: (commentId: string) => void;
-  likeComment: (commentId: string) => void;
-  replies: CommentType[] | null;
-  parentId: string | null;
+  // likeComment: (commentId: string) => void;
+  // replies: CommentType[] | null;
+  // parentId: string | null;
 }
 
 const Comment = (props: CommentProps) => {
   // const t = useTranslations("Comment");
 
   const isUserLoggined = true;
-  const isCommentBelongsToUser = props.comment.isSender;
-  const isReplying =
-    props.affectedComment &&
-    props.affectedComment.type === "replying" &&
-    props.affectedComment.id === props.comment.id;
+  // const isCommentBelongsToUser = props.comment.isSender;
+  // const isCommentBelongsToUser = props.comment.id === "user.id";
+  const isCommentBelongsToUser = true;
+
+  // const isReplying =
+  //   props.affectedComment &&
+  //   props.affectedComment.type === "replying" &&
+  //   props.affectedComment.id === props.comment.id;
   const isEditing =
     props.affectedComment &&
     props.affectedComment.type === "editing" &&
     props.affectedComment.id === props.comment.id;
-  const repliedCommentId = props.parentId ? props.parentId : props.comment.id;
-  const replyOnUserId = props.comment.user.id;
+  // const repliedCommentId = props.parentId ? props.parentId : props.comment.id;
+  // const replyOnUserId = props.comment.user.id;
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [commentToDelete, setCommentToDelete] = useState("");
@@ -65,23 +68,15 @@ const Comment = (props: CommentProps) => {
 
   return (
     <React.Fragment>
-      {/* {isModalOpen && (
+      {isModalOpen && (
         <DeletePopupModal
           comment={commentToDelete}
           onClose={closeModal}
           onDelete={handleDelete}
         />
-      )} */}
+      )}
       <div className="flex flex-row gap-x-3 bg-[#ECECEC] p-3 rounded-xl">
         {!isEditing && (
-          // <div
-          //   className="rounded-full w-14 h-14 aspect-square mr-5"
-          //   style={{
-          //     backgroundImage: `url(${props.comment.user.avatar})`,
-          //     backgroundSize: "cover",
-          //     backgroundRepeat: "no-repeat",
-          //   }}
-          // />
           <div className="m-3">
             <Avatar
               size="large"
@@ -117,17 +112,19 @@ const Comment = (props: CommentProps) => {
 
           {isEditing && (
             <CommentForm
-              btnLabel={<FiSend />}
+              btnLabel={<IoIosSave />}
               formSubmitHandler={(value) => {
                 props.updateComment(value, props.comment.id);
                 props.setAffectedComment(null);
               }}
               formCancelHandler={() => props.setAffectedComment(null)}
               initialText={props.comment.desc}
-            ></CommentForm>
+            />
           )}
           <div className="flex items-center gap-x-3 text-dark-light be-viet-nam-pro-regular text-sm my-3">
-            {isUserLoggined && (
+            {/* reply */}
+
+            {/* {isUserLoggined && (
               <button
                 className="flex items-center space-x-2 hover:font-bold cursor-pointer"
                 type="submit"
@@ -138,10 +135,9 @@ const Comment = (props: CommentProps) => {
                   })
                 }
               >
-                {/* <FiMessageSquare className="w-4 h-auto" /> */}
                 <span>reply</span>
               </button>
-            )}
+            )} */}
             {isCommentBelongsToUser && (
               <>
                 <button
@@ -154,8 +150,7 @@ const Comment = (props: CommentProps) => {
                     })
                   }
                 >
-                  {/* <FiEdit2 className="w-4 h-auto" /> */}
-                  <span>edit</span>
+                  <span>Chỉnh sửa</span>
                 </button>
                 <button
                   className="flex items-center space-x-2 text-[#F10000] hover:font-bold cursor-pointer"
@@ -164,12 +159,14 @@ const Comment = (props: CommentProps) => {
                     openModal(comment);
                   }}
                 >
-                  {/* <FiTrash className="w-4 h-auto" /> */}
-                  <span>delete</span>
+                  <span>Xoá</span>
                 </button>
               </>
             )}
 
+            {/* like */}
+
+            {/* 
             <div className="bg-white w-auto rounded-full flex flex-row">
               <button
                 className="text-[#CC3333] ml-1 cursor-pointer"
@@ -188,9 +185,12 @@ const Comment = (props: CommentProps) => {
               <p className="text-black my-1 mx-1 text-xs md:text-xs lg:text-sm">
                 {props.comment.like}
               </p>
-            </div>
+            </div> */}
           </div>
-          {isReplying && (
+
+          {/* reply */}
+
+          {/* {isReplying && (
             <CommentForm
               btnLabel={<FiSend />}
               formSubmitHandler={(value) =>
@@ -199,8 +199,8 @@ const Comment = (props: CommentProps) => {
               formCancelHandler={() => props.setAffectedComment(null)}
               initialText=""
             />
-          )}
-          {props.replies && props.replies.length > 0 && (
+          )} */}
+          {/* {props.replies && props.replies.length > 0 && (
             <div>
               {props.replies.map((reply) => (
                 <Comment
@@ -217,7 +217,7 @@ const Comment = (props: CommentProps) => {
                 />
               ))}
             </div>
-          )}
+          )} */}
         </div>
       </div>
     </React.Fragment>
