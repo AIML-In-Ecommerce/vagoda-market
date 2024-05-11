@@ -9,6 +9,7 @@ import Navbar from "@/component/customer/Navbar";
 import CategoryDrawer from "@/component/user/utils/CategoryDrawer";
 import WebFooter from "@/component/user/WebFooter";
 // import UserLayout from "@/component/UserLayout";
+import { AntdRegistry } from '@ant-design/nextjs-registry';
 
 interface RootLayoutProps {
   children: ReactNode;
@@ -31,18 +32,20 @@ export default function RootLayout({
     <html lang={"en"}>
       {/* <body className={inter.className}> */}
       <body className="">
-        <NextIntlClientProvider locale={locale} messages={messages}>
-          {/* <AuthProvider> */}
-          {/* <UserLayout children={children} locale={locale} /> */}
-          {/* <UserLayout locale={locale}>{children}</UserLayout> */}
-          {/* </AuthProvider> */}
-          <div className="bg-cover bg-slate-50 min-h-screen">
-            <Navbar />
-            <CategoryDrawer />
-            {children}
-          </div>
-        </NextIntlClientProvider>
-        <WebFooter />
+        <AntdRegistry>
+          <NextIntlClientProvider locale={locale} messages={messages}>
+            {/* <AuthProvider> */}
+            {/* <UserLayout children={children} locale={locale} /> */}
+            {/* <UserLayout locale={locale}>{children}</UserLayout> */}
+            {/* </AuthProvider> */}
+            <div className="bg-cover bg-slate-50 min-h-screen">
+              <Navbar />
+              <CategoryDrawer />
+              {children}
+            </div>
+          </NextIntlClientProvider>
+          <WebFooter />
+        </AntdRegistry>
       </body>
     </html>
   );

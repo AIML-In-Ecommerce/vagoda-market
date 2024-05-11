@@ -9,7 +9,6 @@ import { FaRegCircleQuestion } from "react-icons/fa6"
 import { TiTicket } from "react-icons/ti"
 
 interface CardSummaryProps {
-    offsetTop: number,
     goToShippingAddressPage: () => void
     loading: boolean
     selectedRowKeys: React.Key[]
@@ -29,7 +28,7 @@ export default function FloatingCartSummary(props: CardSummaryProps) {
     const router = useRouter();
 
     return (
-        <div className="lg:sticky lg:mx-0 mx-auto w-4/5 lg:top-10 block">
+        <div className="lg:sticky lg:mx-0 mx-auto lg:w-4/5 w-full lg:top-10 block">
             <Space direction="vertical" size="middle"
                 className="flex bg-slate-50">
                 <Card title={
