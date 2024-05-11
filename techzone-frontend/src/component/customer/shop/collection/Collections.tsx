@@ -92,7 +92,6 @@ export default function Collections(props: CollectionsProps) {
   const [collections, setCollections] =
     useState<CollectionType[]>(collectionsData);
   const [option, setOption] = useState<string[]>(["0"]);
-  const [searchText, setSearchText] = useState("");
 
   useEffect(() => {
     if (props.selectedId && props.selectedId !== "") {
@@ -118,19 +117,14 @@ export default function Collections(props: CollectionsProps) {
             Tất cả bộ sưu tập
           </Menu.Item>
 
-          {/* Filter menu items based on search text */}
-          {collections
-            .filter((item) =>
-              item.name.toLowerCase().includes(searchText.toLowerCase())
-            )
-            .map((item) => (
-              <React.Fragment key={item._id}>
-                {/* Hiển thị mục menu chính */}
-                <Menu.Item key={item._id} onClick={() => setOption([item._id])}>
-                  {item.name}
-                </Menu.Item>
-              </React.Fragment>
-            ))}
+          {collections.map((item) => (
+            <React.Fragment key={item._id}>
+              {/* Hiển thị mục menu chính */}
+              <Menu.Item key={item._id} onClick={() => setOption([item._id])}>
+                {item.name}
+              </Menu.Item>
+            </React.Fragment>
+          ))}
         </Menu>
       </div>
       <div className="col-start-2 col-spans-5 p-5">

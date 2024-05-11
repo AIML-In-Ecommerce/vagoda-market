@@ -1,5 +1,13 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import {
+  LegacyRef,
+  MutableRefObject,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   Badge,
   Descriptions,
@@ -14,10 +22,13 @@ import {
   Skeleton,
   Tabs,
   Image as AntdImage,
+  Popover,
+  Affix,
+  InputNumber,
+  Button,
 } from "antd";
 import ReviewList from "./ReviewList";
 import FloatingCartForm from "./FloatingCartForm";
-import { GiShoppingCart } from "react-icons/gi";
 import ComboList from "./ComboList";
 import Link from "next/link";
 import CartSummaryModal from "./ProductSummaryModal";
@@ -26,7 +37,7 @@ import ReactImageMagnify from "react-image-magnify";
 export default function ProductDetail() {
   const productInfo = {
     _id: "string",
-    name: "ROBOT HÚT BỤI LAU NHÀ THÔNG MINH ECOVACS DEEBOT OZMO T8 NEO BẢN NỘI ĐỊA",
+    name: "Áo Polo Nam Pique Cotton USA",
     // attribute: {
     //   ....
     // }
@@ -37,35 +48,21 @@ export default function ProductDetail() {
     shopId: "string",
     // status: ENUM[AVAILABLE, SOLD_OUT, SALE];
     images: [
-      {
-        url: "https://i.insider.com/5f835d4ebab422001979aaeb",
-      },
-      {
-        url: "https://product.hstatic.net/200000805527/product/z3994157810128_ac5e199adba96c46d6d7282b2bfdcdc5-scaled_843ed368395649f6a68bc7c08dd20524_master.jpg",
-      },
-      {
-        url: "https://product.hstatic.net/200000805527/product/z3994157835398_2b54a80e46f44a6d57b7a7500a87e49e-scaled_37202a4918fa4f03a6e275b8312f0587_master.jpg",
-      },
-      // {
-      //   url: "",
-      // },
-      // {
-      //   url: "",
-      // },
-      // {
-      //   url: "",
-      // },
-      // {
-      //   url: "",
-      // },
-      // {
-      //   url: "",
-      // },
-      // {
-      //   url: "",
-      // },
+      "https://cdn.shopify.com/s/files/1/0023/1342/0889/products/ClassicShirt_White_1_5cd5bf10-af18-4d0b-a477-bc3422d8401a.jpg?v=1688497040",
+      // "https://dictionary.cambridge.org/images/thumb/shirt_noun_002_33400.jpg?version=6.0.11",
+      "https://www.aristobrat.in/cdn/shop/files/ClassicShirt_White_1.jpg?v=1709556583&width=2048",
+      "https://static.nike.com/a/images/t_PDP_1280_v1/f_auto,q_auto:eco/1ea7ed04-5964-4ad8-a224-b884d15fb60c/sportswear-oversized-t-shirt-ptNVST.png",
+
+      // "https://www.aristobrat.in/cdn/shop/files/ClassicShirt_White_1.jpg?v=1709556583&width=2048",
+      // "https://www.aristobrat.in/cdn/shop/files/ClassicShirt_White_1.jpg?v=1709556583&width=2048",
+
+      // "https://www.aristobrat.in/cdn/shop/files/ClassicShirt_White_1.jpg?v=1709556583&width=2048",
+      // "https://www.aristobrat.in/cdn/shop/files/ClassicShirt_White_1.jpg?v=1709556583&width=2048",
+      // "https://www.aristobrat.in/cdn/shop/files/ClassicShirt_White_1.jpg?v=1709556583&width=2048",
+      // "https://www.aristobrat.in/cdn/shop/files/ClassicShirt_White_1.jpg?v=1709556583&width=2048",
+      // "https://www.aristobrat.in/cdn/shop/files/ClassicShirt_White_1.jpg?v=1709556583&width=2048",
     ],
-    avgRating: 4.5,
+    avgRating: 4.9,
     createdAt: "string",
   };
 
@@ -76,7 +73,7 @@ export default function ProductDetail() {
     {
       key: "1",
       label: "Product",
-      children: "ECOVACS DEEBOT OZMO T8 NEO",
+      children: "Áo Polo Nam Pique Cotton USA",
     },
     {
       key: "2",
@@ -121,6 +118,215 @@ export default function ProductDetail() {
       span: 3,
     },
   ];
+
+  // images
+  type ImageInfoType = {
+    width: number;
+    height: number;
+  };
+
+  const [mainImage, setMainImage] = useState(productInfo.images[0]);
+  const [mainImageInfo, setMainImageInfo] = useState<ImageInfoType>({
+    width: 0,
+    height: 0,
+  });
+
+  useEffect(() => {
+    function getMeta(url: string, callback: any) {
+      const img = new Image();
+      img.src = url;
+      img.onload = function () {
+        callback(img.width, img.height);
+      };
+    }
+    getMeta(mainImage, (width: number, height: number) => {
+      // alert(width + "px " + height + "px");
+      let imageInfo = { width, height };
+      setMainImageInfo(imageInfo);
+    });
+  }, [mainImage]);
+
+  // number of reviews
+  const [numberOfReview, setNumberOfReview] = useState(0);
+
+  // price
+  // number of main item
+  const [numberOfItem, setNumberOfItem] = useState(1);
+
+  // total combo price
+  const [totalComboPrice, setTotalComboPrice] = useState(0);
+
+  // combo id list
+  const [comboIdList, setComboIdList] = useState<Array<string>>([]);
+
+  const totalPrice = useMemo(() => {
+    return numberOfItem * productInfo.finalPrice + totalComboPrice;
+  }, [totalComboPrice, numberOfItem]);
+
+  // image col
+  const imageCol = useMemo(() => {
+    return productInfo.images.length > 5 ? 2 : 1;
+  }, []);
+
+  // window size
+  const [width, setWidth] = useState(window.innerWidth);
+  // const [height, setHeight] = useState(window.innerHeight);
+  const updateDimensions = () => {
+    setWidth(window.innerWidth);
+    // setHeight(window.innerHeight);
+    console.log(window.innerWidth);
+  };
+  useEffect(() => {
+    window.addEventListener("resize", updateDimensions);
+    return () => window.removeEventListener("resize", updateDimensions);
+  }, []);
+
+  // modal
+  const [open, setOpen] = useState(false);
+
+  // review summary
+  const reviewSummary = (
+    <div className="sticky bg-white rounded-xl mt-2 border-2 top-0 p-3 flex flex-col md:flex-row lg:flex-col items-center">
+      <div id="star-review-summary">
+        <Popover
+          title="Thống kê chung"
+          content={
+            <div>
+              <Flex vertical gap="small" style={{ width: 300 }}>
+                <Flex gap="small">
+                  <Rate
+                    disabled
+                    defaultValue={5}
+                    style={{ padding: 5, fontSize: 10 }}
+                  />
+                  <Flex gap="small" style={{ width: 180 }}>
+                    <Progress percent={66} size="small" />
+                  </Flex>
+                </Flex>
+                <Flex gap="small">
+                  <Rate
+                    disabled
+                    defaultValue={4}
+                    style={{ padding: 5, fontSize: 10 }}
+                  />
+                  <Flex gap="small" style={{ width: 180 }}>
+                    <Progress percent={33} size="small" />
+                  </Flex>
+                </Flex>
+                <Flex gap="small">
+                  <Rate
+                    disabled
+                    defaultValue={3}
+                    style={{ padding: 5, fontSize: 10 }}
+                  />
+                  <Flex gap="small" style={{ width: 180 }}>
+                    <Progress percent={1} size="small" />
+                  </Flex>
+                </Flex>
+                <Flex gap="small">
+                  <Rate
+                    disabled
+                    defaultValue={2}
+                    style={{ padding: 5, fontSize: 10 }}
+                  />
+                  <Flex gap="small" style={{ width: 180 }}>
+                    <Progress percent={0} size="small" />
+                  </Flex>
+                </Flex>
+                <Flex gap="small">
+                  <Rate
+                    disabled
+                    defaultValue={1}
+                    style={{ padding: 5, fontSize: 10 }}
+                  />
+                  <Flex gap="small" style={{ width: 180 }}>
+                    <Progress percent={0} size="small" />
+                  </Flex>
+                </Flex>
+              </Flex>
+            </div>
+          }
+        >
+          <div className="flex flex-col cursor-pointer items-center gap-2 w-max">
+            <div className="font-bold uppercase text-sm md:text-sm">
+              đánh giá sản phẩm
+            </div>
+            <div className="font-extrabold uppercase text-2xl md:text-6xl">
+              4.5
+            </div>
+            <Rate
+              disabled
+              allowHalf
+              defaultValue={4.5}
+              style={{ padding: 5, fontSize: 28 }}
+            />
+            <div className="italic pb-5 text-[9px] md:text-sm">
+              {numberOfReview} đánh giá
+            </div>
+          </div>
+        </Popover>
+      </div>
+
+      <div id="ai-review-summary" className="mb-5 md:pl-5 lg:pl-0">
+        <div className="font-bold md:pt-5 text-sm md:text-lg">
+          TechZone Assistant 🤖
+        </div>
+
+        <div className="font-semibold pt-5 text-xs md:text-sm">
+          Tổng quan đánh giá khách hàng:
+        </div>
+        <div className="pt-2 text-xs md:text-sm">
+          Tổng thể, iRobot Roomba 980 là một sự lựa chọn tốt cho người tiêu dùng
+          muốn đầu tư vào một robot hút bụi thông minh và hiệu quả. Với hiệu
+          suất hút bụi mạnh mẽ, tính năng thông minh và khả năng vận hành linh
+          hoạt, Roomba 980 sẽ giúp giảm bớt công việc lau chùi và mang lại một
+          không gian sống sạch sẽ hơn.
+        </div>
+      </div>
+    </div>
+  );
+
+  // review summary visibility
+  const [reviewSummaryVisibility, setReviewSummaryVisibility] = useState(true);
+
+  // ATTEMPT 1
+  // Get the navbar
+  // const bottom = document.getElementById("page-bottom-boundary");
+
+  // Get the offset position of the navbar
+
+  // Add the sticky class to the navbar when you reach its scroll position. Remove the sticky class when you leave the scroll position.
+  // useEffect(() => {
+  //   const sticky = bottom ? bottom.offsetTop : window.scrollY;
+
+  //   if (bottom) {
+  //     if (window.scrollY >= sticky) {
+  //       setReviewSummaryVisibility(false);
+  //     } else {
+  //       setReviewSummaryVisibility(true);
+  //     }
+
+  //     console.log("bottom ", bottom.offsetTop);
+  //   } else console.log("bottom is null");
+  // }, [bottom]);
+
+  // ATTEMPT 2
+  //   function getDocHeight() {
+  //     var D = document;
+  //     return Math.max(
+  //         D.body.scrollHeight, D.documentElement.scrollHeight,
+  //         D.body.offsetHeight, D.documentElement.offsetHeight,
+  //         D.body.clientHeight, D.documentElement.clientHeight
+  //     );
+  // }
+  //   window.scroll(function() {
+  //     if(window.innerHeight && window.screenTop + window.innerHeight == getDocHeight()) {
+  //         alert("bottom!");
+  //     }
+  //  });
+
+  // all reviews
+  const allReviews = <ReviewList setNumberOfReview={setNumberOfReview} />;
 
   // tabs, descriptions and review summary
   const tabItems = [
@@ -174,151 +380,40 @@ export default function ProductDetail() {
       label: `Tổng quan đánh giá`,
       key: "3",
       children: (
-        <div className="p-2">
-          <Flex gap="small">
-            <Rate
-              disabled
-              allowHalf
-              defaultValue={4.5}
-              style={{ padding: 5 }}
-            />
-            <div className="font-bold uppercase text-xl">4.5</div>
-          </Flex>
-
-          <div className="font-light pb-5">(10 đánh giá)</div>
-          {/* overview */}
-          <Flex vertical gap="small" style={{ width: 300 }}>
-            <Flex gap="small">
-              <Rate
-                disabled
-                defaultValue={5}
-                style={{ padding: 5, fontSize: 10 }}
-              />
-              <Flex gap="small" style={{ width: 180 }}>
-                <Progress percent={66} size="small" />
-              </Flex>
-            </Flex>
-            <Flex gap="small">
-              <Rate
-                disabled
-                defaultValue={4}
-                style={{ padding: 5, fontSize: 10 }}
-              />
-              <Flex gap="small" style={{ width: 180 }}>
-                <Progress percent={33} size="small" />
-              </Flex>
-            </Flex>
-            <Flex gap="small">
-              <Rate
-                disabled
-                defaultValue={3}
-                style={{ padding: 5, fontSize: 10 }}
-              />
-              <Flex gap="small" style={{ width: 180 }}>
-                <Progress percent={1} size="small" />
-              </Flex>
-            </Flex>
-            <Flex gap="small">
-              <Rate
-                disabled
-                defaultValue={2}
-                style={{ padding: 5, fontSize: 10 }}
-              />
-              <Flex gap="small" style={{ width: 180 }}>
-                <Progress percent={0} size="small" />
-              </Flex>
-            </Flex>
-            <Flex gap="small">
-              <Rate
-                disabled
-                defaultValue={1}
-                style={{ padding: 5, fontSize: 10 }}
-              />
-              <Flex gap="small" style={{ width: 180 }}>
-                <Progress percent={0} size="small" />
-              </Flex>
-            </Flex>
-          </Flex>
-
-          <div className="font-bold pt-5 text-lg">TechZone Assistant 🤖</div>
-
-          <div className="font-semibold pt-5">
-            Tổng quan đánh giá khách hàng:
+        <div>
+          <div className="lg:grid lg:grid-cols-3 gap-5 h-fit">
+            <div className="lg:col-span-1">
+              <Affix
+                offsetTop={60}
+                className={`${reviewSummaryVisibility ? "" : "invisible"} `}
+              >
+                {reviewSummary}
+              </Affix>
+            </div>
+            <div className="lg:col-span-2">{allReviews}</div>
           </div>
-          <div className="pt-2">
-            Tổng thể, iRobot Roomba 980 là một sự lựa chọn tốt cho người tiêu
-            dùng muốn đầu tư vào một robot hút bụi thông minh và hiệu quả. Với
-            hiệu suất hút bụi mạnh mẽ, tính năng thông minh và khả năng vận hành
-            linh hoạt, Roomba 980 sẽ giúp giảm bớt công việc lau chùi và mang
-            lại một không gian sống sạch sẽ hơn.
-          </div>
+          <div
+            id="page-bottom-boundary"
+            style={{ border: "1px solid white" }}
+            //wip
+            // ref={ref}
+          />
         </div>
       ),
     },
   ];
 
-  // images
-  type ImageInfoType = {
-    width: number;
-    height: number;
-  };
-
-  const [mainImage, setMainImage] = useState(productInfo.images[0].url);
-  const [mainImageInfo, setMainImageInfo] = useState<ImageInfoType>({
-    width: 0,
-    height: 0,
-  });
-
-  useEffect(() => {
-    function getMeta(url: string, callback: any) {
-      const img = new Image();
-      img.src = url;
-      img.onload = function () {
-        callback(img.width, img.height);
-      };
-    }
-    getMeta(mainImage, (width: number, height: number) => {
-      // alert(width + "px " + height + "px");
-      let imageInfo = { width, height };
-      setMainImageInfo(imageInfo);
-    });
-  }, [mainImage]);
-
-  // number of reviews
-  const [numberOfReview, setNumberOfReview] = useState(0);
-
-  // price
-  // number of main item
-  const [numberOfItem, setNumberOfItem] = useState(1);
-
-  // total combo price
-  const [totalComboPrice, setTotalComboPrice] = useState(0);
-
-  // combo id list
-  const [comboIdList, setComboIdList] = useState<Array<string>>([]);
-
-  const totalPrice = useMemo(() => {
-    return numberOfItem * productInfo.finalPrice + totalComboPrice;
-  }, [totalComboPrice, numberOfItem]);
-
-  // image col
-  const imageCol = useMemo(() => {
-    return productInfo.images.length > 5 ? 2 : 1;
-  }, []);
-
-  // modal
-  const [open, setOpen] = useState(false);
-  const showModal = () => {
-    setOpen(true);
-  };
-
   return (
-    <div className="justify-between mx-10 lg:px-20 gap-10 grid grid-cols-8 h-fit pb-10 overflow-hidden">
-      <div className="col-span-5 lg:col-span-6">
+    <div className="justify-between mx-10 lg:px-10 pb-10 gap-5 h-fit overflow-hidden relative">
+      <div className="">
         {/* about product */}
-        <div className="bg-white shadow-md flex lg:flex-row flex-col my-10">
+        <div className="bg-white flex lg:flex-row flex-col my-5 lg:max-h-[450px] xl:max-h-[550px] overflow-y-clip">
           <Flex>
-            <div className="m-2 flex flex-col">
+            <div
+              className={`m-2 flex flex-col min-w-14 ${
+                imageCol == 1 ? "max-w-14" : "max-w-28"
+              }`}
+            >
               <List
                 grid={{ gutter: 20, column: imageCol }}
                 dataSource={productInfo.images}
@@ -334,18 +429,18 @@ export default function ProductDetail() {
                   <List.Item>
                     <div
                       className={`cursor-pointer ${
-                        mainImage == item.url
+                        mainImage == item
                           ? "border-4 border-blue-400"
                           : "border-2"
                       }`}
                       onClick={() => {
-                        setMainImage(item.url);
+                        setMainImage(item);
                       }}
                     >
                       <img
-                        className="h-14 w-full object-contain"
-                        src={item.url}
-                        alt={item.url}
+                        className="h-12 w-12 object-fill"
+                        src={item}
+                        // alt={item}
                       />
                     </div>
                   </List.Item>
@@ -353,23 +448,33 @@ export default function ProductDetail() {
               />
             </div>
 
-            <div className="bg-white h-fit shadow-md p-4 z-50 relative">
+            <div className="bg-white h-fit z-50">
               <AntdImage
-                width={50}
-                src="https://cdn-icons-png.flaticon.com/512/12034/12034789.png"
+                width={20}
+                src="https://cdn.icon-icons.com/icons2/1372/PNG/512/resize-3_91066.png"
                 preview={{
                   src: mainImage,
                 }}
-                className="absolute top-0 z-50 cursor-pointer"
+                className="absolute top-2 left-2 z-50 cursor-pointer border-2 border-white mb-5"
               />
+
+              {/* alt option */}
+              {/* <AntdImage
+                width={500}
+                src={mainImage}
+                preview={{
+                  src: mainImage,
+                }}
+                className="border-2 border-white"
+              /> */}
 
               <ReactImageMagnify
                 {...{
                   smallImage: {
                     alt: productInfo.name,
                     isFluidWidth: true,
-                    // width: 500,
-                    // height: 500,
+                    width: 500,
+                    height: 500,
                     src: mainImage,
                     // src: mainImage + "?width=500&height=500",
                   },
@@ -383,108 +488,116 @@ export default function ProductDetail() {
                   enlargedImageContainerDimensions: {
                     // width: "160%",
                     // height: "120%",
-                    width: "250%",
+                    // width: width > 1000 ? "180%" : "350%",
+                    width: "180%",
                     height: "100%",
                   },
-                  isHintEnabled: true,
-                  // Hover to Zoom
-                  hintTextMouse: "Trỏ để phóng to hoặc nhấn vào kính lúp",
+                  // isHintEnabled: true,
+                  // hintTextMouse: "Trỏ để phóng to hoặc nhấn vào kính lúp",
                   shouldHideHintAfterFirstActivation: false,
-                  // imageClassName: "max-w-[550px]",
-                  // enlargedImageContainerClassName:
-                  //   "h-[500px] w-[500px] object-fill",
+                  // imageClassName: "h-[500px] w-[500px] object-fill",
                 }}
               />
             </div>
           </Flex>
-          {/* desc */}
 
-          <div className="p-4 md:w-[450px] lg:min-w-[400px] overflow-hidden">
+          {/* desc */}
+          <div className="p-4 ml-5 md:w-[700px] lg:min-w-[400px] xl:min-w-[600px] xl:min-w-4/7 overflow-hidden grid grid-rows-5 xl:grid-rows-6">
             {productInfo._id == null && <Skeleton active />}
 
-            <div className="text-sm">
-              Thương hiệu / Shop:{" "}
-              <Link href="" className="text-blue-500">
-                Ecovacs
-              </Link>
+            {/* name block */}
+            <div className="row-start-1 flex flex-col gap-2">
+              <div className="font-bold text-xl lg:text-2xl xl:text-3xl truncate">
+                {productInfo.name}
+              </div>
+
+              <div className="text-xs">
+                Thương hiệu / Shop:{" "}
+                <Link href="" className="text-blue-500">
+                  Ecovacs
+                </Link>
+              </div>
             </div>
 
-            <div className="font-bold uppercase text-lg">
-              {productInfo.name}
-            </div>
-
+            {/* rating block */}
             <Flex
               gap="small"
-              style={{ lineHeight: 2, marginTop: 2, alignContent: "center" }}
+              style={{ alignContent: "center" }}
+              className="row-start-2 flex items-center"
             >
               <Rate
                 disabled
                 allowHalf
                 defaultValue={4.5}
-                style={{ padding: 5 }}
+                style={{ padding: 5, fontSize: 30 }}
               />
-              <div className="font-bold uppercase text-xl">
+              <div className="font-bold uppercase text-2xl xl:text-3xl">
                 {productInfo.avgRating}
               </div>
-              <div className="text-xs font-light mt-2">
+              {/* <div className="text-xs font-light mt-2">
                 ({numberOfReview} đánh giá)
               </div>
               <Divider
                 type="vertical"
                 style={{ height: "auto", border: "0.25px solid silver" }}
               />
-              <div className="mt-1 text-sm font-light">Đã bán 5000+</div>
+              <div className="mt-1 text-sm font-light">Đã bán 5000+</div> */}
             </Flex>
 
-            <div className="flex flex-row gap-3 my-2">
-              <div className="line-through text-gray-600 uppercase text-xl md:text-2xl lg:text-2xl">
-                {/* {productInfo.originalPrice} Đ */}
+            {/* price block */}
+            <div className="row-start-3 flex flex-col justify-center">
+              <div className="line-through text-slate-300 uppercase text-sm md:text-lg xl:text-xl">
                 {priceIndex(productInfo.originalPrice)}
               </div>
-              <div className="font-bold text-red-500 uppercase text-xl md:text-2xl lg:text-2xl">
-                {priceIndex(productInfo.finalPrice)}
+              <div className="flex flex-row gap-3">
+                <div className="font-bold text-red-500 uppercase text-xl md:text-2xl xl:text-4xl">
+                  {priceIndex(productInfo.finalPrice)}
+                </div>
+                <div className="text-red-500 uppercase text-xs mt-1">-50%</div>
               </div>
-              {/* <div className="text-red-500 uppercase text-xs mt-1">-50%</div> */}
             </div>
-            {/* sub category tags */}
-            {/* <div className="capitalize text-xs mt-5">Sub-category:</div>
-            <Tag>
-              <a href="https://github.com/ant-design/ant-design/issues/1862">
-                Điện máy - Điện gia dụng
-              </a>
-            </Tag>
-            <Tag>
-              <a href="https://github.com/ant-design/ant-design/issues/1862">
-                Thiết bị văn phòng
-              </a>
-            </Tag> */}
-            {/* sub category tags */}
 
-            {/* add Link later if use */}
-            {/* <div className="flex flex-col gap-3">
-              <div className="font-semibold pt-5">Dịch vụ bổ sung</div>
-              <div className="bg-white shadow-md max-w-1/4 h-fit p-4 cursor-pointer">
-                Thay đổi Thông tin vận chuyển
-              </div>
-              <div className="bg-white shadow-md max-w-1/4 h-fit p-4 cursor-pointer">
-                Ưu đãi, mã giảm giá
-              </div>
-            </div> */}
-
-            <div className="grid grid-cols-4">
-              <div className="col-span-1 col-start-1 font-bold pt-5">
+            <div className="row-start-4 xl:row-span-2 h-1/2 items-center grid grid-cols-4 text-sm xl:text-lg">
+              <div className="col-span-1 col-start-1 font-bold pt-3">
                 Tình trạng:{" "}
               </div>
-              <div className="col-span-1 col-start-2 pt-5">Còn hàng</div>
-              <div className="col-span-1 col-start-1 font-bold pt-5">
+              <div className="col-span-1 col-start-2 pt-3">Còn hàng</div>
+              <div className="col-span-1 col-start-1 font-bold pt-3">
                 Số lượng:{" "}
               </div>
-              <div className="col-span-1 col-start-2 pt-5">124332</div>
+              <div className="col-span-1 col-start-2 pt-3">124332</div>
+            </div>
+
+            {/* buttons block  */}
+            <div className="row-start-5 xl:row-start-6 items-center flex">
+              {/* temp */}
+              <InputNumber size="large" />
+              {/* <Button block size="large">
+                Thêm vào giỏ hàng
+              </Button> */}
+              <Button type="primary" href="/cart" danger block size="large">
+                Mua ngay
+              </Button>
             </div>
           </div>
         </div>
+
+        <Affix offsetTop={0}>
+          <FloatingCartForm
+            handleCartDetail={setOpen}
+            numberOfItem={numberOfItem}
+            updateItemNumber={setNumberOfItem}
+            totalPrice={totalPrice}
+            product={{
+              name: productInfo.name,
+              price: productInfo.finalPrice,
+              mainImage: productInfo.images[0],
+            }}
+          />
+        </Affix>
+
         {/* related products to buy with  */}
-        <div className="font-semibold px-5 text-md">
+        <div className="font-semibold px-5 mt-5 text-sm">
           Sản phẩm có thể kết hợp
         </div>
 
@@ -511,44 +624,26 @@ export default function ProductDetail() {
                 children: item.children,
               };
             })}
+            className="overflow-y-hidden"
           />
         </div>
       </div>
-      <div className="col-span-3 my-10 lg:col-span-2 row-span-2 overflow-visible">
-        <FloatingCartForm
-          handleCartDetail={setOpen}
-          numberOfItem={numberOfItem}
-          updateItemNumber={setNumberOfItem}
-          totalPrice={totalPrice}
-        />
-      </div>
-      <div className="col-span-5 lg:col-span-6">
-        {/* reviews */}
-        <Divider>Khách hàng đánh giá</Divider>
 
-        <ReviewList setNumberOfReview={setNumberOfReview} />
+      {/* others */}
+      <FloatButton.Group>
+        <FloatButton.BackTop tooltip={<div>Lướt lên đầu</div>} />
+      </FloatButton.Group>
 
-        <FloatButton.Group>
-          <FloatButton
-            icon={<GiShoppingCart />}
-            tooltip={<div>Xem chi tiết</div>}
-            // badge={{ count: 23, overflowCount: 999 }}
-            onClick={showModal}
-          />
-          <FloatButton.BackTop tooltip={<div>Lướt lên đầu</div>} />
-        </FloatButton.Group>
-
-        <CartSummaryModal
-          open={open}
-          setOpen={setOpen}
-          totalPrice={totalPrice}
-          mainProductId={productInfo._id}
-          mainProductPrice={productInfo.finalPrice}
-          numberOfItem={numberOfItem}
-          comboIdList={comboIdList}
-          totalComboPrice={totalComboPrice}
-        />
-      </div>
+      <CartSummaryModal
+        open={open}
+        setOpen={setOpen}
+        totalPrice={totalPrice}
+        mainProductId={productInfo._id}
+        mainProductPrice={productInfo.finalPrice}
+        numberOfItem={numberOfItem}
+        comboIdList={comboIdList}
+        totalComboPrice={totalComboPrice}
+      />
     </div>
   );
 }

@@ -1,9 +1,10 @@
 "use client";
 import Banner from "@/component/customer/shop/Banner";
 import ProductList from "../../product-list/page";
-import { Tabs } from "antd";
+import { Input, Tabs } from "antd";
 import AboutShop, { shopDetailType } from "@/component/customer/shop/AboutShop";
-import Search from "antd/es/transfer/search";
+const { Search } = Input;
+
 import {
   WidgetType,
   WidgetCategoryType,
@@ -16,6 +17,7 @@ import {
 import { useEffect, useState } from "react";
 import WidgetList from "@/component/customer/shop/WidgetList";
 import Collections from "@/component/customer/shop/collection/Collections";
+import { SearchProps } from "antd/es/input";
 
 interface ShopInfoProps {
   color: string;
@@ -150,6 +152,8 @@ export default function ShopPage() {
   const [shopDetail, setShopDetail] = useState<shopDetailType>(shopDetailData);
   const [tab, setTab] = useState<string>("0");
   const [selectedCollectionId, setSelectedCollectionId] = useState("");
+  // TODO
+  const [searchText, setSearchText] = useState("");
 
   const tabItems = [
     {
@@ -169,6 +173,12 @@ export default function ShopPage() {
       children: (
         <div className="p-2">
           {/* temp */}
+
+          {/* // Filter menu items based on search text
+            // .filter((item) =>
+            //   item.name.toLowerCase().includes(searchText.toLowerCase())
+            // ) */}
+
           <ProductList />
         </div>
       ),
@@ -201,8 +211,17 @@ export default function ShopPage() {
     setTab("0");
   }, []);
 
+  // functions
+
+  // TODO: wip
+  const onSearch: SearchProps["onSearch"] = (value, _e, info) => {
+    console.log(info?.source, value);
+
+    setSearchText(value);
+  };
+
   return (
-    <div className="mx-20 pb-10 h-fit">
+    <div className="mx-20 pb-10 h-fit overflow-hidden">
       <section id="top-content" />
       <Banner
         color={shopInfo.color}
@@ -224,7 +243,23 @@ export default function ShopPage() {
             children: item.children,
           };
         })}
-        tabBarExtraContent={<Search placeholder="Tìm tại cửa hàng" />}
+        tabBarExtraContent={
+          <div onClick={() => setTab("1")}>
+            <Search
+              size="large"
+              style={{
+                background: "gray",
+                borderRadius: "10px",
+                width: 280,
+                fontSize: "8px",
+              }}
+              placeholder="Tìm sản phẩm tại cửa hàng"
+              onSearch={onSearch}
+              enterButton
+              className="text-xs"
+            />
+          </div>
+        }
       />
     </div>
   );
