@@ -1,29 +1,78 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Badge,
-  Button,
   Descriptions,
   DescriptionsProps,
   Divider,
   Flex,
   FloatButton,
-  InputNumber,
   List,
-  Modal,
   Progress,
   Rate,
-  Spin,
+  Skeleton,
   Tabs,
-  Tag,
 } from "antd";
 import ReviewList from "./ReviewList";
 import FloatingCartForm from "./FloatingCartForm";
 import { GiShoppingCart } from "react-icons/gi";
 import ComboList from "./ComboList";
+import Link from "next/link";
+import CartSummaryModal from "./ProductSummaryModal";
+import ReactImageMagnify from "react-image-magnify";
 
 export default function ProductDetail() {
+  const productInfo = {
+    _id: "string",
+    name: "ROBOT HÚT BỤI LAU NHÀ THÔNG MINH ECOVACS DEEBOT OZMO T8 NEO BẢN NỘI ĐỊA",
+    // attribute: {
+    //   ....
+    // }
+    description: "string",
+    originalPrice: 8900000,
+    finalPrice: 4900000,
+    category: "string",
+    shopId: "string",
+    // status: ENUM[AVAILABLE, SOLD_OUT, SALE];
+    images: [
+      {
+        url: "https://i.insider.com/5f835d4ebab422001979aaeb",
+      },
+      {
+        url: "https://robothutbuisky.com/wp-content/uploads/2020/06/t8-max-100-1.jpg?v=1677693356",
+      },
+      {
+        url: "https://product.hstatic.net/200000805527/product/z3994157810128_ac5e199adba96c46d6d7282b2bfdcdc5-scaled_843ed368395649f6a68bc7c08dd20524_master.jpg",
+      },
+      {
+        url: "https://product.hstatic.net/200000805527/product/z3994157835398_2b54a80e46f44a6d57b7a7500a87e49e-scaled_37202a4918fa4f03a6e275b8312f0587_master.jpg",
+      },
+      {
+        url: "",
+      },
+      {
+        url: "",
+      },
+      {
+        url: "",
+      },
+      {
+        url: "",
+      },
+      {
+        url: "",
+      },
+      {
+        url: "",
+      },
+    ],
+    avgRating: 4.5,
+    createdAt: "string",
+  };
+
   const items: DescriptionsProps["items"] = [
+    // key can be index, label is title, children is content
+    // TODO: make span configurable?
     {
       key: "1",
       label: "Product",
@@ -137,7 +186,7 @@ export default function ProductDetail() {
           </Flex>
 
           <div className="font-light pb-5">(10 đánh giá)</div>
-
+          {/* overview */}
           <Flex vertical gap="small" style={{ width: 300 }}>
             <Flex gap="small">
               <Rate
@@ -190,6 +239,7 @@ export default function ProductDetail() {
               </Flex>
             </Flex>
           </Flex>
+
           <div className="font-bold pt-5 text-lg">TechZone Assistant 🤖</div>
 
           <div className="font-semibold pt-5">
@@ -208,80 +258,76 @@ export default function ProductDetail() {
   ];
 
   // images
-  const images = [
-    {
-      url: "https://i.insider.com/5f835d4ebab422001979aaeb",
-    },
-    {
-      url: "https://bizweb.dktcdn.net/thumb/medium/100/391/225/products/t8max-1.jpg?v=1598201886260",
-    },
-    {
-      url: "https://product.hstatic.net/200000805527/product/z3994157810128_ac5e199adba96c46d6d7282b2bfdcdc5-scaled_843ed368395649f6a68bc7c08dd20524_master.jpg",
-    },
-    {
-      url: "https://product.hstatic.net/200000805527/product/z3994157835398_2b54a80e46f44a6d57b7a7500a87e49e-scaled_37202a4918fa4f03a6e275b8312f0587_master.jpg",
-    },
-  ];
+  type ImageInfoType = {
+    width: number;
+    height: number;
+  };
 
-  const [mainImage, setMainImage] = useState(images[0].url);
+  const [mainImage, setMainImage] = useState(productInfo.images[0].url);
+  const [mainImageInfo, setMainImageInfo] = useState<ImageInfoType>({
+    width: 0,
+    height: 0,
+  });
+
+  useEffect(() => {
+    function getMeta(url: string, callback: any) {
+      const img = new Image();
+      img.src = url;
+      img.onload = function () {
+        callback(img.width, img.height);
+      };
+    }
+    getMeta(mainImage, (width: number, height: number) => {
+      // alert(width + "px " + height + "px");
+      let imageInfo = { width, height };
+      setMainImageInfo(imageInfo);
+    });
+  }, [mainImage]);
+
+  // number of reviews
+  const [numberOfReview, setNumberOfReview] = useState(0);
+
+  // price
+  // number of main item
+  const [numberOfItem, setNumberOfItem] = useState(1);
+
+  // total combo price
+  const [totalComboPrice, setTotalComboPrice] = useState(0);
+
+  // combo id list
+  const [comboIdList, setComboIdList] = useState<Array<string>>([]);
+
+  const totalPrice = useMemo(() => {
+    return numberOfItem * productInfo.finalPrice + totalComboPrice;
+  }, [totalComboPrice, numberOfItem]);
 
   // modal
-  const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
-  const [confirmLoading, setConfirmLoading] = useState(false);
-  const [modalText, setModalText] = useState(<>Estimated price: 0</>);
   const showModal = () => {
     setOpen(true);
   };
-  const handleOk = () => {
-    setModalText(
-      <Flex gap="small">
-        <Spin />
-        Adding to cart...
-      </Flex>
-    );
-    setConfirmLoading(true);
-    setTimeout(() => {
-      setOpen(false);
-      setConfirmLoading(false);
-      setModalText(<>Add to cart?</>);
-    }, 2000);
-  };
-  const handleCancel = () => {
-    console.log("Clicked cancel button");
-    setOpen(false);
-  };
-
-  // button group
-  const [openButton, setOpenButton] = useState(true);
-  const onChange = (checked: boolean) => {
-    console.log("Clicked open group button");
-    setOpenButton(checked);
-  };
 
   return (
-    <div className="justify-between mx-10 lg:mx-20 gap-10 grid grid-cols-8">
+    <div className="justify-between mx-10 lg:mx-20 gap-10 grid grid-cols-8 h-fit pb-10">
       <div className="col-span-5 lg:col-span-6">
         {/* about product */}
-        <div className="bg-white shadow-md flex lg:flex-row md:flex-row flex-col my-10">
+        <div className="bg-white shadow-md flex lg:flex-row flex-col my-10">
           <Flex vertical>
-            <div className="bg-white shadow-md max-w-1/4 h-fit p-4">
-              <img
-                className="h-80 w-80 object-contain"
-                src={mainImage}
-                // alt={classInfo.name}
-              />
-            </div>
-
             <div className="m-2">
               <List
-                grid={{ gutter: 16, column: 4 }}
-                dataSource={images}
+                grid={{ gutter: 20, column: 5 }}
+                dataSource={productInfo.images}
                 renderItem={(item) => (
                   <List.Item>
                     <div
-                      className="cursor-pointer border-2"
-                      onClick={() => setMainImage(item.url)}
+                      className={`cursor-pointer ${
+                        mainImage == item.url
+                          ? "border-4 border-blue-400"
+                          : "border-2"
+                      }`}
+                      onClick={() => {
+                        setMainImage(item.url);
+                      }}
                     >
                       <img
                         className="h-14 w-full object-contain"
@@ -293,34 +339,99 @@ export default function ProductDetail() {
                 )}
               />
             </div>
+
+            <div className="bg-white h-fit shadow-md p-4 z-50">
+              {/* <img
+                className="h-[500px] w-[500px] object-contain"
+                src={mainImage}
+                alt={productInfo.name}
+              /> */}
+
+              <ReactImageMagnify
+                {...{
+                  smallImage: {
+                    alt: productInfo.name,
+                    isFluidWidth: true,
+                    // width: 500,
+                    // height: 500,
+                    src: mainImage,
+                    // src: mainImage + "?width=500&height=500",
+                  },
+                  largeImage: {
+                    src: mainImage,
+                    // width: mainImageInfo.width * 0.8,
+                    // height: mainImageInfo.height * 0.8,
+                    width: mainImageInfo.width,
+                    height: mainImageInfo.height,
+                  },
+                  enlargedImageContainerDimensions: {
+                    // width: "160%",
+                    // height: "120%",
+                    width: "200%",
+                    height: "100%",
+                  },
+                  isHintEnabled: true,
+                  // Hover to Zoom
+                  hintTextMouse: "Trỏ để phóng to",
+                  shouldHideHintAfterFirstActivation: false,
+                  // imageClassName: "max-w-[550px]",
+                  // enlargedImageContainerClassName:
+                  //   "h-[500px] w-[500px] object-fill",
+                }}
+              />
+            </div>
           </Flex>
           {/* desc */}
-          <div className="p-4">
-            <div className="font-bold uppercase text-lg">
-              ROBOT HÚT BỤI LAU NHÀ THÔNG MINH ECOVACS DEEBOT OZMO T8 NEO BẢN
-              NỘI ĐỊA
+
+          <div className="p-4 min-w-[450px] lg:w-[600px]">
+            {productInfo._id == null && <Skeleton active />}
+
+            <div className="text-sm">
+              Thương hiệu / Shop:{" "}
+              <Link href="" className="text-blue-500">
+                Ecovacs
+              </Link>
             </div>
 
-            <Flex gap="small">
+            <div className="font-bold uppercase text-lg">
+              {productInfo.name}
+            </div>
+
+            <Flex
+              gap="small"
+              style={{ lineHeight: 2, marginTop: 2, alignContent: "center" }}
+            >
               <Rate
                 disabled
                 allowHalf
                 defaultValue={4.5}
                 style={{ padding: 5 }}
               />
-              <div className="font-bold uppercase text-xl">4.5</div>
+              <div className="font-bold uppercase text-xl">
+                {productInfo.avgRating}
+              </div>
+              <div className="text-xs font-light mt-2">
+                ({numberOfReview} đánh giá)
+              </div>
+              <Divider
+                type="vertical"
+                style={{ height: "auto", border: "0.25px solid silver" }}
+              />
+              <div className="font-light">Đã bán 5000+</div>
             </Flex>
 
             <div className="flex flex-row gap-3 my-2">
               <div className="line-through text-gray-600 uppercase text-xl md:text-2xl lg:text-2xl">
-                8,900,000 Đ
+                {/* {productInfo.originalPrice} Đ */}
+                {priceIndex(productInfo.originalPrice)}
               </div>
               <div className="font-bold text-red-500 uppercase text-xl md:text-2xl lg:text-2xl">
-                4,900,000 Đ
+                {priceIndex(productInfo.finalPrice)}
               </div>
-              <div className="text-red-500 uppercase text-xs mt-1">-50%</div>
+              {/* <div className="text-red-500 uppercase text-xs mt-1">-50%</div> */}
             </div>
-            <div className="capitalize text-xs mt-5">Sub-category:</div>
+            {/* sub category tags */}
+            {/* <div className="capitalize text-xs mt-5">Sub-category:</div>
             <Tag>
               <a href="https://github.com/ant-design/ant-design/issues/1862">
                 Điện máy - Điện gia dụng
@@ -330,13 +441,46 @@ export default function ProductDetail() {
               <a href="https://github.com/ant-design/ant-design/issues/1862">
                 Thiết bị văn phòng
               </a>
-            </Tag>
+            </Tag> */}
+            {/* sub category tags */}
+
+            {/* add Link later if use */}
+            {/* <div className="flex flex-col gap-3">
+              <div className="font-semibold pt-5">Dịch vụ bổ sung</div>
+              <div className="bg-white shadow-md max-w-1/4 h-fit p-4 cursor-pointer">
+                Thay đổi Thông tin vận chuyển
+              </div>
+              <div className="bg-white shadow-md max-w-1/4 h-fit p-4 cursor-pointer">
+                Ưu đãi, mã giảm giá
+              </div>
+            </div> */}
+
+            <div className="grid grid-cols-4">
+              <div className="col-span-1 col-start-1 font-bold pt-5">
+                Tình trạng:{" "}
+              </div>
+              <div className="col-span-1 col-start-2 pt-5">Còn hàng</div>
+              <div className="col-span-1 col-start-1 font-bold pt-5">
+                Số lượng:{" "}
+              </div>
+              <div className="col-span-1 col-start-2 pt-5">124332</div>
+            </div>
           </div>
         </div>
         {/* related products to buy with  */}
-        <div className="font-semibold p-5 text-md">Sản phẩm có thể kết hợp</div>
+        <div className="font-semibold px-5 text-md">
+          Sản phẩm có thể kết hợp
+        </div>
 
-        <ComboList />
+        <ComboList
+          totalPrice={totalPrice}
+          totalComboPrice={totalComboPrice}
+          updateTotalComboPrice={(price) => {
+            setTotalComboPrice(price);
+          }}
+          comboIdList={comboIdList}
+          setComboIdList={setComboIdList}
+        />
 
         {/* tabs, descriptions and review summary */}
         <div className="my-5">
@@ -355,80 +499,49 @@ export default function ProductDetail() {
         </div>
       </div>
       <div className="col-span-3 my-10 lg:col-span-2">
-        <FloatingCartForm />
+        <FloatingCartForm
+          handleCartDetail={setOpen}
+          numberOfItem={numberOfItem}
+          updateItemNumber={setNumberOfItem}
+          totalPrice={totalPrice}
+        />
       </div>
       <div className="col-span-5 lg:col-span-6">
         {/* reviews */}
         <Divider>Khách hàng đánh giá</Divider>
 
-        <ReviewList />
+        <ReviewList setNumberOfReview={setNumberOfReview} />
 
         <FloatButton.Group>
           <FloatButton
             icon={<GiShoppingCart />}
-            tooltip={<div>Add to Cart</div>}
-            badge={{ count: 23, overflowCount: 999 }}
+            tooltip={<div>Xem chi tiết</div>}
+            // badge={{ count: 23, overflowCount: 999 }}
             onClick={showModal}
           />
           <FloatButton.BackTop tooltip={<div>Move to Top</div>} />
         </FloatButton.Group>
 
-        <Modal
+        <CartSummaryModal
           open={open}
-          title="Cart Details"
-          onOk={handleOk}
-          confirmLoading={confirmLoading}
-          onCancel={handleCancel}
-          footer={[
-            <Button key="back" onClick={handleCancel}>
-              Return
-            </Button>,
-            <Button
-              key="submit"
-              // type="primary"
-              loading={loading}
-              onClick={handleOk}
-            >
-              Add to Cart
-            </Button>,
-            <Button
-              key="link"
-              href="https://google.com"
-              type="primary"
-              loading={loading}
-              onClick={handleOk}
-            >
-              Move to Checkout
-            </Button>,
-          ]}
-        >
-          {/* <div className="mx-2">
-            <Flex gap="small">
-              <div className="mt-1"> Số lượng: </div>
-              <InputNumber
-                min={0}
-                max={999}
-                defaultValue={0}
-                // onChange={onChange}
-                changeOnWheel
-              />
-            </Flex>
-          </div>
-
-          <Flex gap="small">
-            <div className="m-2 my-5 text-xl"> {modalText} </div>
-          </Flex> */}
-
-          <InputNumber
-            min={0}
-            max={999}
-            defaultValue={0}
-            // onChange={onChange}
-            changeOnWheel
-          />
-          <p>{modalText}</p>
-        </Modal>
+          setOpen={setOpen}
+          totalPrice={totalPrice}
+          mainProductId={productInfo._id}
+          mainProductPrice={productInfo.finalPrice}
+          numberOfItem={numberOfItem}
+          comboIdList={comboIdList}
+          totalComboPrice={totalComboPrice}
+        />
       </div>
     </div>
   );
 }
+
+// price
+export const priceIndex = (price: number) => {
+  return price.toLocaleString("vi-VN", {
+    style: "currency",
+    currency: "VND",
+    minimumFractionDigits: 0,
+  });
+};

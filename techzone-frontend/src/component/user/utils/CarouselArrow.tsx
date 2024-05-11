@@ -12,7 +12,6 @@ const arrow: CSSProperties = {
 
 }
 
-
 // Arrow.jsx
 import { LeftOutlined, RightOutlined } from '@ant-design/icons'
 
@@ -36,6 +35,7 @@ const StyleSheet = {
     right: arrowOffset
   }
 }
+
 
 // Antd is doing some interesting things here. Using LeftOutlined and RightOutlined
 // directly without wrapping them in this component doesn't work. Additionally, if

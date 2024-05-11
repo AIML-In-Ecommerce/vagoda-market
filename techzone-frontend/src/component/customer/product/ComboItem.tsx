@@ -1,26 +1,27 @@
 "use client";
 import Link from "next/link";
-import { useTranslations } from "next-intl";
 import { PlusOutlined } from "@ant-design/icons";
-import { Checkbox } from "antd";
+import { Checkbox, CheckboxProps } from "antd";
+import { priceIndex } from "./ProductDetail";
 
-interface ComboItemProp {
-  id: string;
+export interface ComboItemProps {
+  _id: string;
   imageUrl: string;
   name: string;
   price: number;
   productUrl: string;
+  handleCheckbox: (isChecked: boolean, id: string, price: number) => void;
 }
 
-const ComboItem = (combo: ComboItemProp) => {
-  // const t = useTranslations("Tabs");
-
+const ComboItem = (combo: ComboItemProps) => {
   return (
     <div className="flex flex-row">
       <PlusOutlined />
       <Checkbox
         style={{ marginRight: 3, marginLeft: 10 }}
-        // onChange={onChange}
+        onChange={(e) =>
+          combo.handleCheckbox(e.target.checked, combo._id, combo.price)
+        }
       >
         <div className="max-w-[240px] bg-white rounded-xl overflow-hidden md:max-w-2xl relative">
           <div className="flex flex-col">
@@ -35,12 +36,13 @@ const ComboItem = (combo: ComboItemProp) => {
             </Link>
             <div className="p-3">
               <Link href={`/${combo.productUrl}`}>
-                <div className="mt-1 leading-tight font-medium text-black hover:underline overflow-hidden roboto-bold line-clamp-2">
+                <div className="mt-1 leading-tight font-medium text-black overflow-hidden roboto-bold line-clamp-2">
+                  {/* hover:underline */}
                   {combo.name}
                 </div>
               </Link>
               <div className="mt-1 leading-tight font-medium text-black text-ellipsis overflow-hidden roboto-bold text-wrap-2-line">
-                {combo.price} Đ
+                {priceIndex(combo.price)}
               </div>
             </div>
           </div>

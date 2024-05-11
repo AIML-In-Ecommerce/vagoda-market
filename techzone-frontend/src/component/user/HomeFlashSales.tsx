@@ -22,6 +22,27 @@ interface SimpleProductInfo
     image: string,
 }
 
+enum WrapperType{
+    paddingBlock,
+    infoBlock
+}
+
+interface SimpleProductInfoWrapper
+{
+    type: WrapperType,
+    productInfo: SimpleProductInfo
+}
+
+const paddingBlockProps: SimpleProductInfo =
+{
+    _id: "",
+    name: "",
+    originalPrice: 0,
+    finalPrice: 0,
+    status: "",
+    image: "",
+}
+
 const MockData = 
 [
     {
@@ -311,9 +332,9 @@ const MockData =
 export default function HomeFlashSales({}: HomeFlashSalesProps)
 {
     const [products, setProducts] = useState<SimpleProductInfo[]>([])
-    const numberOfDisplayedProductPerScreen = 12
-    const numberOfDisplayedProductPerRow = 6
-    const gridColumnSpan = 4
+    const numberOfDisplayedProductPerScreen = 10
+    const numberOfDisplayedProductPerRow = 5
+    // const gridColumnSpan = 4
 
     const flashSaleMoreDetailHref = "#"
 
@@ -363,50 +384,68 @@ export default function HomeFlashSales({}: HomeFlashSalesProps)
             const items = products.slice(startIndex, endIndex)
             const turn = numberOfDisplayedProductPerScreen / numberOfDisplayedProductPerRow
             let rows: JSX.Element[] = []
-            for(let j = 0; j <= turn; j++)
+            for(let j = 0; j < turn; j++)
             {
                 const leftIndex = j*numberOfDisplayedProductPerRow
                 const rightIndex = (j+1)*numberOfDisplayedProductPerRow > items.length ? items.length : (j+1)*numberOfDisplayedProductPerRow
-                const itemsPerRow = items.slice(leftIndex, rightIndex)
-                const row = itemsPerRow.map((value:SimpleProductInfo, index: number) =>
+                let itemsPerRow = items.slice(leftIndex, rightIndex).map((value: SimpleProductInfo) => 
                 {
+                    const item: SimpleProductInfoWrapper = 
+                    {
+                        type: WrapperType.infoBlock,
+                        productInfo: value
+                    }
+                    
+                    return item
+                })
+                if(itemsPerRow.length < numberOfDisplayedProductPerRow)
+                {
+                    const complements = ((new Array(numberOfDisplayedProductPerRow - itemsPerRow.length)).fill(paddingBlockProps)).map((value: SimpleProductInfo) =>
+                    {
+                        const item: SimpleProductInfoWrapper = 
+                        {
+                            type: WrapperType.paddingBlock,
+                            productInfo: value
+                        }
+
+                        return item
+                    })
+
+                    //insert paddings to itemsPerRow
+                    itemsPerRow = itemsPerRow.concat(complements)
+                }
+                const row = itemsPerRow.map((valueWrapper:SimpleProductInfoWrapper, index: number) =>
+                {
+                    let isInvisible = ""
+                    if(valueWrapper.type == WrapperType.paddingBlock)
+                    {
+                        isInvisible = "invisible "
+                    }
+                    const value = valueWrapper.productInfo
+
                     return(
-                        <Col key={value._id + new String(index)} span={gridColumnSpan}>
+                        <div className={isInvisible + "w-full"} key={value._id + new String(index)}>
                             <SimpleProductCard info={value}/>
-                        </Col>
+                        </div>
                     )
                 })
-                const rowWrapper = <Row key={j.toString()+leftIndex.toString()+rightIndex.toString()}>
+                const rowWrapper = <Flex key={j.toString()+leftIndex.toString()+rightIndex.toString()} className="my-1" justify={"space-evenly"} align="center" gap={8}>
                     {row}
-                </Row>
+                </Flex>
 
                 rows = rows.concat(rowWrapper)
             }
 
-            result = result.concat(<div key={i.toString()+startIndex.toString()+endIndex.toString()}>{rows}</div>)
+            result = result.concat(<div className="py-2" key={i.toString()+startIndex.toString()+endIndex.toString()}>{rows}</div>)
         }
 
         return result
     }
 
-    const PrevButton = 
-    <>
-        <Button>
-            Previous
-        </Button>
-    </>
-
-    const NextButton =
-    <>
-        <Button>
-            Next
-        </Button>
-    </>
-
     return(
         <>
             <div className="w-full bg-blue-50 flex justify-center">
-                <div className="w-10/12">
+                <div className="w-11/12">
                     <div className="invisible h-10 w-full">
                     </div>
                     <Card>

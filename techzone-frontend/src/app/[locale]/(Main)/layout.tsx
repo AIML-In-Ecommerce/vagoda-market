@@ -4,6 +4,8 @@ import "../globals.css";
 // import { AuthProvider } from "@/context/AuthContext";
 // import StyledComponentsRegistry from "../../../lib/AntdRegistry";
 import Navbar from "@/component/customer/Navbar";
+import CategoryDrawer from "@/component/user/utils/CategoryDrawer";
+import WebFooter from "@/component/user/WebFooter";
 import { NextIntlClientProvider, useMessages } from "next-intl";
 import { ReactNode } from "react";
 // import UserLayout from "@/component/UserLayout";
@@ -36,9 +38,11 @@ export default function RootLayout({
           {/* </AuthProvider> */}
           <div className="w-full bg-cover bg-[#f3f3f3] min-h-screen overflow-hidden">
             <Navbar />
+            <CategoryDrawer />
             {children}
           </div>
         </NextIntlClientProvider>
+        <WebFooter />
       </body>
     </html>
   );

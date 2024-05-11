@@ -3,12 +3,11 @@ export type CommentType = {
   reviewId: string;
   user: { id: string; name: string; avatar: string };
   desc: string;
-  parent: string | null;
-  replyOnUser: string | null;
+  // parent: string | null;
+  // replyOnUser: string | null;
+  // like: string[] | null;
   createdAt: string;
-  like: number;
-  isSender: boolean;
-  like_status: boolean; // save locally?
+  // isSender: boolean; //not need if can get cur user id
 };
 
 export type AffectedCommentType = {
@@ -21,9 +20,9 @@ export type RawCommentType = {
   review_id: string;
   sender_id: string;
   desc: string;
-  parent: string | null;
-  replyOnUser: string | null;
+  // parent: string | null;
+  // replyOnUser: string | null;
+  // like: string[] | null;
   createdAt: string;
-  like: number;
-  isSender: boolean;
+  // isSender: boolean;
 };

@@ -15,18 +15,17 @@ import { useParams, usePathname } from "next/navigation";
 
 interface CommentContainerInterface {
   reviewId: string;
-  studentId: string;
+  customerId: string;
 }
 
-// const CommentContainer = (props: CommentContainerInterface) => {
-const CommentContainer = () => {
+const CommentContainer = (props: CommentContainerInterface) => {
   // const auth = useAuth();
-  const { classId } = useParams();
+  const { productId } = useParams();
   const pathname = usePathname();
   // const t = useTranslations("Comment");
 
   const [comments, setComments] = useState<CommentType[]>([]);
-  const [trigger, setTrigger] = useState("");
+  const [trigger, setTrigger] = useState(false);
 
   // useEffect(() => {
   //   (async () => {
@@ -78,7 +77,7 @@ const CommentContainer = () => {
   //           console.log("temp comments", tempComments);
 
   //           setComments(tempComments);
-  //           setTrigger("triggered");
+  //           setTrigger(!trigger);
   //         }
   //       })
   //       .catch((error) => {
@@ -94,7 +93,6 @@ const CommentContainer = () => {
   //       if (!comment.isSender) {
   //         if (auth.user && auth.user != null) {
   //           //TODO: get sender name
-  //           // if (props.senderRole === "Teacher") {
   //           await axios
   //             .get(
   //               `${process.env.NEXT_PUBLIC_BACKEND_PREFIX}profile/${comment.user.id}`,
@@ -125,9 +123,12 @@ const CommentContainer = () => {
   //   })();
   // }, [trigger]);
 
-  const mainComments = comments.filter(
-    (comment) => comment.parent === null || undefined
-  );
+  // const mainComments = comments.filter(
+  //   (comment) => comment.parent === null || undefined
+  // );
+
+  const mainComments = comments;
+
   const [affectedComment, setAffectedComment] =
     useState<AffectedCommentType | null>(null);
 
@@ -175,85 +176,6 @@ const CommentContainer = () => {
     //       newId = response.data._id;
 
     //       console.log("Log out review.id:", props.reviewId);
-
-    //       // notification
-    //       (async () => {
-    //         if (!auth.user || auth.user == null) return;
-
-    //         let senderRole: string,
-    //           message: string,
-    //           redirectUrl: string,
-    //           receiverIdList: string[],
-    //           allMembersList: ClassListType[];
-
-    //         receiverIdList = [];
-
-    //         await axios
-    //           .get(
-    //             `${process.env.NEXT_PUBLIC_BACKEND_PREFIX}classes/${classId}/members`,
-    //             {
-    //               headers: {
-    //                 Authorization: `Bearer ${auth.user.access_token}`,
-    //               },
-    //             }
-    //           )
-    //           .then((response) => {
-    //             if (!auth.user || auth.user == null) return;
-
-    //             allMembersList = response.data.members;
-
-    //             if (allMembersList.length > 0) {
-    //               if (pathname.includes("teaching")) {
-    //                 senderRole = "Teacher";
-    //                 message = "teacher_reply";
-    //                 redirectUrl = `/enrolled/${classId}/review/${props.reviewId}`;
-
-    //                 allMembersList.forEach((member) => {
-    //                   if (
-    //                     member.role === "Student" &&
-    //                     member.student_id === props.studentId
-    //                   ) {
-    //                     receiverIdList.push(member.user_id);
-    //                   }
-    //                 });
-    //               } else {
-    //                 receiverIdList.push(response.data.host_user._id);
-
-    //                 senderRole = "Student";
-    //                 message = "student_reply";
-    //                 redirectUrl = `/teaching/${classId}/review/${props.reviewId}`;
-
-    //                 allMembersList.forEach((member) => {
-    //                   if (member.role === "Teacher") {
-    //                     receiverIdList.push(member.user_id);
-    //                   }
-    //                 });
-    //               }
-    //               let newNotification: NotificationType;
-    //               newNotification = {
-    //                 id: "",
-    //                 senderId: "",
-    //                 classId: classId.toString(),
-    //                 reviewId: props.reviewId,
-    //                 senderRole: senderRole,
-    //                 receiverIdList: receiverIdList,
-    //                 message: message,
-    //                 redirectUrl: redirectUrl,
-    //                 createdAt: newRawComment.createdAt,
-    //                 isRead: false,
-    //               };
-
-    //               actions.sendNotification(
-    //                 auth.user.access_token,
-    //                 newNotification
-    //               );
-    //             }
-    //           })
-    //           .catch((error) => {
-    //             console.error("Error fetching class members:", error);
-    //           });
-    //       })();
-    //       // end send notification
     //     }
     //   })
     //   .catch((error) => {
@@ -344,35 +266,35 @@ const CommentContainer = () => {
     //   });
   };
 
-  const getRepliesHandler = (commentId: string) => {
-    return comments
-      .filter((comment) => comment.parent === commentId)
-      .sort((former, latter) => {
-        return (
-          new Date(former.createdAt).getTime() -
-          new Date(latter.createdAt).getTime()
-        );
-      });
-  };
+  // const getRepliesHandler = (commentId: string) => {
+  //   return comments
+  //     .filter((comment) => comment.parent === commentId)
+  //     .sort((former, latter) => {
+  //       return (
+  //         new Date(former.createdAt).getTime() -
+  //         new Date(latter.createdAt).getTime()
+  //       );
+  //     });
+  // };
 
-  const likeCommentHandler = (commentId: string) => {
-    setComments((curState) => {
-      return curState.map((comment) => {
-        if (comment.id === commentId) {
-          const updatedLikeStatus = !comment.like_status;
-          const updatedLikeCount = updatedLikeStatus
-            ? comment.like + 1
-            : comment.like - 1;
-          return {
-            ...comment,
-            like: updatedLikeCount,
-            like_status: updatedLikeStatus,
-          };
-        }
-        return comment;
-      });
-    });
-  };
+  // const likeCommentHandler = (commentId: string) => {
+  //   setComments((curState) => {
+  //     return curState.map((comment) => {
+  //       if (comment.id === commentId) {
+  //         const updatedLikeStatus = !comment.like_status;
+  //         const updatedLikeCount = updatedLikeStatus
+  //           ? comment.like + 1
+  //           : comment.like - 1;
+  //         return {
+  //           ...comment,
+  //           like: updatedLikeCount,
+  //           like_status: updatedLikeStatus,
+  //         };
+  //       }
+  //       return comment;
+  //     });
+  //   });
+  // };
 
   return (
     <React.Fragment>
@@ -387,7 +309,7 @@ const CommentContainer = () => {
           formCancelHandler={() => {}}
           initialText=""
         />
-        <div className="overflow-auto h-24 space-y-2">
+        <div className="overflow-auto h-32 space-y-2">
           {mainComments.map((comment) => (
             <Comment
               key={comment.id}
@@ -397,9 +319,9 @@ const CommentContainer = () => {
               addComment={addCommentHandler}
               updateComment={updateCommentHandler}
               deleteComment={deleteCommentHandler}
-              likeComment={likeCommentHandler}
-              replies={getRepliesHandler(comment.id)}
-              parentId={comment.parent}
+              // likeComment={likeCommentHandler}
+              // replies={getRepliesHandler(comment.id)}
+              // parentId={comment.parent}
             />
           ))}
         </div>
