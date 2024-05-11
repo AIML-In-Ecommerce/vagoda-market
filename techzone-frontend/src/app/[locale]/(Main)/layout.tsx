@@ -5,7 +5,6 @@ import "../globals.css";
 // import StyledComponentsRegistry from "../../../lib/AntdRegistry";
 import Navbar from "@/component/customer/Navbar";
 import AssistantFloatingButtonGroup from "@/component/user/AssistantFloatingButtonGroup";
-import CategoryDrawer from "@/component/user/utils/CategoryDrawer";
 import WebFooter from "@/component/user/WebFooter";
 import { NextIntlClientProvider, useMessages } from "next-intl";
 import { Lato } from "next/font/google";
@@ -48,7 +47,6 @@ export default function RootLayout({
           <Suspense fallback={<RootLoading />}>
             <div className="w-full bg-cover bg-[#f3f3f3]  min-h-screen  overflow-hidden">
               <Navbar />
-              <CategoryDrawer />
               {children}
               <AssistantFloatingButtonGroup />
             </div>
