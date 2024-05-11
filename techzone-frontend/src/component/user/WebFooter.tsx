@@ -3,6 +3,9 @@
 import { Flex, Image, Skeleton, Typography } from "antd"
 import Link from "next/link"
 import { useEffect, useState } from "react"
+import facebookImgLocalLink from '../../../public/asset/facebook.256x256.png'
+import mediaImgLocalLink from '../../../public/asset/youtube.256x180.png'
+import googleImgLocalLink from '../../../public/asset/google.256x256.png'
 
 
 interface WebFooterProps
@@ -183,19 +186,19 @@ const ServiceInfoMockData =
         _id: "si-19",
         name: "Facebook TechZone",
         link: "#",
-        icon: "@/asset/facebook.256x256.png"
+        icon: facebookImgLocalLink.src
     },
     {
         _id: "si-20",
         name: "TechZone Media",
         link: "#",
-        icon: "\asset\youtube.256x180.png"
+        icon: mediaImgLocalLink.src
     },
     {
         _id: "si-21",
         name: "TechZone gmail",
         link: "#",
-        icon: "@/asset/google.256x256.png"
+        icon: googleImgLocalLink.src
     },
     {
         _id: "si-22",
@@ -292,9 +295,11 @@ export default function WebFooter({}: WebFooterProps)
 
                         return(
                             <Link key={item._id} href={item.link} prefetch={false}>
-                                <Typography.Text className="no-underline text-sm hover:text-blue-500">
-                                    {item.icon.length > 0 ? <Image className="mr-1" src={item.icon} preview={false}/> : <></>}
-                                    {item.name}
+                                <Typography.Text className="no-underline text-sm hover:text-amber-800">
+                                    <Flex justify="start" align="center">
+                                        {item.icon.length > 0 ? <img className="w-4 h-4" src={item.icon} alt="icon"></img>: <></>}
+                                        {item.name}
+                                    </Flex>
                                 </Typography.Text>
                             </Link>
                         )
@@ -302,7 +307,7 @@ export default function WebFooter({}: WebFooterProps)
 
                     return(
                         <Flex key={value._id} vertical justify="center" align="start">
-                            <Typography.Text className="text-blue-800 mb-1 font-semibold">
+                            <Typography.Text className="text-amber-900 mb-1 font-semibold">
                                 {value.name}
                             </Typography.Text>
                             {childDisplay}
@@ -315,37 +320,39 @@ export default function WebFooter({}: WebFooterProps)
 
     return(
         <>
-            <div className="w-full h-0.5 invisible">
-                hidden block
-            </div>
-            <div className="w-full">
-                <div className="bg-blue-800 h-0.5"></div>
-                <div className="w-full h-7 invisible">
+            <div className="w-full bg-stone-200">
+                <div className="w-full h-0.5 invisible">
                     hidden block
                 </div>
-                <Flex justify="center" align="center" className="w-full">
-                    {
-                        SupportServicesDisplay
-                    }
-                </Flex>
-                <div className="w-full h-7 invisible">
-                    hidden block
-                </div>
-                <div className="w-full flex justify-evenly items-center">
-                    <Flex justify="center" className="w-1/2">
-                        <Image src={"@asset/logo.png"} />
-                        <Typography.Text className="text-grey-300 text-base">
-                            CÔNG TY CỔ PHẦN THƯƠNG MẠI - DỊCH VỤ TECHZONE
-                        </Typography.Text>
+                <div className="w-full">
+                    <div className="bg-amber-900 h-0.5"></div>
+                    <div className="w-full h-7 invisible">
+                        hidden block
+                    </div>
+                    <Flex justify="center" align="center" className="w-full">
+                        {
+                            SupportServicesDisplay
+                        }
                     </Flex>
-                    <Flex vertical justify="center" className="w-1/2">
-                        <Typography.Text className="text-black font-semibold text-sm">
-                            Địa chỉ trụ sở chính:
-                        </Typography.Text>
-                        <Typography.Text className="text-grey-200 text-sm">
-                            227 Đ.Nguyễn Văn Cừ, Phường 4, quận 5, thành phố Hồ Chí Minh
-                        </Typography.Text>
-                    </Flex>
+                    <div className="w-full h-7 invisible">
+                        hidden block
+                    </div>
+                    <div className="w-full flex justify-evenly items-center">
+                        <Flex justify="center" className="w-1/2">
+                            <Image src={"@asset/logo.png"} />
+                            <Typography.Text className="text-amber-900 text-base">
+                                CÔNG TY CỔ PHẦN THƯƠNG MẠI - DỊCH VỤ TECHZONE
+                            </Typography.Text>
+                        </Flex>
+                        <Flex vertical justify="center" className="w-1/2">
+                            <Typography.Text className="text-amber-900 font-semibold text-sm">
+                                Địa chỉ trụ sở chính:
+                            </Typography.Text>
+                            <Typography.Text className="text-stone-800 text-sm">
+                                227 Đ.Nguyễn Văn Cừ, Phường 4, quận 5, thành phố Hồ Chí Minh
+                            </Typography.Text>
+                        </Flex>
+                    </div>
                 </div>
             </div>
         </>

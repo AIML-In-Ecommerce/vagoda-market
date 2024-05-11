@@ -1,10 +1,13 @@
-import { Card, Flex, Image, Typography } from "antd";
-import { MouseEvent } from "react";
+import { Button, Card, Flex, Image, Typography } from "antd";
+import { MouseEvent, useState } from "react";
+import { PiShoppingCart } from "react-icons/pi";
 
 
 interface SimpleProductCardProps
 {
-    info: SimpleProductInfo
+    info: SimpleProductInfo,
+    imageHeight: string | undefined,
+    imageWidth: string | undefined
 }
 
 interface SimpleProductInfo
@@ -17,67 +20,88 @@ interface SimpleProductInfo
     image: string,
 }
 
-export default function SimpleProductCard({info}:SimpleProductCardProps)
+export default function SimpleProductCard({info, imageHeight, imageWidth}:SimpleProductCardProps)
 {
     //here we can get locale from web locale language hahaha
     const locale = 'vi-VN'
+    const visibleAdditionalInfo = "transition-opacity duration-1000 opacity-100"
+    const hiddenAdditionalInfo = "transition-opacity duration-1000 opacity-0"
+
     const currencyFormater = Intl.NumberFormat(locale, {style:"currency", currency:"VND"})
+    const [visibleAdditionalInfoState, setVisibleAdditionalInfoState] = useState<string>(hiddenAdditionalInfo)
 
     function calculateDiscountPercentage(originalPrice: number, finalPrice: number)
     {
         return Math.ceil((originalPrice - finalPrice)*100 / originalPrice)
     }
 
-    function handleOnClickButton(event: MouseEvent<HTMLDivElement, globalThis.MouseEvent>)
+    function handleAddToCartOnClick()
     {
         console.log(info)
     }
 
+    function handleItemOnClick()
+    {
+
+    }
+
+    function handleMouseEnter()
+    {
+        setTimeout(() =>
+        {
+            setVisibleAdditionalInfoState(visibleAdditionalInfo)
+        }, 700)
+    }
+
+    function handleMouseLeave()
+    {
+        setTimeout(() =>
+        {
+            setVisibleAdditionalInfoState(hiddenAdditionalInfo)
+        }, 1000)
+    }
+
+    const ProductImage = <Image className="rounded-lg" height={imageHeight} width={imageWidth} src={info.image}/>
+
+    const ProductFinalPrice = <p className="text-xl sm:text-md font-semibold text-amber-700">{currencyFormater.format(info.finalPrice)}</p>
+
+    const ProductOriginPrice = <p className="text-sm xs:text-xs line-through">{currencyFormater.format(info.originalPrice)}</p>
+
+    const ProductName = <p className="text-wrap text-base font-semibold text-amber-900">{info.name}</p>
+
+
     return(
         <>
-            <Card style={{height:"100%"}} onClick={(handleOnClickButton)} hoverable>
-                <Card cover={<Image src={info.image}/>}
-                    bordered={false} style={{height:"150px", maxHeight:"150px"}}>
-                </Card>
-                <Flex justify="end">
-                    {
-                        info.originalPrice !== undefined && info.originalPrice != null && info.originalPrice > 0?
-                        <Typography.Text style={{borderTopLeftRadius: "25px", borderBottomLeftRadius: "25px"}} 
-                            className="text-base bg-orange-500 w-1/4 text-center">
-                            -{calculateDiscountPercentage(info.originalPrice, info.finalPrice)}%
-                        </Typography.Text>:
-                        <Typography.Text className="invisible">
-                            No discount
-                        </Typography.Text>
-                    }
+            <Flex className="h-full rounded-lg bg-white hover:border-2 hover:border-stone-600 py-2 px-1" vertical justify="center"
+                onMouseEnter={() => handleMouseEnter()} onMouseLeave={() => handleMouseLeave()}
+                onClick={() => handleItemOnClick()}
+            >
+                <Flex className="relative" vertical justify="center" align="center">
+                    <div>{ProductImage}</div>
+                    <Flex className={`w-full absolute bottom-0 bg-white py-4 ${visibleAdditionalInfoState}`} justify="center" align="center">
+                        <Flex className="w-2/3 px-2" justify="start" align="baseline">
+                            {ProductName}
+                        </Flex>
+                        <Flex className="w-1/3" justify="end" align="center">
+                            <button className="w-full" type="button" onClick={() => handleAddToCartOnClick}>
+                                <Flex className="w-full bg-stone-600 hover:bg-stone-700 font-semibold text-white py-2 rounded-md" justify="center" align="center" gap={4}>
+                                    <PiShoppingCart />
+                                    <p>Add</p>
+                                </Flex>
+                            </button>
+                        </Flex>
+                    </Flex>
                 </Flex>
-                <Flex vertical align="center" justify="center">
-                    <Typography className="text-lg">
-                        {info.name}
-                    </Typography>
-                    {
-                        (info.originalPrice !== undefined)?
-                        <Typography className="text-sm text-slate-400 line-through">
-                            {currencyFormater.format(info.originalPrice)}
-                        </Typography>:
-                        <Typography className="invisible text-sm">
-                            No discount
-                        </Typography>
-                    }
-                    {
-                        (info.originalPrice !== undefined && info.originalPrice != null && info.originalPrice > 0)?
-                        <Typography.Text className="text-2xl text-orange-500">
-                            {currencyFormater.format(info.finalPrice)}
-                        </Typography.Text>:
-                        <Typography.Text className="text-2xl text-slate-600">
-                            {currencyFormater.format(info.finalPrice)}
-                        </Typography.Text>
-                    }
-                    <button className="bg-orange-500 mt-2 hover:bg-orange-600 hover:text-white px-2 py-1 rounded-md text-base">
-                        Thêm vào giỏ hàng
-                    </button>
+                <Flex className="w-full pl-1" justify="center" align="center">
+                    <Flex className="w-2/3 pl-1" vertical justify="center" align="start">
+                        {ProductFinalPrice}
+                        {ProductOriginPrice}
+                    </Flex>
+                    <Flex className="w-1/3 bg-amber-800 h-12" justify="center" align="center">
+                        <p className="text-white text-lg">-{calculateDiscountPercentage(info.originalPrice, info.finalPrice)}%</p>
+                    </Flex>
                 </Flex>
-            </Card>
+            </Flex>
         </>
     )
 }

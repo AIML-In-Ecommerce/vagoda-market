@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@ant-design/nextjs-registry": "^1.0.0",
     "@headlessui/react": "^1.7.18",
     "@lottiefiles/lottie-player": "^2.0.4",
     "@lottiefiles/react-lottie-player": "^3.5.3",
@@ -19,8 +20,8 @@
     "react": "^18",
     "react-dom": "^18",
     "react-icons": "^5.0.1",
-    "react-intersection-observer": "^9.8.1",
-    "react-image-magnify": "^2.7.4"
+    "react-image-magnify": "^2.7.4",
+    "react-intersection-observer": "^9.8.1"
   },
   "devDependencies": {
     "@types/node": "^20",

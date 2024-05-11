@@ -1,10 +1,13 @@
-import React, { useRef, useState } from "react";
+"use client";
+
+import React, { useEffect, useRef, useState } from "react";
 // import Image from "next/image";
 import { Button, Image, Tooltip } from "antd";
 import { HiHeart, HiOutlineHeart } from "react-icons/hi2";
 import { PiShoppingCart } from "react-icons/pi";
 
 interface ProductItemProps {
+  size: string | undefined;
   imageLink: string;
   name: string;
   rating: number;
@@ -15,11 +18,54 @@ interface ProductItemProps {
   inWishlist: boolean;
 }
 export default function ProductItem(props: ProductItemProps) {
+  const SmallScaleSize: ScaleSize = {
+    rootContainerHeight: "h-60",
+    innerContainerWeightHeight: "w-48 h-48",
+    lottieWidth: "240px",
+    lottieHeight: "240px",
+    infoBlockTop: "top-32",
+    cartButtonSize: 16,
+  };
+
+  const MediumScaleSize: ScaleSize = {
+    rootContainerHeight: "h-72",
+    innerContainerWeightHeight: "h-56 w-56",
+    lottieWidth: "26px",
+    lottieHeight: "260px",
+    infoBlockTop: "top-40",
+    cartButtonSize: 16,
+  };
+
+  const LargeScaleSize: ScaleSize = {
+    rootContainerHeight: "h-96",
+    innerContainerWeightHeight: "w-64 h-64",
+    lottieWidth: "300px",
+    lottieHeight: "300px",
+    infoBlockTop: "top-48",
+    cartButtonSize: 16,
+  };
+
   const [showAnimation, setShowAnimation] = useState(false);
+  const [scaleSize, setScaleSize] = useState<ScaleSize>(LargeScaleSize);
+
   const ref = useRef(null);
   React.useEffect(() => {
     require("@lottiefiles/lottie-player");
   });
+
+  useEffect(() => {
+    if (props.size == ProductItemScaleSize.small) {
+      setScaleSize(SmallScaleSize);
+    } else if (props.size == ProductItemScaleSize.medium) {
+      setScaleSize(MediumScaleSize);
+    } else if (props.size == ProductItemScaleSize.large) {
+      setScaleSize(LargeScaleSize);
+    } //undefinded
+    else {
+      setScaleSize(LargeScaleSize);
+    }
+  }, [props.size]);
+
   const lottie = showAnimation ? (
     <lottie-player
       id="firstLottie"
@@ -28,7 +74,10 @@ export default function ProductItem(props: ProductItemProps) {
       loop
       mode="normal"
       src="https://lottie.host/5372b19b-fb7f-40f5-90fc-a3ae60187b65/thLcXtFJQd.json"
-      style={{ width: "300px", height: "300px" }}
+      style={{
+        width: `${scaleSize.lottieWidth}`,
+        height: `${scaleSize.lottieHeight}`,
+      }}
       className="absolute bottom-4"
     ></lottie-player>
   ) : null;
@@ -71,8 +120,10 @@ export default function ProductItem(props: ProductItemProps) {
   });
 
   return (
-    <div className="container h-96">
-      <div className=" container relative w-64 h-64 rounded-lg shadow-xl border  transition-transform duration-300 hover:scale-105 hover:shadow-lg">
+    <div className={`container ${scaleSize.rootContainerHeight}`}>
+      <div
+        className={`container relative ${scaleSize.innerContainerWeightHeight} rounded-lg shadow-xl border  transition-transform duration-300 hover:scale-105 hover:shadow-lg`}
+      >
         {/* Hình ảnh sản phẩm */}
         {/* <div className="relative w-full h-full overflow-hidden rounded-lg shadow-xl border">
         <img
@@ -127,7 +178,9 @@ export default function ProductItem(props: ProductItemProps) {
           />
         </div>
 
-        <div className="absolute top-48 left-1/2 transform -translate-x-1/2 w-11/12 h-2/3 z-10 bg-white rounded-lg shadow-xl border">
+        <div
+          className={`absolute ${scaleSize.infoBlockTop} left-1/2 transform -translate-x-1/2 w-11/12 h-2/3 z-10 bg-white rounded-lg shadow-xl border`}
+        >
           <div className="p-4 space-y-2 text-sm ">
             <p className="font-bold overflow-hidden line-clamp-2">
               {props.name}
@@ -168,8 +221,11 @@ export default function ProductItem(props: ProductItemProps) {
                 type="primary"
                 className=" p-1 bg-theme flex items-center "
               >
-                <PiShoppingCart size={16} />
-                <span className="ml-1">Cart</span>
+                <PiShoppingCart size={scaleSize.cartButtonSize} />
+                {props.size == ProductItemScaleSize.large ||
+                props.size == undefined ? (
+                  <span className="ml-1">Cart</span>
+                ) : undefined}
               </Button>
             </div>
           </div>
