@@ -12,68 +12,36 @@ import {
   Badge,
   Descriptions,
   DescriptionsProps,
-  Divider,
   Flex,
   FloatButton,
   List,
-  Progress,
   Rate,
   Skeleton,
   Tabs,
   Image as AntdImage,
-  Popover,
   Affix,
-  InputNumber,
   Button,
 } from "antd";
-import ReviewList from "./ReviewList";
+import ReviewList from "../review/ReviewList";
 import FloatingCartForm from "./FloatingCartForm";
 import ComboList from "./ComboList";
 import Link from "next/link";
 import CartSummaryModal from "./ProductSummaryModal";
 import ReactImageMagnify from "react-image-magnify";
-import { POST_GetProductDetail } from "@/app/apis/product/ProductDetailAPI";
+import { GET_GetProductDetail } from "@/app/apis/product/ProductDetailAPI";
 import { useParams } from "next/navigation";
 import { ProductDetailType } from "@/model/ProductType";
 import CustomEmpty from "../shop/mini/CustomEmpty";
+import { QuantityControl } from "@/component/user/utils/QuantityControl";
+import ReviewSummary from "../review/ReviewSummary";
+import { ProductStatusToStringConverter } from "@/component/user/utils/ProductStatusConverter";
 
 export default function ProductDetail() {
   const { productId } = useParams();
 
-  const productInfo: ProductDetailType = {
-    _id: "string",
-    name: "Áo Polo Nam Pique Cotton USA",
-    // attribute: {
-    //   ....
-    // }
-    description: "string",
-    originalPrice: 8900000,
-    finalPrice: 4900000,
-    category: "string",
-    shopId: "string",
-    status: 0,
-    image: [
-      "https://cdn.shopify.com/s/files/1/0023/1342/0889/products/ClassicShirt_White_1_5cd5bf10-af18-4d0b-a477-bc3422d8401a.jpg?v=1688497040",
-      // "https://dictionary.cambridge.org/images/thumb/shirt_noun_002_33400.jpg?version=6.0.11",
-      "https://www.aristobrat.in/cdn/shop/files/ClassicShirt_White_1.jpg?v=1709556583&width=2048",
-      "https://static.nike.com/a/images/t_PDP_1280_v1/f_auto,q_auto:eco/1ea7ed04-5964-4ad8-a224-b884d15fb60c/sportswear-oversized-t-shirt-ptNVST.png",
-
-      // "https://www.aristobrat.in/cdn/shop/files/ClassicShirt_White_1.jpg?v=1709556583&width=2048",
-      // "https://www.aristobrat.in/cdn/shop/files/ClassicShirt_White_1.jpg?v=1709556583&width=2048",
-
-      // "https://www.aristobrat.in/cdn/shop/files/ClassicShirt_White_1.jpg?v=1709556583&width=2048",
-      // "https://www.aristobrat.in/cdn/shop/files/ClassicShirt_White_1.jpg?v=1709556583&width=2048",
-      // "https://www.aristobrat.in/cdn/shop/files/ClassicShirt_White_1.jpg?v=1709556583&width=2048",
-      // "https://www.aristobrat.in/cdn/shop/files/ClassicShirt_White_1.jpg?v=1709556583&width=2048",
-      // "https://www.aristobrat.in/cdn/shop/files/ClassicShirt_White_1.jpg?v=1709556583&width=2048",
-    ],
-    avgRating: 0,
-    soldQuantity: 0,
-  };
-
   const [product, setProduct] = useState<ProductDetailType>();
 
-  // replace this with html component from seller page
+  // TODO: replace this with html component from seller page
   const items: DescriptionsProps["items"] = [
     // key can be index, label is title, children is content
     // TODO: make span configurable?
@@ -126,7 +94,7 @@ export default function ProductDetail() {
     },
   ];
 
-  // images
+  // images for zoom lens
   type ImageInfoType = {
     width: number;
     height: number;
@@ -156,7 +124,7 @@ export default function ProductDetail() {
   // number of reviews
   const [numberOfReview, setNumberOfReview] = useState(0);
 
-  // price
+  // price--------------------------------------------------------
   // number of main item
   const [numberOfItem, setNumberOfItem] = useState(1);
 
@@ -170,6 +138,7 @@ export default function ProductDetail() {
     if (!product) return 0;
     return numberOfItem * product.finalPrice + totalComboPrice;
   }, [totalComboPrice, numberOfItem, product]);
+  //----------------------------------------------------------------
 
   // image col
   const imageCol = useMemo(() => {
@@ -192,112 +161,6 @@ export default function ProductDetail() {
 
   // modal
   const [open, setOpen] = useState(false);
-
-  // review summary
-  const reviewSummary = (
-    <div>
-      {product && (
-        <div className="sticky bg-white rounded-xl mt-2 border-2 top-0 p-3 flex flex-col md:flex-row lg:flex-col items-center">
-          <div id="star-review-summary">
-            <Popover
-              title="Thống kê chung"
-              content={
-                <div>
-                  <Flex vertical gap="small" style={{ width: 300 }}>
-                    <Flex gap="small">
-                      <Rate
-                        disabled
-                        defaultValue={5}
-                        style={{ padding: 5, fontSize: 10 }}
-                      />
-                      <Flex gap="small" style={{ width: 180 }}>
-                        <Progress percent={66} size="small" />
-                      </Flex>
-                    </Flex>
-                    <Flex gap="small">
-                      <Rate
-                        disabled
-                        defaultValue={4}
-                        style={{ padding: 5, fontSize: 10 }}
-                      />
-                      <Flex gap="small" style={{ width: 180 }}>
-                        <Progress percent={33} size="small" />
-                      </Flex>
-                    </Flex>
-                    <Flex gap="small">
-                      <Rate
-                        disabled
-                        defaultValue={3}
-                        style={{ padding: 5, fontSize: 10 }}
-                      />
-                      <Flex gap="small" style={{ width: 180 }}>
-                        <Progress percent={1} size="small" />
-                      </Flex>
-                    </Flex>
-                    <Flex gap="small">
-                      <Rate
-                        disabled
-                        defaultValue={2}
-                        style={{ padding: 5, fontSize: 10 }}
-                      />
-                      <Flex gap="small" style={{ width: 180 }}>
-                        <Progress percent={0} size="small" />
-                      </Flex>
-                    </Flex>
-                    <Flex gap="small">
-                      <Rate
-                        disabled
-                        defaultValue={1}
-                        style={{ padding: 5, fontSize: 10 }}
-                      />
-                      <Flex gap="small" style={{ width: 180 }}>
-                        <Progress percent={0} size="small" />
-                      </Flex>
-                    </Flex>
-                  </Flex>
-                </div>
-              }
-            >
-              <div className="flex flex-col cursor-pointer items-center gap-2 w-max">
-                <div className="font-bold uppercase text-sm md:text-sm">
-                  đánh giá sản phẩm
-                </div>
-                <div className="font-extrabold uppercase text-2xl md:text-6xl">
-                  {product.avgRating}
-                </div>
-                <Rate
-                  disabled
-                  allowHalf
-                  defaultValue={product.avgRating}
-                  style={{ padding: 5, fontSize: 28 }}
-                />
-                <div className="italic pb-5 text-[9px] md:text-sm">
-                  {numberOfReview} đánh giá
-                </div>
-              </div>
-            </Popover>
-          </div>
-
-          <div id="ai-review-summary" className="mb-5 md:pl-5 lg:pl-0">
-            <div className="font-bold md:pt-5 text-sm md:text-lg">
-              TechZone Assistant 🤖
-            </div>
-
-            <div className="font-semibold pt-5 text-xs md:text-sm">
-              Tổng quan đánh giá khách hàng:
-            </div>
-            <div className="pt-2 text-xs md:text-sm">
-              Tổng thể, iRobot Roomba 980 là một sự lựa chọn tốt cho người tiêu
-              dùng muốn đầu tư vào một robot hút bụi thông minh và hiệu quả. Với
-              hiệu suất hút bụi mạnh mẽ, tính năng thông minh và khả năng vận
-              hành linh hoạt, Roomba 980 sẽ giúp giảm bớt công việc lau chùi và
-              mang lại một không gian sống sạch sẽ hơn.
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
 
   // review summary visibility
   const [reviewSummaryVisibility, setReviewSummaryVisibility] = useState(true);
@@ -340,6 +203,9 @@ export default function ProductDetail() {
 
   // all reviews
   const allReviews = <ReviewList setNumberOfReview={setNumberOfReview} />;
+  const reviewSummary = (
+    <ReviewSummary product={product} numberOfReview={numberOfReview} />
+  );
 
   // tabs, descriptions and review summary
   const tabItems = [
@@ -348,38 +214,7 @@ export default function ProductDetail() {
       label: "Mô tả",
       key: "1",
       children: (
-        <div className="p-2">
-          <b>Tổng Quan: </b>
-          Robot hút bụi đã trở thành một phần không thể thiếu trong cuộc sống
-          hiện đại, và iRobot Roomba 980 là một trong những sự lựa chọn hàng đầu
-          trong thị trường này. Với nhiều tính năng thông minh và hiệu suất tốt,
-          Roomba 980 hứa hẹn mang lại sự thuận tiện và sạch sẽ cho gia đình của
-          bạn.
-          <br />
-          <b>Hiệu Suất Hút Bụi: </b>
-          Roomba 980 có một hệ thống hút bụi mạnh mẽ với công nghệ hút
-          AeroForce, giúp làm sạch hiệu quả cả trên các bề mặt cứng và thảm. Bộ
-          cảm biến thông minh giúp robot nhận biết các khu vực bẩn và tăng cường
-          hút ở những vùng đó.
-          <br />
-          <b>Tính Năng Thông Minh: </b>
-          Với tính năng điều khiển từ xa thông qua ứng dụng di động, Roomba 980
-          cho phép bạn kiểm soát và lập lịch trình hút bụi một cách linh hoạt.
-          Hệ thống điều hướng iAdapt 2.0 cùng với các cảm biến giúp robot tránh
-          va chạm và điều hướng thông minh trong không gian, tránh các vật cản
-          và lên các bề mặt khác nhau một cách dễ dàng.
-          <br />
-          <b>Thời Lượng Pin: </b>
-          Một điểm yếu nhỏ của Roomba 980 là thời lượng pin không được dài lâu
-          như mong đợi. Trong điều kiện sử dụng thông thường, pin có thể đủ cho
-          việc hút bụi trong khoảng 1-2 giờ, tùy thuộc vào cấp độ sạch sẽ của
-          không gian.
-          <br />
-          <b>Dễ Dàng Vệ Sinh: </b>
-          Việc vệ sinh và bảo dưỡng Roomba 980 cũng khá đơn giản. Bộ lọc và
-          thùng chứa bụi dễ dàng tháo rời và làm sạch. Bạn chỉ cần thường xuyên
-          làm sạch các phần này để đảm bảo hiệu suất hút bụi tốt nhất.
-        </div>
+        <div className="p-2">{product && <div>{product.description}</div>}</div>
       ),
     },
     {
@@ -417,6 +252,30 @@ export default function ProductDetail() {
   ];
 
   // functions
+  const onIncrement = (key: React.Key, value: number) => {
+    if (value === 100) return;
+    setNumberOfItem(value + 1);
+  };
+
+  const onDecrement = (key: React.Key, value: number) => {
+    if (value === 1) return;
+    setNumberOfItem(value - 1);
+  };
+
+  const onQuantityChange = (key: React.Key, value: number) => {
+    // Update the 'amount' field of the product with the specified key
+    if (value) {
+      setNumberOfItem(value);
+    }
+  };
+
+  const discountPercentage = useMemo(() => {
+    if (!product) return 0;
+    return Math.round(
+      ((product.originalPrice - product.finalPrice) / product.originalPrice) *
+        100
+    );
+  }, [product]);
 
   // call api
   useEffect(() => {
@@ -429,21 +288,19 @@ export default function ProductDetail() {
   }, [product]);
 
   const handleGetProductDetail = async () => {
-    const response = await POST_GetProductDetail(productId.toString());
+    const response = await GET_GetProductDetail(productId.toString());
     if (response.status == 200) {
-      // console.log(response.message);
-
       let data = response.data as ProductDetailType;
       if (data) {
         setProduct(data);
         console.log("product", data);
       }
-    }
+    } else console.log(response.message);
   };
 
   return (
     <div>
-      {product && (
+      {(product && (
         <div className="justify-between mx-10 lg:px-10 pb-10 gap-5 h-fit overflow-hidden relative">
           <div className="">
             {/* about product */}
@@ -567,7 +424,7 @@ export default function ProductDetail() {
                     style={{ padding: 5, fontSize: 30 }}
                   />
                   <div className="font-bold uppercase text-2xl xl:text-3xl">
-                    {product.avgRating}
+                    ({product.avgRating})
                   </div>
                   {/* <div className="text-xs font-light mt-2">
                 ({numberOfReview} đánh giá)
@@ -581,16 +438,21 @@ export default function ProductDetail() {
 
                 {/* price block */}
                 <div className="row-start-3 flex flex-col justify-center">
-                  <div className="line-through text-slate-300 uppercase text-sm md:text-lg xl:text-xl">
-                    {priceIndex(product.originalPrice)}
-                  </div>
+                  {discountPercentage !== 0 && (
+                    <div className="line-through text-slate-300 uppercase text-sm md:text-lg xl:text-xl">
+                      {priceIndex(product.originalPrice)}
+                    </div>
+                  )}
+
                   <div className="flex flex-row gap-3">
                     <div className="font-bold text-red-500 uppercase text-xl md:text-2xl xl:text-4xl">
                       {priceIndex(product.finalPrice)}
                     </div>
-                    <div className="text-red-500 uppercase text-xs mt-1">
-                      -50%
-                    </div>
+                    {discountPercentage !== 0 && (
+                      <div className="text-red-500 uppercase text-xs mt-1">
+                        -{discountPercentage}%
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -599,7 +461,7 @@ export default function ProductDetail() {
                     Tình trạng:{" "}
                   </div>
                   <div className="col-span-1 col-start-2 pt-3">
-                    {product.status}
+                    {ProductStatusToStringConverter(product.status)}
                   </div>
                   <div className="col-span-1 col-start-1 font-bold pt-3">
                     Đã bán:{" "}
@@ -610,12 +472,20 @@ export default function ProductDetail() {
                 </div>
 
                 {/* buttons block  */}
-                <div className="row-start-5 xl:row-start-6 items-center flex">
-                  {/* temp */}
-                  <InputNumber size="large" />
-                  {/* <Button block size="large">
-                Thêm vào giỏ hàng
-              </Button> */}
+                <div className="row-start-5 xl:row-start-6 items-center flex gap-2">
+                  <QuantityControl
+                    componentSize={5}
+                    keyProp={0}
+                    value={numberOfItem}
+                    minValue={1}
+                    maxValue={100}
+                    defaultValue={1}
+                    inputWidth={75}
+                    onIncrement={onIncrement}
+                    onDecrement={onDecrement}
+                    onQuantityChange={onQuantityChange}
+                  />
+
                   <Button
                     type="primary"
                     href="/cart"
@@ -693,7 +563,7 @@ export default function ProductDetail() {
             totalComboPrice={totalComboPrice}
           />
         </div>
-      )}
+      )) || <Skeleton active style={{ margin: 10 }} />}
     </div>
   );
 }

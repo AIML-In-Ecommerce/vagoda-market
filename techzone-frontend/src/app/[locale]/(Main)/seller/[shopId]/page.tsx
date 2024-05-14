@@ -1,7 +1,7 @@
 "use client";
 import Banner from "@/component/customer/shop/Banner";
 import ProductList from "../../product-list/page";
-import { Input, Tabs } from "antd";
+import { Input, Skeleton, Tabs } from "antd";
 import AboutShop, { shopDetailType } from "@/component/customer/shop/AboutShop";
 const { Search } = Input;
 
@@ -18,6 +18,9 @@ import { useEffect, useState } from "react";
 import WidgetList from "@/component/customer/shop/WidgetList";
 import Collections from "@/component/customer/shop/collection/Collections";
 import { SearchProps } from "antd/es/input";
+import { ShopType } from "@/model/ShopType";
+import { useParams } from "next/navigation";
+import { GET_GetShop } from "@/app/apis/shop/ShopAPI";
 
 interface ShopInfoProps {
   color: string;
@@ -147,11 +150,16 @@ export default function ShopPage() {
   };
 
   //variables
+
   const [widgets, setWidgets] = useState<WidgetType[]>(widgetList);
-  const [shopInfo, setShopInfo] = useState<ShopInfoProps>(shopInfoData);
+  const [shopInfo, setShopInfo] = useState<ShopInfoProps>();
   const [shopDetail, setShopDetail] = useState<shopDetailType>(shopDetailData);
   const [tab, setTab] = useState<string>("0");
   const [selectedCollectionId, setSelectedCollectionId] = useState("");
+
+  const { shopId } = useParams();
+  const [shop, setShop] = useState<ShopType>();
+
   // TODO
   const [searchText, setSearchText] = useState("");
 
@@ -174,7 +182,7 @@ export default function ShopPage() {
         <div className="p-2">
           {/* temp */}
 
-          {/* // Filter menu items based on search text
+          {/* // TODO: Filter menu items based on search text
             // .filter((item) =>
             //   item.name.toLowerCase().includes(searchText.toLowerCase())
             // ) */}
@@ -220,15 +228,69 @@ export default function ShopPage() {
     setSearchText(value);
   };
 
+  // call api
+  useEffect(() => {
+    handleGetShop();
+  }, []);
+
+  useEffect(() => {
+    if (!shop) return;
+    if (shop.shopInfoDesign) {
+      setShopInfo({
+        color: shop.shopInfoDesign.color,
+        name: shop.name,
+        avatarUrl: shop.shopInfoDesign.name,
+        bannerUrl: shop.shopInfoDesign.bannerUrl,
+      });
+    } else
+      setShopInfo({
+        color: "white",
+        name: shop.name,
+        avatarUrl: "",
+        bannerUrl: "",
+      });
+
+    if (shop.shopDetail) {
+      setShopDetail({
+        cancelPercentage: shop.shopDetail.cancelPercentage,
+        refundPercentage: shop.shopDetail.refundPercentage,
+        sinceYear: shop.shopDetail.sinceYear,
+        totalProductNumber: shop.shopDetail.totalProductNumber,
+        description: shop.description,
+        rating: shop.shopDetail.rating,
+        replyPercentage: shop.shopDetail.replyPercentage,
+        address: shop.location,
+      });
+    }
+
+    if (shop.design && shop.design.length > 0) {
+      // TODO: get widgets and update them
+    }
+  }, [shop]);
+
+  const handleGetShop = async () => {
+    const response = await GET_GetShop(shopId.toString());
+    if (response.status == 200) {
+      // console.log(response.data);
+
+      let data = response.data as ShopType;
+      if (data) {
+        setShop(data);
+      }
+    }
+  };
+
   return (
     <div className="mx-20 pb-10 h-fit overflow-hidden">
       <section id="top-content" />
-      <Banner
-        color={shopInfo.color}
-        name={shopInfo.name}
-        avatarUrl={shopInfo.avatarUrl}
-        bannerUrl={shopInfo.bannerUrl}
-      />
+      {(shopInfo && (
+        <Banner
+          color={shopInfo.color}
+          name={shopInfo.name}
+          avatarUrl={shopInfo.avatarUrl}
+          bannerUrl={shopInfo.bannerUrl}
+        />
+      )) || <Skeleton active style={{ margin: 10 }} />}
 
       <Tabs
         defaultActiveKey="0"
