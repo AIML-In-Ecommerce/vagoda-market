@@ -1,5 +1,5 @@
 "use client";
-import { AddressType } from '@/model/AddressType';
+import { Address, AddressType } from '@/model/AddressType';
 import { Select, Radio, Checkbox, Button, Input, CheckboxProps, RadioChangeEvent, Form } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 import React, { useEffect, useState } from 'react';
@@ -28,7 +28,7 @@ export function AddressForm(props: AddressFormProps) {
     const [addressInfo, setAddressInfo] = useState<AddressType | undefined>(props.currentAddress);
     const [name, setName] = useState<string | undefined>(props.currentAddress?.receiverName);
     const [phoneNumber, setPhoneNumber] = useState<string | undefined>(props.currentAddress?.phoneNumber);
-    const [address, setAddress] = useState<string | undefined>(props.currentAddress?.address);
+    const [address, setAddress] = useState<Address | undefined>(props.currentAddress?.address);
     const [selectedAsDefault, setSelectedAsDefault] = useState<boolean | undefined>(props.currentAddress?.selectedAsDefault);
     const [addressType, setAddressType] = useState<string | undefined>(props.currentAddress?.addressType);
 
@@ -127,7 +127,7 @@ export function AddressForm(props: AddressFormProps) {
                         // onChange={onChange}
                         placeholder={`${address ?? "Ví dụ: 227, đường Nguyễn Văn Cừ"}`}
                         style={{ height: 100, resize: 'none' }}
-                        value={address} onChange={(e) => setAddress(e.target.value)}
+                        // value={address} onChange={(e) => setAddress(Address.fromString(e.target.value))}
                     />
                 </Form.Item>
                 <Form.Item label={

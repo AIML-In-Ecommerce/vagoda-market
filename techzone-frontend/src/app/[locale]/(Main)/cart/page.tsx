@@ -1,17 +1,21 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
-import { Button, Card, Modal, Space, Table, Image, Tooltip, Skeleton, Select } from 'antd';
-import type { TableColumnsType } from 'antd';
+import { Button, Card, Modal, Space, Table, Image, Tooltip, Skeleton, Select, Radio, Divider } from 'antd';
+import type { RadioChangeEvent, TableColumnsType } from 'antd';
 import { FaRegTrashCan, FaRegCircleQuestion } from "react-icons/fa6";
 import { Currency } from "@/component/user/utils/CurrencyDisplay";
 import { QuantityControl } from "@/component/user/utils/QuantityControl";
-import { AddressType } from "@/model/AddressType";
+import { Address, AddressType } from "@/model/AddressType";
 import Search from "antd/es/transfer/search";
-import FloatingCartSummary from "@/component/customer/product/FloatingCartSummary";
 import { DiscountType, PromotionType } from "@/model/PromotionType";
 import PromotionCard from "@/component/customer/product/PromotionCard";
 import crypto from 'crypto';
 import styled from 'styled-components'
+import Link from "next/link";
+import { RiContactsBookLine } from "react-icons/ri";
+import DeliveryInfoForm from "@/component/customer/cart/DeliveryInfoForm";
+import TransactionSection from "@/component/customer/cart/TransactionSection";
+import PromotionSection from "@/component/customer/cart/PromotionSection";
 
 type CartPageType = {
     key: React.Key;
@@ -78,20 +82,28 @@ export default function CartPage() {
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
     const [selectedKey, setSelectedKey] = useState<React.Key | null>(null)
     const [loading, setLoading] = useState(false);
-    const [top, setTop] = React.useState<number>(50);
     const [provisional, setProvisional] = useState(0);
     const [discount, setDiscount] = useState(0);
+    const [shippingFee, setShippingFee] = useState(0);
     const [discounts, setDiscounts] = useState<PromotionType[]>([]);
     const [total, setTotal] = useState(0);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showDeleteManyModal, setShowDeleteManyModal] = useState(false);
     const [showPromotionModal, setShowPromotionModal] = useState(false);
+    const [paymentMethod, setPaymentMethod] = useState<string>('cash_on_delivery');
     const promotion_help = "Áp dụng tối đa 1 Mã giảm giá Sản Phẩm và 1 Mã Vận Chuyển"
 
     const [currentAddress, setCurrentAddress] = useState<AddressType>({
         _id: '1',
         receiverName: 'Nguyễn Minh Quang',
-        address: "135B Trần Hưng Đạo, Phường Cầu Ông Lãnh, Quận 1, Hồ Chí Minh, Việt Nam",
+        address: {
+            street: "135B Trần Hưng Đạo",
+            idProvince: "79",
+            idDistrict: "760",
+            idCommune: "26752",
+            country: "Việt Nam"
+        }
+        ,
         phoneNumber: "0839994856",
         addressType: "residential",
         selectedAsDefault: true
@@ -138,7 +150,7 @@ export default function CartPage() {
                 discountValue: 50,
                 quantity: 6,
                 upperBound: 100000,
-                expiredDate: formatDate(new Date('2024-03-24T12:30:00')), // 
+                expiredDate: formatDate(new Date('2024-05-30T12:30:00')), // 
                 code: ""
             },
             {
@@ -149,7 +161,7 @@ export default function CartPage() {
                 discountValue: 200000,
                 quantity: 20,
                 lowerBound: 400000,
-                expiredDate: formatDate(new Date('2024-03-27T12:30:00')),
+                expiredDate: formatDate(new Date('2024-06-27T12:30:00')),
                 code: ""
             },
             {
@@ -198,38 +210,38 @@ export default function CartPage() {
         const data: CartPageType[] = [
             {
                 key: '1',
-                image: 'https://akko.vn/wp-content/uploads/2023/07/3098-RF-Dracula-Castle-01.png',
-                name: 'Bàn phím AKKO 3098 RF Dracula Castle Akko Switch V3 Cream Yellow',
-                unit_price: 1690000,
+                image: 'https://media3.coolmate.me/cdn-cgi/image/quality=80,format=auto/uploads/March2024/att.sn.xaq.5.png',
+                name: 'Áo Sát Nách Nam Thể Thao Promax',
+                unit_price: 189000,
                 amount: 1
 
             },
             {
                 key: '2',
-                image: 'https://product.hstatic.net/200000722513/product/gearvn-man-hinh-e-dra-egm25f100-25-ips-100hz-1_1ac2962172cc4030a2a09485eac87191_1024x1024.jpg',
-                name: 'Màn hình E-DRA EGM25F100 25" IPS 100Hz',
-                unit_price: 2190000,
+                image: 'https://media3.coolmate.me/cdn-cgi/image/quality=80,format=auto/uploads/April2023/zDSC05002_copy.jpg',
+                name: 'Áo Singlet chạy bộ Fast & Free',
+                unit_price: 189000,
                 amount: 1
             },
             {
                 key: '3',
-                image: 'https://product.hstatic.net/200000722513/product/g502x-plus-gallery-2-white_69229c9ba5534ad5bfae7d827037a28f_365394a31b6342e4949249099adb755e_1024x1024.png',
-                name: 'Chuột Logitech G502 X Plus LightSpeed White',
+                image: 'https://down-vn.img.susercontent.com/file/vn-11134207-23020-4p4muea2hjnv80.png',
+                name: 'Bộ đồ Maid dài',
                 unit_price: 309000,
                 amount: 1
             },
             {
                 key: '4',
-                image: 'https://product.hstatic.net/200000722513/product/54078_ghe_cong_thai_hoc_edra_eec219_black_4_e9645318c0814037b24162c5d2d767b9_1024x1024.jpg',
-                name: 'Ghế công thái học E-Dra EEC219',
-                unit_price: 2590000,
+                image: 'https://media3.coolmate.me/cdn-cgi/image/quality=80,format=auto/uploads/November2023/Hoodie_Reu_1.jpg',
+                name: 'Áo Hoodie Essential',
+                unit_price: 499000,
                 amount: 1
             },
             {
                 key: '5',
-                image: 'https://product.hstatic.net/200000722513/product/hinh-1_2735fbceb0a14ddb955bdf64b63e45b7_ac360205755f44648b50ec4bcf0a7fcd_1024x1024.gif',
-                name: 'Tai nghe Corsair HS55 Wireless Core Black (CA-9011290-AP)',
-                unit_price: 1540000,
+                image: 'https://media3.coolmate.me/cdn-cgi/image/quality=80,format=auto/uploads/April2023/2uIMG_1077_copy.jpg',
+                name: 'Áo Sơ mi dài tay Café-DriS',
+                unit_price: 429000,
                 amount: 1
             },
 
@@ -397,7 +409,7 @@ export default function CartPage() {
                             <div className="flex flex-row">
                                 <div className="flex flex-col gap-1">
                                     <div className="text-sm font-bold text-ellipsis overflow-hidden">{record.name}</div>
-                                    <div className="text-sm text-gray-500 mb-1">Category1 / Category2</div>
+                                    <div className="text-sm text-gray-500 mb-1">Vàng / XS</div>
                                     <SelectWrapper className="flex flex-row gap-2 mb-1">
                                         <Select
                                             defaultValue="yellow"
@@ -410,18 +422,21 @@ export default function CartPage() {
                                             ]}
                                         />
                                         <Select
-                                            defaultValue="red"
+                                            defaultValue="xs"
                                             style={{ width: 75 }}
                                             // onChange={handleChange}
                                             options={[
-                                                { value: 'red', label: 'Đỏ' },
-                                                { value: 'green', label: 'Xanh' },
-                                                { value: 'yellow', label: 'Vàng' },
+                                                { value: 'xs', label: 'XS' },
+                                                { value: 's', label: 'S' },
+                                                { value: 'm', label: 'M' },
+                                                { value: 'l', label: 'L' },
+                                                { value: 'xl', label: 'XL' },
+                                                { value: '2xl', label: '2XL' },
                                             ]}
                                         />
                                     </SelectWrapper>
                                     <div style={{ width: 75 }} onClick={() => handleShowDeleteOneModal(record.key)}>
-                                        <div className="flex flex-row items-center gap-1 hover:font-semibold">
+                                        <div className="flex flex-row cursor-pointer items-center gap-1 hover:font-semibold">
                                             <FaRegTrashCan /> Xóa
                                         </div>
                                     </div>
@@ -488,21 +503,103 @@ export default function CartPage() {
     useEffect(() => {
         const storedAddress = localStorage.getItem('shippingAddress');
         if (!storedAddress) return;
-        setCurrentAddress(JSON.parse(storedAddress) as AddressType);
+        const storedAddressObject = JSON.parse(storedAddress) as AddressType;
+        const completedAddressObject = { ...storedAddressObject, address: storedAddressObject.address as Address } as AddressType;
+        setCurrentAddress(completedAddressObject);
+        console.log('currentAddress', completedAddressObject);
     }, []);
-
-
 
     const goToShippingAddressPage = () => {
         localStorage.setItem('shippingAddress', JSON.stringify(currentAddress));
     }
 
+    const payment_options = [
+        {
+            label: 'COD',
+            description: 'Thanh toán bằng tiền mặt khi nhận hàng',
+            value: 'cash_on_delivery',
+            icon: 'https://cdn-icons-png.flaticon.com/512/1554/1554401.png'
+        },
+        {
+            label: 'Thanh toán bằng ví ZaloPay',
+            description: "Thẻ ATM / Thẻ tín dụng (Credit card) / Thẻ ghi nợ (Debit card)",
+            value: 'zalopay_wallet',
+            icon: "https://web.venusagency.vn/uploads/public/2021/06/03/1622682588188_zalopay.png"
+        },
+        {
+            label: 'Thanh toán qua Paypal',
+            description: "Thẻ tín dụng (Credit card) / Thẻ ghi nợ (Debit card)",
+            value: 'paypal_wallet',
+            icon: "https://cdn.iconscout.com/icon/free/png-256/free-paypal-58-711793.png"
+        },
+    ];
+
+    const onPaymentMethodChange = (e: RadioChangeEvent) => {
+        console.log('radio checked', e.target.value);
+        setPaymentMethod(e.target.value);
+    };
+
+    const GreyoutWrapper = styled.div`
+        .ant-image {
+            transition: filter 0.3s; /* Smooth transition for the filter effect */
+        }
+
+        /* When the radio not is selected or not hovered over, apply greyscale filter */
+        .ant-radio-wrapper:not(.ant-radio-wrapper-checked):not(:hover) .ant-image {
+            filter: grayscale(100%);
+        }        
+    `
+
     return (
         <React.Fragment>
-            <div className="container flex flex-col p-5 mx-auto my-5">
+            <div className="container flex flex-col p-5 mx-auto my-5 overflow-hidden">
                 <div className="mt-5 flex xs:flex-col sm:flex-col md:flex-col lg:grid lg:grid-cols-6 gap-2 relative">
-                    <div className="lg:col-start-1 lg:col-span-3 lg:mb-0 mb-10">
-                        <div className="text-2xl font-bold normal-case p-2">Thông tin vận chuyển</div>
+                    <div className="lg:col-start-1 lg:col-span-3 lg:mb-0 mb-10 p-2 flex flex-col">
+                        {/* Thông tin vận chuyển section */}
+                        <div className="flex flex-row justify-between items-center">
+                            <div className="text-3xl font-bold normal-case">Thông tin vận chuyển</div>
+                            <Link href="/cart/shipping">
+                                <div className="flex flex-row gap-1 text-blue-700 cursor-pointer hover:text-blue-900 items-center">
+                                    <RiContactsBookLine />
+                                    <div className="text-base">Chọn từ sổ địa chỉ</div>
+                                </div>
+                            </Link>
+                        </div>
+                        <div className="mt-5">
+                            {loading ? <Skeleton /> :
+                                <DeliveryInfoForm currentAddress={currentAddress} />
+                            }
+                        </div>
+                        {/* Hình thức thanh toán section */}
+                        <div className="text-3xl font-bold normal-case my-10">Hình thức thanh toán</div>
+                        <Radio.Group onChange={onPaymentMethodChange} value={paymentMethod} size="large" className="w-full">
+                            <div className="flex flex-col gap-2">
+                                {
+                                    payment_options.map(item => {
+                                        return (
+                                            <div className={`border-2 rounded-xl cursor-pointer ${paymentMethod === item.value ? "border-[#9bb0e8]" : "border-gray-200"} mt-1 p-2`}>
+                                                <GreyoutWrapper>
+                                                    <Radio value={item.value} className="w-full text-gray-400 hover:text-black">
+                                                        <div className="flex flex-row items-center">
+                                                            <div className="mr-3">
+                                                                <Image src={item.icon} preview={false} width={40}></Image>
+                                                            </div>
+                                                            <div className="flex flex-col gap-1">
+                                                                <div className={`font-semibold ${paymentMethod === item.value ? "text-black" : ""}`}>{item.label}</div>
+                                                                <div className={`${paymentMethod === item.value ? "text-black" : ""}`}>{item.description}</div>
+                                                            </div>
+
+                                                        </div>
+                                                    </Radio>
+                                                </GreyoutWrapper>
+                                            </div>
+                                        )
+                                    })
+                                }
+                            </div>
+                        </Radio.Group>
+
+
                     </div>
 
                     <div className="lg:col-start-4 lg:col-span-3 lg:w-auto w-full flex flex-col border-l-2 pl-3">
@@ -513,10 +610,10 @@ export default function CartPage() {
                             currentAddress={currentAddress}
                             showPromotionModal={handleShowPromotionModal}
                         /> */}
-                        
-                        <div className="text-2xl font-bold normal-case p-2">Giỏ hàng</div>
+
+                        <div className="text-3xl font-bold normal-case p-2">Giỏ hàng</div>
                         <Table
-                            tableLayout='auto'
+                            // tableLayout='auto'
                             rowSelection={{
                                 type: selectionType,
                                 ...rowSelection,
@@ -528,10 +625,26 @@ export default function CartPage() {
                             //         onClick: () => handleRowClick(record),
                             //       })}
                             loading={loading}
-                            pagination={{ pageSize: 4 }}
+                            pagination={false}
                             scroll={{ x: 'min-content' }}
-
                         />
+                        <Divider style={{ height: "auto", border: "0.25px solid silver" }}></Divider>
+
+                        <PromotionSection
+                            loading={loading}
+                            showPromotionModal={handleShowPromotionModal}
+                            selectedDiscounts={discounts}
+                            allPromotions={promotions}
+                            applyDiscount={applyDiscount}
+                            removeDiscount={removeDiscount} />
+
+                        <Divider style={{ height: "auto", border: "0.25px solid silver" }}></Divider>
+
+                        <TransactionSection
+                            selectedRowKeys={selectedRowKeys}
+                            loading={loading}
+                            provisional={provisional} discount={discount} shippingFee={shippingFee}
+                            total={total} />
                     </div>
                 </div>
             </div>

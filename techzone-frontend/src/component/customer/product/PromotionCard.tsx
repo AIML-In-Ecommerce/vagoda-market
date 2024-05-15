@@ -36,16 +36,18 @@ const handleBackgroundPromotion = (promotions: PromotionType[], item: PromotionT
 
 export default function PromotionCard(props: PromotionCardProps) {
     return (
-        <Card type="inner" className="mb-10 h-32"
+        <Card type="inner" className="mb-10 h-32 w-[437.2px] select-none"
             key={props.item._id}
             style={{
                 backgroundImage: `${handleBackgroundPromotion(props.promotions, props.item)}`,
                 backgroundSize: "100% 100%"
             }}>
             <div className="relative grid h-36">
-                <div className="absolute top-1 z-10 w-16 flex flex-col justify-center items-center">
-                    <img alt="logo" src={LOGO.src}></img>
-                    <div className="font-semibold">TechZone</div>
+                <div className="absolute top-3 z-10 w-16">
+                    <div className="flex flex-col justify-center items-center">
+                        <img alt="logo" src={LOGO.src}></img>
+                        <div className="font-semibold">FashionStyle</div>
+                    </div>
                 </div>
                 <div className="absolute right-0 top-1 text-lg w-auto">
                     <Tooltip title={

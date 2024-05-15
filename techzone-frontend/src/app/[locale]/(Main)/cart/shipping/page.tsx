@@ -4,7 +4,8 @@ import React, { useEffect, useRef, useState } from "react";
 import { FaPlus } from "react-icons/fa6"
 import { useRouter } from "next/navigation"
 import { AddressForm } from "@/component/customer/shipping/AddressForm";
-import { AddressType } from "@/model/AddressType";
+import { Address, AddressType } from "@/model/AddressType";
+import { getFullAddress } from "@/app/apis/cart/AddressAPI";
 
 //utils for testing process
 //source: https://stackoverflow.com/questions/6860853/generate-random-string-for-div-id
@@ -50,7 +51,13 @@ export default function ShippingAddressPage() {
             {
                 _id: '1',
                 receiverName: 'Nguyễn Minh Quang',
-                address: "135B Trần Hưng Đạo, Phường Cầu Ông Lãnh, Quận 1, Hồ Chí Minh, Việt Nam",
+                address: {
+                    street: "135B Trần Hưng Đạo",
+                    idProvince: "79",
+                    idDistrict: "760",
+                    idCommune: "26752",
+                    country: "Việt Nam"
+                },
                 phoneNumber: "0839994856",
                 addressType: "residential",
                 selectedAsDefault: true
@@ -58,7 +65,13 @@ export default function ShippingAddressPage() {
             {
                 _id: '2',
                 receiverName: 'Nguyễn Minh Quang',
-                address: "227, đường Nguyễn Văn Cừ, Phường 4, Quận 5, Hồ Chí Minh, Việt Nam",
+                address: {
+                    street: "227 Nguyễn Văn Cừ",
+                    idProvince: "79",
+                    idDistrict: "774",
+                    idCommune: "27301",
+                    country: "Việt Nam"
+                },
                 phoneNumber: "0839994856",
                 addressType: "workplace",
                 selectedAsDefault: false
@@ -66,7 +79,13 @@ export default function ShippingAddressPage() {
             {
                 _id: '3',
                 receiverName: 'Lê Hoàng Khanh Nguyên',
-                address: "106, đường Phạm Viết Chánh, Phường Nguyễn Cư Trinh, Quận 1, Hồ Chí Minh, Việt Nam",
+                address: {
+                    street: "106, Phạm Viết Chánh",
+                    idProvince: "79",
+                    idDistrict: "760",
+                    idCommune: "26758",
+                    country: "Việt Nam"
+                },
                 phoneNumber: "0773969851",
                 addressType: "workplace",
                 selectedAsDefault: false
@@ -140,7 +159,7 @@ export default function ShippingAddressPage() {
                                 <Card size="small" className={item.selectedAsDefault ? `border-dashed border-green-600` : `border`}>
                                     <div className="flex flex-col relative">
                                         <p className="font-bold uppercase">{item.receiverName}</p>
-                                        <p>Địa chỉ: {item.address}</p>
+                                        <p>Địa chỉ: {getFullAddress(item.address)}</p>
                                         <p>Số điện thoại: {item.phoneNumber}</p>
                                         <p>Loại địa chỉ: {getAddressTypeLabel(item.addressType)}</p>
                                         {

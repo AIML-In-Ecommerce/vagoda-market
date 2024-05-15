@@ -1,6 +1,6 @@
 "use client";
-import FloatingCartSummary from "@/component/customer/product/FloatingCartSummary"
-import { AddressType } from "@/model/AddressType";
+// import FloatingCartSummary from "@/component/customer/product/FloatingCartSummary"
+import { Address, AddressType } from "@/model/AddressType";
 import { PromotionType } from "@/model/PromotionType";
 import { Input, Radio, RadioChangeEvent, Space, Image } from "antd";
 import React, { useState } from "react"
@@ -17,7 +17,13 @@ export default function PaymentPage() {
     const [currentAddress, setCurrentAddress] = useState<AddressType>({
         _id: '1',
         receiverName: 'Nguyễn Minh Quang',
-        address: "135B Trần Hưng Đạo, Phường Cầu Ông Lãnh, Quận 1, Hồ Chí Minh, Việt Nam",
+        address: {
+            street: "227 Nguyễn Văn Cừ",
+            idProvince: "79",
+            idDistrict: "774",
+            idCommune: "27301",
+            country: "Việt Nam"
+        },
         phoneNumber: "0839994856",
         addressType: "residential",
         selectedAsDefault: true
@@ -34,7 +40,7 @@ export default function PaymentPage() {
         { label: 'Thanh toán bằng tiền mặt khi nhận hàng', value: 'cash_on_delivery', icon: 'https://salt.tikicdn.com/ts/upload/92/b2/78/1b3b9cda5208b323eb9ec56b84c7eb87.png' },
         { label: 'Thanh toán bằng ví MoMo', value: 'momo_wallet', icon: "https://salt.tikicdn.com/ts/upload/ce/f6/e8/ea880ef285856f744e3ffb5d282d4b2d.jpg" },
         { label: 'Thanh toán bằng ví ZaloPay', value: 'zalopay_wallet', icon: "https://salt.tikicdn.com/ts/upload/2f/43/da/dd7ded6d3659036f15f95fe81ac76d93.png" },
-        { label: 'Thanh toán thẻ quốc tế Visa, Master...', value: 'credit_card', icon: "https://salt.tikicdn.com/ts/upload/7e/48/50/7fb406156d0827b736cf0fe66c90ed78.png"},
+        { label: 'Thanh toán thẻ quốc tế Visa, Master...', value: 'credit_card', icon: "https://salt.tikicdn.com/ts/upload/7e/48/50/7fb406156d0827b736cf0fe66c90ed78.png" },
     ];
 
     return (
@@ -66,13 +72,7 @@ export default function PaymentPage() {
                     </div>
 
                     <div className="lg:col-start-3 lg:col-span-1 lg:w-auto w-full">
-                        <FloatingCartSummary offsetTop={top}
-                            goToShippingAddressPage={() => { }}
-                            loading={loading} selectedRowKeys={selectedRowKeys}
-                            provisional={provisional} discount={discount} total={total}
-                            currentAddress={currentAddress}
-                            showPromotionModal={() => { }}
-                        />
+
                     </div>
                 </div>
             </div>
