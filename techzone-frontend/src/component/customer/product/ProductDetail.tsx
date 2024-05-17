@@ -21,6 +21,7 @@ import {
   Image as AntdImage,
   Affix,
   Button,
+  Divider,
 } from "antd";
 import ReviewList from "../review/ReviewList";
 import FloatingCartForm from "./FloatingCartForm";
@@ -35,6 +36,7 @@ import CustomEmpty from "../shop/mini/CustomEmpty";
 import { QuantityControl } from "@/component/user/utils/QuantityControl";
 import ReviewSummary from "../review/ReviewSummary";
 import { ProductStatusToStringConverter } from "@/component/user/utils/ProductStatusConverter";
+import SimilarList from "./SimilarList";
 
 export default function ProductDetail() {
   const { productId } = useParams();
@@ -143,7 +145,7 @@ export default function ProductDetail() {
   // image col
   const imageCol = useMemo(() => {
     if (!product) return 1;
-    return product.image.length > 5 ? 2 : 1;
+    return product.images.length > 5 ? 2 : 1;
   }, [product]);
 
   // window size _ ATTEMPT
@@ -166,12 +168,12 @@ export default function ProductDetail() {
   const [reviewSummaryVisibility, setReviewSummaryVisibility] = useState(true);
 
   // ATTEMPT 1
-  // Get the navbar
+  // // Get the navbar
   // const bottom = document.getElementById("page-bottom-boundary");
 
-  // Get the offset position of the navbar
+  // // Get the offset position of the navbar
 
-  // Add the sticky class to the navbar when you reach its scroll position. Remove the sticky class when you leave the scroll position.
+  // // Add the sticky class to the navbar when you reach its scroll position. Remove the sticky class when you leave the scroll position.
   // useEffect(() => {
   //   const sticky = bottom ? bottom.offsetTop : window.scrollY;
 
@@ -284,7 +286,7 @@ export default function ProductDetail() {
 
   useEffect(() => {
     if (!product) return;
-    setMainImage(product.image[0]);
+    setMainImage(product.images[0]);
   }, [product]);
 
   const handleGetProductDetail = async () => {
@@ -313,7 +315,7 @@ export default function ProductDetail() {
                 >
                   <List
                     grid={{ gutter: 20, column: imageCol }}
-                    dataSource={product.image}
+                    dataSource={product.images}
                     locale={{
                       emptyText: <CustomEmpty />,
                     }}
@@ -509,15 +511,13 @@ export default function ProductDetail() {
                 product={{
                   name: product.name,
                   price: product.finalPrice,
-                  mainImage: product.image[0],
+                  mainImage: product.images[0],
                 }}
               />
             </Affix>
 
             {/* related products to buy with  */}
-            <div className="font-semibold px-5 mt-5 text-sm">
-              Sản phẩm có thể kết hợp
-            </div>
+            <div className="px-5 mt-5 text-lg">Sản phẩm có thể kết hợp</div>
 
             <ComboList
               totalPrice={totalPrice}
@@ -545,6 +545,11 @@ export default function ProductDetail() {
                 className="overflow-y-hidden"
               />
             </div>
+
+            <Divider />
+            {/* similar products */}
+            <div className="px-5 mt-5 text-lg">Sản phẩm tương tự</div>
+            <SimilarList />
           </div>
 
           {/* others */}

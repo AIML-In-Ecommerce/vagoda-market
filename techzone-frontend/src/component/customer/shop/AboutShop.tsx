@@ -12,20 +12,10 @@ import {
   InfoCircleOutlined,
 } from "@ant-design/icons";
 import { useState } from "react";
-
-export interface shopDetailType {
-  cancelPercentage: number;
-  refundPercentage: number;
-  sinceYear: number;
-  totalProductNumber: number;
-  description: string;
-  rating: number;
-  replyPercentage: number;
-  address: string;
-}
+import { ShopDetailType } from "@/model/ShopType";
 
 interface AboutProps {
-  shopDetail: shopDetailType;
+  shopDetail: ShopDetailType;
 }
 
 export default function AboutShop(aboutProps: AboutProps) {

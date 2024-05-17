@@ -1,22 +1,23 @@
-type ShopInfoDesignType = {
+export type ShopInfoDesignType = {
   color: string;
-  name: string; // optional
+  name: string;
   avatarUrl: string;
   bannerUrl: string;
 };
 
-type ShopDetailType = {
+export type ShopDetailType = {
   cancelPercentage: number;
   refundPercentage: number;
   sinceYear: number;
   totalProductNumber: number;
-  description: string; //optional
+  description: string;
   rating: number;
   replyPercentage: number;
-  address: string; //optional
+  address: string;
 };
 
 export type ShopType = {
+  _id: string;
   account: string;
   name: string;
   location: string;

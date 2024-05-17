@@ -2,6 +2,7 @@
 import { WidgetType } from "@/model/WidgetType";
 import { Carousel, Image, Skeleton } from "antd";
 import React, { useEffect, useState } from "react";
+import CustomEmpty from "../mini/CustomEmpty";
 
 interface BannerCarouselProps {
   widget: WidgetType;
@@ -183,7 +184,7 @@ export default function BannerCarousel(props: BannerCarouselProps) {
 
   return (
     <div>
-      {carouselImages.length > 0 && (
+      {(carouselImages.length > 0 && (
         <div className="mb-10">
           <div
             className="w-full flex flex-col justify-end items-center relative"
@@ -203,6 +204,10 @@ export default function BannerCarousel(props: BannerCarouselProps) {
               <div className="invisible h-10">hidden block</div>
             </div>
           </div>
+        </div>
+      )) || (
+        <div className="bg-white p-10 my-5">
+          <CustomEmpty />
         </div>
       )}
     </div>

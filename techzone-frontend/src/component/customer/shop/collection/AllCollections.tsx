@@ -26,7 +26,7 @@ export default function AllCollections(props: AllCollectionsProps) {
           xl: 3,
           xxl: 3,
         }}
-        dataSource={props.collections} // TODO: get data from element.collectionIdList
+        dataSource={props.collections}
         locale={{
           emptyText: <CustomEmpty />,
         }}

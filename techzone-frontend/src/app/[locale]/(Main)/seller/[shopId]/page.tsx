@@ -2,7 +2,7 @@
 import Banner from "@/component/customer/shop/Banner";
 import ProductList from "../../product-list/page";
 import { Input, Skeleton, Tabs } from "antd";
-import AboutShop, { shopDetailType } from "@/component/customer/shop/AboutShop";
+import AboutShop from "@/component/customer/shop/AboutShop";
 const { Search } = Input;
 
 import {
@@ -18,9 +18,10 @@ import { useEffect, useState } from "react";
 import WidgetList from "@/component/customer/shop/WidgetList";
 import Collections from "@/component/customer/shop/collection/Collections";
 import { SearchProps } from "antd/es/input";
-import { ShopType } from "@/model/ShopType";
+import { ShopDetailType, ShopType } from "@/model/ShopType";
 import { useParams } from "next/navigation";
 import { GET_GetShop } from "@/app/apis/shop/ShopAPI";
+import { POST_GetWidgetList } from "@/app/apis/widget/WidgetAPI";
 
 interface ShopInfoProps {
   color: string;
@@ -138,22 +139,21 @@ export default function ShopPage() {
   };
 
   const shopDetailData = {
-    cancelPercentage: 11.29,
-    refundPercentage: 9.4,
-    sinceYear: 2023,
-    totalProductNumber: 510,
-    description:
-      "Mua ngay online sản phẩm của cửa hàng TechZone Trading trên TechZone.vn. ✓ chất lượng cao, uy tín, giá tốt ✓ Chính hãng ✓ Giao hàng toàn quốc",
-    rating: 4.6,
-    replyPercentage: 99,
-    address: "4820 Hilltop Haven Drive",
+    cancelPercentage: 0,
+    refundPercentage: 0,
+    sinceYear: 0,
+    totalProductNumber: 0,
+    description: "",
+    rating: 0,
+    replyPercentage: 0,
+    address: "",
   };
 
   //variables
 
-  const [widgets, setWidgets] = useState<WidgetType[]>(widgetList);
+  const [widgets, setWidgets] = useState<WidgetType[]>();
   const [shopInfo, setShopInfo] = useState<ShopInfoProps>();
-  const [shopDetail, setShopDetail] = useState<shopDetailType>(shopDetailData);
+  const [shopDetail, setShopDetail] = useState<ShopDetailType>(shopDetailData);
   const [tab, setTab] = useState<string>("0");
   const [selectedCollectionId, setSelectedCollectionId] = useState("");
 
@@ -169,10 +169,12 @@ export default function ShopPage() {
       children: (
         <div className="p-2">
           {/* pattern list here */}
-          <WidgetList
-            widgets={widgets}
-            setCollectionId={setSelectedCollectionId}
-          />
+          {(widgets && (
+            <WidgetList
+              widgets={widgets}
+              setCollectionId={setSelectedCollectionId}
+            />
+          )) || <Skeleton active style={{ margin: 10 }} />}
         </div>
       ),
     },
@@ -264,7 +266,8 @@ export default function ShopPage() {
     }
 
     if (shop.design && shop.design.length > 0) {
-      // TODO: get widgets and update them
+      // get widgets and update them
+      handleGetWidgetList(shop.design);
     }
   }, [shop]);
 
@@ -272,10 +275,18 @@ export default function ShopPage() {
     const response = await GET_GetShop(shopId.toString());
     if (response.status == 200) {
       // console.log(response.data);
+      if (response.data) {
+        setShop(response.data);
+      }
+    }
+  };
 
-      let data = response.data as ShopType;
-      if (data) {
-        setShop(data);
+  const handleGetWidgetList = async (ids: string[]) => {
+    const response = await POST_GetWidgetList(ids);
+    if (response.status == 200) {
+      // console.log(response.data);
+      if (response.data) {
+        setWidgets(response.data);
       }
     }
   };
