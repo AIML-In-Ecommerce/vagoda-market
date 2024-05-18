@@ -24,6 +24,7 @@ interface AuthFormProps {
 export default function AuthForm(props: AuthFormProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirm] = useState<string>("")
   const [username, setUsername] = useState("");
   const [isSigninOpeneded, setIsSigninOpeneded] = useState(true);
   const [isSignupOpeneded, setIsSignupOpeneded] = useState(false);
@@ -210,7 +211,7 @@ export default function AuthForm(props: AuthFormProps) {
   return (
     <div className="flex flex-col border rounded-xl p-4 m-8 w-96 mx-auto my-auto bg-white">
         <Link href={"/"} prefetch={false} className="text-center">
-            <label className="font-semibold text-4xl text-center p-2 text-blue-950">TechZone</label>
+            <label className="font-semibold text-4xl text-center p-2 text-amber-900">TechZone</label>
         </Link>
       {isSignupOpeneded && (
         <input
@@ -256,7 +257,7 @@ export default function AuthForm(props: AuthFormProps) {
       {isSigninOpeneded && (
         <button
           onClick={() => handleLogin()}
-          className="btn btn-info w-full max-w-xs m-4 mx-auto mt-3 hover:bg-blue-800 text-white bg-blue-600 rounded-full py-2"
+          className="btn btn-info w-full max-w-xs m-4 mx-auto mt-3 hover:bg-amber-700 text-white bg-amber-800 rounded-full py-2"
         >
           {t("signin_btn")}
         </button>
@@ -265,7 +266,7 @@ export default function AuthForm(props: AuthFormProps) {
       {isSignupOpeneded && (
         <button
           onClick={() => handleSignup()}
-          className="btn btn-info w-full max-w-xs m-4 mx-auto mt-3 hover:bg-blue-800 text-white bg-blue-600 rounded-full py-2"
+          className="btn btn-info w-full max-w-xs m-4 mx-auto mt-3 hover:bg-amber-700 text-white bg-amber-800 rounded-full py-2"
         >
           {t("signup_btn")}
         </button>
@@ -337,7 +338,7 @@ export default function AuthForm(props: AuthFormProps) {
             className="flex text-center items-center justify-center"
             >
             {t("go_to_signup_mg")}
-            <span className="text-blue-500 ml-2 hover:text-blue-800">{t("signup_btn")}</span>
+            <span className="text-amber-800 ml-2 hover:text-amber-950">{t("signup_btn")}</span>
             </label>
         </>
       )}
@@ -348,7 +349,7 @@ export default function AuthForm(props: AuthFormProps) {
           onClick={() => goToLogin()}
           className="flex text-center items-center justify-center">
             {t("go_to_signin_mg")}
-            <span className="text-blue-500 ml-2 hover:text-blue-800">{t("signin_btn")}</span>
+            <span className="text-amber-800 ml-2 hover:text-amber-950">{t("signin_btn")}</span>
             </label>
         </>
       )}
@@ -357,7 +358,7 @@ export default function AuthForm(props: AuthFormProps) {
           <div className="w-full h-3 invisible">hidden block</div>
           <label
             onClick={() => goToResetPassword()}
-            className="flex text-center items-center justify-center italic text-blue-500 ml-2 hover:text-blue-800"
+            className="flex text-center items-center justify-center italic text-amber-800 ml-2 hover:text-amber-950"
           >
             {t("go_to_password_reset_mg")}
           </label>

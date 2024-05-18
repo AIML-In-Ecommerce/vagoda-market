@@ -2,7 +2,7 @@
 
 import { Divider, Flex, Pagination, Skeleton, Typography } from "antd";
 import { useEffect, useState } from "react";
-import ProductItem from "./utils/ProductItem";
+import ProductItem, { ProductItemScaleSize } from "./utils/ProductItem";
 
 
 
@@ -301,6 +301,7 @@ export default function HotSalesProducts({}: SpecifiedProductsCarouselProp)
                     <>
                         <div className={isVisible} key={value._id}>
                             <ProductItem
+                            size={ProductItemScaleSize.large}
                             imageLink={value.imageLink} name={value.name} rating={value.rating} 
                             soldAmount={value.soldAmount} price={value.price} isFlashSale={value.isFlashSale} 
                             originalPrice={value.originalPrice} inWishlist={value.inWishlist}/>
