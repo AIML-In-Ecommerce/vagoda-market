@@ -300,6 +300,7 @@ export default function ShopPage() {
           name={shopInfo.name}
           avatarUrl={shopInfo.avatarUrl}
           bannerUrl={shopInfo.bannerUrl}
+          replyPercentage={shopDetail.replyPercentage}
         />
       )) || <Skeleton active style={{ margin: 10 }} />}
 

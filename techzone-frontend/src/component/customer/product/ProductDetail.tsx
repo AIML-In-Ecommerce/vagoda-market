@@ -1,13 +1,5 @@
 "use client";
-import {
-  LegacyRef,
-  MutableRefObject,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Badge,
   Descriptions,
@@ -37,6 +29,7 @@ import { QuantityControl } from "@/component/user/utils/QuantityControl";
 import ReviewSummary from "../review/ReviewSummary";
 import { ProductStatusToStringConverter } from "@/component/user/utils/ProductStatusConverter";
 import SimilarList from "./SimilarList";
+import useOnScreen from "../../user/utils/UseOnScreen";
 
 export default function ProductDetail() {
   const { productId } = useParams();
@@ -148,27 +141,15 @@ export default function ProductDetail() {
     return product.images.length > 5 ? 2 : 1;
   }, [product]);
 
-  // window size _ ATTEMPT
-  // const [width, setWidth] = useState(window.innerWidth);
-  // // const [height, setHeight] = useState(window.innerHeight);
-  // const updateDimensions = () => {
-  //   setWidth(window.innerWidth);
-  //   // setHeight(window.innerHeight);
-  //   console.log(window.innerWidth);
-  // };
-  // useEffect(() => {
-  //   window.addEventListener("resize", updateDimensions);
-  //   return () => window.removeEventListener("resize", updateDimensions);
-  // }, []);
-
   // modal
   const [open, setOpen] = useState(false);
 
-  // review summary visibility
-  const [reviewSummaryVisibility, setReviewSummaryVisibility] = useState(true);
+  // review summary visibility----------------------------------------------------------------
+  // const [reviewSummaryVisibility, setReviewSummaryVisibility] = useState(true);
+  // -----------------------------------------------------------------------------------------
 
   // ATTEMPT 1
-  // // Get the navbar
+  // Get the navbar
   // const bottom = document.getElementById("page-bottom-boundary");
 
   // // Get the offset position of the navbar
@@ -203,6 +184,13 @@ export default function ProductDetail() {
   //     }
   //  });
 
+  // ATTEMPT 3: SUCCESSFUL
+  const ref = useRef<HTMLDivElement>(null);
+  const reviewSummaryVisibility = !useOnScreen(ref);
+
+  const ref2 = useRef<HTMLDivElement>(null);
+  const cartVisibility = !useOnScreen(ref2);
+
   // all reviews
   const allReviews = <ReviewList setNumberOfReview={setNumberOfReview} />;
   const reviewSummary = (
@@ -232,7 +220,7 @@ export default function ProductDetail() {
       children: (
         <div>
           <div className="lg:grid lg:grid-cols-3 gap-5 h-fit">
-            <div className="lg:col-span-1">
+            <div className="lg:col-span-1 overflow-y-hidden">
               <Affix
                 offsetTop={60}
                 className={`${reviewSummaryVisibility ? "" : "invisible"} `}
@@ -242,12 +230,6 @@ export default function ProductDetail() {
             </div>
             <div className="lg:col-span-2">{allReviews}</div>
           </div>
-          <div
-            id="page-bottom-boundary"
-            style={{ border: "1px solid white" }}
-            //wip
-            // ref={ref}
-          />
         </div>
       ),
     },
@@ -306,7 +288,10 @@ export default function ProductDetail() {
         <div className="justify-between mx-10 lg:px-10 pb-10 gap-5 h-fit overflow-hidden relative">
           <div className="">
             {/* about product */}
-            <div className="bg-white flex lg:flex-row flex-col my-5 lg:max-h-[450px] xl:max-h-[550px] overflow-y-clip">
+            <div
+              className="bg-white flex lg:flex-row flex-col my-5 lg:max-h-[450px] xl:max-h-[550px] overflow-y-clip"
+              ref={ref2}
+            >
               <Flex>
                 <div
                   className={`m-2 flex flex-col min-w-14 ${
@@ -502,7 +487,11 @@ export default function ProductDetail() {
               </div>
             </div>
 
-            <Affix offsetTop={0}>
+            {/* top floating cart */}
+            <Affix
+              offsetTop={0}
+              className={`${cartVisibility ? "" : "hidden"} `}
+            >
               <FloatingCartForm
                 handleCartDetail={setOpen}
                 numberOfItem={numberOfItem}
@@ -543,13 +532,16 @@ export default function ProductDetail() {
                   };
                 })}
                 className="overflow-y-hidden"
+                style={{ overflow: "hidden" }}
               />
             </div>
 
-            <Divider />
-            {/* similar products */}
-            <div className="px-5 mt-5 text-lg">Sản phẩm tương tự</div>
-            <SimilarList />
+            <div id="page-bottom-boundary" ref={ref}>
+              <Divider />
+              {/* similar products */}
+              <div className="px-5 mt-5 text-lg">Sản phẩm tương tự</div>
+              <SimilarList />
+            </div>
           </div>
 
           {/* others */}

@@ -98,3 +98,46 @@ export async function GET_GetAllCategories() {
     };
   }
 }
+
+export async function POST_GetCategoryList(ids: string[]) {
+  const url = (
+    BACKEND_PREFIX?.toString() +
+    ":" +
+    CATEGORY_PORT?.toString() +
+    "/categories/list"
+  ).toString();
+
+  try {
+    // console.log(url);
+    const requestBody = {
+      ids: ids,
+    };
+
+    const response = await axios.post(url, requestBody);
+    const responseData: CategoryListResponse = response.data;
+
+    if (responseData.status == 200) {
+      return {
+        isDenied: false,
+        message: "Get category successfully",
+        status: responseData.status,
+        data: responseData.data,
+      };
+    } else {
+      return {
+        isDenied: true,
+        message: "Failed to get category",
+        status: responseData.status,
+        data: responseData.data,
+      };
+    }
+  } catch (err) {
+    console.error(err);
+    return {
+      isDenied: true,
+      message: "Failed to get category",
+      status: 500,
+      data: undefined,
+    };
+  }
+}

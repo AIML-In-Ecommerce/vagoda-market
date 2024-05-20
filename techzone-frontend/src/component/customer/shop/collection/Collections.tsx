@@ -35,8 +35,8 @@ export default function Collections(props: CollectionsProps) {
     const response = await GET_GetCollectionListByShop(mockId);
 
     if (response.status === 200) {
-      console.log(response.data);
-      console.log(response.message);
+      // console.log(response.data);
+      // console.log(response.message);
       if (response.data) setCollections(response.data);
     } else console.log(response.message);
   };

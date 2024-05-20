@@ -8,6 +8,7 @@ interface BannerProps {
   name: string;
   avatarUrl: string | undefined;
   bannerUrl: string | undefined;
+  replyPercentage: number;
 }
 
 export default function Banner(shopInfo: BannerProps) {
@@ -83,7 +84,8 @@ export default function Banner(shopInfo: BannerProps) {
                 style={{ height: "auto", border: "0.25px solid silver" }}
               />
               <div>
-                <MessageFilled /> Phản hồi chat: 100%
+                <MessageFilled /> Phản hồi chat:{" "}
+                {shopInfo.replyPercentage * 100}%
               </div>
             </Flex>
           </Flex>
