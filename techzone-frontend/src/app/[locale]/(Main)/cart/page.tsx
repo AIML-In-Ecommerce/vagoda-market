@@ -552,99 +552,92 @@ export default function CartPage() {
 
     return (
         <React.Fragment>
-            <div className="container flex flex-col p-5 mx-auto my-5 overflow-hidden">
-                <div className="mt-5 flex xs:flex-col sm:flex-col md:flex-col lg:grid lg:grid-cols-6 gap-2 relative">
-                    <div className="lg:col-start-1 lg:col-span-3 lg:mb-0 mb-10 p-2 flex flex-col">
-                        {/* Thông tin vận chuyển section */}
-                        <div className="flex flex-row justify-between items-center">
-                            <div className="text-3xl font-bold normal-case">Thông tin vận chuyển</div>
-                            <Link href="/cart/shipping">
-                                <div className="flex flex-row gap-1 text-blue-700 cursor-pointer hover:text-blue-900 items-center">
-                                    <RiContactsBookLine />
-                                    <div className="text-base">Chọn từ sổ địa chỉ</div>
-                                </div>
-                            </Link>
-                        </div>
-                        <div className="mt-5">
-                            {loading ? <Skeleton /> :
-                                <DeliveryInfoForm currentAddress={currentAddress} />
-                            }
-                        </div>
-                        {/* Hình thức thanh toán section */}
-                        <div className="text-3xl font-bold normal-case my-10">Hình thức thanh toán</div>
-                        <Radio.Group onChange={onPaymentMethodChange} value={paymentMethod} size="large" className="w-full">
-                            <div className="flex flex-col gap-2">
-                                {
-                                    payment_options.map(item => {
-                                        return (
-                                            <div className={`border-2 rounded-xl cursor-pointer ${paymentMethod === item.value ? "border-[#9bb0e8]" : "border-gray-200"} mt-1 p-2`}>
-                                                <GreyoutWrapper>
-                                                    <Radio value={item.value} className="w-full text-gray-400 hover:text-black">
-                                                        <div className="flex flex-row items-center">
-                                                            <div className="mr-3">
-                                                                <Image src={item.icon} preview={false} width={40}></Image>
-                                                            </div>
-                                                            <div className="flex flex-col gap-1">
-                                                                <div className={`font-semibold ${paymentMethod === item.value ? "text-black" : ""}`}>{item.label}</div>
-                                                                <div className={`${paymentMethod === item.value ? "text-black" : ""}`}>{item.description}</div>
-                                                            </div>
-
-                                                        </div>
-                                                    </Radio>
-                                                </GreyoutWrapper>
-                                            </div>
-                                        )
-                                    })
+            <div className="container flex flex-col p-5 mx-auto my-5 overflow-x-hidden">
+                <div className="mt-5 flex xs:flex-col sm:flex-col md:flex-col lg:grid lg:grid-cols-12 gap-2 relative">
+                    <div className="lg:col-span-6 lg:mb-0 mb-10 p-2 flex flex-col">
+                        <div className="w-full">
+                            {/* Thông tin vận chuyển section */}
+                            <div className="flex flex-row justify-between items-center">
+                                <div className="text-3xl font-bold normal-case">Thông tin vận chuyển</div>
+                                <Link href="/cart/shipping">
+                                    <div className="flex flex-row gap-1 text-blue-700 cursor-pointer hover:text-blue-900 items-center">
+                                        <RiContactsBookLine />
+                                        <div className="text-base">Chọn từ sổ địa chỉ</div>
+                                    </div>
+                                </Link>
+                            </div>
+                            <div className="mt-5">
+                                {loading ? <Skeleton /> :
+                                    <DeliveryInfoForm currentAddress={currentAddress} />
                                 }
                             </div>
-                        </Radio.Group>
+                            {/* Hình thức thanh toán section */}
+                            <div className="text-3xl font-bold normal-case my-10">Hình thức thanh toán</div>
+                            <Radio.Group onChange={onPaymentMethodChange} value={paymentMethod} size="large" className="w-full">
+                                <div className="flex flex-col gap-2">
+                                    {
+                                        payment_options.map(item => {
+                                            return (
+                                                <div className={`border-2 rounded-xl cursor-pointer ${paymentMethod === item.value ? "border-[#9bb0e8]" : "border-gray-200"} mt-1 p-2`}>
+                                                    <GreyoutWrapper>
+                                                        <Radio value={item.value} className="w-full text-gray-400 hover:text-black">
+                                                            <div className="flex flex-row items-center">
+                                                                <div className="mr-3">
+                                                                    <Image src={item.icon} preview={false} width={40}></Image>
+                                                                </div>
+                                                                <div className="flex flex-col gap-1">
+                                                                    <div className={`font-semibold ${paymentMethod === item.value ? "text-black" : ""}`}>{item.label}</div>
+                                                                    <div className={`${paymentMethod === item.value ? "text-black" : ""}`}>{item.description}</div>
+                                                                </div>
 
-
+                                                            </div>
+                                                        </Radio>
+                                                    </GreyoutWrapper>
+                                                </div>
+                                            )
+                                        })
+                                    }
+                                </div>
+                            </Radio.Group>
+                        </div>
                     </div>
+                    <div className="lg:col-span-6 lg:w-auto w-full flex flex-col border-l-2 pl-3">
+                        <div className="w-full">
+                            <div className="text-3xl font-bold normal-case p-2">Giỏ hàng</div>
+                            <Table
+                                tableLayout='auto'
+                                rowSelection={{
+                                    type: selectionType,
+                                    ...rowSelection,
 
-                    <div className="lg:col-start-4 lg:col-span-3 lg:w-auto w-full flex flex-col border-l-2 pl-3">
-                        {/* <FloatingCartSummary
-                            goToShippingAddressPage={goToShippingAddressPage}
-                            loading={loading} selectedRowKeys={selectedRowKeys}
-                            provisional={provisional} discount={discount} total={total}
-                            currentAddress={currentAddress}
-                            showPromotionModal={handleShowPromotionModal}
-                        /> */}
+                                }}
+                                columns={columns}
+                                dataSource={products}
+                                // onRow={(record) => ({
+                                //         onClick: () => handleRowClick(record),
+                                //       })}
+                                loading={loading}
+                                pagination={false}
+                                scroll={{ x: 'min-content', y: 480 }}
+                            />
+                            <Divider style={{ height: "auto", border: "0.25px solid silver" }}></Divider>
 
-                        <div className="text-3xl font-bold normal-case p-2">Giỏ hàng</div>
-                        <Table
-                            // tableLayout='auto'
-                            rowSelection={{
-                                type: selectionType,
-                                ...rowSelection,
+                            <PromotionSection
+                                loading={loading}
+                                showPromotionModal={handleShowPromotionModal}
+                                selectedDiscounts={discounts}
+                                allPromotions={promotions}
+                                applyDiscount={applyDiscount}
+                                removeDiscount={removeDiscount} />
 
-                            }}
-                            columns={columns}
-                            dataSource={products}
-                            // onRow={(record) => ({
-                            //         onClick: () => handleRowClick(record),
-                            //       })}
-                            loading={loading}
-                            pagination={false}
-                            scroll={{ x: 'min-content' }}
-                        />
-                        <Divider style={{ height: "auto", border: "0.25px solid silver" }}></Divider>
+                            <Divider style={{ height: "auto", border: "0.25px solid silver" }}></Divider>
 
-                        <PromotionSection
-                            loading={loading}
-                            showPromotionModal={handleShowPromotionModal}
-                            selectedDiscounts={discounts}
-                            allPromotions={promotions}
-                            applyDiscount={applyDiscount}
-                            removeDiscount={removeDiscount} />
-
-                        <Divider style={{ height: "auto", border: "0.25px solid silver" }}></Divider>
-
-                        <TransactionSection
-                            selectedRowKeys={selectedRowKeys}
-                            loading={loading}
-                            provisional={provisional} discount={discount} shippingFee={shippingFee}
-                            total={total} />
+                            <TransactionSection
+                                selectedRowKeys={selectedRowKeys}
+                                loading={loading}
+                                provisional={provisional} discount={discount} shippingFee={shippingFee}
+                                total={total} />
+                        </div>
                     </div>
                 </div>
             </div>

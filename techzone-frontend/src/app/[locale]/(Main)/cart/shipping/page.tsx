@@ -16,11 +16,27 @@ function guidGenerator() {
     return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
 }
 
+const initialAddress = {
+    _id: guidGenerator(),
+    receiverName: "",
+    address: {
+        street: "",
+        idCommune: "",
+        idDistrict: "",
+        idProvince: "",
+        country: ""
+    } as Address,
+    phoneNumber: "",
+    addressType: "residential",
+    selectedAsDefault: false
+} as AddressType
+
 export default function ShippingAddressPage() {
     const [formVisibility, setFormVisibility] = useState<boolean>(false);
     const [address, setAddress] = useState<AddressType[]>([]);
     const [isEditMode, setIsEditMode] = useState<boolean>(false);
-    const [currentAddress, setCurrentAddress] = useState<AddressType | undefined>(undefined);
+    const [currentAddress, setCurrentAddress] = useState<AddressType>(initialAddress);
+
     const componentRef = useRef<HTMLDivElement | null>(null);
     const router = useRouter();
 
@@ -36,15 +52,13 @@ export default function ShippingAddressPage() {
 
     const scrollToComponent = () => {
         if (componentRef.current === null) return;
-        componentRef.current.scrollIntoView({ behavior: 'smooth'});
-        
+        componentRef.current.scrollIntoView({ behavior: 'smooth' });
     };
 
     //Scroll to the bottom of the screen when the user clicks on the "add address button"
     useEffect(() => {
-        if (!formVisibility) return;
         scrollToComponent();
-    }, [formVisibility, currentAddress, address])
+    }, [formVisibility])
 
     const fetchAddress = async () => {
         const userAddresses: AddressType[] = [
@@ -154,43 +168,46 @@ export default function ShippingAddressPage() {
                 <div className="text-base mb-10">Chọn địa chỉ giao hàng có sẵn bên dưới:</div>
                 <Space direction="vertical" size="middle" className="grid lg:grid-cols-2 grid-cols-1">
                     {
-                        address.map((item: AddressType) => {
+                        address.map((item: AddressType, index: number) => {
                             return (
-                                <Card size="small" className={item.selectedAsDefault ? `border-dashed border-green-600` : `border`}>
-                                    <div className="flex flex-col relative">
-                                        <p className="font-bold uppercase">{item.receiverName}</p>
-                                        <p>Địa chỉ: {getFullAddress(item.address)}</p>
-                                        <p>Số điện thoại: {item.phoneNumber}</p>
-                                        <p>Loại địa chỉ: {getAddressTypeLabel(item.addressType)}</p>
-                                        {
-                                            item.selectedAsDefault ?
-                                                <p className="absolute mx-auto right-0 top-0 text-green-600 font-semibold">
-                                                    Mặc định
-                                                </p>
-                                                : null
-                                        }
-                                        <div className="mt-3 flex flex-row space-x-5">
-                                            <Button className="bg-sky-400 text-white font-semibold"
-                                                onClick={() => goToCartPage(item)}
-                                            >Giao đến địa chỉ này
-                                            </Button>
-                                            <Button className="bg-slate-400 text-white border font-medium"
-                                                onClick={() => {
-                                                    setIsEditMode(true);
-                                                    setCurrentAddress(item);
-                                                    console.log("Edit Mode", currentAddress);
-                                                    setFormVisibility(true);
-                                                }}>
-                                                Sửa
-                                            </Button>
+                                <div key={index}>
+                                    <Card size="small" className={item.selectedAsDefault ? `border-dashed border-green-600` : `border`}>
+                                        <div className="flex flex-col relative">
+                                            <p className="font-bold uppercase">{item.receiverName}</p>
+                                            <p className="truncate">Địa chỉ: {getFullAddress(item.address)}</p>
+                                            <p>Số điện thoại: {item.phoneNumber}</p>
+                                            <p>Loại địa chỉ: {getAddressTypeLabel(item.addressType)}</p>
                                             {
-                                                item.selectedAsDefault ? null :
-                                                    <Button className="bg-red-400 text-white border font-medium"
-                                                        onClick={() => handleRemoveShippingAddress(item._id)}>Xóa</Button>
+                                                item.selectedAsDefault ?
+                                                    <p className="absolute mx-auto right-0 top-0 text-green-600 font-semibold">
+                                                        Mặc định
+                                                    </p>
+                                                    : null
                                             }
+                                            <div className="mt-3 flex flex-row space-x-5">
+                                                <Button className="bg-sky-400 text-white font-semibold"
+                                                    onClick={() => goToCartPage(item)}
+                                                >Giao đến địa chỉ này
+                                                </Button>
+                                                <Button className="bg-slate-400 text-white border font-medium"
+                                                    onClick={() => {
+                                                        setFormVisibility(false);
+                                                        console.log("Edit Mode");
+                                                        setIsEditMode(true);
+                                                        setCurrentAddress(item);
+                                                        setFormVisibility(true);
+                                                    }}>
+                                                    Sửa
+                                                </Button>
+                                                {
+                                                    item.selectedAsDefault ? null :
+                                                        <Button className="bg-red-400 text-white border font-medium"
+                                                            onClick={() => handleRemoveShippingAddress(item._id)}>Xóa</Button>
+                                                }
+                                            </div>
                                         </div>
-                                    </div>
-                                </Card>
+                                    </Card>
+                                </div>
                             )
                         })
                     }
@@ -200,9 +217,10 @@ export default function ShippingAddressPage() {
                     <Button
                         icon={<FaPlus />}
                         onClick={() => {
+                            setFormVisibility(false);
+                            console.log("Create Mode");
                             setIsEditMode(false);
-                            setCurrentAddress(undefined);
-                            console.log("Create Address", currentAddress)
+                            setCurrentAddress(initialAddress);
                             setFormVisibility(true);
                         }}
                         className="border-dashed border-gray-500">
@@ -211,15 +229,13 @@ export default function ShippingAddressPage() {
                 </div>
                 <div ref={componentRef}>
                     {
-                        formVisibility ?
-                            <AddressForm
-                                setFormVisibility={setFormVisibility}
-                                isEditMode={isEditMode}
-                                currentAddress={currentAddress}
-                                handleCreate={handleCreateShippingAddress}
-                                handleUpdate={handleUpdateShippingAddress}
-                            />
-                            : <div></div>
+                        formVisibility ? <AddressForm
+                            setFormVisibility={setFormVisibility}
+                            isEditMode={isEditMode}
+                            currentAddress={currentAddress}
+                            handleCreate={handleCreateShippingAddress}
+                            handleUpdate={handleUpdateShippingAddress}
+                        /> : <></>
                     }
                 </div>
             </div>
