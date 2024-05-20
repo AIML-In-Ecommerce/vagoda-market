@@ -28,12 +28,48 @@ export default function DeliveryInfoForm(props: DeliveryInfoFormProps) {
     const [isLoadingDistrict, setIsLoadingDistrict] = React.useState(false);
     const [isLoadingCommune, setIsLoadingCommune] = React.useState(false);
 
+    // useEffect(() => {
+    //     getProvince().then((value: any) => setProvinceList(value));
+    //     handleChangeProvince(provinceValue);
+    //     handleChangeDistrict(districtValue);
+    //     handleChangeCommune(communeValue);
+    // },[]);
+
     useEffect(() => {
-        getProvince().then((value: any) => setProvinceList(value));
-        handleChangeProvince(provinceValue);
-        handleChangeDistrict(districtValue);
-        handleChangeCommune(communeValue);
-    },[]);
+        const fetchAddressData = async () => {
+            const storedProvinces = localStorage.getItem('provinceList');
+            const storedDistricts = localStorage.getItem('districtList');
+            const storedCommunes = localStorage.getItem('communeList');
+
+            if (storedProvinces && storedDistricts && storedCommunes) {
+                setProvinceList(JSON.parse(storedProvinces));
+                setDistrictList(JSON.parse(storedDistricts));
+                setCommuneList(JSON.parse(storedCommunes));
+            } else {
+                const provinces = await getProvince();
+                setProvinceList(provinces);
+                localStorage.setItem('provinceList', JSON.stringify(provinces));
+
+                if (provinceValue !== "0") {
+                    setIsLoadingDistrict(true);
+                    const districts = await getDistrict(provinceValue);
+                    setDistrictList(districts);
+                    localStorage.setItem('districtList', JSON.stringify(districts));
+                    setIsLoadingDistrict(false);
+
+                    if (districtValue !== "0") {
+                        setIsLoadingCommune(true);
+                        const communes = await getCommune(districtValue);
+                        setCommuneList(communes);
+                        localStorage.setItem('communeList', JSON.stringify(communes));
+                        setIsLoadingCommune(false);
+                    }
+                }
+            }
+        };
+
+        fetchAddressData();
+    }, [provinceValue, districtValue, communeValue]);
 
     const provinceOptions = useMemo(() => {
         return [

@@ -93,20 +93,23 @@ export default function CartPage() {
     const [paymentMethod, setPaymentMethod] = useState<string>('cash_on_delivery');
     const promotion_help = "Áp dụng tối đa 1 Mã giảm giá Sản Phẩm và 1 Mã Vận Chuyển"
 
+    const initialAddress = {
+        
+    } as AddressType
+
     const [currentAddress, setCurrentAddress] = useState<AddressType>({
-        _id: '1',
-        receiverName: 'Nguyễn Minh Quang',
+        _id: "datn1",
+        receiverName: "",
         address: {
-            street: "135B Trần Hưng Đạo",
-            idProvince: "79",
-            idDistrict: "760",
-            idCommune: "26752",
-            country: "Việt Nam"
-        }
-        ,
-        phoneNumber: "0839994856",
+            street: "",
+            idCommune: "",
+            idDistrict: "",
+            idProvince: "",
+            country: ""
+        } as Address,
+        phoneNumber: "",
         addressType: "residential",
-        selectedAsDefault: true
+        selectedAsDefault: false
     });
 
     const handleShowDeleteOneModal = (key: any) => {
