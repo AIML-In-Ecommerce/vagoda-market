@@ -34,7 +34,7 @@ export default function ProductItemList(props: ProductListProps) {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [sortedProducts, setSortedProducts] = useState<ProductType[]>(
-    props.products
+    props.products,
   );
 
   const displayedProducts = useMemo(() => {
@@ -159,7 +159,7 @@ export default function ProductItemList(props: ProductListProps) {
                     {formatPrice(item.value.min)
                       ? formatPrice(item.value.max)
                         ? `${formatPrice(item.value.min)} - ${formatPrice(
-                            item.value.max
+                            item.value.max,
                           )}`
                         : `Trên ${formatPrice(item.value.min)}`
                       : `Dưới ${formatPrice(item.value.max)}`}
@@ -211,8 +211,8 @@ export default function ProductItemList(props: ProductListProps) {
         <div
           className={`grid   ${
             props.isFilterOpened
-              ? "sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 "
-              : "sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 "
+              ? "sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 "
+              : "sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 "
           } 
           justify-center gap-y-6`}
         >
@@ -241,7 +241,7 @@ export default function ProductItemList(props: ProductListProps) {
                   inWishlist={true}
                 />
               </div>
-            )
+            ),
           )}
         </div>
       )}
