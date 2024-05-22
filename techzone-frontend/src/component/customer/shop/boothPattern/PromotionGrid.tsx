@@ -1,5 +1,5 @@
 "use client";
-import { List, Typography } from "antd";
+import { Divider, List } from "antd";
 import MiniPromotionTicket from "../../MiniPromotionTicket";
 import { DiscountType, PromotionType } from "@/model/PromotionType";
 import { PromotionElement, WidgetType } from "@/model/WidgetType";
@@ -103,32 +103,57 @@ export default function PromotionGrid(props: PromotionGridProps) {
   };
 
   return (
-    <div className="bg-white my-5 py-5 px-10 ">
-      <Typography.Text className="text-2xl font-semibold w-full">
+    <div className="bg-white my-5 py-5 px-10 rounded-xl">
+      {/* <Typography.Text className="text-2xl font-semibold w-full">
         {element.title}
-      </Typography.Text>
-      <List
-        grid={{
-          gutter: 16,
-          xs: 0,
-          sm: 1,
-          md: 2,
-          lg: 3,
-          xl: 4,
-          xxl: 5,
-        }}
-        dataSource={promotions}
-        locale={{
-          emptyText: <CustomEmpty />,
-        }}
-        renderItem={(item, i) => (
-          <div key={i}>
-            <List.Item>
-              <MiniPromotionTicket item={item} />
-            </List.Item>
+      </Typography.Text> */}
+
+      {element.title && (
+        <div className="w-full flex align-middle justify-center items-center">
+          <div className="w-1/2">
+            <Divider
+              style={{
+                border: "2px solid silver",
+                borderTop: 0,
+                borderBottom: 0,
+                borderLeft: 0,
+                borderRight: 0,
+                paddingBottom: 0,
+                marginBottom: 40,
+              }}
+            >
+              <div className="px-5 text-lg uppercase line-clamp-2">
+                {element.title}
+              </div>
+            </Divider>
           </div>
-        )}
-      />
+        </div>
+      )}
+
+      <div className="flex align-middle justify-center items-center">
+        <List
+          grid={{
+            gutter: 16,
+            xs: 0,
+            sm: 1,
+            md: 2,
+            lg: 3,
+            xl: 4,
+            xxl: 5,
+          }}
+          dataSource={promotions}
+          locale={{
+            emptyText: <CustomEmpty />,
+          }}
+          renderItem={(item, i) => (
+            <div key={i}>
+              <List.Item>
+                <MiniPromotionTicket item={item} />
+              </List.Item>
+            </div>
+          )}
+        />
+      </div>
     </div>
   );
 }

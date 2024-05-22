@@ -14,7 +14,14 @@ import {
   Affix,
   Button,
   Divider,
+  ConfigProvider,
+  Tag,
 } from "antd";
+import {
+  PercentageOutlined,
+  CloseCircleOutlined,
+  CheckCircleOutlined,
+} from "@ant-design/icons";
 import ReviewList from "../review/ReviewList";
 import FloatingCartForm from "./FloatingCartForm";
 import ComboList from "./ComboList";
@@ -23,7 +30,7 @@ import CartSummaryModal from "./ProductSummaryModal";
 import ReactImageMagnify from "react-image-magnify";
 import { GET_GetProductDetail } from "@/app/apis/product/ProductDetailAPI";
 import { useParams } from "next/navigation";
-import { ProductDetailType } from "@/model/ProductType";
+import { ProductDetailType, ProductStatus } from "@/model/ProductType";
 import CustomEmpty from "../shop/mini/CustomEmpty";
 import { QuantityControl } from "@/component/user/utils/QuantityControl";
 import ReviewSummary from "../review/ReviewSummary";
@@ -32,10 +39,7 @@ import SimilarList from "./SimilarList";
 import useOnScreen from "../../user/utils/UseOnScreen";
 
 export default function ProductDetail() {
-  const { productId } = useParams();
-
-  const [product, setProduct] = useState<ProductDetailType>();
-
+  // mock data
   // TODO: replace this with html component from seller page
   const items: DescriptionsProps["items"] = [
     // key can be index, label is title, children is content
@@ -88,6 +92,26 @@ export default function ProductDetail() {
       span: 3,
     },
   ];
+
+  const colorOptionsData = [
+    { label: "Cam", value: "#cc4f14" },
+    { label: "Đỏ", value: "#cc1414" },
+    { label: "Vàng", value: "#fae102" },
+  ];
+  const sizeOptionsData = ["XL", "L"];
+
+  // end mock data
+
+  // variables and functions
+  const { productId } = useParams();
+
+  const [product, setProduct] = useState<ProductDetailType>();
+
+  const [colorOptions, setColorOptions] = useState<any[]>(colorOptionsData);
+  const [selectedColorOption, setSelectedColorOption] = useState<any>();
+
+  const [sizeOptions, setSizeOptions] = useState<string[]>(sizeOptionsData);
+  const [selectedSizeOption, setSelectedSizeOption] = useState<string>();
 
   // images for zoom lens
   type ImageInfoType = {
@@ -197,11 +221,27 @@ export default function ProductDetail() {
     <ReviewSummary product={product} numberOfReview={numberOfReview} />
   );
 
+  // selected tab key
+  const [tabKey, setTabKey] = useState("1");
+
+  const onTabClick = (tabKey: string) => {
+    console.log("key: " + tabKey);
+    setTabKey(tabKey);
+  };
+
   // tabs, descriptions and review summary
   const tabItems = [
     {
       // label: `Descriptions`,
-      label: "Mô tả",
+      label: (
+        <div
+          className={`uppercase font-bold ${
+            tabKey === "1" ? "underline underline-offset-8" : ""
+          }`}
+        >
+          Mô tả
+        </div>
+      ),
       key: "1",
       children: (
         <div className="p-2">{product && <div>{product.description}</div>}</div>
@@ -209,13 +249,29 @@ export default function ProductDetail() {
     },
     {
       // label: `Specifications`,
-      label: "Đặc điểm nổi bật",
+      label: (
+        <div
+          className={`uppercase font-bold ${
+            tabKey === "2" ? "underline underline-offset-8" : ""
+          }`}
+        >
+          Đặc điểm nổi bật
+        </div>
+      ),
       key: "2",
       children: <Descriptions bordered items={items} />,
     },
     {
       // label: `Review Summary`,
-      label: `Tổng quan đánh giá`,
+      label: (
+        <div
+          className={`uppercase font-bold ${
+            tabKey === "3" ? "underline underline-offset-8" : ""
+          }`}
+        >
+          Tổng quan đánh giá
+        </div>
+      ),
       key: "3",
       children: (
         <div>
@@ -283,9 +339,9 @@ export default function ProductDetail() {
   };
 
   return (
-    <div>
+    <div className="bg-white">
       {(product && (
-        <div className="justify-between mx-10 lg:px-10 pb-10 gap-5 h-fit overflow-hidden relative">
+        <div className="justify-between mx-24 pb-10 gap-5 h-fit overflow-hidden relative">
           <div className="">
             {/* about product */}
             <div
@@ -294,7 +350,7 @@ export default function ProductDetail() {
             >
               <Flex>
                 <div
-                  className={`m-2 flex flex-col min-w-14 ${
+                  className={`m-2 flex flex-col min-w-14 mt-6 ${
                     imageCol == 1 ? "max-w-14" : "max-w-28"
                   }`}
                 >
@@ -381,85 +437,152 @@ export default function ProductDetail() {
               </Flex>
 
               {/* desc */}
-              <div className="p-4 ml-5 md:w-[700px] lg:min-w-[400px] xl:min-w-[600px] xl:min-w-4/7 overflow-hidden grid grid-rows-5 xl:grid-rows-6">
+              <div className="p-4 ml-5 md:w-[700px] lg:min-w-[400px] xl:min-w-[600px] xl:min-w-4/7 overflow-hidden ">
+                {/* grid grid-rows-3 */}
                 {product._id == null && <Skeleton active />}
 
-                {/* name block */}
-                <div className="row-start-1 flex flex-col gap-2">
-                  <div className="font-bold text-xl lg:text-2xl xl:text-3xl truncate">
-                    {product.name}
+                <Flex vertical gap="small">
+                  {/* name block */}
+                  <div className="flex flex-col gap-2">
+                    <div className="font-bold text-xl lg:text-2xl xl:text-3xl truncate mt-2 xl:mt-10">
+                      {product.name}
+                    </div>
+
+                    <div className="text-xs">
+                      Thương hiệu / Shop:{" "}
+                      <Link href="" className="text-blue-500">
+                        Ecovacs
+                      </Link>
+                    </div>
                   </div>
 
-                  <div className="text-xs">
-                    Thương hiệu / Shop:{" "}
-                    <Link href="" className="text-blue-500">
-                      Ecovacs
-                    </Link>
-                  </div>
-                </div>
-
-                {/* rating block */}
-                <Flex
-                  gap="small"
-                  style={{ alignContent: "center" }}
-                  className="row-start-2 flex items-center"
-                >
-                  <Rate
-                    disabled
-                    allowHalf
-                    defaultValue={product.avgRating}
-                    style={{ padding: 5, fontSize: 30 }}
-                  />
-                  <div className="font-bold uppercase text-2xl xl:text-3xl">
-                    ({product.avgRating})
-                  </div>
-                  {/* <div className="text-xs font-light mt-2">
+                  {/* rating block */}
+                  <Flex
+                    gap="small"
+                    style={{ alignContent: "center" }}
+                    className="flex items-center h-fit"
+                  >
+                    <Rate
+                      disabled
+                      allowHalf
+                      defaultValue={product.avgRating}
+                      style={{ padding: 5, fontSize: 18 }}
+                    />
+                    <div className="font-bold uppercase text-xl">
+                      ({product.avgRating})
+                    </div>
+                    {/* <div className="text-xs font-light mt-2">
                 ({numberOfReview} đánh giá)
-              </div>
-              <Divider
-                type="vertical"
-                style={{ height: "auto", border: "0.25px solid silver" }}
-              />
-              <div className="mt-1 text-sm font-light">Đã bán 5000+</div> */}
-                </Flex>
-
-                {/* price block */}
-                <div className="row-start-3 flex flex-col justify-center">
-                  {discountPercentage !== 0 && (
-                    <div className="line-through text-slate-300 uppercase text-sm md:text-lg xl:text-xl">
-                      {priceIndex(product.originalPrice)}
+              </div> */}
+                    <Divider
+                      type="vertical"
+                      style={{ height: "auto", border: "1px solid silver" }}
+                    />
+                    <div className="mt-1 text-sm text-slate-600">
+                      Đã bán {product.soldQuantity}
                     </div>
-                  )}
+                  </Flex>
 
-                  <div className="flex flex-row gap-3">
-                    <div className="font-bold text-red-500 uppercase text-xl md:text-2xl xl:text-4xl">
-                      {priceIndex(product.finalPrice)}
-                    </div>
+                  {/* price block */}
+                  <div className="flex flex-col justify-center">
                     {discountPercentage !== 0 && (
-                      <div className="text-red-500 uppercase text-xs mt-1">
-                        -{discountPercentage}%
+                      <div className="line-through text-slate-300 uppercase text-sm md:text-lg xl:text-xl">
+                        {priceIndex(product.originalPrice)}
                       </div>
                     )}
-                  </div>
-                </div>
 
-                <div className="row-start-4 xl:row-span-2 h-1/2 items-center grid grid-cols-4 text-sm xl:text-lg">
-                  <div className="col-span-1 col-start-1 font-bold pt-3">
-                    Tình trạng:{" "}
+                    <div className="flex flex-row gap-3">
+                      <div className="font-bold text-red-500 uppercase text-xl md:text-2xl xl:text-4xl">
+                        {priceIndex(product.finalPrice)}
+                      </div>
+                      {discountPercentage !== 0 && (
+                        <div className="text-red-500 uppercase text-xs mt-1">
+                          -{discountPercentage}%
+                        </div>
+                      )}
+                    </div>
                   </div>
-                  <div className="col-span-1 col-start-2 pt-3">
-                    {ProductStatusToStringConverter(product.status)}
+                </Flex>
+
+                {/* attributes and status */}
+                <Flex vertical gap="middle" className="row-start-2 mt-5">
+                  {/* status block */}
+                  <Flex gap="4px 0">
+                    {product.status === ProductStatus.AVAILABLE && (
+                      <Tag color="#55acee" icon={<CheckCircleOutlined />}>
+                        {ProductStatusToStringConverter(product.status)}
+                      </Tag>
+                    )}
+                    {product.status === ProductStatus.SOLD_OUT && (
+                      <Tag color="#cd201f" icon={<CloseCircleOutlined />}>
+                        {ProductStatusToStringConverter(product.status)}
+                      </Tag>
+                    )}
+                    {product.status === ProductStatus.SALE && (
+                      <Tag color="#87d068" icon={<PercentageOutlined />}>
+                        {ProductStatusToStringConverter(product.status)}
+                      </Tag>
+                    )}
+                  </Flex>
+
+                  {/* attributes block */}
+                  <div className="flex text-xs gap-1">
+                    <div>Màu sắc: </div>
+                    <div className="font-bold">{"Đen"}</div>
                   </div>
-                  <div className="col-span-1 col-start-1 font-bold pt-3">
-                    Đã bán:{" "}
+
+                  <Flex gap="4px">
+                    {colorOptions.map((color, index) => (
+                      <div
+                        key={index}
+                        className={`${
+                          selectedColorOption === color
+                            ? "border-2 border-blue-500 rounded-full"
+                            : ""
+                        }`}
+                      >
+                        <Button
+                          type="primary"
+                          size="middle"
+                          style={{ background: color.value, width: 50 }}
+                          className="rounded-full"
+                          onClick={() => setSelectedColorOption(color)}
+                        />
+                      </div>
+                    ))}
+                  </Flex>
+
+                  <div className="flex text-xs gap-1">
+                    <div>Kích thước: </div>
+                    <div className="font-bold">{selectedSizeOption}</div>
                   </div>
-                  <div className="col-span-1 col-start-2 pt-3">
-                    {product.soldQuantity}
-                  </div>
-                </div>
+
+                  <Flex gap="4px">
+                    {sizeOptions.map((size, index) => (
+                      <div
+                        key={index}
+                        className={`${
+                          selectedSizeOption === size
+                            ? "border-2 border-blue-500 rounded-full"
+                            : ""
+                        }`}
+                      >
+                        <Button
+                          type="primary"
+                          size="middle"
+                          style={{ background: "#86997c", width: 50 }}
+                          className="rounded-full"
+                          onClick={() => setSelectedSizeOption(size)}
+                        >
+                          {size}
+                        </Button>
+                      </div>
+                    ))}
+                  </Flex>
+                </Flex>
 
                 {/* buttons block  */}
-                <div className="row-start-5 xl:row-start-6 items-center flex gap-2">
+                <div className="row-start-3 items-end flex gap-2 mt-5">
                   <QuantityControl
                     componentSize={5}
                     keyProp={0}
@@ -480,6 +603,7 @@ export default function ProductDetail() {
                     block
                     size="large"
                     style={{ background: "#5c6856" }}
+                    className="rounded-full"
                   >
                     Mua ngay
                   </Button>
@@ -506,7 +630,26 @@ export default function ProductDetail() {
             </Affix>
 
             {/* related products to buy with  */}
-            <div className="px-5 mt-5 text-lg">Sản phẩm có thể kết hợp</div>
+            <div className="w-full flex align-middle justify-center items-center">
+              <div className="w-1/2">
+                <Divider
+                  className="mt-8"
+                  style={{
+                    border: "2px solid silver",
+                    borderTop: 0,
+                    borderBottom: 0,
+                    borderLeft: 0,
+                    borderRight: 0,
+                    paddingBottom: 0,
+                    marginBottom: 0,
+                  }}
+                >
+                  <div className="px-5 text-lg uppercase">
+                    Sản phẩm có thể kết hợp
+                  </div>
+                </Divider>
+              </div>
+            </div>
 
             <ComboList
               totalPrice={totalPrice}
@@ -520,26 +663,58 @@ export default function ProductDetail() {
 
             {/* tabs, descriptions and review summary */}
             <div className="my-5">
-              <Tabs
-                defaultActiveKey="1"
-                type="card"
-                items={tabItems.map((item, i) => {
-                  //   const id = String(i + 1);
-                  return {
-                    label: item.label,
-                    key: item.key,
-                    children: item.children,
-                  };
-                })}
-                className="overflow-y-hidden"
-                style={{ overflow: "hidden" }}
-              />
+              <ConfigProvider
+                theme={{
+                  components: {
+                    Tabs: {
+                      itemActiveColor: "#c4996c",
+                      itemHoverColor: "#c4996c",
+                      itemSelectedColor: "#c4996c",
+                    },
+                  },
+                }}
+              >
+                <Tabs
+                  defaultActiveKey="1"
+                  type="card"
+                  items={tabItems.map((item, i) => {
+                    //   const id = String(i + 1);
+                    return {
+                      label: item.label,
+                      key: item.key,
+                      children: item.children,
+                    };
+                  })}
+                  className="overflow-y-hidden"
+                  style={{ overflow: "hidden" }}
+                  onTabClick={onTabClick}
+                />
+              </ConfigProvider>
             </div>
 
             <div id="page-bottom-boundary" ref={ref}>
               <Divider />
               {/* similar products */}
-              <div className="px-5 mt-5 text-lg">Sản phẩm tương tự</div>
+              <div className="w-full flex align-middle justify-center items-center">
+                <div className="w-1/2">
+                  <Divider
+                    // className="mt-20"
+                    style={{
+                      border: "2px solid silver",
+                      borderTop: 0,
+                      borderBottom: 0,
+                      borderLeft: 0,
+                      borderRight: 0,
+                      paddingBottom: 0,
+                      marginBottom: 0,
+                    }}
+                  >
+                    <div className="px-5 text-lg uppercase">
+                      Sản phẩm tương tự
+                    </div>
+                  </Divider>
+                </div>
+              </div>
               <SimilarList />
             </div>
           </div>

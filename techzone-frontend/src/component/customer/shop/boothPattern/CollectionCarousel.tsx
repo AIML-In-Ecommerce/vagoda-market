@@ -1,5 +1,5 @@
 "use client";
-import { Carousel } from "antd";
+import { Carousel, List } from "antd";
 import { useEffect, useState } from "react";
 import { CarouselArrow } from "@/component/user/utils/CarouselArrow";
 import { CollectionType } from "@/model/CollectionType";
@@ -95,18 +95,37 @@ export default function CollectionCarousel(props: CollectionCarouselProps) {
   };
 
   return (
-    <div>
+    <div className="bg-white rounded-xl my-5">
       {collections.length === 0 ? (
-        <div className="bg-white p-10 my-5">
+        <div className="p-10">
           <CustomEmpty />
         </div>
       ) : (
-        <div className="w-full flex justify-center items-center bg-white py-10 my-5">
-          <div className="w-full px-10">
-            {collections.length === 1 ? (
-              <CollectionItem
-                collection={collections[0]}
-                setCollectionId={props.setCollectionId}
+        <div className="w-full flex justify-center items-center py-10">
+          <div className="w-full pr-5">
+            {collections.length < 4 ? (
+              <List
+                grid={{
+                  gutter: 5,
+                  xs: 1,
+                  sm: 2,
+                  md: 3,
+                  lg: 3,
+                  xl: 4,
+                  xxl: 4,
+                }}
+                dataSource={collections}
+                locale={{
+                  emptyText: <CustomEmpty />,
+                }}
+                renderItem={(item) => (
+                  <List.Item>
+                    <CollectionItem
+                      collection={item}
+                      setCollectionId={props.setCollectionId}
+                    />
+                  </List.Item>
+                )}
               />
             ) : (
               <Carousel
@@ -115,12 +134,21 @@ export default function CollectionCarousel(props: CollectionCarouselProps) {
                 arrows
                 prevArrow={<CarouselArrow direction="left" />}
                 nextArrow={<CarouselArrow direction="right" />}
-                slidesToShow={3}
+                slidesToShow={4}
                 slidesToScroll={1}
                 initialSlide={0}
                 responsive={[
                   {
-                    breakpoint: 1280,
+                    breakpoint: 1400,
+                    settings: {
+                      slidesToShow: 3,
+                      slidesToScroll: 1,
+                      infinite: true,
+                      dots: true,
+                    },
+                  },
+                  {
+                    breakpoint: 768,
                     settings: {
                       slidesToShow: 2,
                       slidesToScroll: 1,
@@ -129,7 +157,7 @@ export default function CollectionCarousel(props: CollectionCarouselProps) {
                     },
                   },
                   {
-                    breakpoint: 768,
+                    breakpoint: 600,
                     settings: {
                       slidesToShow: 1,
                       slidesToScroll: 1,

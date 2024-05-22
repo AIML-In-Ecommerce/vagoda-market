@@ -51,7 +51,7 @@ export default function Banner(shopInfo: BannerProps) {
 
   return (
     <div
-      className={`p-5 ${classColor}`}
+      className={`p-5 rounded-tr-xl	rounded-tl-xl ${classColor}`}
       style={{
         backgroundImage: `url(${backgroundUrl})`,
         backgroundSize: "cover",

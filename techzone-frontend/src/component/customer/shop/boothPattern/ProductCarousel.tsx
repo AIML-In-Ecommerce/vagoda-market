@@ -1,5 +1,5 @@
 "use client";
-import { Carousel, Flex, Typography } from "antd";
+import { Carousel, Flex, List, Typography } from "antd";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { AiOutlineRight } from "react-icons/ai";
@@ -88,16 +88,16 @@ export default function ProductCarousel(props: ProductCarouselProps) {
   };
 
   return (
-    <div>
+    <div className="bg-white rounded-xl my-5">
       {products.length === 0 ? (
-        <div className="bg-white p-10 my-5">
+        <div className="p-10">
           <CustomEmpty />
         </div>
       ) : (
-        <div className="w-full flex justify-center items-center bg-white py-10 my-5">
+        <div className="w-full flex justify-center items-center py-5">
           <div className="w-full px-10">
             <Flex className="w-full mb-4" align="center">
-              <Typography.Text className="text-2xl font-semibold w-full">
+              <Typography.Text className="mt-3 text-lg uppercase font-semibold w-full">
                 {element.title}
               </Typography.Text>
               <Flex
@@ -116,16 +116,36 @@ export default function ProductCarousel(props: ProductCarouselProps) {
                 </Typography.Text>
               </Flex>
             </Flex>
-            {products.length === 1 ? (
+            <div className="invisible h-5">hidden block</div>
+            {products.length < 4 ? (
               <div className="px-10">
-                <ProductItem
-                  imageLink={products[0].imageLink}
-                  name={products[0].name}
-                  rating={products[0].rating}
-                  soldAmount={products[0].soldAmount}
-                  price={products[0].price}
-                  isFlashSale={products[0].isFlashSale}
-                  originalPrice={products[0].originalPrice}
+                <List
+                  grid={{
+                    gutter: 5,
+                    xs: 0,
+                    sm: 1,
+                    md: 2,
+                    lg: 3,
+                    xl: 5,
+                    xxl: 5,
+                  }}
+                  dataSource={products}
+                  locale={{
+                    emptyText: <CustomEmpty />,
+                  }}
+                  renderItem={(item) => (
+                    <List.Item>
+                      <ProductItem
+                        imageLink={item.imageLink}
+                        name={item.name}
+                        rating={item.rating}
+                        soldAmount={item.soldAmount}
+                        price={item.price}
+                        isFlashSale={item.isFlashSale}
+                        originalPrice={item.originalPrice}
+                      />
+                    </List.Item>
+                  )}
                 />
               </div>
             ) : (
@@ -135,15 +155,15 @@ export default function ProductCarousel(props: ProductCarouselProps) {
                 arrows
                 prevArrow={<CarouselArrow direction="left" />}
                 nextArrow={<CarouselArrow direction="right" />}
-                slidesToShow={4}
-                slidesToScroll={4}
+                slidesToShow={5}
+                slidesToScroll={1}
                 initialSlide={0}
                 responsive={[
                   {
                     breakpoint: 1280,
                     settings: {
                       slidesToShow: 3,
-                      slidesToScroll: 3,
+                      slidesToScroll: 1,
                       infinite: true,
                       dots: true,
                     },
@@ -152,7 +172,7 @@ export default function ProductCarousel(props: ProductCarouselProps) {
                     breakpoint: 1024,
                     settings: {
                       slidesToShow: 2,
-                      slidesToScroll: 2,
+                      slidesToScroll: 1,
                       infinite: true,
                       dots: true,
                     },
@@ -183,6 +203,7 @@ export default function ProductCarousel(props: ProductCarouselProps) {
                   ))}
               </Carousel>
             )}
+            <div className="invisible h-5">hidden block</div>
           </div>
         </div>
       )}

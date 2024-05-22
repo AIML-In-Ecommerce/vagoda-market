@@ -1,9 +1,9 @@
 "use client";
 import Banner from "@/component/customer/shop/Banner";
 import ProductList from "../../product-list/page";
-import { Input, Skeleton, Tabs } from "antd";
+import { ConfigProvider, Input, Skeleton, Tabs } from "antd";
 import AboutShop from "@/component/customer/shop/AboutShop";
-const { Search } = Input;
+import { GoSearch } from "react-icons/go";
 
 import {
   WidgetType,
@@ -292,7 +292,7 @@ export default function ShopPage() {
   };
 
   return (
-    <div className="mx-20 pb-10 h-fit overflow-hidden">
+    <div className="mx-24 py-2 h-fit overflow-hidden">
       <section id="top-content" />
       {(shopInfo && (
         <Banner
@@ -304,37 +304,63 @@ export default function ShopPage() {
         />
       )) || <Skeleton active style={{ margin: 10 }} />}
 
-      <Tabs
-        defaultActiveKey="0"
-        activeKey={tab}
-        onChange={(key) => setTab(key)}
-        size="middle"
-        style={{ marginLeft: 10, marginRight: 10, marginTop: 10 }}
-        items={tabItems.map((item, i) => {
-          return {
-            label: item.label,
-            key: i.toString(),
-            children: item.children,
-          };
-        })}
-        tabBarExtraContent={
-          <div onClick={() => setTab("1")}>
-            <Search
-              size="large"
-              style={{
-                background: "gray",
-                borderRadius: "10px",
-                width: 280,
-                fontSize: "8px",
-              }}
-              placeholder="Tìm sản phẩm tại cửa hàng"
-              onSearch={onSearch}
-              enterButton
-              className="text-xs"
-            />
-          </div>
-        }
-      />
+      <ConfigProvider
+        theme={{
+          components: {
+            Tabs: {
+              // inkBarColor: "#c4996c",
+              // itemActiveColor: "#c4996c",
+              // itemHoverColor: "#c4996c",
+              // itemSelectedColor: "#c4996c",
+              inkBarColor: "#5c6856",
+              itemActiveColor: "#5c6856",
+              itemHoverColor: "#5c6856",
+              itemSelectedColor: "#5c6856",
+            },
+          },
+        }}
+      >
+        <Tabs
+          defaultActiveKey="0"
+          activeKey={tab}
+          onChange={(key) => setTab(key)}
+          size="middle"
+          style={{ marginLeft: 10, marginRight: 10, marginTop: 10 }}
+          items={tabItems.map((item, i) => {
+            return {
+              label: item.label,
+              key: i.toString(),
+              children: item.children,
+            };
+          })}
+          tabBarExtraContent={
+            <div onClick={() => setTab("1")}>
+              {/* <Input
+                size="large"
+                style={{
+                  background: "gray",
+                  borderRadius: "10px",
+                  width: 280,
+                  fontSize: "8px",
+                }}
+                placeholder="Tìm sản phẩm tại cửa hàng"
+                onSearch={onSearch}
+                enterButton
+                className="text-xs"
+              /> */}
+
+              <Input
+                size="middle"
+                placeholder="Tìm sản phẩm tại cửa hàng"
+                suffix={<GoSearch color="#5c6856" />}
+                className="rounded-full w-64 m-1 "
+                // onChange={onSearch}
+                value={searchText}
+              />
+            </div>
+          }
+        />{" "}
+      </ConfigProvider>
     </div>
   );
 }

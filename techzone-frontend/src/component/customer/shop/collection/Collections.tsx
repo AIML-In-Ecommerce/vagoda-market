@@ -44,14 +44,14 @@ export default function Collections(props: CollectionsProps) {
   return (
     <div>
       {(collections && (
-        <div className="bg-white flex flex-row">
+        <div className="bg-white flex flex-row rounded-xl">
           <div className="">
             <Menu
               theme="light"
               mode="inline"
               selectedKeys={option}
-              style={{ height: "75vh", overflowY: "auto", width: "300px" }}
-              className="text-xs overflow-auto custom-scrollbar"
+              style={{ height: "75vh", overflowY: "auto", width: "180px" }}
+              className="text-xs overflow-auto custom-scrollbar truncate rounded-xl"
             >
               <Menu.Item
                 key={"0"}

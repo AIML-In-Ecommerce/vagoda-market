@@ -211,8 +211,8 @@ const ComboList = (comboListData: ComboListProps) => {
             </Carousel>
           </div>
 
-          <div className="col-span-1 col-start-1 sm:col-start-4 lg:col-start-5 xl:col-end-6">
-            <div className="mx-5 my-10 min-w-32">
+          <div className="col-span-1 col-start-1 sm:col-start-4 lg:col-start-5 xl:col-end-6 flex flex-col justify-center align-middle">
+            <div className="mx-5 mb-16 min-w-32">
               <Flex vertical gap="small">
                 <div className="font-semibold">Tổng cộng:</div>
                 <div className="text-xl">
