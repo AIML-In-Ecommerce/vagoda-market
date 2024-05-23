@@ -65,9 +65,14 @@ const mockVtoProductData = [
 const VirtualTryOn = () => {
   const [mode, setMode] = useState<Mode>("MODEL");
   const [productList, setProductList] = useState<VtoProduct[]>([]);
+  const [chosenProduct, setChosenProduct] = useState<VtoProduct>();
 
   const changeMode = (newMode: Mode) => {
     setMode(newMode);
+  };
+
+  const changeChosenProduct = (product: VtoProduct) => {
+    setChosenProduct(product);
   };
 
   const renderTitle = (mode: Mode) => {
@@ -94,9 +99,13 @@ const VirtualTryOn = () => {
         );
       case "PRODUCT":
         return (
-          <div className="grid grid-cols-3 gap-4 p-2">
+          <div className="grid grid-cols-3 gap-4 p-5">
             {mockVtoProductData.map((product) => (
-              <VtoProduct key={product._id} product={product} />
+              <VtoProduct
+                key={product._id}
+                product={product}
+                setChosenProduct={changeChosenProduct}
+              />
             ))}
           </div>
         );
@@ -116,7 +125,7 @@ const VirtualTryOn = () => {
 
   return (
     <div className="bg-[url('https://res.cloudinary.com/dgsrxvev1/image/upload/v1716347947/dressing_room_c9bl2n.jpg')] bg-center bg-cover bg-no-repeat w-[100vw] h-[100vh] flex flex-col justify-center items-center">
-      <div className="w-full h-[70%] flex flex-col gap-10 justify-center items-center">
+      <div className="w-full h-[80%] flex flex-col gap-10 justify-center items-center">
         <div className="flex w-[200px] h-[50px] bg-style text-white text-xl justify-center items-center rounded-full">
           {renderTitle(mode)}
         </div>
@@ -167,7 +176,7 @@ const VirtualTryOn = () => {
               </div>
             </div>
           </div>
-          <div className="w-[50%] h-full bg-style text-white rounded-3xl p-2">
+          <div className="w-[60%] h-full bg-style text-white rounded-3xl p-4">
             <div className=" w-fit h-[48px] flex flex-row justify-center items-center px-1 bg-white bg-opacity-50 text-white text-xl rounded-full">
               <div className="w-[40px] h-[40px] bg-white text-slate-500 rounded-full flex justify-center items-center">
                 <PiCoatHangerFill className="w-[25px] h-[25px] text-slate" />
