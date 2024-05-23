@@ -12,16 +12,63 @@ import { BsEye } from "react-icons/bs";
 import { BsEyeFill } from "react-icons/bs";
 import { PiCoatHangerFill } from "react-icons/pi";
 import { title } from "process";
+import VtoProduct from "@/component/customer/product/VtoProduct";
 
 type Mode = "MODEL" | "PRODUCT" | "PREVIEW";
 
+interface VtoProduct {
+  _id: string;
+  name: string;
+  orginalPrice: number;
+  finalPrice: number;
+  size: string;
+  color: string;
+  image: string[];
+}
+
+const mockVtoProductData = [
+  {
+    _id: "123",
+    name: "Áo thun Nam Lados",
+    originalPrice: 200000,
+    finalPrice: 150000,
+    size: "XL",
+    color: "Trắng",
+    image: [
+      "https://res.cloudinary.com/dgsrxvev1/image/upload/v1716443927/%C3%A1o_thun_cppclk.jpg",
+    ],
+  },
+  {
+    _id: "234",
+    name: "Áo thun Unisex Laurents",
+    originalPrice: 200000,
+    finalPrice: 150000,
+    size: "XL",
+    color: "Trắng",
+    image: [
+      "https://res.cloudinary.com/dgsrxvev1/image/upload/v1716443927/l%E1%BA%A3utent_qwmpog.jpg",
+    ],
+  },
+  {
+    _id: "345",
+    name: "Áo Sơ mi Nam Laurents",
+    originalPrice: 200000,
+    finalPrice: 150000,
+    size: "XL",
+    color: "Trắng",
+    image: [
+      "https://res.cloudinary.com/dgsrxvev1/image/upload/v1716443926/vn-11134207-7r98o-lp8u23rvrf4r40_hcpkjk.jpg",
+    ],
+  },
+];
+
 const VirtualTryOn = () => {
   const [mode, setMode] = useState<Mode>("MODEL");
+  const [productList, setProductList] = useState<VtoProduct[]>([]);
 
   const changeMode = (newMode: Mode) => {
     setMode(newMode);
   };
-  console.log("Mode: ", mode);
 
   const renderTitle = (mode: Mode) => {
     switch (mode) {
@@ -46,7 +93,13 @@ const VirtualTryOn = () => {
           </div>
         );
       case "PRODUCT":
-        return "Chọn sản phẩm";
+        return (
+          <div className="grid grid-cols-3 gap-4 p-2">
+            {mockVtoProductData.map((product) => (
+              <VtoProduct key={product._id} product={product} />
+            ))}
+          </div>
+        );
       case "PREVIEW":
         return "Preview";
       default:
@@ -56,7 +109,10 @@ const VirtualTryOn = () => {
 
   useEffect(() => {
     renderTitle(mode);
+    renderMainBox(mode);
   }, [mode]);
+
+  useEffect(() => {}, []);
 
   return (
     <div className="bg-[url('https://res.cloudinary.com/dgsrxvev1/image/upload/v1716347947/dressing_room_c9bl2n.jpg')] bg-center bg-cover bg-no-repeat w-[100vw] h-[100vh] flex flex-col justify-center items-center">
@@ -68,26 +124,50 @@ const VirtualTryOn = () => {
           <div className="w-[200px] flex justify-center items-center">
             <div className="w-[60px] h-[200px] rounded-full bg-style flex flex-col gap-5 justify-center items-center text-white">
               <div
-                className="w-[50px] h-[50px] bg-white bg-opacity-50 rounded-full flex justify-center items-center"
+                className={`w-[50px] h-[50px]  rounded-full flex justify-center items-center cursor-pointer ${
+                  mode === "MODEL"
+                    ? "bg-white bg-opacity-50 "
+                    : "hover:bg-slate-50 hover:bg-opacity-20"
+                }`}
                 onClick={(e) => changeMode("MODEL")}
               >
-                <IoBody className="w-[30px] h-[30px] " />
+                {mode === "MODEL" ? (
+                  <IoBody className="w-[30px] h-[30px] " />
+                ) : (
+                  <IoBodyOutline className="w-[30px] h-[30px] " />
+                )}
               </div>
               <div
-                className="w-[50px] h-[50px] rounded-full flex justify-center items-center"
+                className={`w-[50px] h-[50px] rounded-full flex justify-center items-center cursor-pointer ${
+                  mode === "PRODUCT"
+                    ? "bg-white bg-opacity-50"
+                    : "hover:bg-white hover:bg-opacity-20"
+                }`}
                 onClick={(e) => changeMode("PRODUCT")}
               >
-                <IoShirtOutline className="w-[30px] h-[30px] " />
+                {mode === "PRODUCT" ? (
+                  <IoShirt className="w-[30px] h-[30px] " />
+                ) : (
+                  <IoShirtOutline className="w-[30px] h-[30px] " />
+                )}
               </div>
               <div
-                className="w-[50px] h-[50px]  rounded-full flex justify-center items-center"
+                className={`w-[50px] h-[50px]  rounded-full flex justify-center items-center cursor-pointer ${
+                  mode === "PREVIEW"
+                    ? "bg-white bg-opacity-50"
+                    : "hover:bg-slate-50 hover:bg-opacity-20"
+                }`}
                 onClick={(e) => changeMode("PREVIEW")}
               >
-                <BsEye className="w-[30px] h-[30px] " />
+                {mode === "PREVIEW" ? (
+                  <BsEyeFill className="w-[30px] h-[30px] " />
+                ) : (
+                  <BsEye className="w-[30px] h-[30px] " />
+                )}
               </div>
             </div>
           </div>
-          <div className="w-[50%] h-full bg-style text-white rounded-3xl p-4">
+          <div className="w-[50%] h-full bg-style text-white rounded-3xl p-2">
             <div className=" w-fit h-[48px] flex flex-row justify-center items-center px-1 bg-white bg-opacity-50 text-white text-xl rounded-full">
               <div className="w-[40px] h-[40px] bg-white text-slate-500 rounded-full flex justify-center items-center">
                 <PiCoatHangerFill className="w-[25px] h-[25px] text-slate" />
