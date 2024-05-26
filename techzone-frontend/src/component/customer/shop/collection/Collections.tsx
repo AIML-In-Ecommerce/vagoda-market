@@ -6,7 +6,7 @@ import React from "react";
 import AllCollections from "./AllCollections";
 import CollectionDetail from "./CollectionDetail";
 import { BsHouseHeart } from "react-icons/bs";
-import { GET_GetCollectionListByShop } from "@/app/apis/collection/CollectionAPI";
+import { GET_GetCollectionListByShop } from "@/apis/collection/CollectionAPI";
 
 interface CollectionsProps {
   selectedId: string;

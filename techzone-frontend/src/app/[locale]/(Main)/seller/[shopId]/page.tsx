@@ -20,8 +20,8 @@ import Collections from "@/component/customer/shop/collection/Collections";
 import { SearchProps } from "antd/es/input";
 import { ShopDetailType, ShopType } from "@/model/ShopType";
 import { useParams } from "next/navigation";
-import { GET_GetShop } from "@/app/apis/shop/ShopAPI";
-import { POST_GetWidgetList } from "@/app/apis/widget/WidgetAPI";
+import { GET_GetShop } from "@/apis/shop/ShopAPI";
+import { POST_GetWidgetList } from "@/apis/widget/WidgetAPI";
 
 interface ShopInfoProps {
   color: string;

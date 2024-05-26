@@ -4,7 +4,7 @@ import MiniPromotionTicket from "../../MiniPromotionTicket";
 import { DiscountType, PromotionType } from "@/model/PromotionType";
 import { PromotionElement, WidgetType } from "@/model/WidgetType";
 import CustomEmpty from "../mini/CustomEmpty";
-import { POST_GetPromotionList } from "@/app/apis/promotion/PromotionAPI";
+import { POST_GetPromotionList } from "@/apis/promotion/PromotionAPI";
 import { useState, useEffect } from "react";
 
 const formatDate = (date: Date) => {

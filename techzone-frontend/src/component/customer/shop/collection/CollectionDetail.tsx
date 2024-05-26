@@ -3,9 +3,9 @@ import React, { useEffect, useState } from "react";
 import CustomEmpty from "../mini/CustomEmpty";
 import ProductItem from "../../ProductItem";
 import { ProductType } from "@/model/ProductType";
-import { POST_GetProductList } from "@/app/apis/product/ProductDetailAPI";
+import { POST_GetProductList } from "@/apis/product/ProductDetailAPI";
 import { CollectionType } from "@/model/CollectionType";
-import { GET_GetCollection } from "@/app/apis/collection/CollectionAPI";
+import { GET_GetCollection } from "@/apis/collection/CollectionAPI";
 
 interface CollectionDetailProps {
   collectionId: string;

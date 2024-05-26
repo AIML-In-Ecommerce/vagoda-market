@@ -4,8 +4,8 @@ import ProductItem from "../../ProductItem";
 import { ProductType } from "@/model/ProductType";
 import { ProductElement, WidgetType } from "@/model/WidgetType";
 import CustomEmpty from "../mini/CustomEmpty";
-import { GET_GetCollection } from "@/app/apis/collection/CollectionAPI";
-import { POST_GetProductList } from "@/app/apis/product/ProductDetailAPI";
+import { GET_GetCollection } from "@/apis/collection/CollectionAPI";
+import { POST_GetProductList } from "@/apis/product/ProductDetailAPI";
 import { CollectionType } from "@/model/CollectionType";
 import { useState, useEffect } from "react";
 

@@ -8,7 +8,7 @@ import { ProductDetailType, ProductType } from "@/model/ProductType";
 import {
   GET_GetProductDetail,
   POST_GetProductList,
-} from "@/app/apis/product/ProductDetailAPI";
+} from "@/apis/product/ProductDetailAPI";
 
 interface ModalProps {
   open: boolean;

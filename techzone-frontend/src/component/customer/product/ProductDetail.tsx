@@ -28,7 +28,7 @@ import ComboList from "./ComboList";
 import Link from "next/link";
 import CartSummaryModal from "./ProductSummaryModal";
 import ReactImageMagnify from "react-image-magnify";
-import { GET_GetProductDetail } from "@/app/apis/product/ProductDetailAPI";
+import { GET_GetProductDetail } from "@/apis/product/ProductDetailAPI";
 import { useParams } from "next/navigation";
 import { ProductDetailType, ProductStatus } from "@/model/ProductType";
 import CustomEmpty from "../shop/mini/CustomEmpty";
