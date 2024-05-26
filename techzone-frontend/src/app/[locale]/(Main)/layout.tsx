@@ -11,6 +11,7 @@ import { Lato } from "next/font/google";
 import { ReactNode } from "react";
 
 // import UserLayout from "@/component/UserLayout";
+import { AntdRegistry } from "@ant-design/nextjs-registry";
 
 interface RootLayoutProps {
   children: ReactNode;
@@ -38,20 +39,22 @@ export default function RootLayout({
     <html lang={"en"}>
       {/* <body className={inter.className}> */}
       <body className={lato.className}>
-        <NextIntlClientProvider locale={locale} messages={messages}>
-          {/* <AuthProvider> */}
-          {/* <UserLayout children={children} locale={locale} /> */}
-          {/* <UserLayout locale={locale}>{children}</UserLayout> */}
-          {/* </AuthProvider> */}
-          {/* <Suspense fallback={<RootLoading />}> */}
-          <div className="w-full bg-cover bg-[#f3f3f3]  min-h-screen  overflow-hidden">
-            <Navbar />
-            {children}
-            <AssistantFloatingButtonGroup />
-          </div>
-          {/* </Suspense> */}
-        </NextIntlClientProvider>
-        <WebFooter />
+        <AntdRegistry>
+          <NextIntlClientProvider locale={locale} messages={messages}>
+            {/* <AuthProvider> */}
+            {/* <UserLayout children={children} locale={locale} /> */}
+            {/* <UserLayout locale={locale}>{children}</UserLayout> */}
+            {/* </AuthProvider> */}
+            {/* <Suspense fallback={<RootLoading />}> */}
+            <div className="w-full bg-cover bg-[#f3f3f3]  min-h-screen  overflow-hidden">
+              <Navbar />
+              {children}
+              <AssistantFloatingButtonGroup />
+            </div>
+            {/* </Suspense> */}
+          </NextIntlClientProvider>
+          <WebFooter />
+        </AntdRegistry>
       </body>
     </html>
   );
