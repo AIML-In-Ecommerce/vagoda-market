@@ -29,7 +29,7 @@ const VtoProduct: React.FC<{
     >
       <div className="w-full px-4 py-4 flex flex-row  justify-between items-start">
         <div className="w-[65%] flex flex-col gap-1">
-          <div className="text-base font-medium text-white truncate overflow-hidden overflow-ellipsis whitespace-nowrap">
+          <div className="text-base font-bold text-white truncate overflow-hidden overflow-ellipsis whitespace-nowrap">
             {product.name}
           </div>
           <div className="w-full flex flex-row justify-between bg-white bg-opacity-50 rounded-full ">

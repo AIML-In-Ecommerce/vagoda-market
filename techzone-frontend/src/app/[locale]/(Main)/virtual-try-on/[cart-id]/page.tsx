@@ -2,7 +2,7 @@
 
 import React from "react";
 import "./local.css";
-import { useState, useEffect } from "react";
+import { ChangeEvent, useState, useEffect, useRef } from "react";
 import { BsPersonBoundingBox } from "react-icons/bs";
 import { IoShirtOutline } from "react-icons/io5";
 import { IoShirt } from "react-icons/io5";
@@ -13,13 +13,15 @@ import { BsEyeFill } from "react-icons/bs";
 import { PiCoatHangerFill } from "react-icons/pi";
 import { title } from "process";
 import VtoProduct from "@/component/customer/product/VtoProduct";
+import Image from "next/image";
+import axios from "axios";
 
 type Mode = "MODEL" | "PRODUCT" | "PREVIEW";
 
 interface VtoProduct {
   _id: string;
   name: string;
-  orginalPrice: number;
+  originalPrice: number;
   finalPrice: number;
   size: string;
   color: string;
@@ -51,7 +53,7 @@ const mockVtoProductData = [
   },
   {
     _id: "345",
-    name: "Áo Sơ mi Nam Laurents",
+    name: "Áo Sơ mi Nam Lados",
     originalPrice: 200000,
     finalPrice: 150000,
     size: "XL",
@@ -66,6 +68,44 @@ const VirtualTryOn = () => {
   const [mode, setMode] = useState<Mode>("MODEL");
   const [productList, setProductList] = useState<VtoProduct[]>([]);
   const [chosenProduct, setChosenProduct] = useState<VtoProduct>();
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+
+  const handleIconClick = () => {
+    if (fileRef.current) {
+      fileRef.current.click();
+    }
+  };
+
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleUpload = async () => {
+    if (fileRef.current?.files?.length) {
+      const formData = new FormData();
+      formData.append("image", fileRef.current.files[0]);
+
+      try {
+        const response = await axios.post("YOUR_API_ENDPOINT", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+
+        console.log("Image uploaded successfully:", response.data);
+      } catch (error) {
+        console.error("Error uploading image:", error);
+      }
+    }
+  };
 
   const changeMode = (newMode: Mode) => {
     setMode(newMode);
@@ -92,9 +132,19 @@ const VirtualTryOn = () => {
     switch (mode) {
       case "MODEL":
         return (
-          <div className="w-full h-[calc(100%-80px)] flex flex-col gap-5 justify-center items-center">
+          <div
+            className="w-full h-[calc(100%-80px)] flex flex-col gap-5 justify-center items-center cursor-pointer"
+            onClick={(e) => handleIconClick()}
+          >
+            <input
+              ref={fileRef}
+              type="file"
+              className="hidden"
+              onChange={handleFileChange}
+              accept="image/*"
+            />
             <BsPersonBoundingBox className="w-[150px] h-[150px]" />
-            <div className="text-md  italic">Tải lên ảnh của bạn</div>
+            <div className="text-md  italic">Click để lên ảnh của bạn</div>
           </div>
         );
       case "PRODUCT":
@@ -116,12 +166,54 @@ const VirtualTryOn = () => {
     }
   };
 
+  const renderChosenProductBox = (chosenProduct: VtoProduct) => {
+    return (
+      <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-2/3 w-[45%] h-[20%] bg-style flex flex-row rounded-2xl">
+        <div className="w-[75%] h-full flex flex-col gap-1 justify-center items-start p-4">
+          <div className="text-base font-semibold text-white">
+            {chosenProduct.name}
+          </div>
+          <div className="w-full flex flex-row gap-2 items-center">
+            <div className="text-base font-bold text-white">
+              {chosenProduct.finalPrice}đ
+            </div>
+            <div className="text-xs font-normal text-[#D7D7D7] line-through">
+              {chosenProduct.originalPrice}đ
+            </div>
+          </div>
+          <div className="w-[75%] flex flex-row justify-between bg-white bg-opacity-50 rounded-full">
+            <div className="px-2 py-1 text-xs font-normal text-white">
+              Size{" "}
+              <span className="text-sm font-bold ml-1">
+                {chosenProduct.size}
+              </span>
+            </div>
+            <div className="px-2 py-1 text-xs font-normal text-white">
+              Màu sắc{" "}
+              <span className="text-sm font-bold ml-1">
+                {chosenProduct.color}
+              </span>
+            </div>
+          </div>
+        </div>
+        <div className="relative w-[25%] aspect-square">
+          <Image
+            src={chosenProduct.image[0]}
+            alt="Image of product"
+            layout="fill"
+            objectFit="cover"
+            loading="lazy"
+            className="rounded-r-2xl"
+          />
+        </div>
+      </div>
+    );
+  };
+
   useEffect(() => {
     renderTitle(mode);
     renderMainBox(mode);
   }, [mode]);
-
-  useEffect(() => {}, []);
 
   return (
     <div className="bg-[url('https://res.cloudinary.com/dgsrxvev1/image/upload/v1716347947/dressing_room_c9bl2n.jpg')] bg-center bg-cover bg-no-repeat w-[100vw] h-[100vh] flex flex-col justify-center items-center">
@@ -176,7 +268,7 @@ const VirtualTryOn = () => {
               </div>
             </div>
           </div>
-          <div className="w-[60%] h-full bg-style text-white rounded-3xl p-4">
+          <div className="relative w-[60%] h-full bg-style text-white rounded-3xl p-4">
             <div className=" w-fit h-[48px] flex flex-row justify-center items-center px-1 bg-white bg-opacity-50 text-white text-xl rounded-full">
               <div className="w-[40px] h-[40px] bg-white text-slate-500 rounded-full flex justify-center items-center">
                 <PiCoatHangerFill className="w-[25px] h-[25px] text-slate" />
@@ -184,6 +276,8 @@ const VirtualTryOn = () => {
               <div className="mx-3">Phòng thử đồ</div>
             </div>
             {renderMainBox(mode)}
+            {chosenProduct != undefined &&
+              renderChosenProductBox(chosenProduct)}
           </div>
           <div className="flex w-[200px] h-[50px] bg-style text-white text-xl justify-center items-center rounded-full">
             Tiếp tục
