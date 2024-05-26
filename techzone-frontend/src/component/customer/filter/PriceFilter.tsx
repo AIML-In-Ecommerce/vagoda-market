@@ -40,7 +40,7 @@ export default function PriceFilter(props: PriceFilterProps) {
     } else {
       updatedQuery.delete("minPrice");
     }
-    if (_max) {
+    if (_max != null) {
       updatedQuery.set("maxPrice", _max.toString());
     } else {
       updatedQuery.delete("maxPrice");
@@ -84,6 +84,8 @@ export default function PriceFilter(props: PriceFilterProps) {
             : `Trên ${formatPrice(price.min)}`
           : `Dưới ${formatPrice(price.max)}`;
         const isSelected =
+          price &&
+          props.selectedPriceRange &&
           props.selectedPriceRange.max === price.max &&
           props.selectedPriceRange.min === price.min;
         return (
