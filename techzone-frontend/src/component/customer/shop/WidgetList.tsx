@@ -179,7 +179,9 @@ export default function WidgetList(props: WidgetListProps) {
         .sort((a, b) => a.order - b.order)
         .map((item, index) => (
           <div key={index}>
-            <Widget widget={item} setCollectionId={props.setCollectionId} />
+            {item.visibility && (
+              <Widget widget={item} setCollectionId={props.setCollectionId} />
+            )}
           </div>
         ))}
     </div>
@@ -231,10 +233,10 @@ function ProductWidget(props: WidgetProps) {
   return (
     <div>
       {element && element.pattern === ProductPatternType.CAROUSEL && (
-        <ProductCarousel products={MockData} widget={props.widget} />
+        <ProductCarousel widget={props.widget} />
       )}
       {element && element.pattern === ProductPatternType.GRID && (
-        <ProductGrid products={MockData} widget={props.widget} />
+        <ProductGrid widget={props.widget} />
       )}
     </div>
   );

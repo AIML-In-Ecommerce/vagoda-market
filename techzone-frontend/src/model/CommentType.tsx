@@ -17,12 +17,19 @@ export type AffectedCommentType = {
 
 export type RawCommentType = {
   _id: string;
-  review_id: string;
-  sender_id: string;
-  desc: string;
-  // parent: string | null;
-  // replyOnUser: string | null;
-  // like: string[] | null;
+  user: string; //sender-id
+  content: string; //desc
   createdAt: string;
-  // isSender: boolean;
 };
+
+// export type RawCommentType = {
+//   _id: string;
+//   review_id: string;
+//   sender_id: string;
+//   desc: string;
+//   // parent: string | null;
+//   // replyOnUser: string | null;
+//   // like: string[] | null;
+//   createdAt: string;
+//   // isSender: boolean;
+// };

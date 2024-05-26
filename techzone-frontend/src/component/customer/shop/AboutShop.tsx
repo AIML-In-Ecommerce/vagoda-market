@@ -12,20 +12,10 @@ import {
   InfoCircleOutlined,
 } from "@ant-design/icons";
 import { useState } from "react";
-
-export interface shopDetailType {
-  cancelPercentage: number;
-  refundPercentage: number;
-  sinceYear: number;
-  totalProductNumber: number;
-  description: string;
-  rating: number;
-  replyPercentage: number;
-  address: string;
-}
+import { ShopDetailType } from "@/model/ShopType";
 
 interface AboutProps {
-  shopDetail: shopDetailType;
+  shopDetail: ShopDetailType;
 }
 
 export default function AboutShop(aboutProps: AboutProps) {
@@ -52,7 +42,7 @@ export default function AboutShop(aboutProps: AboutProps) {
         // If successful, update the isCopied state value
         if (result) {
           //   toast
-          //   bannerProps.toast.success("Copy thành công!");
+          //   TODO: bannerProps.toast.success("Copy thành công!");
           setIsCopied(true);
         }
       })
@@ -86,7 +76,7 @@ export default function AboutShop(aboutProps: AboutProps) {
                     </Tooltip>
                   </div>
                 }
-                value={aboutProps.shopDetail.cancelPercentage}
+                value={aboutProps.shopDetail.cancelPercentage * 100}
                 precision={2}
                 valueStyle={{ color: "#3f8600" }}
                 // prefix={<ArrowUpOutlined />}
@@ -114,7 +104,7 @@ export default function AboutShop(aboutProps: AboutProps) {
                     </Tooltip>
                   </div>
                 }
-                value={aboutProps.shopDetail.refundPercentage}
+                value={aboutProps.shopDetail.refundPercentage * 100}
                 precision={2}
                 valueStyle={{ color: "#3f8600" }}
                 // prefix={<ArrowDownOutlined />}
@@ -165,7 +155,7 @@ export default function AboutShop(aboutProps: AboutProps) {
         <MessageOutlined /> Phản hồi chat:{" "}
       </div>
       <div className="m-2 col-span-4 col-start-7">
-        {aboutProps.shopDetail.replyPercentage}%
+        {aboutProps.shopDetail.replyPercentage * 100}%
       </div>
 
       <div className="m-2 col-span-2 col-start-5 font-semibold text-gray-600">

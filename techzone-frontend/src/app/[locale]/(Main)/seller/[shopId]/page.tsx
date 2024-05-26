@@ -1,9 +1,9 @@
 "use client";
 import Banner from "@/component/customer/shop/Banner";
 import ProductList from "../../product-list/page";
-import { Input, Tabs } from "antd";
-import AboutShop, { shopDetailType } from "@/component/customer/shop/AboutShop";
-const { Search } = Input;
+import { ConfigProvider, Input, Skeleton, Tabs } from "antd";
+import AboutShop from "@/component/customer/shop/AboutShop";
+import { GoSearch } from "react-icons/go";
 
 import {
   WidgetType,
@@ -18,6 +18,10 @@ import { useEffect, useState } from "react";
 import WidgetList from "@/component/customer/shop/WidgetList";
 import Collections from "@/component/customer/shop/collection/Collections";
 import { SearchProps } from "antd/es/input";
+import { ShopDetailType, ShopType } from "@/model/ShopType";
+import { useParams } from "next/navigation";
+import { GET_GetShop } from "@/apis/shop/ShopAPI";
+import { POST_GetWidgetList } from "@/apis/widget/WidgetAPI";
 
 interface ShopInfoProps {
   color: string;
@@ -135,23 +139,27 @@ export default function ShopPage() {
   };
 
   const shopDetailData = {
-    cancelPercentage: 11.29,
-    refundPercentage: 9.4,
-    sinceYear: 2023,
-    totalProductNumber: 510,
-    description:
-      "Mua ngay online sản phẩm của cửa hàng TechZone Trading trên TechZone.vn. ✓ chất lượng cao, uy tín, giá tốt ✓ Chính hãng ✓ Giao hàng toàn quốc",
-    rating: 4.6,
-    replyPercentage: 99,
-    address: "4820 Hilltop Haven Drive",
+    cancelPercentage: 0,
+    refundPercentage: 0,
+    sinceYear: 0,
+    totalProductNumber: 0,
+    description: "",
+    rating: 0,
+    replyPercentage: 0,
+    address: "",
   };
 
   //variables
-  const [widgets, setWidgets] = useState<WidgetType[]>(widgetList);
-  const [shopInfo, setShopInfo] = useState<ShopInfoProps>(shopInfoData);
-  const [shopDetail, setShopDetail] = useState<shopDetailType>(shopDetailData);
+
+  const [widgets, setWidgets] = useState<WidgetType[]>();
+  const [shopInfo, setShopInfo] = useState<ShopInfoProps>();
+  const [shopDetail, setShopDetail] = useState<ShopDetailType>(shopDetailData);
   const [tab, setTab] = useState<string>("0");
   const [selectedCollectionId, setSelectedCollectionId] = useState("");
+
+  const { shopId } = useParams();
+  const [shop, setShop] = useState<ShopType>();
+
   // TODO
   const [searchText, setSearchText] = useState("");
 
@@ -161,10 +169,12 @@ export default function ShopPage() {
       children: (
         <div className="p-2">
           {/* pattern list here */}
-          <WidgetList
-            widgets={widgets}
-            setCollectionId={setSelectedCollectionId}
-          />
+          {(widgets && (
+            <WidgetList
+              widgets={widgets}
+              setCollectionId={setSelectedCollectionId}
+            />
+          )) || <Skeleton active style={{ margin: 10 }} />}
         </div>
       ),
     },
@@ -174,7 +184,7 @@ export default function ShopPage() {
         <div className="p-2">
           {/* temp */}
 
-          {/* // Filter menu items based on search text
+          {/* // TODO: Filter menu items based on search text
             // .filter((item) =>
             //   item.name.toLowerCase().includes(searchText.toLowerCase())
             // ) */}
@@ -220,47 +230,137 @@ export default function ShopPage() {
     setSearchText(value);
   };
 
-  return (
-    <div className="mx-20 pb-10 h-fit overflow-hidden">
-      <section id="top-content" />
-      <Banner
-        color={shopInfo.color}
-        name={shopInfo.name}
-        avatarUrl={shopInfo.avatarUrl}
-        bannerUrl={shopInfo.bannerUrl}
-      />
+  // call api
+  useEffect(() => {
+    handleGetShop();
+  }, []);
 
-      <Tabs
-        defaultActiveKey="0"
-        activeKey={tab}
-        onChange={(key) => setTab(key)}
-        size="middle"
-        style={{ marginLeft: 10, marginRight: 10, marginTop: 10 }}
-        items={tabItems.map((item, i) => {
-          return {
-            label: item.label,
-            key: i.toString(),
-            children: item.children,
-          };
-        })}
-        tabBarExtraContent={
-          <div onClick={() => setTab("1")}>
-            <Search
-              size="large"
-              style={{
-                background: "gray",
-                borderRadius: "10px",
-                width: 280,
-                fontSize: "8px",
-              }}
-              placeholder="Tìm sản phẩm tại cửa hàng"
-              onSearch={onSearch}
-              enterButton
-              className="text-xs"
-            />
-          </div>
-        }
-      />
+  useEffect(() => {
+    if (!shop) return;
+    if (shop.shopInfoDesign) {
+      setShopInfo({
+        color: shop.shopInfoDesign.color,
+        name: shop.name,
+        avatarUrl: shop.shopInfoDesign.avatarUrl,
+        bannerUrl: shop.shopInfoDesign.bannerUrl,
+      });
+    } else
+      setShopInfo({
+        color: "white",
+        name: shop.name,
+        avatarUrl: "",
+        bannerUrl: "",
+      });
+
+    if (shop.shopDetail) {
+      setShopDetail({
+        cancelPercentage: shop.shopDetail.cancelPercentage,
+        refundPercentage: shop.shopDetail.refundPercentage,
+        sinceYear: shop.shopDetail.sinceYear,
+        totalProductNumber: shop.shopDetail.totalProductNumber,
+        description: shop.description,
+        rating: shop.shopDetail.rating,
+        replyPercentage: shop.shopDetail.replyPercentage,
+        address: shop.location,
+      });
+    }
+
+    if (shop.design && shop.design.length > 0) {
+      // get widgets and update them
+      handleGetWidgetList(shop.design);
+    }
+  }, [shop]);
+
+  const handleGetShop = async () => {
+    const response = await GET_GetShop(shopId.toString());
+    if (response.status == 200) {
+      // console.log(response.data);
+      if (response.data) {
+        setShop(response.data);
+      }
+    }
+  };
+
+  const handleGetWidgetList = async (ids: string[]) => {
+    const response = await POST_GetWidgetList(ids);
+    if (response.status == 200) {
+      // console.log(response.data);
+      if (response.data) {
+        setWidgets(response.data);
+      }
+    }
+  };
+
+  return (
+    <div className="mx-2 lg:mx-24 py-2 h-fit overflow-hidden">
+      <section id="top-content" />
+      {(shopInfo && (
+        <Banner
+          color={shopInfo.color}
+          name={shopInfo.name}
+          avatarUrl={shopInfo.avatarUrl}
+          bannerUrl={shopInfo.bannerUrl}
+          replyPercentage={shopDetail.replyPercentage}
+        />
+      )) || <Skeleton active style={{ margin: 10 }} />}
+
+      <ConfigProvider
+        theme={{
+          components: {
+            Tabs: {
+              // inkBarColor: "#c4996c",
+              // itemActiveColor: "#c4996c",
+              // itemHoverColor: "#c4996c",
+              // itemSelectedColor: "#c4996c",
+              inkBarColor: "#5c6856",
+              itemActiveColor: "#5c6856",
+              itemHoverColor: "#5c6856",
+              itemSelectedColor: "#5c6856",
+            },
+          },
+        }}
+      >
+        <Tabs
+          defaultActiveKey="0"
+          activeKey={tab}
+          onChange={(key) => setTab(key)}
+          size="middle"
+          style={{ marginLeft: 10, marginRight: 10, marginTop: 10 }}
+          items={tabItems.map((item, i) => {
+            return {
+              label: item.label,
+              key: i.toString(),
+              children: item.children,
+            };
+          })}
+          tabBarExtraContent={
+            <div onClick={() => setTab("1")}>
+              {/* <Input
+                size="large"
+                style={{
+                  background: "gray",
+                  borderRadius: "10px",
+                  width: 280,
+                  fontSize: "8px",
+                }}
+                placeholder="Tìm sản phẩm tại cửa hàng"
+                onSearch={onSearch}
+                enterButton
+                className="text-xs"
+              /> */}
+
+              <Input
+                size="middle"
+                placeholder="Tìm sản phẩm tại cửa hàng"
+                suffix={<GoSearch color="#5c6856" />}
+                className="rounded-full w-64 m-1 "
+                // onChange={onSearch}
+                value={searchText}
+              />
+            </div>
+          }
+        />{" "}
+      </ConfigProvider>
     </div>
   );
 }

@@ -11,7 +11,6 @@ interface ProductItemProps {
   price: number;
   isFlashSale: boolean;
   originalPrice: number;
-  inWishlist: boolean;
 }
 
 export const formatPrice = (value: number | null): string => {

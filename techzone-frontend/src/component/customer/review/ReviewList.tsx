@@ -2,7 +2,7 @@
 import { useMemo, useState } from "react";
 import { Pagination, PaginationProps } from "antd";
 // import { useTranslations } from "next-intl";
-import Review from "../review/Review";
+import Review from "./Review";
 
 interface ReviewListProps {
   setNumberOfReview(value: number): void;

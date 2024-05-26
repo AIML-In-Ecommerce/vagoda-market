@@ -1,5 +1,5 @@
 "use client";
-import { Carousel, Flex, Typography } from "antd";
+import { Carousel, Flex, List, Typography } from "antd";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { AiOutlineRight } from "react-icons/ai";
@@ -8,9 +8,11 @@ import ProductItem from "@/component/customer/ProductItem";
 import { ProductType } from "@/model/ProductType";
 import { ProductElement, WidgetType } from "@/model/WidgetType";
 import CustomEmpty from "../mini/CustomEmpty";
+import { CollectionType } from "@/model/CollectionType";
+import { GET_GetCollection } from "@/apis/collection/CollectionAPI";
+import { POST_GetProductList } from "@/apis/product/ProductDetailAPI";
 
 interface ProductCarouselProps {
-  products: ProductType[]; // TODO: get this from collection id
   widget: WidgetType;
 }
 
@@ -26,14 +28,17 @@ interface ProductItemProps {
 }
 
 export default function ProductCarousel(props: ProductCarouselProps) {
+  const element = props.widget.element as ProductElement;
+  const [collection, setCollection] = useState<CollectionType>();
+  const [rawProducts, setRawProducts] = useState<ProductType[]>([]);
+
   const [products, setProducts] = useState<ProductItemProps[]>([]);
   const SuggestionProductsMoreDetailHref = "#";
   const autoPlayCarouselSpeed = 5000; //ms
 
   useEffect(() => {
-    //fetch data here
-
-    const data = props.products;
+    //process data here
+    const data = rawProducts;
     const tr_data: ProductItemProps[] = data.map((value) => {
       const tr_item: ProductItemProps = {
         _id: value._id,
@@ -50,20 +55,49 @@ export default function ProductCarousel(props: ProductCarouselProps) {
     });
 
     setProducts(tr_data);
-  }, []);
+  }, [rawProducts]);
 
-  // var
-  const element = props.widget.element as ProductElement;
+  // call api
+  useEffect(() => {
+    handleGetCollection();
+  }, [element]);
+
+  useEffect(() => {
+    handleGetProductList();
+  }, [collection]);
+
+  const handleGetCollection = async () => {
+    const response = await GET_GetCollection(element.collectionId);
+    if (response.status == 200) {
+      if (response.data) {
+        setCollection(response.data);
+        // console.log("collection", response.data);
+      }
+    }
+  };
+
+  const handleGetProductList = async () => {
+    if (!collection) return;
+    const response = await POST_GetProductList(collection.productIdList);
+    if (response.status == 200) {
+      if (response.data) {
+        setRawProducts(response.data);
+        // console.log("product", data);
+      }
+    }
+  };
 
   return (
-    <div>
+    <div className="bg-white rounded-xl my-5">
       {products.length === 0 ? (
-        <CustomEmpty />
+        <div className="p-10">
+          <CustomEmpty />
+        </div>
       ) : (
-        <div className="w-full flex justify-center items-center bg-white py-10 my-5">
+        <div className="w-full flex justify-center items-center py-5">
           <div className="w-full px-10">
             <Flex className="w-full mb-4" align="center">
-              <Typography.Text className="text-2xl font-semibold w-full">
+              <Typography.Text className="mt-3 text-lg uppercase font-semibold w-full">
                 {element.title}
               </Typography.Text>
               <Flex
@@ -82,59 +116,94 @@ export default function ProductCarousel(props: ProductCarouselProps) {
                 </Typography.Text>
               </Flex>
             </Flex>
-            <Carousel
-              autoplay
-              autoplaySpeed={autoPlayCarouselSpeed}
-              arrows
-              prevArrow={<CarouselArrow direction="left" />}
-              nextArrow={<CarouselArrow direction="right" />}
-              slidesToShow={4}
-              slidesToScroll={4}
-              initialSlide={0}
-              responsive={[
-                {
-                  breakpoint: 1280,
-                  settings: {
-                    slidesToShow: 3,
-                    slidesToScroll: 3,
-                    infinite: true,
-                    dots: true,
+            <div className="invisible h-5">hidden block</div>
+            {products.length < 4 ? (
+              <div className="px-10">
+                <List
+                  grid={{
+                    gutter: 5,
+                    xs: 0,
+                    sm: 1,
+                    md: 2,
+                    lg: 3,
+                    xl: 5,
+                    xxl: 5,
+                  }}
+                  dataSource={products}
+                  locale={{
+                    emptyText: <CustomEmpty />,
+                  }}
+                  renderItem={(item) => (
+                    <List.Item>
+                      <ProductItem
+                        imageLink={item.imageLink}
+                        name={item.name}
+                        rating={item.rating}
+                        soldAmount={item.soldAmount}
+                        price={item.price}
+                        isFlashSale={item.isFlashSale}
+                        originalPrice={item.originalPrice}
+                      />
+                    </List.Item>
+                  )}
+                />
+              </div>
+            ) : (
+              <Carousel
+                autoplay
+                autoplaySpeed={autoPlayCarouselSpeed}
+                arrows
+                prevArrow={<CarouselArrow direction="left" />}
+                nextArrow={<CarouselArrow direction="right" />}
+                slidesToShow={5}
+                slidesToScroll={1}
+                initialSlide={0}
+                responsive={[
+                  {
+                    breakpoint: 1280,
+                    settings: {
+                      slidesToShow: 3,
+                      slidesToScroll: 1,
+                      infinite: true,
+                      dots: true,
+                    },
                   },
-                },
-                {
-                  breakpoint: 1024,
-                  settings: {
-                    slidesToShow: 2,
-                    slidesToScroll: 2,
-                    infinite: true,
-                    dots: true,
+                  {
+                    breakpoint: 1024,
+                    settings: {
+                      slidesToShow: 2,
+                      slidesToScroll: 1,
+                      infinite: true,
+                      dots: true,
+                    },
                   },
-                },
-                {
-                  breakpoint: 768,
-                  settings: {
-                    slidesToShow: 1,
-                    slidesToScroll: 1,
-                    initialSlide: 1,
+                  {
+                    breakpoint: 768,
+                    settings: {
+                      slidesToShow: 1,
+                      slidesToScroll: 1,
+                      initialSlide: 1,
+                    },
                   },
-                },
-              ]}
-            >
-              {products.length > 0 &&
-                products.map((value, index) => (
-                  <div key={index} className="pl-5">
-                    <ProductItem
-                      imageLink={value.imageLink}
-                      name={value.name}
-                      rating={value.rating}
-                      soldAmount={value.soldAmount}
-                      price={value.price}
-                      isFlashSale={value.isFlashSale}
-                      originalPrice={value.originalPrice}
-                    />
-                  </div>
-                ))}
-            </Carousel>
+                ]}
+              >
+                {products.length > 0 &&
+                  products.map((value, index) => (
+                    <div key={index} className="pl-5">
+                      <ProductItem
+                        imageLink={value.imageLink}
+                        name={value.name}
+                        rating={value.rating}
+                        soldAmount={value.soldAmount}
+                        price={value.price}
+                        isFlashSale={value.isFlashSale}
+                        originalPrice={value.originalPrice}
+                      />
+                    </div>
+                  ))}
+              </Carousel>
+            )}
+            <div className="invisible h-5">hidden block</div>
           </div>
         </div>
       )}
