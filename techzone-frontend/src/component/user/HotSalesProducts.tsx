@@ -2,7 +2,8 @@
 
 import { Divider, Flex, Pagination, Skeleton, Typography } from "antd";
 import { useEffect, useState } from "react";
-import ProductItem, { ProductItemScaleSize } from "./utils/ProductItem";
+import ProductItem from "../customer/ProductItem";
+import CenterTitle from "./utils/CenterTitle";
 
 
 
@@ -186,6 +187,10 @@ const paddingBlockProps: ProductItemProps =
 
 export default function HotSalesProducts({}: SpecifiedProductsCarouselProp)
 {
+    const titleValue = "Sản phẩm bán chạy"
+    const subTitleValue = "Sản phẩm được lựa chọn nhiều trong tuần"
+    const titleBackground = "bg-[#F2F2F2]"
+
     const [products, setProducts] = useState<ProductItemProps[]>([])
     const [mainDisplay, setMainDisplay] = useState<JSX.Element>(<Skeleton active />)
     const [currentPagination, setCurrentPagination] = useState<number>(1)
@@ -301,7 +306,6 @@ export default function HotSalesProducts({}: SpecifiedProductsCarouselProp)
                     <>
                         <div className={isVisible} key={value._id}>
                             <ProductItem
-                            size={ProductItemScaleSize.large}
                             imageLink={value.imageLink} name={value.name} rating={value.rating} 
                             soldAmount={value.soldAmount} price={value.price} isFlashSale={value.isFlashSale} 
                             originalPrice={value.originalPrice} inWishlist={value.inWishlist}/>
@@ -311,7 +315,7 @@ export default function HotSalesProducts({}: SpecifiedProductsCarouselProp)
             })
 
             wrapper.push(
-                <Flex key={i.toString()} className="w-full" justify="center" align="center" gap={6}>
+                <Flex key={i.toString()} className="w-full" justify="space-evenly" align="center" gap={6}>
                     {rowDisplay}
                 </Flex>
             )
@@ -322,9 +326,9 @@ export default function HotSalesProducts({}: SpecifiedProductsCarouselProp)
         //     {wrapper}
         // </Flex>
 
-        result = <div className="w-10/12">
+        result = <Flex vertical className="w-full" justify="center" align="center" gap={16}>
             {wrapper}
-        </div>
+        </Flex>
 
         return result
     }
@@ -338,18 +342,29 @@ export default function HotSalesProducts({}: SpecifiedProductsCarouselProp)
 
     return(
         <>
-            <div className="w-full bg-indigo-300 flex flex-col justify-center items-center rounded-lg py-4">
-                <div className="w-10/12 pb-4">
-                    <Flex justify="start" align="center">
-                        <Typography.Text className="text-3xl font-semibold w-full pt-4 text-white text-center">
-                            Sản phẩm bán chạy
-                        </Typography.Text>
-                    </Flex>
-                    <div className="w-full h-px bg-white mt-3 mb-4"></div>
-                </div>
-                {mainDisplay}
-                <Pagination defaultCurrent={1} current={currentPagination} total={totalPage*10} showPrevNextJumpers onChange={handlePageChange}
-                />
+            <div className="w-full flex flex-col justify-center items-center  py-4">
+                <Flex vertical className="container w-full" justify="center" align="center">
+                    {/* <div className="w-full pb-4">
+                        <Flex justify="start" align="center">
+                            <Typography.Text className="text-3xl font-semibold w-full pt-4">
+                                Sản phẩm bán chạy
+                            </Typography.Text>
+                        </Flex>
+                        <Flex className="w-full mt-4" align="baseline">
+                                <div className="w-80 h-1 bg-[#683A25] mb-4"></div>
+                                <div className="w-full h-px bg-gray-200 mb-4"></div>
+                        </Flex>
+                    </div> */}
+                    <CenterTitle title={titleValue} subTitle={subTitleValue} isUppercase background={titleBackground}/>
+                    <div className="invisible h-10 w-full">
+                    </div>
+                    {mainDisplay}
+                    <div className="h-10 invisible">hidden block</div>
+                    <Pagination defaultCurrent={1} current={currentPagination} total={totalPage*10} showPrevNextJumpers onChange={handlePageChange}
+                    />
+                    <div className="invisible h-10 w-full">
+                    </div>
+                </Flex>
             </div>
         </>
     )

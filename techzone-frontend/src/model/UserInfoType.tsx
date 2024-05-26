@@ -1,18 +1,47 @@
 
-interface SimpleUserAddress
+interface AddressCoordinate
 {
-    receiverName: string,
-    address: string,
-    phoneNumber: string
+    _id: string,
+    lng: number,
+    lat: number
 }
 
-interface UserInfo
+export type UserShippingAddressType =
+{
+    _id: string,
+    street: string,
+    idProvince: string,
+    idDistrict: string,
+    idCommune: string,
+    country: string,
+    receiverName: string,
+    phoneNumber: string,
+    coordinate: AddressCoordinate | null,
+    label: string,
+    isDefault: boolean
+}
+
+export type UserInfoType = 
 {
     _id: string,
     fullname: string,
     avatar: string,
     dob: string,
     phoneNumber: string,
-    address: SimpleUserAddress[],
-    account: string
+    address: UserShippingAddressType[],
+    createAt: Date | string
+    account: string,
+    __v: number
+}
+
+export type SimpleUserInfoType =
+{
+    _id: string,
+    fullname: string,
+    avatar: string,
+    dob: string,
+    phoneNumber: string,
+    createAt: Date | string
+    account: string,
+    __v: number
 }

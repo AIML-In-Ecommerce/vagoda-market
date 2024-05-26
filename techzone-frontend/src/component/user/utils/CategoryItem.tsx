@@ -10,16 +10,18 @@ import { useState } from "react"
 interface CategoryItemProps
 {
     category: CategoryType,
+    onHoldingCallback: (params: any) => void,
+    onLeavingCallback: (params: any) => void,
     // maxSize: any[]
 }
 
 
-export default function CategoryItem(props: CategoryItemProps)
+export default function CategoryItem(props: CategoryItemProps,)
 {
     const hiddenNameState = " transition-opacity duration-1000 ease-out opacity-0"
-    const visibleNameState = " transition-opacity duration-700 ease-in opacity-100"
+    const visibleNameState = " transition-opacity duration-700 ease-in opacity-80"
 
-    const hiddenImageOpacity = " opacity-60"
+    const hiddenImageOpacity = " opacity-100"
     const visibleImageOpacity = " opacity-100"
 
     // const maxWidth = props.maxSize[0]
@@ -35,7 +37,8 @@ export default function CategoryItem(props: CategoryItemProps)
         {
             setImageOpacity(hiddenImageOpacity)
             setIsVisibleName(visibleNameState)
-        }, 400)
+            props.onHoldingCallback(true)
+        }, 0)
         // setIsVisibleName(visibleNameState)
 
     }
@@ -46,39 +49,46 @@ export default function CategoryItem(props: CategoryItemProps)
         {
             setImageOpacity(visibleImageOpacity)
             setIsVisibleName(hiddenNameState)
-        }, 700)
+            props.onLeavingCallback(false)
+        },0)
     }
 
     return(
         <>
-            <div key={props.category._id} className="w-full h-full shadow-black rounded-md hover:scale-105 transition duration-500 cursor-pointer" 
+            <div key={props.category._id}  className="container w-full h-full overflow-hidden"
                 onMouseEnter={() => {handleMouseEnter()}} onMouseLeave={() => {handleMouseLeave()}}
-                // style={{maxHeight: maxHeight, maxWidth: maxWidth}}
+                style={{
+                    // backgroundImage: `url(${props.category.image})`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                  }}
                 >
-                {
-                    props.category.image != undefined ?
-                    <Image 
-                    className={`container relative ${imageOpacity} rounded-md`}
-                    width={"100%"}
-                    height={"100%"}
-                    preview={false}
-                    src={props.category.image}
-                    /> :
-                    <Image 
-                    className="container relative"
-                    width={"100%"}
-                    height={"100%"}
-                    preview={false}
-                    src={""}
-                />
-                }
-                <Flex className={`container absolute bg-stone-700 bottom-10 left-0 right-0 h-1/5 min-h-16 w-full p-1${isVisibleName}`} justify="center" align="center">
-                    <Flex className="w-full h-full border border-white" justify="center" align="center">
-                        <p className="font-semibold text-lg text-wrap text-white">
-                            {props.category.name}
-                        </p>
-                    </Flex>
-                </Flex>
+                    <div className="w-full h-full shadow-black rounded-md hover:scale-105 transition duration-500 cursor-pointer">
+                        {
+                        props.category.image != undefined ?
+                        <Image 
+                        className={`container relative ${imageOpacity} rounded-md`}
+                        width={"100%"}
+                        height={"100%"}
+                        preview={false}
+                        src={props.category.image}
+                        /> :
+                        <Image 
+                        className="container relative"
+                        width={"100%"}
+                        height={"100%"}
+                        preview={false}
+                        src={""}
+                        />
+                        }
+                        <Flex className={`container absolute bg-white from-white/20 to-white/0 bottom-10 left-0 right-0 h-1/5 min-h-16 w-full p-1${isVisibleName}`} justify="center" align="center">
+                            <Flex className="w-full h-full" justify="center" align="center">
+                                <p className="font-semibold text-lg text-wrap text-black uppercase opacity-100 backdrop-blur-lg">
+                                    {props.category.name}
+                                </p>
+                            </Flex>
+                        </Flex>
+                    </div>
             </div>
         </>
     )

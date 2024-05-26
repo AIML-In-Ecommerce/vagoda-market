@@ -4,6 +4,8 @@ import { Button, Card, Carousel, Col, Divider, Flex, Image, Row, Skeleton } from
 import Meta from "antd/es/card/Meta"
 import { useEffect, useState } from "react"
 import CategoryItem from "./utils/CategoryItem"
+import { CategoryType } from "@/model/CategoryType"
+import CenterTitle from "./utils/CenterTitle"
 
 
 
@@ -146,14 +148,21 @@ interface CategoryProps
 export default function HotCategory({}: HotCategoryProps)
 {
 
+    const titleValue = "Danh mục phổ biến"
+    const subTitleValue = "Danh mục được lựa chọn nhiều trong tuần"
+    const titleBackground = "bg-[#F2F2F2]"
+
     // const nonAppearanceEffect = "transition-opacity duration-700 ease-in opacity-0"
     // const appearanceEffect = "transition-opacity duration-700 ease-in opacity-100"
 
     const numOfItemPerSlide = 7
-    const [category, setCategory] = useState<CategoryProps[]>([])
+    const [category, setCategory] = useState<CategoryType[]>([])
     const [currentSlide, setCurrentSlide] = useState<number>(-1)
     const [mainDisplay, setMainDisplay] = useState<JSX.Element | undefined>(undefined)
     // const [fadedEffect, setFadedEffect] = useState<string>(appearanceEffect)
+
+    const [changeFlat, setChangeFlat] = useState<boolean>(false)
+    const [isHolding, setIsHolding] = useState<boolean>(false)
 
     useEffect(() =>
     {
@@ -200,49 +209,72 @@ export default function HotCategory({}: HotCategoryProps)
         //auto change
         setTimeout(() =>
         {
-            if(category.length == 0)
-            {
-                return
-            }
-
-            const nextSlideIndex = (currentSlide + 1) % category.length
-            setCurrentSlide(nextSlideIndex)
+            setChangeFlat((prev) => !prev)
         }, 6000)
 
     },
     [currentSlide])
 
+    useEffect(() =>
+    {
+        if(category.length == 0)
+        {
+            return
+        }
 
-    function get7ItemsDisplay(data: CategoryProps[])
+        if(isHolding == true)
+        {
+            return
+        }
+
+        const nextSlideIndex = (currentSlide + 1) % category.length
+        setCurrentSlide(nextSlideIndex)
+
+    }, [changeFlat, isHolding])
+
+    function onHoldingCallback(value: boolean)
+    {
+        setIsHolding(true)
+    }
+
+    function onLeavingCallback(value: boolean)
+    {
+        setTimeout(() =>
+        {
+            setIsHolding(false)
+        }, 6000)
+    }
+
+    function get7ItemsDisplay(data: CategoryType[])
     {
         return(
             <>
                 <Row className="w-full" gutter={12}>
                     <Col span={8} style={{maxHeight: "410px"}} flex={"auto"}>
-                        <CategoryItem category={data[0]}/>
+                        <CategoryItem onHoldingCallback={onHoldingCallback} onLeavingCallback={onLeavingCallback} category={data[0]}/>
                     </Col>
                     <Col span={16}>
                         <Row gutter={[5,10]}>
                             <Row gutter={10}>
                                 <Col span={6} style={{maxHeight: "200px"}}>
-                                    <CategoryItem category={data[1]} />
+                                    <CategoryItem onHoldingCallback={onHoldingCallback} onLeavingCallback={onLeavingCallback} category={data[1]} />
                                 </Col>
                                 <Col span={9} style={{maxHeight: "200px"}}>
-                                    <CategoryItem category={data[2]} />
+                                    <CategoryItem onHoldingCallback={onHoldingCallback} onLeavingCallback={onLeavingCallback} category={data[2]} />
                                 </Col>
                                 <Col span={9} style={{maxHeight: "200px"}}>
-                                    <CategoryItem category={data[3]} />
+                                    <CategoryItem onHoldingCallback={onHoldingCallback} onLeavingCallback={onLeavingCallback} category={data[3]} />
                                 </Col>
                             </Row>
                             <Row gutter={10}>
                                 <Col span={9} style={{maxHeight: "200px"}}>
-                                    <CategoryItem category={data[4]} />
+                                    <CategoryItem onHoldingCallback={onHoldingCallback} onLeavingCallback={onLeavingCallback} category={data[4]} />
                                 </Col>
                                 <Col span={9} style={{maxHeight: "200px"}}>
-                                    <CategoryItem category={data[5]} />
+                                    <CategoryItem onHoldingCallback={onHoldingCallback} onLeavingCallback={onLeavingCallback} category={data[5]} />
                                 </Col>
                                 <Col span={6} style={{maxHeight: "200px"}}>
-                                    <CategoryItem category={data[6]} />
+                                    <CategoryItem onHoldingCallback={onHoldingCallback} onLeavingCallback={onLeavingCallback} category={data[6]} />
                                 </Col>
                             </Row>
                         </Row>
@@ -254,18 +286,17 @@ export default function HotCategory({}: HotCategoryProps)
 
     return(
         <>
-            <Flex vertical className="bg-gray-100 w-full" justify="start" align="center">
+            <Flex vertical className="w-full" justify="start" align="center">
                 <Flex vertical className="w-full py-6" justify="center" align="center">
-                    <div className="container w-full pb-6">
-                        <p className="text-3xl font-semibold text-amber-900">
-                            Danh mục TOP
-                        </p>
-                        {/* <div className="w-full h-px bg-amber-900 mt-3 mb-4"></div> */}
+                    <CenterTitle title={titleValue} subTitle={subTitleValue} background={titleBackground} isUppercase/>
+                    <div className="invisible h-10 w-full">
                     </div>
-                    <div className="container w-full">
+                    <div className="container w-full mt-4">
                         {mainDisplay}
                     </div>
                 </Flex>
+                <div className="invisible h-10 w-full">
+                </div>
             </Flex>
         </>
     )

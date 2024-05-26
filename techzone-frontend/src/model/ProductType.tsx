@@ -37,6 +37,16 @@ export type ProductDetailType = {
   shopId: string;
   status: ProductStatus;
   images: string[];
+  // image: [
+  //   {
+  //     link: string,
+  //     color: {
+  //         label: string,
+  //         value: string
+  //     },
+  //     type: string,
+  //   },
+  // ],
   avgRating: number;
   soldQuantity: number;
 };

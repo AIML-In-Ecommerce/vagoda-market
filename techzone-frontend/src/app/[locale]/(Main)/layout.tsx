@@ -1,14 +1,12 @@
 import type { Metadata } from "next";
 // import { Inter } from "next/font/google";
-import "../globals.css";
-// import { AuthProvider } from "@/context/AuthContext";
-// import StyledComponentsRegistry from "../../../lib/AntdRegistry";
 import Navbar from "@/component/customer/Navbar";
 import AssistantFloatingButtonGroup from "@/component/user/AssistantFloatingButtonGroup";
 import WebFooter from "@/component/user/WebFooter";
 import { NextIntlClientProvider, useMessages } from "next-intl";
 import { Lato } from "next/font/google";
 import { ReactNode } from "react";
+import "../../globals.css";
 
 // import UserLayout from "@/component/UserLayout";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
