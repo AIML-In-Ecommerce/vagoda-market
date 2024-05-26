@@ -339,9 +339,9 @@ export default function ProductDetail() {
   };
 
   return (
-    <div className="bg-white">
+    <div className="bg-white px-2 lg:px-24 ">
       {(product && (
-        <div className="justify-between mx-24 pb-10 gap-5 h-fit overflow-hidden relative">
+        <div className="justify-between pb-10 gap-5 h-fit overflow-hidden relative">
           <div className="">
             {/* about product */}
             <div

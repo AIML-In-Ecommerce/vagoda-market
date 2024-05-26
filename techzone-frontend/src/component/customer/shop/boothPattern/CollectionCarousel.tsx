@@ -64,31 +64,11 @@ export default function CollectionCarousel(props: CollectionCarouselProps) {
     handleGetCollectionList(element.collectionIdList);
   }, [element]);
 
-  useEffect(() => {
-    //fetch data here
-    const data = collections;
-
-    const tr_data: CollectionType[] = data.map((value) => {
-      const tr_item: CollectionType = {
-        _id: value._id,
-        name: value.name,
-        imageUrl: value.imageUrl,
-        productIdList: value.productIdList,
-        createDate: value.createDate,
-        isActive: value.isActive,
-        shop: value.shop,
-      };
-      return tr_item;
-    });
-
-    setCollections(tr_data);
-  }, [collections]);
-
   const handleGetCollectionList = async (ids: string[]) => {
     const response = await POST_GetCollectionList(ids);
     if (response.status == 200) {
       if (response.data) {
-        setCollections(response.data);
+        setCollections(response.data.filter((c) => c.isActive === true));
         // console.log("collection", response.data);
       }
     }
@@ -126,6 +106,7 @@ export default function CollectionCarousel(props: CollectionCarouselProps) {
                     />
                   </List.Item>
                 )}
+                className="px-10"
               />
             ) : (
               <Carousel

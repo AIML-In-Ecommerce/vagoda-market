@@ -54,3 +54,43 @@ export async function POST_GetPromotionList(ids: string[]) {
     };
   }
 }
+
+export async function GET_GetPromotionListByShop(shopId: string) {
+  const url = (
+    BACKEND_PREFIX?.toString() +
+    ":" +
+    PROMOTION_PORT?.toString() +
+    "/promotions/shop/" +
+    shopId
+  ).toString();
+
+  try {
+    // console.log(url);
+    const response = await axios.get(url);
+    const responseData: PromotionListResponse = response.data;
+
+    if (responseData.status == 200) {
+      return {
+        isDenied: false,
+        message: "Get promotion successfully",
+        status: responseData.status,
+        data: responseData.data,
+      };
+    } else {
+      return {
+        isDenied: true,
+        message: "Failed to get promotion",
+        status: responseData.status,
+        data: responseData.data,
+      };
+    }
+  } catch (err) {
+    console.error(err);
+    return {
+      isDenied: true,
+      message: "Failed to get promotion",
+      status: 500,
+      data: undefined,
+    };
+  }
+}

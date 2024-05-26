@@ -241,7 +241,7 @@ export default function ShopPage() {
       setShopInfo({
         color: shop.shopInfoDesign.color,
         name: shop.name,
-        avatarUrl: shop.shopInfoDesign.name,
+        avatarUrl: shop.shopInfoDesign.avatarUrl,
         bannerUrl: shop.shopInfoDesign.bannerUrl,
       });
     } else
@@ -292,7 +292,7 @@ export default function ShopPage() {
   };
 
   return (
-    <div className="mx-24 py-2 h-fit overflow-hidden">
+    <div className="mx-2 lg:mx-24 py-2 h-fit overflow-hidden">
       <section id="top-content" />
       {(shopInfo && (
         <Banner

@@ -37,7 +37,8 @@ export default function Collections(props: CollectionsProps) {
     if (response.status === 200) {
       // console.log(response.data);
       // console.log(response.message);
-      if (response.data) setCollections(response.data);
+      if (response.data)
+        setCollections(response.data.filter((c) => c.isActive === true));
     } else console.log(response.message);
   };
 

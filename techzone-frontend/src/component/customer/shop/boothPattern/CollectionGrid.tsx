@@ -67,7 +67,7 @@ export default function CollectionGrid(props: CollectionGridProps) {
     const response = await POST_GetCollectionList(ids);
     if (response.status == 200) {
       if (response.data) {
-        setCollections(response.data);
+        setCollections(response.data.filter((c) => c.isActive === true));
         // console.log("collection", response.data);
       }
     }
