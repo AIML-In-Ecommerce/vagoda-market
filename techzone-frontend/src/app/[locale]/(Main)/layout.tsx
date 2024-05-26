@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 // import { Inter } from "next/font/google";
-import "../globals.css";
-// import { AuthProvider } from "@/context/AuthContext";
-// import StyledComponentsRegistry from "../../../lib/AntdRegistry";
+import "../../globals.css"
 import Navbar from "@/component/customer/Navbar";
 import AssistantFloatingButtonGroup from "@/component/user/AssistantFloatingButtonGroup";
 import WebFooter from "@/component/user/WebFooter";
@@ -10,8 +8,6 @@ import { NextIntlClientProvider, useMessages } from "next-intl";
 import { Lato } from "next/font/google";
 import { ReactNode, Suspense } from "react";
 import RootLoading from "./loading";
-
-// import UserLayout from "@/component/UserLayout";
 
 interface RootLayoutProps {
   children: ReactNode;
@@ -40,10 +36,6 @@ export default function RootLayout({
       {/* <body className={inter.className}> */}
       <body className={lato.className}>
         <NextIntlClientProvider locale={locale} messages={messages}>
-          {/* <AuthProvider> */}
-          {/* <UserLayout children={children} locale={locale} /> */}
-          {/* <UserLayout locale={locale}>{children}</UserLayout> */}
-          {/* </AuthProvider> */}
           <Suspense fallback={<RootLoading />}>
             <div className="w-full bg-cover bg-[#f3f3f3]  min-h-screen  overflow-hidden">
               <Navbar />

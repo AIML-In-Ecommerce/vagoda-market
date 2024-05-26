@@ -274,7 +274,8 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps)
         return(
             <Flex className="w-full" key={Date.now().toString() + index.toString()} justify="end" align="center">
                 <Flex className="w-7/12" justify="end" align="center">
-                    <Tag color={"#92400e"}>
+                    {/* <Tag color={"#92400e"}> */}
+                    <Tag color={"#797979"}>
                         <Typography.Paragraph className="text-wrap text-sm text-white">
                             {message.content}
                         </Typography.Paragraph>
@@ -451,7 +452,7 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps)
             <Popover open={open} trigger={"click"} placement="leftBottom" content={AIAssistantPopoverContent}>
                 <Flex vertical align="center" justify="end">
                     <Tooltip trigger={"hover"} title={""} placement="left">
-                        <button type="button" className="bg-stone-600 hover:bg-stone-500 w-16 min-w-16 h-20 min-h-16 rounded-md border-0 bg-blue-600 hover:bg-blue-400" onClick={handleOpenAssistant}>
+                        <button type="button" className="bg-stone-600 hover:bg-[#797979] w-16 min-w-16 h-20 min-h-16 rounded-md border-0 " onClick={handleOpenAssistant}>
                             <Flex vertical className="w-full h-full py-4" justify="center" align="center">
                                 <BiSupport className="w-full h-full text-sm text-white"/>
                                 <Typography.Text className="text-xs text-white font-medium">

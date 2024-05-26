@@ -6,6 +6,7 @@ import { Button, Card, Carousel, Col, Flex, Row, Skeleton, Typography } from "an
 import Link from "next/link"
 import {AiOutlineRight} from "react-icons/ai"
 import { CarouselArrow } from "./utils/CarouselArrow"
+import CenterTitle from "./utils/CenterTitle"
 
 interface HomeFlashSalesProps
 {
@@ -331,6 +332,10 @@ const MockData =
 
 export default function HomeFlashSales({}: HomeFlashSalesProps)
 {
+    const titleValue = "Giảm giá sốc "
+    const subTitleValue = "Ngày giảm giá, giảm giá cực sốc ngay hôm nay"
+    const titleBackground = "bg-[#F2F2F2]"
+
     const [products, setProducts] = useState<SimpleProductInfo[]>([])
     const numberOfDisplayedProductPerScreen = 10
     const numberOfDisplayedProductPerRow = 5
@@ -433,7 +438,7 @@ export default function HomeFlashSales({}: HomeFlashSalesProps)
                         </div>
                     )
                 })
-                const rowWrapper = <Flex key={j.toString()+leftIndex.toString()+rightIndex.toString()} className="mb-3 px-1 h-full" justify={"space-evenly"} align="center" gap={8}>
+                const rowWrapper = <Flex key={j.toString()+leftIndex.toString()+rightIndex.toString()} className="ư-full mb-3 px-1 h-full" justify={"space-evenly"} align="center" gap={8}>
                     {row}
                 </Flex>
 
@@ -448,25 +453,32 @@ export default function HomeFlashSales({}: HomeFlashSalesProps)
 
     return(
         <>
-            <div className="w-full bg-gray-100 flex justify-center">
+            <div className="w-full flex justify-center">
                 <div className="container">
                     <div className="invisible h-10 w-full">
                     </div>
-                        <Flex className="w-full mb-2 bg-stone-700 py-4 px-2 rounded-md" align="center">
-                            <Typography.Text className="text-3xl font-semibold w-full text-white">
-                                Flash sales
+                        {/* <Flex className="w-full py-4 rounded-md" align="center">
+                            <Typography.Text className="text-3xl font-semibold w-full">
+                                Giảm giá sốc
                             </Typography.Text>
                             <Flex className="w-full" justify="end" align="baseline"> 
                                 <Link href={flashSaleMoreDetailHref} prefetch={false}>
-                                    <Typography.Text className="text-white">
+                                    <Typography.Text className="text-black">
                                         Xem thêm
                                     </Typography.Text>
                                 </Link>
-                                <Typography.Text className="text-base text-white">
+                                <Typography.Text className="text-base">
                                     <AiOutlineRight size={"12px"}/>
                                 </Typography.Text>
                             </Flex>
-                        </Flex>
+                        </Flex> */}
+                        {/* <Flex className="w-full" align="baseline">
+                            <div className="w-52 h-1 bg-[#683A25] mb-4"></div>
+                            <div className="w-full h-px bg-gray-200 mb-4"></div>
+                        </Flex> */}
+                        <CenterTitle title={titleValue} subTitle={subTitleValue} isUppercase background={titleBackground}/>
+                        <div className="invisible h-10 w-full">
+                        </div>
                         {/* <div className="w-full h-px bg-amber-900 mt-3 mb-4"></div> */}
                         <div className="h-full">
                             <div className="block">

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Lato } from "next/font/google";
-import "../globals.css";
+import "../../globals.css";
 // import { AuthProvider } from "@/context/AuthContext";
 // import { RecoveryProvider } from "@/context/RecoveryContext";
 import { ReactNode } from "react";
