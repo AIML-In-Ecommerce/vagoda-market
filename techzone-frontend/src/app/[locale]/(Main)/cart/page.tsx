@@ -1,27 +1,26 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
-import { Button, Card, Modal, Space, Table, Image, Tooltip, Skeleton, Select } from 'antd';
-import type { TableColumnsType } from 'antd';
+import { Button, Card, Modal, Space, Table, Image, Tooltip, Skeleton, Select, Radio, Divider } from 'antd';
+import type { RadioChangeEvent, TableColumnsType } from 'antd';
 import { FaRegTrashCan, FaRegCircleQuestion } from "react-icons/fa6";
 import { Currency } from "@/component/user/utils/CurrencyDisplay";
 import { QuantityControl } from "@/component/user/utils/QuantityControl";
-import { AddressType } from "@/model/AddressType";
+import { Address, AddressType } from "@/model/AddressType";
 import Search from "antd/es/transfer/search";
-import FloatingCartSummary from "@/component/customer/product/FloatingCartSummary";
 import { DiscountType, PromotionType } from "@/model/PromotionType";
 import PromotionCard from "@/component/customer/product/PromotionCard";
 import crypto from 'crypto';
 import styled from 'styled-components'
-
-type CartPageType = {
-    key: React.Key;
-    image: string;
-    name: string;
-    unit_price: number;
-
-    amount?: number;
-    final_price?: number;
-}
+import Link from "next/link";
+import { RiContactsBookLine } from "react-icons/ri";
+import DeliveryInfoForm from "@/component/customer/cart/DeliveryInfoForm";
+import TransactionSection from "@/component/customer/cart/TransactionSection";
+import PromotionSection from "@/component/customer/cart/PromotionSection";
+import { Product, GET_getUserCartProducts, PUT_updateCartProduct } from "@/app/apis/cart/CartProductAPI";
+import { ShippingAddress } from "@/app/apis/cart/AddressAPI";
+import { useRouter } from "next/navigation";
+import { POST_processTransaction, PaymentMethod } from "@/app/apis/payment/PaymentAPI";
+import { POST_createOrder } from "@/app/apis/order/OrderAPI";
 
 const formatDate = (date: Date) => {
     const hours = date.getHours().toString().padStart(2, '0');
@@ -71,31 +70,36 @@ const SelectWrapper = styled.div`
     }
 `
 
+interface ProductTableItem extends Product {
+    key: React.Key
+}
+
 export default function CartPage() {
     const [selectionType, setSelectionType] = useState<'checkbox' | 'radio'>('checkbox');
-    const [products, setProducts] = useState<any>(null);
+    const [products, setProducts] = useState<Product[]>();
     const [promotions, setPromotions] = useState<PromotionType[]>([]);
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
     const [selectedKey, setSelectedKey] = useState<React.Key | null>(null)
     const [loading, setLoading] = useState(false);
-    const [top, setTop] = React.useState<number>(50);
     const [provisional, setProvisional] = useState(0);
     const [discount, setDiscount] = useState(0);
+    const [shippingFee, setShippingFee] = useState(0);
     const [discounts, setDiscounts] = useState<PromotionType[]>([]);
     const [total, setTotal] = useState(0);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showDeleteManyModal, setShowDeleteManyModal] = useState(false);
     const [showPromotionModal, setShowPromotionModal] = useState(false);
+    const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(PaymentMethod.COD);
+    const [isSavingAddress, setIsSavingAddress] = useState<boolean>(false);
     const promotion_help = "Áp dụng tối đa 1 Mã giảm giá Sản Phẩm và 1 Mã Vận Chuyển"
+    const router = useRouter();
 
-    const [currentAddress, setCurrentAddress] = useState<AddressType>({
-        _id: '1',
-        receiverName: 'Nguyễn Minh Quang',
-        address: "135B Trần Hưng Đạo, Phường Cầu Ông Lãnh, Quận 1, Hồ Chí Minh, Việt Nam",
-        phoneNumber: "0839994856",
-        addressType: "residential",
-        selectedAsDefault: true
-    });
+    const initialAddress = {
+        _id: "datn1",
+
+    } as ShippingAddress;
+
+    const [currentAddress, setCurrentAddress] = useState<ShippingAddress>(initialAddress);
 
     const handleShowDeleteOneModal = (key: any) => {
         setSelectedKey(key);
@@ -128,6 +132,27 @@ export default function CartPage() {
         setShowPromotionModal(false);
     }
 
+    //transaction process
+    const handleTransaction = async () => {
+        console.log('Transaction processing...');
+
+        //Create order
+        const createOrderResponse = await POST_createOrder(
+            process.env.NEXT_PUBLIC_USER_ID as string, currentAddress._id, "", paymentMethod);
+
+        //Direct call to transaction api
+        const transactionResponse = await POST_processTransaction(
+            process.env.NEXT_PUBLIC_USER_ID as string, 
+            products?.filter(product => selectedRowKeys.includes(product._id))!,
+            total,
+            paymentMethod
+        );
+        if (transactionResponse) {
+            console.log('Navigating to gateway...', transactionResponse.data);
+            transactionResponse.data ? router.push(transactionResponse.data) : router.push('/payment');
+        }
+    }
+
     const fetchPromotions = async () => {
         const data: PromotionType[] = [
             {
@@ -138,7 +163,7 @@ export default function CartPage() {
                 discountValue: 50,
                 quantity: 6,
                 upperBound: 100000,
-                expiredDate: formatDate(new Date('2024-03-24T12:30:00')), // 
+                expiredDate: formatDate(new Date('2024-05-30T12:30:00')), // 
                 code: ""
             },
             {
@@ -149,7 +174,7 @@ export default function CartPage() {
                 discountValue: 200000,
                 quantity: 20,
                 lowerBound: 400000,
-                expiredDate: formatDate(new Date('2024-03-27T12:30:00')),
+                expiredDate: formatDate(new Date('2024-06-27T12:30:00')),
                 code: ""
             },
             {
@@ -195,49 +220,12 @@ export default function CartPage() {
     }
 
     const fetchProducts = async () => {
-        const data: CartPageType[] = [
-            {
-                key: '1',
-                image: 'https://akko.vn/wp-content/uploads/2023/07/3098-RF-Dracula-Castle-01.png',
-                name: 'Bàn phím AKKO 3098 RF Dracula Castle Akko Switch V3 Cream Yellow',
-                unit_price: 1690000,
-                amount: 1
-
-            },
-            {
-                key: '2',
-                image: 'https://product.hstatic.net/200000722513/product/gearvn-man-hinh-e-dra-egm25f100-25-ips-100hz-1_1ac2962172cc4030a2a09485eac87191_1024x1024.jpg',
-                name: 'Màn hình E-DRA EGM25F100 25" IPS 100Hz',
-                unit_price: 2190000,
-                amount: 1
-            },
-            {
-                key: '3',
-                image: 'https://product.hstatic.net/200000722513/product/g502x-plus-gallery-2-white_69229c9ba5534ad5bfae7d827037a28f_365394a31b6342e4949249099adb755e_1024x1024.png',
-                name: 'Chuột Logitech G502 X Plus LightSpeed White',
-                unit_price: 309000,
-                amount: 1
-            },
-            {
-                key: '4',
-                image: 'https://product.hstatic.net/200000722513/product/54078_ghe_cong_thai_hoc_edra_eec219_black_4_e9645318c0814037b24162c5d2d767b9_1024x1024.jpg',
-                name: 'Ghế công thái học E-Dra EEC219',
-                unit_price: 2590000,
-                amount: 1
-            },
-            {
-                key: '5',
-                image: 'https://product.hstatic.net/200000722513/product/hinh-1_2735fbceb0a14ddb955bdf64b63e45b7_ac360205755f44648b50ec4bcf0a7fcd_1024x1024.gif',
-                name: 'Tai nghe Corsair HS55 Wireless Core Black (CA-9011290-AP)',
-                unit_price: 1540000,
-                amount: 1
-            },
-
-        ];
+        await GET_getUserCartProducts(process.env.NEXT_PUBLIC_USER_ID as string)
+            .then(response => setProducts(response.data?.products || undefined));
         setTimeout(() => {
             setLoading(false);
         }, 1000);
-        setProducts(data);
+        ;
     }
 
     const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
@@ -256,9 +244,9 @@ export default function CartPage() {
             return;
         }
         if (products) {
-            const updatedProducts = products.map((product: { key: React.Key; }) => {
-                if (product.key === key) {
-                    return { ...product, amount: value };
+            const updatedProducts = products.map((product: Product) => {
+                if (product._id === key) {
+                    return { ...product, quantity: value };
                 }
                 return product;
             });
@@ -266,37 +254,42 @@ export default function CartPage() {
         }
     }
 
-    const onIncrement = (key: React.Key, value: number) => {
+    const onIncrement = async (key: React.Key, value: number) => {
         if (value === 100) return;
         if (products) {
-            const updatedProducts = products.map((product: { key: React.Key; }) => {
-                if (product.key === key) {
-                    return { ...product, amount: value + 1 };
+            const updatedProducts = products.map((product: Product) => {
+                if (product._id === key) {
+                    return { ...product, quantity: value + 1 };
                 }
                 return product;
             });
+            await PUT_updateCartProduct(process.env.NEXT_PUBLIC_USER_ID as string, key.toString(), value + 1);
             setProducts(updatedProducts);
         }
     }
 
-    const onDecrement = (key: React.Key, value: number) => {
-        if (value === 1) return handleShowDeleteOneModal(key)
+    const onDecrement = async (key: React.Key, value: number) => {
+        if (value === 1) {   
+            return handleShowDeleteOneModal(key);
+        }
 
         if (products) {
-            const updatedProducts = products.map((product: { key: React.Key; }) => {
-                if (product.key === key) {
-                    return { ...product, amount: value - 1 };
+            const updatedProducts = products.map((product: Product) => {
+                if (product._id === key) {
+                    return { ...product, quantity: value - 1 };
                 }
                 return product;
             });
+            await PUT_updateCartProduct(process.env.NEXT_PUBLIC_USER_ID as string, key.toString(), value - 1);
             setProducts(updatedProducts);
         }
     }
 
-    const handleRemoveRow = (key: React.Key) => {
+    const handleRemoveRow = async (key: React.Key) => {
         if (products) {
-            const updatedProducts = products.filter((product: { key: React.Key; }) => product.key !== key);
+            const updatedProducts = products.filter((product: Product) => product._id !== key);
             setProducts(updatedProducts);
+            await PUT_updateCartProduct(process.env.NEXT_PUBLIC_USER_ID as string, key.toString(), 0);
         }
         const updatedRowKeys = selectedRowKeys.filter(beforeKey => beforeKey !== key);
         setSelectedRowKeys(updatedRowKeys);
@@ -305,8 +298,10 @@ export default function CartPage() {
 
     const handleRemoveSelectedRows = () => {
         console.log('handleRemoveSelectedRows', selectedRowKeys)
-        const updatedProducts = products.filter((product: { key: React.Key; }) => !selectedRowKeys.includes(product.key));
+        const updatedProducts = products!.filter((product: Product) => !selectedRowKeys.includes(product._id));
         setProducts(updatedProducts);
+        selectedRowKeys.forEach(async (rowKey: React.Key) => 
+            await PUT_updateCartProduct(process.env.NEXT_PUBLIC_USER_ID as string, rowKey.toString(), 0))
         setSelectedRowKeys([]);
     };
 
@@ -334,11 +329,10 @@ export default function CartPage() {
         setDiscounts(updatedDiscounts);
     }
 
-
     const handleProvisional = () => {
-        const selectedProducts = products ? products.filter((product: { key: React.Key; }) => selectedRowKeys.includes(product.key)) : [];
-        const provisional = selectedProducts ? selectedProducts.reduce((total: number, product: { unit_price: number; amount: any; }) => {
-            return total + (product.unit_price * (product.amount || 1));
+        const selectedProducts = products ? products.filter((product: Product) => selectedRowKeys.includes(product._id)) : [];
+        const provisional = selectedProducts ? selectedProducts.reduce((total: number, product: Product) => {
+            return total + (product.finalPrice * (product.quantity || 1));
         }, 0) : 0;
         setProvisional(provisional);
     }
@@ -373,7 +367,7 @@ export default function CartPage() {
         setTotal(total);
     }
 
-    const columns: TableColumnsType<CartPageType> = [
+    const columns: TableColumnsType<Product> = [
         {
             title: <div className="flex flex-row gap-1 items-center uppercase text-gray-400">
                 <div className="text-base">Sản phẩm ({selectedRowKeys.length})</div>
@@ -381,8 +375,8 @@ export default function CartPage() {
                     <FaRegTrashCan />
                 </Button>
             </div>,
-            dataIndex: ['name'],
-            render: (text: string, record: CartPageType, index: number) =>
+            dataIndex: 'name',
+            render: (text: string, record: Product) =>
                 <Space align="start" size={12} className="flex flex-row">
                     {
                         loading ? <Skeleton.Image active /> :
@@ -397,7 +391,7 @@ export default function CartPage() {
                             <div className="flex flex-row">
                                 <div className="flex flex-col gap-1">
                                     <div className="text-sm font-bold text-ellipsis overflow-hidden">{record.name}</div>
-                                    <div className="text-sm text-gray-500 mb-1">Category1 / Category2</div>
+                                    <div className="text-sm text-gray-500 mb-1">Vàng / XS</div>
                                     <SelectWrapper className="flex flex-row gap-2 mb-1">
                                         <Select
                                             defaultValue="yellow"
@@ -410,18 +404,21 @@ export default function CartPage() {
                                             ]}
                                         />
                                         <Select
-                                            defaultValue="red"
+                                            defaultValue="xs"
                                             style={{ width: 75 }}
                                             // onChange={handleChange}
                                             options={[
-                                                { value: 'red', label: 'Đỏ' },
-                                                { value: 'green', label: 'Xanh' },
-                                                { value: 'yellow', label: 'Vàng' },
+                                                { value: 'xs', label: 'XS' },
+                                                { value: 's', label: 'S' },
+                                                { value: 'm', label: 'M' },
+                                                { value: 'l', label: 'L' },
+                                                { value: 'xl', label: 'XL' },
+                                                { value: '2xl', label: '2XL' },
                                             ]}
                                         />
                                     </SelectWrapper>
-                                    <div style={{ width: 75 }} onClick={() => handleShowDeleteOneModal(record.key)}>
-                                        <div className="flex flex-row items-center gap-1 hover:font-semibold">
+                                    <div style={{ width: 75 }} onClick={() => handleShowDeleteOneModal(record._id)}>
+                                        <div className="flex flex-row cursor-pointer items-center gap-1 hover:font-semibold">
                                             <FaRegTrashCan /> Xóa
                                         </div>
                                     </div>
@@ -437,13 +434,13 @@ export default function CartPage() {
         },
         {
             title: <span className="text-base uppercase text-gray-400">Số lượng</span>,
-            dataIndex: 'amount',
-            render: (value: number, record: CartPageType) =>
+            dataIndex: 'quantity',
+            render: (value: number, record: Product) =>
                 <div className="flex justify-center">
                     {
                         loading ? <Skeleton.Input active /> : (
                             <QuantityControl
-                                keyProp={record.key} value={value}
+                                keyProp={record._id} value={record.quantity}
                                 minValue={1} maxValue={100} defaultValue={1}
                                 inputWidth={75}
                                 onIncrement={onIncrement}
@@ -458,15 +455,25 @@ export default function CartPage() {
         },
         {
             title: <span className="text-base uppercase text-gray-400">Thành tiền</span>,
-            dataIndex: 'final_price',
-            render: (value: number, record: CartPageType) => (
+            dataIndex: ['finalPrice', 'originalPrice'],
+            render: (value: number, record: Product) => (
                 loading ? <Skeleton.Input active /> : (
-                    <span className="text-red-500 font-bold text-base ">
-                        <Currency value={(record.unit_price * (record.amount || 1))}
-                            locales={"vi-VN"}
-                            currency={"VND"}
-                            minimumFractionDigits={0} />
-                    </span>)
+                    <div className="flex flex-col gap-1">
+                        <span className="text-slate-500 text-base line-through">
+                            <Currency value={(record.originalPrice * (record.quantity || 1))}
+                                locales={"vi-VN"}
+                                currency={"VND"}
+                                minimumFractionDigits={0} />
+                        </span>
+                        <span className="text-red-500 font-bold text-base">
+                            <Currency value={(record.finalPrice * (record.quantity || 1))}
+                                locales={"vi-VN"}
+                                currency={"VND"}
+                                minimumFractionDigits={0} />
+                        </span>
+                    </div>
+
+                )
             ),
             width: '25%',
             align: 'center' as const,
@@ -488,50 +495,144 @@ export default function CartPage() {
     useEffect(() => {
         const storedAddress = localStorage.getItem('shippingAddress');
         if (!storedAddress) return;
-        setCurrentAddress(JSON.parse(storedAddress) as AddressType);
+        const storedAddressObject = JSON.parse(storedAddress) as ShippingAddress;
+        setCurrentAddress(storedAddressObject);
+        console.log('currentAddress', storedAddressObject);
     }, []);
-
-
 
     const goToShippingAddressPage = () => {
         localStorage.setItem('shippingAddress', JSON.stringify(currentAddress));
     }
 
+    const payment_options = [
+        {
+            label: 'COD',
+            description: 'Thanh toán bằng tiền mặt khi nhận hàng',
+            value: PaymentMethod.COD,
+            icon: 'https://cdn-icons-png.flaticon.com/512/1554/1554401.png'
+        },
+        {
+            label: 'Thanh toán bằng ví ZaloPay',
+            description: "Thẻ ATM / Thẻ tín dụng (Credit card) / Thẻ ghi nợ (Debit card)",
+            value: PaymentMethod.ZALOPAY,
+            icon: "https://web.venusagency.vn/uploads/public/2021/06/03/1622682588188_zalopay.png"
+        },
+        {
+            label: 'Thanh toán qua Paypal',
+            description: "Thẻ tín dụng (Credit card) / Thẻ ghi nợ (Debit card)",
+            value: PaymentMethod.PAYPAL,
+            icon: "https://cdn.iconscout.com/icon/free/png-256/free-paypal-58-711793.png"
+        },
+    ];
+
+    const onPaymentMethodChange = (e: RadioChangeEvent) => {
+        console.log('radio checked', e.target.value);
+        setPaymentMethod(e.target.value);
+    };
+
+    const GreyoutWrapper = styled.div`
+        .ant-image {
+            transition: filter 0.3s; /* Smooth transition for the filter effect */
+        }
+
+        /* When the radio not is selected or not hovered over, apply greyscale filter */
+        .ant-radio-wrapper:not(.ant-radio-wrapper-checked):not(:hover) .ant-image {
+            filter: grayscale(100%);
+        }        
+    `
+
     return (
         <React.Fragment>
-            <div className="container flex flex-col p-5 mx-auto my-5">
-                <div className="mt-5 flex xs:flex-col sm:flex-col md:flex-col lg:grid lg:grid-cols-6 gap-2 relative">
-                    <div className="lg:col-start-1 lg:col-span-3 lg:mb-0 mb-10">
-                        <div className="text-2xl font-bold normal-case p-2">Thông tin vận chuyển</div>
+            <div className="container flex flex-col p-5 mx-auto my-5 overflow-x-hidden">
+                <div className="mt-5 flex xs:flex-col sm:flex-col md:flex-col lg:grid lg:grid-cols-12 gap-2 relative">
+                    <div className="lg:col-span-6 lg:mb-0 mb-10 p-2 flex flex-col">
+                        <div className="w-full">
+                            {/* Thông tin vận chuyển section */}
+                            <div className="flex flex-row justify-between items-center">
+                                <div className="text-3xl font-bold normal-case">Thông tin vận chuyển</div>
+                                <Link href="/cart/shipping">
+                                    <div className="flex flex-row gap-1 text-blue-700 cursor-pointer hover:text-blue-900 items-center">
+                                        <RiContactsBookLine />
+                                        <div className="text-base">Chọn từ sổ địa chỉ</div>
+                                    </div>
+                                </Link>
+                            </div>
+                            <div className="mt-5">
+                                {loading ? <Skeleton /> :
+                                    <DeliveryInfoForm currentAddress={currentAddress}
+                                        setIsSavingAddress={setIsSavingAddress} />
+                                }
+                            </div>
+                            {/* Hình thức thanh toán section */}
+                            <div className="text-3xl font-bold normal-case my-10">Hình thức thanh toán</div>
+                            <Radio.Group onChange={onPaymentMethodChange} value={paymentMethod} size="large" className="w-full">
+                                <div className="flex flex-col gap-2">
+                                    {
+                                        payment_options.map(item => {
+                                            return (
+                                                <div className={`border-2 rounded-xl cursor-pointer ${paymentMethod === item.value ? "border-[#9bb0e8]" : "border-gray-200"} mt-1 p-2`}>
+                                                    <GreyoutWrapper>
+                                                        <Radio value={item.value} className="w-full text-gray-400 hover:text-black">
+                                                            <div className="flex flex-row items-center">
+                                                                <div className="mr-3">
+                                                                    <Image src={item.icon} preview={false} width={40}></Image>
+                                                                </div>
+                                                                <div className="flex flex-col gap-1">
+                                                                    <div className={`font-semibold ${paymentMethod === item.value ? "text-black" : ""}`}>{item.label}</div>
+                                                                    <div className={`${paymentMethod === item.value ? "text-black" : ""}`}>{item.description}</div>
+                                                                </div>
+
+                                                            </div>
+                                                        </Radio>
+                                                    </GreyoutWrapper>
+                                                </div>
+                                            )
+                                        })
+                                    }
+                                </div>
+                            </Radio.Group>
+                        </div>
                     </div>
+                    <div className="lg:col-span-6 lg:w-auto w-full flex flex-col border-l-2 pl-3">
+                        <div className="w-full">
+                            <div className="text-3xl font-bold normal-case p-2">Giỏ hàng</div>
+                            <Table
+                                tableLayout='auto'
+                                rowSelection={{
+                                    type: selectionType,
+                                    ...rowSelection,
 
-                    <div className="lg:col-start-4 lg:col-span-3 lg:w-auto w-full flex flex-col border-l-2 pl-3">
-                        {/* <FloatingCartSummary
-                            goToShippingAddressPage={goToShippingAddressPage}
-                            loading={loading} selectedRowKeys={selectedRowKeys}
-                            provisional={provisional} discount={discount} total={total}
-                            currentAddress={currentAddress}
-                            showPromotionModal={handleShowPromotionModal}
-                        /> */}
-                        
-                        <div className="text-2xl font-bold normal-case p-2">Giỏ hàng</div>
-                        <Table
-                            tableLayout='auto'
-                            rowSelection={{
-                                type: selectionType,
-                                ...rowSelection,
+                                }}
+                                columns={columns}
+                                dataSource={products?.map(product => ({...product, key: product._id} as ProductTableItem))}
+                                // onRow={(record) => ({
+                                //         onClick: () => handleRowClick(record),
+                                //       })}
+                                loading={loading}
+                                pagination={false}
+                                scroll={{ x: 'min-content' }}
+                            />
+                            <Divider style={{ height: "auto", border: "0.25px solid silver" }}></Divider>
 
-                            }}
-                            columns={columns}
-                            dataSource={products}
-                            // onRow={(record) => ({
-                            //         onClick: () => handleRowClick(record),
-                            //       })}
-                            loading={loading}
-                            pagination={{ pageSize: 4 }}
-                            scroll={{ x: 'min-content' }}
+                            <PromotionSection
+                                loading={loading}
+                                showPromotionModal={handleShowPromotionModal}
+                                selectedDiscounts={discounts}
+                                allPromotions={promotions}
+                                applyDiscount={applyDiscount}
+                                removeDiscount={removeDiscount} />
 
-                        />
+                            <Divider style={{ height: "auto", border: "0.25px solid silver" }}></Divider>
+
+                            <TransactionSection
+                                selectedRowKeys={selectedRowKeys}
+                                loading={loading}
+                                provisional={provisional} 
+                                discount={discount} 
+                                shippingFee={shippingFee}
+                                total={total} 
+                                handleTransaction={handleTransaction}/>
+                        </div>
                     </div>
                 </div>
             </div>

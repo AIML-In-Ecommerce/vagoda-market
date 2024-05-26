@@ -1,20 +1,21 @@
 "use client";
-import { AddressType } from '@/model/AddressType';
+import { getProvince, getDistrict, getCommune, Commune, District, Province, ShippingAddress } from '@/app/apis/cart/AddressAPI';
+import { Address, AddressType } from '@/model/AddressType';
 import { Select, Radio, Checkbox, Button, Input, CheckboxProps, RadioChangeEvent, Form } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 interface AddressFormProps {
     setFormVisibility: (value: boolean) => void
     isEditMode: boolean // true: edit mode or false: create mode
-    currentAddress?: AddressType
-    handleCreate: (_address: AddressType | undefined) => void
-    handleUpdate: (_address: AddressType | undefined) => void
+    currentAddress: ShippingAddress | undefined
+    handleCreate: (_address: ShippingAddress | undefined) => void
+    handleUpdate: (_address: ShippingAddress | undefined) => void
 }
 
 const addressTypeOptions = [
-    { label: 'Nhà riêng / Chung cư', value: 'residential' },
-    { label: 'Cơ quan / Công ty', value: 'workplace' },
+    { label: 'Nhà riêng / Chung cư', value: 'HOME' },
+    { label: 'Cơ quan / Công ty', value: 'OFFICE' },
 ];
 
 const getAddressTypeLabel = (value: string) => {
@@ -25,24 +26,152 @@ const getAddressTypeLabel = (value: string) => {
 
 export function AddressForm(props: AddressFormProps) {
     const [form] = Form.useForm();
-    const [addressInfo, setAddressInfo] = useState<AddressType | undefined>(props.currentAddress);
-    const [name, setName] = useState<string | undefined>(props.currentAddress?.receiverName);
-    const [phoneNumber, setPhoneNumber] = useState<string | undefined>(props.currentAddress?.phoneNumber);
-    const [address, setAddress] = useState<string | undefined>(props.currentAddress?.address);
-    const [selectedAsDefault, setSelectedAsDefault] = useState<boolean | undefined>(props.currentAddress?.selectedAsDefault);
-    const [addressType, setAddressType] = useState<string | undefined>(props.currentAddress?.addressType);
+
+    const [name, setName] = useState<string>(props.currentAddress?.receiverName || "");
+    const [phoneNumber, setPhoneNumber] = useState<string>(props.currentAddress?.phoneNumber || "");
+    const [street, setStreet] = useState<string>(props.currentAddress?.street || "");
+    const [selectedAsDefault, setSelectedAsDefault] = useState<boolean>(props.currentAddress?.isDefault || false);
+
+    const [provinceList, setProvinceList] = React.useState<Province[]>([]);
+    const [districtList, setDistrictList] = React.useState<District[]>([]);
+    const [communeList, setCommuneList] = React.useState<Commune[]>([]);
+    const [provinceValue, setProvinceValue] = React.useState<string>(props.currentAddress?.idProvince || "0");
+    const [districtValue, setDistrictValue] = React.useState<string>(props.currentAddress?.idDistrict || "0");
+    const [communeValue, setCommuneValue] = React.useState<string>(props.currentAddress?.idCommune || "0");
+    const [isLoadingDistrict, setIsLoadingDistrict] = React.useState(false);
+    const [isLoadingCommune, setIsLoadingCommune] = React.useState(false);
+    const [addressType, setAddressType] = React.useState<string>(props.currentAddress?.label || "HOME");
+
+    const address = useMemo<Address>(() => {
+        const currentAddress = {
+            ...props.currentAddress,
+            street: street,
+            idCommune: communeValue,
+            idDistrict: districtValue,
+            idProvince: provinceValue,
+        } as Address;
+        return currentAddress;
+    }, [street, communeValue, districtValue, provinceValue]);
+
+    const addressInfo = useMemo<ShippingAddress>(() => ({
+        ...props.currentAddress,
+        receiverName: name,
+        phoneNumber: phoneNumber,
+        label: addressType,
+        isDefault: selectedAsDefault,
+        street: address.street,
+        idProvince: address.idProvince,
+        idDistrict: address.idDistrict,
+        idCommune: address.idCommune,
+        country: address.country,
+        coordinite: null,
+    } as ShippingAddress), [name, phoneNumber, addressType, address, selectedAsDefault, props.currentAddress]);
 
     useEffect(() => {
-        console.log("AddressForm: ", name, phoneNumber, address, addressType, selectedAsDefault);
-        setAddressInfo({
-            ...addressInfo, receiverName: name,
-            phoneNumber: phoneNumber,
-            address: address,
-            addressType: addressType,
-            selectedAsDefault: selectedAsDefault
-        } as AddressType)
-    }, [name, phoneNumber, address, selectedAsDefault, addressType])
+        console.log("AddressForm " + props.isEditMode, props.currentAddress);
+    }, [props.currentAddress])
 
+    // useEffect(() => {
+    //     getProvince().then((value: any) => setProvinceList(value));
+    //     handleChangeProvince(provinceValue);
+    //     handleChangeDistrict(districtValue);
+    //     handleChangeCommune(communeValue);
+    // }, []);
+
+    useEffect(() => {
+        const fetchAddressData = async () => {
+            const provinces = getProvince();
+            setProvinceList(provinces);
+
+            if (provinceValue !== "0") {
+                setIsLoadingDistrict(true);
+                const districts = getDistrict(provinceValue);
+                setDistrictList(districts);
+                setIsLoadingDistrict(false);
+            }
+
+            if (districtValue !== "0") {
+                setIsLoadingCommune(true);
+                const communes = getCommune(districtValue);
+                setCommuneList(communes);
+                setIsLoadingCommune(false);
+            }
+        };
+
+        fetchAddressData();
+    }, [provinceValue, districtValue, communeValue]);
+
+
+    const provinceOptions = useMemo(() => {
+        return [
+            { label: "Chọn Tỉnh/Thành phô...", value: "0" },
+            ...provinceList.map((province: any) => ({
+                label: province.name,
+                value: province.idProvince,
+            }))
+        ];
+    }, [provinceList]);
+
+    const districtOptions = useMemo(() => {
+        return [
+            { label: "Chọn Quận/Huyện...", value: "0" },
+            ...districtList.map((district: any) => ({
+                label: district.name,
+                value: district.idDistrict,
+            }))
+        ];
+    }, [districtList]);
+
+    const communeOptions = useMemo(() => {
+        return [
+            { label: "Chọn Phường/Xã...", value: "0" },
+            ...communeList.map((commune: any) => ({
+                label: commune.name,
+                value: commune.idCommune,
+            }))
+        ];
+    }, [communeList]);
+
+    const handleChangeProvince = async (idProvince: string) => {
+        const value = idProvince;
+        setProvinceValue(idProvince);
+        console.log("Province value changed", idProvince);
+
+        if (value === "0") {
+            setDistrictList([]);
+            setCommuneList([]);
+            setDistrictValue("0");
+            setCommuneValue("0");
+            return;
+        }
+        setIsLoadingDistrict(true);
+        const districtList = getDistrict(value);
+        //Clear commune options, set default values for district and commune
+        setCommuneList([]);
+        setDistrictValue("0");
+        setCommuneValue("0");
+        setDistrictList(districtList);
+        setIsLoadingDistrict(false);
+    };
+
+    const handleChangeDistrict = async (idDistrict: string) => {
+        const value = idDistrict;
+        setDistrictValue(value);
+        if (value === "0") {
+            setCommuneList([]);
+            setCommuneValue("0");
+        } else {
+            setIsLoadingCommune(true);
+            const communeList = getCommune(value);
+            setCommuneList(communeList);
+            //Clear commune options, set default value for commune
+            setCommuneValue("0");
+            setIsLoadingCommune(false);
+        }
+    };
+    const handleChangeCommune = (idCommnue: string) => {
+        setCommuneValue(idCommnue);
+    };
 
     const onConfirmation = () => {
         if (props.isEditMode) {
@@ -88,7 +217,7 @@ export function AddressForm(props: AddressFormProps) {
                     }
                     hasFeedback
                     rules={[{ required: true, message: 'Vui lòng nhập số điện thoại người nhận' }]}>
-                    <Input placeholder={`${phoneNumber ?? "Nhập số điện thoại"}`}
+                    <Input placeholder={`Ví dụ: 0123456789`}
                         value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} />
                 </Form.Item>
                 <Form.Item label={
@@ -97,7 +226,12 @@ export function AddressForm(props: AddressFormProps) {
                     </span>
                 }
                     hasFeedback>
-                    <Select placeholder="Chọn Tỉnh/Thành phố" />
+                    <Select placeholder=" Chọn Thành Phố/Tỉnh"
+                        defaultValue={provinceValue}
+                        value={provinceValue}
+                        options={provinceOptions}
+                        onChange={handleChangeProvince}>
+                    </Select>
                 </Form.Item>
                 <Form.Item label={
                     <span className="font-semibold text-base">
@@ -105,7 +239,13 @@ export function AddressForm(props: AddressFormProps) {
                     </span>
                 }
                     hasFeedback>
-                    <Select placeholder="Chọn Quận/Huyện" />
+                    <Select placeholder=" Chọn Quận/Huyện"
+                        defaultValue={districtValue}
+                        value={districtValue}
+                        options={districtOptions}
+                        loading={isLoadingDistrict}
+                        onChange={handleChangeDistrict}>
+                    </Select>
                 </Form.Item>
                 <Form.Item label={
                     <span className="font-semibold text-base">
@@ -113,7 +253,13 @@ export function AddressForm(props: AddressFormProps) {
                     </span>
                 }
                     hasFeedback>
-                    <Select placeholder="Chọn Phường/Xã" />
+                    <Select placeholder=" Chọn Phường/Xã"
+                        defaultValue={communeValue}
+                        value={communeValue}
+                        options={communeOptions}
+                        loading={isLoadingCommune}
+                        onChange={handleChangeCommune}>
+                    </Select>
                 </Form.Item>
                 <Form.Item label={
                     <span className="font-semibold text-base">
@@ -125,9 +271,10 @@ export function AddressForm(props: AddressFormProps) {
                         // showCount
                         maxLength={100}
                         // onChange={onChange}
-                        placeholder={`${address ?? "Ví dụ: 227, đường Nguyễn Văn Cừ"}`}
+                        placeholder={`Ví dụ: 227, đường Nguyễn Văn Cừ`}
                         style={{ height: 100, resize: 'none' }}
-                        value={address} onChange={(e) => setAddress(e.target.value)}
+                        value={street}
+                        onChange={(e) => setStreet(e.target.value)}
                     />
                 </Form.Item>
                 <Form.Item label={
