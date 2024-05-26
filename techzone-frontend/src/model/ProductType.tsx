@@ -10,6 +10,20 @@ export type ProductType = {
   category: string;
 };
 
+export type _ProductType = {
+  _id: string;
+  name: string;
+  image: string;
+  avgRating: number;
+  soldQuantity: number;
+  finalPrice: number;
+  originalPrice: number;
+  isFlashSale: boolean;
+  // category: { id: string; name: string };
+  // subCategory: { id: string; name: string };
+  // subCategoryType: { id: string; name: string };
+};
+
 export type ProductDetailType = {
   _id: string;
   name: string;

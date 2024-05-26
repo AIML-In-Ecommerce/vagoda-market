@@ -1,38 +1,29 @@
 "use client";
 import {
-  LegacyRef,
-  MutableRefObject,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-import {
+  Affix,
+  Image as AntdImage,
   Badge,
+  Button,
   Descriptions,
   DescriptionsProps,
-  Divider,
   Empty,
   Flex,
   FloatButton,
+  InputNumber,
   List,
+  Popover,
   Progress,
   Rate,
   Skeleton,
   Tabs,
-  Image as AntdImage,
-  Popover,
-  Affix,
-  InputNumber,
-  Button,
 } from "antd";
-import ReviewList from "./ReviewList";
-import FloatingCartForm from "./FloatingCartForm";
-import ComboList from "./ComboList";
 import Link from "next/link";
-import CartSummaryModal from "./ProductSummaryModal";
+import { useEffect, useMemo, useState } from "react";
 import ReactImageMagnify from "react-image-magnify";
+import ComboList from "./ComboList";
+import FloatingCartForm from "./FloatingCartForm";
+import CartSummaryModal from "./ProductSummaryModal";
+import ReviewList from "./ReviewList";
 
 export default function ProductDetail() {
   const productInfo = {
@@ -146,35 +137,25 @@ export default function ProductDetail() {
     });
   }, [mainImage]);
 
-  // number of reviews
   const [numberOfReview, setNumberOfReview] = useState(0);
 
-  // price
-  // number of main item
   const [numberOfItem, setNumberOfItem] = useState(1);
 
-  // total combo price
   const [totalComboPrice, setTotalComboPrice] = useState(0);
 
-  // combo id list
   const [comboIdList, setComboIdList] = useState<Array<string>>([]);
 
   const totalPrice = useMemo(() => {
     return numberOfItem * productInfo.finalPrice + totalComboPrice;
   }, [totalComboPrice, numberOfItem]);
 
-  // image col
   const imageCol = useMemo(() => {
     return productInfo.images.length > 5 ? 2 : 1;
   }, []);
 
-  // window size
   const [width, setWidth] = useState(window.innerWidth);
-  // const [height, setHeight] = useState(window.innerHeight);
   const updateDimensions = () => {
     setWidth(window.innerWidth);
-    // setHeight(window.innerHeight);
-    console.log(window.innerWidth);
   };
   useEffect(() => {
     window.addEventListener("resize", updateDimensions);

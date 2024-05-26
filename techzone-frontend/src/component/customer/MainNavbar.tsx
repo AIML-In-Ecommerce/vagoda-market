@@ -1,8 +1,9 @@
 "use client";
+import { _CategoryType } from "@/model/CategoryType";
+import { CategoryService } from "@/services/Category";
 import { Badge, Dropdown, MenuProps } from "antd";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { BsInstagram } from "react-icons/bs";
@@ -21,8 +22,9 @@ import NavbarMenu from "./NavbarMenu";
 export default function MainNavbar() {
   const router = useRouter();
   const [menuMode, setMenuMode] = useState("");
-  const [menuVisible, setMenuVisible] = useState();
   const [countItemsCart, setCountItemsCart] = useState(0);
+  const [allCategories, setAllCategories] = useState<_CategoryType[]>([]);
+
   const items: MenuProps["items"] = [
     {
       key: "1",
@@ -76,10 +78,19 @@ export default function MainNavbar() {
     return () => window.removeEventListener("resize", checkWindowSize);
   }, [checkWindowSize]);
 
+  useEffect(() => {
+    const loadAllCategories = async () => {
+      const data: _CategoryType[] = await CategoryService.getAllCategories();
+      setAllCategories(data);
+    };
+
+    loadAllCategories();
+  }, []);
+
   return (
     <div>
       <div
-        className={`flex text-[10px]  justify-between bg-[#5c6856]  items-center ${
+        className={`flex text-xs  justify-between bg-[#5c6856]  items-center ${
           menuMode == "mobileMode" ? "px-2" : "px-24"
         }  `}
       >
@@ -122,9 +133,9 @@ export default function MainNavbar() {
                   placement="bottomLeft"
                   className="xs:hidden"
                 >
-                  <div className="flex items-center text-white hover:text-sky  p-2 rounded-lg bg-[#5c6856] text-sm">
+                  <div className="flex items-center space-x-2 text-white hover:text-sky  p-2 rounded-lg bg-[#5c6856] text-sm">
                     <RxPerson className="" size={20} />
-                    <p className="ml-4">Account</p>
+                    <p className="">Account</p>
                   </div>
                 </Dropdown>
               </motion.div>
@@ -141,10 +152,8 @@ export default function MainNavbar() {
                   />
                 </Badge>
               </div>
-              <NavbarMenu
-                name="Nam"
-                image_link="https://images.pexels.com/photos/5693891/pexels-photo-5693891.jpeg?auto=compress&cs=tinysrgb&w=600"
-              />
+
+              <NavbarMenu options={allCategories} />
             </div>
           </div>
           <div
@@ -160,57 +169,32 @@ export default function MainNavbar() {
           style={{ backgroundColor: "rgba(151, 151, 151, 0.8)" }}
         >
           <header className="flex   items-center justify-between relative h-30 xs:space-x-4 md:space-x-8 ">
-            <NavbarMenu
-              name="Nam"
-              image_link="https://images.pexels.com/photos/5693891/pexels-photo-5693891.jpeg?auto=compress&cs=tinysrgb&w=600"
-            />
-            <div className="mb-0 p-1">
-              <Image
-                src={logo}
-                width={120}
-                height={60}
-                alt="Logo"
-                onClick={() => router.push("/")}
-              />
+            <div className="flex space-x-4 items-center">
+              <NavbarMenu options={allCategories} />
+              <div className="mb-0 p-1">
+                <Image
+                  src={logo}
+                  width={120}
+                  height={60}
+                  alt="Logo"
+                  onClick={() => router.push("/")}
+                />
+              </div>
             </div>
             <div className="">
               {" "}
-              {/* <AutoComplete
-              popupClassName="certain-category-search-dropdown"
-              popupMatchSelectWidth={550}
-              style={{ width: 550 }}
-              options={options}
-              size="large"
-            > */}
               <div className="rounded-full " style={{ width: 550 }}>
                 <Searchbar />
               </div>
-              {/* </AutoComplete> */}
               <div className="flex space-x-10 text-sm  items-center justify-center text-[#5c6856] pr-8">
-                <NavbarCategory
-                  name="Nam"
-                  image_link="https://images.pexels.com/photos/5693891/pexels-photo-5693891.jpeg?auto=compress&cs=tinysrgb&w=600"
-                />
-                <Link className="uppercase font-semibold" href={`/category/nu`}>
-                  Nữ
-                </Link>
-                <Link
-                  className="uppercase font-semibold"
-                  href={`/category/nam-nu`}
-                >
-                  Nam/Nữ
-                </Link>
-                <Link
-                  className="uppercase font-semibold"
-                  href={`/category/tre-em`}
-                >
-                  Trẻ em{" "}
-                </Link>
+                {allCategories.map((category) => (
+                  <NavbarCategory category={category} />
+                ))}
               </div>
             </div>
 
             <div className="">
-              <div className="right-0 justify-end flex space-x-4 text-sm">
+              <div className="right-0 justify-end flex space-x-4 text-sm items-center">
                 <div className="flex items-center text-white   p-4 rounded-lg hover:text-[#5c6856]">
                   <Badge
                     size="small"
@@ -230,9 +214,9 @@ export default function MainNavbar() {
                     placement="bottomLeft"
                     className="xs:hidden"
                   >
-                    <div className="flex items-center text-white hover:text-sky  p-4 rounded-lg bg-[#5c6856] text-sm">
+                    <div className="flex space-x-2 items-center text-white hover:text-sky  p-[12px] rounded-lg bg-[#5c6856] text-sm">
                       <RxPerson className="" size={20} />
-                      <p className="ml-4">Account</p>
+                      <p className="">Account</p>
                     </div>
                   </Dropdown>
                 </motion.div>

@@ -1,68 +1,178 @@
-import type { TreeDataNode } from "antd";
+import { _CategoryType } from "@/model/CategoryType";
+import { CategoryService } from "@/services/Category";
+import type { TreeDataNode, TreeProps } from "antd";
 import { Tree } from "antd";
-import React from "react";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
-const options: TreeDataNode[] = [
-  {
-    title: "Nam",
-    key: "nam",
-    children: [
-      { title: "Áo Nam", key: "ao-nam" },
-      { title: "Quần Nam", key: "quan-nam" },
-      { title: "Đồ Bộ Nam", key: "do-bo-nam" },
-      { title: "Đồ Thể Thao Nam", key: "do-the-thao-nam" },
-      { title: "Đồ Lót Nam", key: "do-lot-nam" },
-      { title: "Giày Nam - Dép Nam", key: "giay-nam-dep-nam" },
-      { title: "Phụ Kiện Nam", key: "phu-kien-nam" },
-    ],
-  },
-  {
-    title: "Nữ",
-    key: "nu",
-    children: [
-      { title: "Áo Nữ", key: "ao-nu" },
-      { title: "Quần Nữ", key: "quan-nu" },
-      { title: "Đồ Bộ Nữ", key: "do-bo-nu" },
-      { title: "Đồ Thể Thao Nữ", key: "do-the-thao-nu" },
-      { title: "Đồ Lót Nữ", key: "do-lot-nu" },
-      { title: "Chân Váy Nữ", key: "chan-vay-nu" },
-      { title: "Đầm Nữ - Váy Nữ", key: "dam-vay-nu" },
-      { title: "Phụ Kiện Nữ", key: "phu-kien-nu" },
-      { title: "Giày Nữ - Dép Nữ", key: "giay-nu-dep-nu" },
-    ],
-  },
-  {
-    title: "Nam/Nữ",
-    key: "nam-nu",
-    // children: [
-    //   { title: "Áo Nữ", key: "ao-nu" },
-    //   { title: "Quần Nữ", key: "quan-nu" },
-    //   { title: "Đồ Bộ Nữ", key: "do-bo-nu" },
-    //   { title: "Đồ Thể Thao Nữ", key: "do-the-thao-nu" },
-    //   { title: "Đồ Lót Nữ", key: "do-lot-nu" },
-    //   { title: "Chân Váy Nữ", key: "chan-vay-nu" },
-    //   { title: "Đầm Nữ - Váy Nữ", key: "dam-vay-nu" },
-    //   { title: "Phụ Kiện Nữ", key: "phu-kien-nu" },
-    //   { title: "Giày Nữ - Dép Nữ", key: "giay-nu-dep-nu" },
-    // ],
-  },
-  {
-    title: "Trẻ Em",
-    key: "tre-em",
-    children: [
-      { title: "Áo Trẻ Em", key: "ao-tre-em" },
-      { title: "Quần Trẻ Em", key: "quan-tre-em" },
-      { title: "Đồ Bộ Trẻ Em", key: "do-bo-tre-em" },
-      { title: "Đồ Thể Thao Trẻ Em", key: "do-the-thao-tre-em" },
-      { title: "Đầm/Váy Bé Gái", key: "dam-vay-be-gai" },
-      { title: "Giày Dép Trẻ Em", key: "giay-dep-tre-em" },
-      { title: "Phụ Kiện Trẻ Em", key: "phu-kien-tre-em" },
-    ],
-  },
-];
+interface CategoryFilterProps {
+  selectedCategories: string[];
+  setSelectedCategories: (categories: string[]) => void;
+  addFilter: (key: string, value: any) => void;
+  removeFilter: (key: string, value: any) => void;
+  isFiltered: boolean;
+}
 
-const CategoryFilter: React.FC = () => (
-  <Tree checkable treeData={options} blockNode className="bg-[#f3f3f3]" />
-);
+export default function CategoryFilter(props: CategoryFilterProps) {
+  const getNodeLevel = (
+    key: string,
+    nodes: TreeDataNode[],
+    level = 1
+  ): number | null => {
+    for (const node of nodes) {
+      if (node.key === key) {
+        return level;
+      }
+      if (node.children) {
+        const childLevel = getNodeLevel(key, node.children, level + 1);
+        if (childLevel !== null) {
+          return childLevel;
+        }
+      }
+    }
+    return null;
+  };
 
-export default CategoryFilter;
+  const convertToTreeDataNode = (category: _CategoryType): TreeDataNode => ({
+    title: category.name,
+    key: category._id,
+    children: category.subCategories
+      ? category.subCategories.map((item) => convertToTreeDataNode(item))
+      : [],
+  });
+
+  const mergeCheckedKeys = (
+    checkedNodes: TreeDataNode[]
+  ): { id: string; name: string; level: number | null }[] => {
+    const keysSet = new Set<{
+      id: string;
+      name: string;
+      level: number | null;
+    }>();
+    const nodesToRemove = new Set<string>();
+
+    const addKeys = (node: any) => {
+      const level = getNodeLevel(node.key, allCategories);
+      if (node.children && node.children.length > 0) {
+        const allChildrenChecked = node.children.every((child: any) =>
+          checkedNodes.some((n) => n.key === child.key)
+        );
+
+        if (allChildrenChecked) {
+          keysSet.add({ id: node.key, name: node.title, level: level });
+          node.children.forEach((child: any) => {
+            nodesToRemove.add(child.key);
+          });
+        }
+      } else {
+        keysSet.add({ id: node.key, name: node.title, level: level });
+      }
+    };
+
+    checkedNodes.forEach((node) => addKeys(node));
+
+    nodesToRemove.forEach((key) => {
+      keysSet.forEach((obj) => {
+        if (obj.id === key) {
+          keysSet.delete(obj);
+        }
+      });
+    });
+
+    return Array.from(keysSet);
+  };
+
+  const query = useSearchParams();
+  const [allCategories, setAllCategories] = useState<TreeDataNode[]>([]);
+  const reduceIdNode = (selectedIds: string[]) => {
+    const treeNodes: TreeDataNode[] = selectedIds.map((key) => {
+      return { key, title: "", children: [] };
+    });
+    const newSelectedCategories = mergeCheckedKeys(treeNodes);
+    const newSelectedCategoriesId = newSelectedCategories.map((c) => c.id);
+    return newSelectedCategoriesId;
+  };
+  const [checkedKeys, setCheckedKeys] = useState<string[]>(
+    reduceIdNode(props.selectedCategories)
+  );
+
+  const onCheck: TreeProps["onCheck"] = (checkedKeysValue, info) => {
+    const checkedNodes = info.checkedNodes;
+    const newSelectedCategories = mergeCheckedKeys(checkedNodes);
+    const newSelectedCategoriesId = newSelectedCategories.map((c) => c.id);
+    setCheckedKeys(newSelectedCategoriesId as string[]);
+    props.setSelectedCategories(checkedKeysValue as string[]);
+
+    const categoryKeys: string[] = [];
+    const subCategoryKeys: string[] = [];
+    const subCategoryTypeKeys: string[] = [];
+
+    newSelectedCategories.forEach((category) => {
+      const level = getNodeLevel(category.id, allCategories);
+      if (level === 1) {
+        categoryKeys.push(category.id);
+      } else if (level === 2) {
+        subCategoryKeys.push(category.id);
+      } else if (level === 3) {
+        subCategoryTypeKeys.push(category.id);
+      }
+    });
+
+    const updatedQuery = new URLSearchParams(query.toString());
+    if (categoryKeys.length > 0) {
+      updatedQuery.set("category", encodeURIComponent(categoryKeys.join(",")));
+    } else {
+      updatedQuery.delete("category");
+    }
+    if (subCategoryKeys.length > 0) {
+      updatedQuery.set(
+        "subCategory",
+        encodeURIComponent(subCategoryKeys.join(","))
+      );
+    } else {
+      updatedQuery.delete("subCategory");
+    }
+    if (subCategoryTypeKeys.length > 0) {
+      updatedQuery.set(
+        "subCategoryType",
+        encodeURIComponent(subCategoryTypeKeys.join(","))
+      );
+    } else {
+      updatedQuery.delete("subCategoryType");
+    }
+
+    window.history.pushState(
+      {},
+      "",
+      `${window.location.pathname}?${updatedQuery.toString()}`
+    );
+    props.addFilter("category", newSelectedCategories);
+  };
+
+  useEffect(() => {
+    const loadAllCategories = async () => {
+      const data: _CategoryType[] = await CategoryService.getAllCategories();
+      const categories = data.map((category) =>
+        convertToTreeDataNode(category)
+      );
+      setAllCategories(categories);
+    };
+
+    loadAllCategories();
+  }, []);
+
+  useEffect(() => {
+    setCheckedKeys(reduceIdNode(props.selectedCategories));
+  }, [props.selectedCategories]);
+
+  return (
+    <Tree
+      checkable
+      onCheck={onCheck}
+      checkedKeys={checkedKeys}
+      treeData={allCategories}
+      blockNode
+      className="bg-[#f3f3f3] text-xs"
+    />
+  );
+}

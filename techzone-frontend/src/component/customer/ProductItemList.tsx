@@ -1,5 +1,5 @@
 import { FilterCriteria } from "@/app/[locale]/(Main)/product-list/page";
-import { ProductType } from "@/model/ProductType";
+import { _ProductType } from "@/model/ProductType";
 import {
   Button,
   ConfigProvider,
@@ -10,64 +10,60 @@ import {
   Skeleton,
   Space,
 } from "antd";
-import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { CiCircleRemove } from "react-icons/ci";
 import { HiOutlineAdjustmentsHorizontal } from "react-icons/hi2";
 import { IoImageOutline } from "react-icons/io5";
 import ProductItem, { formatPrice } from "./ProductItem";
 interface ProductListProps {
+  total: number;
+  totalPages: number;
   isFilterOpened: boolean;
   setIsFilterOpened: (show: boolean) => void;
   filterList: FilterCriteria[];
-  products: ProductType[];
+  products: _ProductType[];
   removeFilter: (key: string, value: any) => void;
 }
+
 const sortOptions = [
-  { value: "Đánh giá cao nhất", label: "Đánh giá cao nhất" },
-  { value: "Bán chạy nhất", label: "Bán chạy nhất" },
-  { value: "Giá tăng dần", label: "Giá tăng dần" },
-  { value: "Giá giảm dần", label: "Giá giảm dần" },
+  { value: "highest rating", label: "Đánh giá cao nhất" },
+  { value: " top sale", label: "Bán chạy nhất" },
+  { value: " latest", label: "Mới nhất" },
+  { value: "ascending price", label: "Giá tăng dần" },
+  { value: "descending price", label: "Giá giảm dần" },
 ];
 
 export default function ProductItemList(props: ProductListProps) {
-  const maxItemNumber = 8;
+  const query = useSearchParams();
   const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
   const [loading, setLoading] = useState(true);
-  const [sortedProducts, setSortedProducts] = useState<ProductType[]>(
-    props.products
-  );
 
-  const displayedProducts = useMemo(() => {
-    const startIndex = (page - 1) * maxItemNumber;
-    const endIndex = startIndex + maxItemNumber;
-    return sortedProducts.slice(startIndex, endIndex);
-  }, [page, sortedProducts]);
+  const handlePageChange = (pageNumber: number, pageSize: number) => {
+    const updatedQuery = new URLSearchParams(query);
 
-  const handleDisplayProduct = (page: number) => {
-    setPage(page);
+    updatedQuery.set("index", String(pageNumber));
+    updatedQuery.set("amount", String(pageSize));
+
+    window.history.pushState(
+      {},
+      "",
+      `${window.location.pathname}?${updatedQuery.toString()}`
+    );
+    setPage(pageNumber);
+    setPageSize(pageSize);
   };
 
-  const handleSortProducts = (criteria: string) => {
-    let sortedProductList = [...sortedProducts];
-    console.log(criteria);
-    switch (criteria) {
-      case "Đánh giá cao nhất":
-        sortedProductList.sort((a, b) => b.rating - a.rating);
-        break;
-      case "Bán chạy nhất":
-        sortedProductList.sort((a, b) => b.soldAmount - a.soldAmount);
-        break;
-      case "Giá tăng dần":
-        sortedProductList.sort((a, b) => a.price - b.price);
-        break;
-      case "Giá giảm dần":
-        sortedProductList.sort((a, b) => b.price - a.price);
-        break;
-      default:
-        break;
-    }
-    setSortedProducts(sortedProductList);
-    setPage(1);
+  const handleSortChange = (value: string) => {
+    const updatedQuery = new URLSearchParams(query);
+
+    updatedQuery.set("sortBy", value);
+    window.history.pushState(
+      {},
+      "",
+      `${window.location.pathname}?${updatedQuery.toString()}`
+    );
   };
 
   useEffect(() => {
@@ -103,7 +99,7 @@ export default function ProductItemList(props: ProductListProps) {
 
           <div className="text-xs font-semibold">
             {" "}
-            Chúng tôi tìm thấy {sortedProducts.length} sản phẩm cho bạn!
+            Chúng tôi tìm thấy {props.total} sản phẩm cho bạn!
           </div>
         </div>
         <Space className=" items-end  rounded-lg p-1  m-2 text-xs items-center ">
@@ -113,7 +109,6 @@ export default function ProductItemList(props: ProductListProps) {
               components: {
                 Select: {
                   optionFontSize: 12,
-                  // colorBgContainer: "#f3f3f3",
                 },
               },
               token: {
@@ -126,7 +121,7 @@ export default function ProductItemList(props: ProductListProps) {
               style={{ width: 140, fontSize: 10 }}
               options={sortOptions}
               className="text-[10px]"
-              onChange={handleSortProducts}
+              onChange={handleSortChange}
             />
           </ConfigProvider>
         </Space>
@@ -143,17 +138,17 @@ export default function ProductItemList(props: ProductListProps) {
         <Divider className="p-0 m-0" />
       </ConfigProvider>
 
-      <div className="flex  mb-4  space-x-4 p-4">
+      {/* <div className="flex  flex-wrap mb-4  space-x-4 p-4 space-y-2">
         {props.filterList.map((item, index) => {
           return (
             <div
               // key={index}
-              className="flex p-2 rounded-2xl border-black space-x-2 items-center  bg-[#797979] text-sm text-white"
+              className="rounded-2xl text-sm border-black space-x-2 items-center   text-sm text-white"
             >
               {item.key === "price" ? (
                 <div
                   key={index}
-                  className=" flex rounded-2xl  space-x-2 items-center  text-sm mx-2"
+                  className=" flex flex-wrap rounded-2xl  items-center bg-[#797979] p-2 space-x-1 "
                 >
                   <p>
                     {formatPrice(item.value.min)
@@ -166,28 +161,36 @@ export default function ProductItemList(props: ProductListProps) {
                   </p>
                   <div
                     className=""
-                    // onClick={() => props.removeFilter(item.key, value)}
+                    onClick={() => props.removeFilter(item.key, "")}
                   >
                     <CiCircleRemove size={20} />
                   </div>
                 </div>
               ) : Array.isArray(item.value) ? (
-                item.value.map((value: string, idx: number) => (
-                  <div
-                    key={index}
-                    className=" flex rounded-2xl  space-x-2 items-center  text-sm mx-2"
-                  >
-                    <p>{value}</p>
+                <div className="flex flex-wrap space-x-2 space-y-2 ">
+                  {item.value.map((_item) => (
                     <div
-                      className=""
-                      onClick={() => props.removeFilter(item.key, value)}
+                      key={index}
+                      className=" flex p-2 rounded-2xl bg-[#797979]  items-center mx-2 space-x-1"
                     >
-                      <CiCircleRemove size={20} />
+                      <p>{_item.name}</p>
+                      <div
+                        className=""
+                        onClick={() =>
+                          props.removeFilter("category", {
+                            id: _item.id,
+                            name: _item.name,
+                            level: _item.level,
+                          })
+                        }
+                      >
+                        <CiCircleRemove size={20} />
+                      </div>
                     </div>
-                  </div>
-                ))
+                  ))}
+                </div>
               ) : (
-                <div className="flex items-center space-x-2">
+                <div className="flex p-2 rounded-2xl items-center bg-[#797979]  space-x-1">
                   <p>{item.value}</p>
                   <div
                     className=""
@@ -200,8 +203,63 @@ export default function ProductItemList(props: ProductListProps) {
             </div>
           );
         })}
+      </div> */}
+      <div className="flex flex-wrap gap-2 mb-4 p-4">
+        {props.filterList.map((item, index) => (
+          <div
+            key={index}
+            className="flex  flex-wrap gap-2 items-center rounded-2xl text-sm text-white  space-x-1"
+          >
+            {item.key === "price" ? (
+              <div className="flex items-center space-x-1 bg-[#797979] p-2 rounded-2xl">
+                <p>
+                  {formatPrice(item.value.min)
+                    ? formatPrice(item.value.max)
+                      ? `${formatPrice(item.value.min)} - ${formatPrice(
+                          item.value.max
+                        )}`
+                      : `Trên ${formatPrice(item.value.min)}`
+                    : `Dưới ${formatPrice(item.value.max)}`}
+                </p>
+                <div onClick={() => props.removeFilter(item.key, "")}>
+                  <CiCircleRemove size={20} />
+                </div>
+              </div>
+            ) : Array.isArray(item.value) ? (
+              <div className="flex flex-wrap gap-2">
+                {item.value.map((_item, subIndex) => (
+                  <div
+                    key={subIndex}
+                    className="flex items-center bg-[#797979] p-2 rounded-2xl space-x-1"
+                  >
+                    <p>{_item.name}</p>
+                    <div
+                      onClick={() =>
+                        props.removeFilter("category", {
+                          id: _item.id,
+                          name: _item.name,
+                          level: _item.level,
+                        })
+                      }
+                    >
+                      <CiCircleRemove size={20} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="flex items-center space-x-1 bg-[#797979] p-2 rounded-2xl">
+                <p>{item.value}</p>
+                <div onClick={() => props.removeFilter(item.key, item.value)}>
+                  <CiCircleRemove size={20} />
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
       </div>
-      {displayedProducts.length == 0 ? (
+
+      {props.products.length == 0 ? (
         <Empty
           image={Empty.PRESENTED_IMAGE_SIMPLE}
           className="mt-24"
@@ -211,12 +269,12 @@ export default function ProductItemList(props: ProductListProps) {
         <div
           className={`grid   ${
             props.isFilterOpened
-              ? "sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 "
-              : "sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 "
+              ? "sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 "
+              : "sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 "
           } 
           justify-center gap-y-6`}
         >
-          {displayedProducts.map((product, index) =>
+          {props.products.map((product, index) =>
             loading ? (
               <div key={index} className="items-center justify-center">
                 <Skeleton.Node active className="w-lg m-4">
@@ -232,11 +290,11 @@ export default function ProductItemList(props: ProductListProps) {
                 <ProductItem
                   key={index}
                   name={product.name}
-                  rating={product.rating}
-                  soldAmount={product.soldAmount}
-                  price={product.price}
-                  isFlashSale={product.flashSale}
-                  imageLink={product.imageLink}
+                  rating={product.avgRating}
+                  soldAmount={product.soldQuantity}
+                  price={product.finalPrice}
+                  isFlashSale={true}
+                  imageLink={product.image}
                   originalPrice={product.originalPrice}
                   inWishlist={true}
                 />
@@ -249,10 +307,15 @@ export default function ProductItemList(props: ProductListProps) {
         showQuickJumper
         current={page}
         defaultCurrent={1}
-        total={sortedProducts.length}
-        pageSize={maxItemNumber}
-        onChange={handleDisplayProduct}
+        total={props.total}
+        pageSize={pageSize}
+        onChange={handlePageChange}
         className="flex justify-center mx-auto mb-4 mt-8"
+        showTotal={(total, range) =>
+          // `${range[0]}-${range[1]} of ${total} items`
+          ` ${range[0]} - ${range[1]} trên tổng ${total} sản phẩm`
+        }
+        locale={{ jump_to: "Nhảy đến trang", page: "" }}
       />
     </>
   );

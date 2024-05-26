@@ -3,7 +3,7 @@ import { useState } from "react";
 import { GrLanguage } from "react-icons/gr";
 
 export default function LanguageOption() {
-  const [language, setLanguage] = useState("VI");
+  const [language, setLanguage] = useState("Tiếng Việt");
   const handleChange = (value: string) => {
     console.log(`selected ${value}`);
   };

@@ -1,22 +1,21 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 import Link from "next/link";
 // import axios from "axios";
 // import { useAuth } from "@/context/AuthContext";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 // import { UserType } from "@/model/UserType";
-import { useTranslations } from "next-intl";
+import { POST_LocalSignIn } from "@/apis/auth/SignInAPI";
+import { POST_getUserInfo } from "@/apis/user/UserInfoAPI";
 import { Divider } from "antd";
-import { POST_LocalSignIn } from "@/app/apis/auth/SignInAPI";
-import { GetUserInfoResponse, POST_getUserInfo } from "@/app/apis/user/UserInfoAPI";
-import { userInfo } from "os";
+import { useTranslations } from "next-intl";
 // import { useRecoveryContext } from "@/context/RecoveryContext";
 // import { signIn as signInWithGoogle } from "next-auth/react";
 // import { io } from "socket.io-client";
 
-const Cookies = require('js-cookie')
+const Cookies = require("js-cookie");
 
 interface AuthFormProps {
   showSuccessMsg: (show: boolean) => void;
@@ -24,16 +23,16 @@ interface AuthFormProps {
 export default function AuthForm(props: AuthFormProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirm] = useState<string>("")
+  const [confirmPassword, setConfirm] = useState<string>("");
   const [username, setUsername] = useState("");
   const [isSigninOpeneded, setIsSigninOpeneded] = useState(true);
   const [isSignupOpeneded, setIsSignupOpeneded] = useState(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [validAuthMsg, setValidAuthMsg] = useState<string | null>(null);
-//   const context = useRecoveryContext();
+  //   const context = useRecoveryContext();
   const router = useRouter();
   const t = useTranslations("Authentication");
-//   context.request = `${process.env.NEXT_PUBLIC_BACKEND_PREFIX}auth/send-verification`;
+  //   context.request = `${process.env.NEXT_PUBLIC_BACKEND_PREFIX}auth/send-verification`;
 
   const isEmail = (email: string) => {
     const regex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
@@ -64,51 +63,48 @@ export default function AuthForm(props: AuthFormProps) {
     if (!isValidAuth(email, password)) return;
 
     // try {
-      const response1 = await POST_LocalSignIn(email, password)
+    const response1 = await POST_LocalSignIn(email, password);
 
-      if(response1.isDenied == true)
-      {
-        setValidAuthMsg(response1.message)
-        return;
-      }
+    if (response1.isDenied == true) {
+      setValidAuthMsg(response1.message);
+      return;
+    }
 
-      if(response1.status == 200)
-      {
-        if(response1.data)
-        {
-          const reply = response1.data
-          
-          sessionStorage.setItem('accessToken', `${reply.accessToken}`)
-          Cookies.set('refreshToken', `${reply.refreshToken}`, {expires: new Date(reply.refreshTokenExpiry).getUTCMilliseconds()})
-          Cookies.set("userId", `${reply.userId}`, {expires: new Date(reply.refreshTokenExpiry).getUTCMilliseconds()})
+    if (response1.status == 200) {
+      if (response1.data) {
+        const reply = response1.data;
 
-          setValidAuthMsg(response1.message)
-          
-          const responseUserInfo = await POST_getUserInfo(reply.userId)
+        sessionStorage.setItem("accessToken", `${reply.accessToken}`);
+        Cookies.set("refreshToken", `${reply.refreshToken}`, {
+          expires: new Date(reply.refreshTokenExpiry).getUTCMilliseconds(),
+        });
+        Cookies.set("userId", `${reply.userId}`, {
+          expires: new Date(reply.refreshTokenExpiry).getUTCMilliseconds(),
+        });
 
-          if(responseUserInfo.isDenied == true)
-          {
-            setValidAuthMsg(responseUserInfo.message)
-            return
-          }
-          
-          if(responseUserInfo.status == 200 && responseUserInfo.data)
-          {
-            sessionStorage.setItem("userInfo", JSON.stringify(responseUserInfo.data))
-          }
+        setValidAuthMsg(response1.message);
 
+        const responseUserInfo = await POST_getUserInfo(reply.userId);
+
+        if (responseUserInfo.isDenied == true) {
+          setValidAuthMsg(responseUserInfo.message);
+          return;
         }
-        else
-        {
-          setValidAuthMsg(response1.message)
-        }
-      }
 
+        if (responseUserInfo.status == 200 && responseUserInfo.data) {
+          sessionStorage.setItem(
+            "userInfo",
+            JSON.stringify(responseUserInfo.data)
+          );
+        }
+      } else {
+        setValidAuthMsg(response1.message);
+      }
+    }
   };
 
   const handleSignup = async () => {
     // if (!isValidAuth(email, password)) return;
-
     // try {
     //   const response = await axios.post(
     //     `${process.env.NEXT_PUBLIC_BACKEND_PREFIX}auth/register`,
@@ -119,7 +115,6 @@ export default function AuthForm(props: AuthFormProps) {
     //       role: "user",
     //     }
     //   );
-
     //   if (response.status === 201) {
     //     props.showSuccessMsg(true);
     //     setTimeout(() => {
@@ -134,7 +129,6 @@ export default function AuthForm(props: AuthFormProps) {
     //       ? error.response.data.message
     //       : "Failed to register";
     //   setValidAuthMsg(errorMessage);
-
     //   console.error("Failed to login:", error);
     // }
   };
@@ -144,7 +138,6 @@ export default function AuthForm(props: AuthFormProps) {
     // const generatedOTP = Math.floor(Math.random() * 9000 + 1000);
     // context.otp = generatedOTP;
     // console.log("RecoveryContext:", context);
-
     // try {
     //   const response = await axios.post(context.request, {
     //     email: context.email,
@@ -165,7 +158,6 @@ export default function AuthForm(props: AuthFormProps) {
     //       ? error.response.data.message
     //       : "Failed to send reset password request";
     //   setValidAuthMsg(errorMessage);
-
     //   console.error("Failed to send reset password request:", error);
     // }
   };
@@ -202,7 +194,7 @@ export default function AuthForm(props: AuthFormProps) {
   const handleFacebookLogin = async () => {
     try {
       // router.push(`${process.env.NEXT_PUBLIC_BACKEND_PREFIX}auth/facebook`);
-    //   router.push(`http://localhost:4000/auth/facebook`);
+      //   router.push(`http://localhost:4000/auth/facebook`);
     } catch (error) {
       console.error("Error initiating Facebook login:", error);
     }
@@ -210,9 +202,11 @@ export default function AuthForm(props: AuthFormProps) {
 
   return (
     <div className="flex flex-col border rounded-xl p-4 m-8 w-96 mx-auto my-auto bg-white">
-        <Link href={"/"} prefetch={false} className="text-center">
-            <label className="font-semibold text-4xl text-center p-2 text-amber-900">TechZone</label>
-        </Link>
+      <Link href={"/"} prefetch={false} className="text-center">
+        <label className="font-semibold text-4xl text-center p-2 text-amber-900">
+          TechZone
+        </label>
+      </Link>
       {isSignupOpeneded && (
         <input
           type="text"
@@ -271,8 +265,8 @@ export default function AuthForm(props: AuthFormProps) {
           {t("signup_btn")}
         </button>
       )}
-        <Divider />
-        <button
+      <Divider />
+      <button
         onClick={() => handleGoogleLogin()}
         className="flex w-full items-center justify-center gap-3.5 font-medium rounded-lg border border-stroke bg-gray p-4 hover:bg-opacity-80 dark:border-strokedark dark:bg-meta-4 dark:hover:bg-opacity-80 my-4
             hover:bg-gray-200
@@ -332,25 +326,30 @@ export default function AuthForm(props: AuthFormProps) {
 
       {isSigninOpeneded && (
         <>
-            <div className="w-full h-3 invisible">hidden block</div>
-            <label
+          <div className="w-full h-3 invisible">hidden block</div>
+          <label
             onClick={() => goToSignup()}
             className="flex text-center items-center justify-center"
-            >
+          >
             {t("go_to_signup_mg")}
-            <span className="text-amber-800 ml-2 hover:text-amber-950">{t("signup_btn")}</span>
-            </label>
+            <span className="text-amber-800 ml-2 hover:text-amber-950">
+              {t("signup_btn")}
+            </span>
+          </label>
         </>
       )}
       {isSignupOpeneded && (
         <>
           <div className="w-full h-3 invisible">hidden block</div>
           <label
-          onClick={() => goToLogin()}
-          className="flex text-center items-center justify-center">
+            onClick={() => goToLogin()}
+            className="flex text-center items-center justify-center"
+          >
             {t("go_to_signin_mg")}
-            <span className="text-amber-800 ml-2 hover:text-amber-950">{t("signin_btn")}</span>
-            </label>
+            <span className="text-amber-800 ml-2 hover:text-amber-950">
+              {t("signin_btn")}
+            </span>
+          </label>
         </>
       )}
       {isSigninOpeneded && (
@@ -367,4 +366,3 @@ export default function AuthForm(props: AuthFormProps) {
     </div>
   );
 }
-

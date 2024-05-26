@@ -8,8 +8,7 @@ import AssistantFloatingButtonGroup from "@/component/user/AssistantFloatingButt
 import WebFooter from "@/component/user/WebFooter";
 import { NextIntlClientProvider, useMessages } from "next-intl";
 import { Lato } from "next/font/google";
-import { ReactNode, Suspense } from "react";
-import RootLoading from "./loading";
+import { ReactNode } from "react";
 
 // import UserLayout from "@/component/UserLayout";
 
@@ -44,13 +43,13 @@ export default function RootLayout({
           {/* <UserLayout children={children} locale={locale} /> */}
           {/* <UserLayout locale={locale}>{children}</UserLayout> */}
           {/* </AuthProvider> */}
-          <Suspense fallback={<RootLoading />}>
-            <div className="w-full bg-cover bg-[#f3f3f3]  min-h-screen  overflow-hidden">
-              <Navbar />
-              {children}
-              <AssistantFloatingButtonGroup />
-            </div>
-          </Suspense>
+          {/* <Suspense fallback={<RootLoading />}> */}
+          <div className="w-full bg-cover bg-[#f3f3f3]  min-h-screen  overflow-hidden">
+            <Navbar />
+            {children}
+            <AssistantFloatingButtonGroup />
+          </div>
+          {/* </Suspense> */}
         </NextIntlClientProvider>
         <WebFooter />
       </body>

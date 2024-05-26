@@ -1,10 +1,15 @@
 "use client";
+import { ProductFilterInput } from "@/apis/product/ProductAPI";
 import ProductItemList from "@/component/customer/ProductItemList";
 import PriceFilter from "@/component/customer/filter/PriceFilter";
 import RatingFilter from "@/component/customer/filter/RatingFilter";
 import CategoryFilter from "@/component/customer/product/CategoryFilter";
-import { Button, Divider } from "antd";
-import { useState } from "react";
+import { _ProductType } from "@/model/ProductType";
+import { CategoryService } from "@/services/Category";
+import { ProductService } from "@/services/Product";
+import { Button, Divider, TreeDataNode } from "antd";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { HiOutlineAdjustmentsHorizontal } from "react-icons/hi2";
 import "../../globals.css";
 
@@ -12,6 +17,14 @@ export interface FilterCriteria {
   key: string;
   value: any;
 }
+
+const suggestedPrices = [
+  { min: null, max: 100000 },
+  { min: 100000, max: 300000 },
+  { min: 300000, max: 500000 },
+  { min: 500000, max: 1000000 },
+  { min: 1000000, max: null },
+];
 
 const products = [
   {
@@ -149,36 +162,23 @@ const products = [
 ];
 
 export default function ProductList() {
-  const filterList = ["Dưới 1.000.000", "5 sao", "Laptop", "Màn hình máy tính"];
-  const [filterCriterias, setFilterCriterias] = useState<FilterCriteria[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [totalProduct, setTotalProduct] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
   const [isFilterOpened, setIsFilterOpened] = useState(false);
-  const [allProducts, setAllProducts] = useState([]);
-  const [displayProduct, setDisplayProduct] = useState([]);
+  const [allProducts, setAllProducts] = useState<_ProductType[]>([]);
+  const router = useRouter();
+  const query = useSearchParams();
+  const [filterCriterias, setFilterCriterias] = useState<FilterCriteria[]>([]);
+  const [filter, setFilter] = useState<ProductFilterInput>();
+  const [allCategories, setAllCategories] = useState<TreeDataNode[]>([]);
 
-  const categories = [
-    "Laptop",
-    "Điện máy - Điện gia dụng",
-    "PC- Máy tính bộ",
-    "Màn hình máy tính",
-    "Linh kiện máy tính",
-    "Phụ kiện máy tính",
-    "Game & Stream",
-    "Điện thoại & Phụ kiện",
-    "Phụ kiện",
-    "Thiết bị âm thanh",
-    "Thiết bị văn phòng",
-    "Khác",
-  ];
-
-  const suggestedPrices = [
-    { min: null, max: 100000 },
-    { min: 100000, max: 300000 },
-    { min: 300000, max: 500000 },
-    { min: 500000, max: 1000000 },
-    { min: 1000000, max: 3000000 },
-    { min: 3000000, max: 5000000 },
-    { min: 5000000, max: null },
-  ];
+  const clearAllFilterCriterias = () => {
+    const keyword = query.get("keyword") || undefined;
+    router.push(`/product-list${keyword ? `?keyword=${keyword}` : ""}`);
+    setFilterCriterias([]);
+    setFilter({ keyword });
+  };
 
   const addFilterCriteria = (key: string, value: any) => {
     const updatedFilterCriterias = [...filterCriterias];
@@ -195,128 +195,287 @@ export default function ProductList() {
     }
 
     setFilterCriterias(updatedFilterCriterias);
-    console.log(filterCriterias);
+  };
+
+  const updateURL = (key: string, value: any) => {
+    const updatedQuery = new URLSearchParams(query.toString());
+    if (key == "category") {
+      switch (value.level) {
+        case 1:
+          const categoryValues = query.get("category")
+            ? decodeURIComponent(query.get("category")!)!.split(",")
+            : undefined;
+          if (categoryValues) {
+            const updatedCategoryValues = categoryValues.filter(
+              (item) => item != value.id
+            );
+            if (updatedCategoryValues.length > 0) {
+              updatedQuery.set(
+                "category",
+                encodeURIComponent(updatedCategoryValues.join(","))
+              );
+            } else {
+              updatedQuery.delete(key);
+            }
+          }
+          break;
+        case 2:
+          const subCategoryValues = query.get("subCategory")
+            ? decodeURIComponent(query.get("subCategory")!)!.split(",")
+            : undefined;
+          if (subCategoryValues) {
+            const updatedSubCategoryValues = subCategoryValues.filter(
+              (item) => item != value.id
+            );
+
+            if (updatedSubCategoryValues.length > 0) {
+              updatedQuery.set(
+                "subCategory",
+                encodeURIComponent(updatedSubCategoryValues.join(","))
+              );
+            } else {
+              updatedQuery.delete("subCategory");
+            }
+          }
+          break;
+        case 3:
+          const subCategoryTypeValues = query.get("subCategoryType")
+            ? decodeURIComponent(query.get("subCategoryType")!)!.split(",")
+            : undefined;
+          if (subCategoryTypeValues) {
+            const updatedSubCategoryTypeValues = subCategoryTypeValues.filter(
+              (item) => item != value.id
+            );
+
+            if (updatedSubCategoryTypeValues.length > 0) {
+              updatedQuery.set(
+                "subCategoryType",
+                encodeURIComponent(updatedSubCategoryTypeValues.join(","))
+              );
+            } else {
+              updatedQuery.delete("subCategoryType");
+            }
+          }
+          break;
+        default:
+          const defaultCategoryValues = query.get("category")
+            ? decodeURIComponent(query.get("category")!)!.split(",")
+            : undefined;
+          if (defaultCategoryValues) {
+            const updatedDefaultCategoryValues = defaultCategoryValues.filter(
+              (item) => item != value.id
+            );
+            if (updatedDefaultCategoryValues.length > 0) {
+              updatedQuery.set(
+                "category",
+                encodeURIComponent(updatedDefaultCategoryValues.join(","))
+              );
+            } else {
+              updatedQuery.delete(key);
+            }
+          }
+          break;
+      }
+    } else if (key === "price") {
+      updatedQuery.delete("maxPrice");
+      updatedQuery.delete("minPrice");
+    } else {
+      updatedQuery.delete(key);
+    }
+
+    window.history.pushState(
+      {},
+      "",
+      `${window.location.pathname}?${updatedQuery.toString()}`
+    );
   };
 
   const removeFilterCriteria = (key: string, value: any) => {
     let updatedFilterCriterias: FilterCriteria[] = [...filterCriterias];
 
-    updatedFilterCriterias = updatedFilterCriterias.filter(
-      (criteria) => criteria.key !== key
-    );
+    if (
+      key === "category" ||
+      key === "subCategory" ||
+      key === "subCategoryType"
+    ) {
+      const criteriaIndex = updatedFilterCriterias.findIndex(
+        (criteria) => criteria.key === key
+      );
+
+      if (criteriaIndex !== -1) {
+        setSelectedCategories((prev) =>
+          prev.filter((item) => item != value.id)
+        );
+
+        const updatedCategory = updatedFilterCriterias[criteriaIndex].value;
+
+        const newValues = updatedCategory.filter(
+          (item: any) => item.id !== value.id
+        );
+
+        if (newValues.length > 0) {
+          updatedFilterCriterias[criteriaIndex] = {
+            ...updatedFilterCriterias[criteriaIndex],
+            value: newValues,
+          };
+        } else {
+          updatedFilterCriterias = updatedFilterCriterias.filter(
+            (_, index) => index !== criteriaIndex
+          );
+        }
+      }
+    } else {
+      updatedFilterCriterias = updatedFilterCriterias.filter(
+        (criteria) => criteria.key !== key
+      );
+    }
+
+    updateURL(key, value);
+    setFilterCriterias(updatedFilterCriterias);
+  };
+  const handleFilterChange = async () => {
+    const updatedFilterCriterias: FilterCriteria[] = [];
+
+    if (filters.minPrice || filters.maxPrice) {
+      updatedFilterCriterias.push({
+        key: "price",
+        value: {
+          min: filters.minPrice ? filters.minPrice : null,
+          max: filters.maxPrice ? filters.maxPrice : null,
+        },
+      });
+    }
+
+    const categoryPromises: Promise<{
+      id: string;
+      name: string;
+      level: number;
+    }>[] = [];
+
+    if (filters.category) {
+      filters.category.forEach((id) => {
+        categoryPromises.push(
+          CategoryService.getCategoryById(id).then((categoryInfo) => ({
+            id,
+            name: categoryInfo.name,
+            level: 1,
+          }))
+        );
+      });
+    }
+
+    if (filters.subCategory) {
+      filters.subCategory.forEach((id) => {
+        categoryPromises.push(
+          CategoryService.getSubCategoryById(id).then((categoryInfo) => ({
+            id,
+            name: categoryInfo.name,
+            level: 2,
+          }))
+        );
+      });
+    }
+
+    if (filters.subCategoryType) {
+      filters.subCategoryType.forEach((id) => {
+        categoryPromises.push(
+          CategoryService.getSubCategoryTypeById(id).then((categoryInfo) => ({
+            id,
+            name: categoryInfo.name,
+            level: 3,
+          }))
+        );
+      });
+    }
+
+    const categories = await Promise.all(categoryPromises);
+
+    if (categories.length > 0) {
+      updatedFilterCriterias.push({
+        key: "category",
+        value: categories,
+      });
+      const categoryIds = categories.map((category) => category.id);
+      setSelectedCategories(categoryIds);
+    }
+
+    if (filters.avgRating) {
+      updatedFilterCriterias.push({
+        key: "rating",
+        value: `${filters.avgRating} sao`,
+      });
+    }
 
     setFilterCriterias(updatedFilterCriterias);
-    console.log(updatedFilterCriterias);
   };
 
-  const clearAllFilterCriterias = () => {
-    setFilterCriterias([]);
+  const filters: ProductFilterInput = {
+    keyword: query.get("keyword") || undefined,
+    shopId: query.get("shopId") || undefined,
+    minPrice: query.get("minPrice") ? Number(query.get("minPrice")) : undefined,
+    maxPrice: query.get("maxPrice") ? Number(query.get("maxPrice")) : undefined,
+    category: query.get("category")
+      ? decodeURIComponent(query.get("category")!)!.split(",")
+      : undefined,
+    subCategory: query.get("subCategory")
+      ? decodeURIComponent(query.get("subCategory")!)!.split(",")
+      : undefined,
+    subCategoryType: query.get("subCategoryType")
+      ? decodeURIComponent(query.get("subCategoryType")!)!.split(",")
+      : undefined,
+    avgRating: query.get("rating") ? Number(query.get("rating")) : undefined,
+    sortBy: query.get("sortBy") || undefined,
+    index: query.get("index") ? Number(query.get("index")) : undefined,
+    amount: query.get("amount") ? Number(query.get("amount")) : undefined,
   };
 
-  // useEffect(() => {
-  //       const filterProducts = () => {
-  //     // Lọc sản phẩm dựa trên filterCriterias
-  //     const filteredProducts = products.filter((product) => {
-  //       // Lấy danh sách các key đã được lọc
-  //       const filterKeys = filterCriterias.map((criteria) => criteria.key);
+  useEffect(() => {
+    setFilter(filters);
+  }, [query]);
 
-  //       // Kiểm tra xem sản phẩm có chứa tất cả các tiêu chí lọc không
-  //       return filterKeys.every((key) => {
-  //         // Nếu key không tồn tại trong filterCriterias thì sản phẩm đó không cần lọc
-  //         if (!filterCriterias.find((criteria) => criteria.key === key)) {
-  //           return true;
-  //         }
+  useEffect(() => {
+    handleFilterChange();
+  }, []);
 
-  //         // Lấy giá trị cần so sánh
-  //         const valueToCompare = product[key];
+  useEffect(() => {
+    const loadFilteredProducts = async () => {
+      if (filter) {
+        const response: {
+          total: number;
+          totalPages: number;
+          products: _ProductType[];
+        } = await ProductService.getProductByFilter(filter);
+        setAllProducts(response.products);
+        setTotalProduct(response.total);
+        setTotalPages(response.totalPages);
+      }
+    };
 
-  //         // So sánh giá trị của sản phẩm với giá trị lọc
-  //         return filterCriterias.some((criteria) => {
-  //           if (criteria.key === key) {
-  //             // Thực hiện so sánh giá trị của sản phẩm với giá trị lọc
-  //             // Ở đây mình giả sử chỉ có hai trường hợp là string hoặc number, bạn có thể điều chỉnh cho phù hợp với dữ liệu thực tế
-  //             if (typeof valueToCompare === 'string') {
-  //               // So sánh chuỗi
-  //               return valueToCompare.includes(criteria.value);
-  //             } else if (typeof valueToCompare === 'number') {
-  //               // So sánh số
-  //               return valueToCompare === criteria.value;
-  //             }
-  //           }
-  //           return false;
-  //         });
-  //       });
-  //     });
-
-  //     // Cập nhật danh sách sản phẩm hiển thị
-  //     setDisplayedProducts(filteredProducts);
-  //   };
-  //   console.log("FILTER", filterCriterias);
-  // }, [filterCriterias]);
-
-  // useEffect(() => {
-  //   // Hàm lọc sản phẩm dựa trên các tiêu chí lọc
-  //   const filterProducts = () => {
-  //     // Lọc sản phẩm dựa trên filterCriterias
-  //     const filteredProducts = products.filter((product) => {
-  //       // Lấy danh sách các key đã được lọc
-  //       const filterKeys = filterCriterias.map((criteria) => criteria.key);
-
-  //       // Kiểm tra xem sản phẩm có chứa tất cả các tiêu chí lọc không
-  //       return filterKeys.every((key) => {
-  //         // Nếu key không tồn tại trong filterCriterias thì sản phẩm đó không cần lọc
-  //         if (!filterCriterias.find((criteria) => criteria.key === key)) {
-  //           return true;
-  //         }
-
-  //         // Lấy giá trị cần so sánh
-  //         const valueToCompare = product[key];
-
-  //         // So sánh giá trị của sản phẩm với giá trị lọc
-  //         return filterCriterias.some((criteria) => {
-  //           if (criteria.key === key) {
-  //             // Thực hiện so sánh giá trị của sản phẩm với giá trị lọc
-  //             // Ở đây mình giả sử chỉ có hai trường hợp là string hoặc number, bạn có thể điều chỉnh cho phù hợp với dữ liệu thực tế
-  //             if (typeof valueToCompare === 'string') {
-  //               // So sánh chuỗi
-  //               return valueToCompare.includes(criteria.value);
-  //             } else if (typeof valueToCompare === 'number') {
-  //               // So sánh số
-  //               return valueToCompare === criteria.value;
-  //             }
-  //           }
-  //           return false;
-  //         });
-  //       });
-  //     });
-
-  //     // Cập nhật danh sách sản phẩm hiển thị
-  //     setDisplayedProducts(filteredProducts);
-  //   };
-
-  //   // Gọi hàm lọc sản phẩm khi filterCriterias thay đổi
-  //   filterProducts();
-  // }, [filterCriterias, products]); // Thêm products vào dependencies để khi products thay đổi, danh sách sản phẩm cũng được lọc lại
+    loadFilteredProducts();
+  }, [filter]);
 
   return (
-    <div className="flex">
+    <div className="flex ">
       {/* Filter section */}
       {isFilterOpened && (
-        <div className="md:w-1/4 p-4 border-r sm:w-1/2  min-w-[20%]">
-          <div className=" flex justify-center mx-auto items-center space-x-2 mb-4">
+        <div className="md:w-1/5 p-4 border-r sm:w-1/2  min-w-[20%]">
+          <div className=" flex mx-auto items-center space-x-2 mb-4">
             {" "}
             <HiOutlineAdjustmentsHorizontal size={25} color="black" />
-            <h2 className="text-xl font-bold ">Bộ lọc</h2>
+            <h2 className="text-md font-bold ">Bộ lọc</h2>
           </div>
           <Button
             danger
-            className="flex mx-auto justify-center w-full mb-2"
+            className="flex mx-auto justify-center w-full mb-2 text-xs items-center"
             onClick={() => clearAllFilterCriterias()}
           >
             Clear all
           </Button>
 
           <PriceFilter
+            selectedPriceRange={
+              filterCriterias.find((item) => item.key === "price")?.value
+            }
             suggestedPrices={suggestedPrices}
             addFilter={addFilterCriteria}
             removeFilter={removeFilterCriteria}
@@ -326,6 +485,7 @@ export default function ProductList() {
           />
           <Divider className="mx-2" />
           <RatingFilter
+            selectedValue={filter?.avgRating ? filter.avgRating : 0}
             addFilter={addFilterCriteria}
             removeFilter={removeFilterCriteria}
             isFiltered={filterCriterias.some(
@@ -333,17 +493,17 @@ export default function ProductList() {
             )}
           />
           <Divider className="mx-2" />
-          {/* <CheckboxFilter
-            filterCriteria="Danh mục sản phẩm"
+
+          <h3 className="font-semibold my-4 text-sm">Danh mục sản phẩm</h3>
+          <CategoryFilter
+            selectedCategories={selectedCategories}
+            setSelectedCategories={setSelectedCategories}
             addFilter={addFilterCriteria}
             removeFilter={removeFilterCriteria}
-            options={categories}
             isFiltered={filterCriterias.some(
               (criteria) => criteria.key === "category"
             )}
-          /> */}
-          <h3 className="font-semibold my-4">Danh mục sản phẩm</h3>
-          <CategoryFilter />
+          />
         </div>
       )}
       <div
@@ -353,8 +513,10 @@ export default function ProductList() {
           isFilterOpened={isFilterOpened}
           setIsFilterOpened={setIsFilterOpened}
           filterList={filterCriterias}
-          products={products}
+          products={allProducts}
           removeFilter={removeFilterCriteria}
+          total={totalProduct}
+          totalPages={totalPages}
         />
       </div>
     </div>
