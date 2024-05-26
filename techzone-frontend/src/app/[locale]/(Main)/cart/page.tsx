@@ -16,16 +16,11 @@ import { RiContactsBookLine } from "react-icons/ri";
 import DeliveryInfoForm from "@/component/customer/cart/DeliveryInfoForm";
 import TransactionSection from "@/component/customer/cart/TransactionSection";
 import PromotionSection from "@/component/customer/cart/PromotionSection";
-
-type CartPageType = {
-    key: React.Key;
-    image: string;
-    name: string;
-    unit_price: number;
-
-    amount?: number;
-    final_price?: number;
-}
+import { Product, GET_getUserCartProducts, PUT_updateCartProduct } from "@/app/apis/cart/CartProductAPI";
+import { ShippingAddress } from "@/app/apis/cart/AddressAPI";
+import { useRouter } from "next/navigation";
+import { POST_processTransaction, PaymentMethod } from "@/app/apis/payment/PaymentAPI";
+import { POST_createOrder } from "@/app/apis/order/OrderAPI";
 
 const formatDate = (date: Date) => {
     const hours = date.getHours().toString().padStart(2, '0');
@@ -75,9 +70,13 @@ const SelectWrapper = styled.div`
     }
 `
 
+interface ProductTableItem extends Product {
+    key: React.Key
+}
+
 export default function CartPage() {
     const [selectionType, setSelectionType] = useState<'checkbox' | 'radio'>('checkbox');
-    const [products, setProducts] = useState<any>(null);
+    const [products, setProducts] = useState<Product[]>();
     const [promotions, setPromotions] = useState<PromotionType[]>([]);
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
     const [selectedKey, setSelectedKey] = useState<React.Key | null>(null)
@@ -90,27 +89,17 @@ export default function CartPage() {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showDeleteManyModal, setShowDeleteManyModal] = useState(false);
     const [showPromotionModal, setShowPromotionModal] = useState(false);
-    const [paymentMethod, setPaymentMethod] = useState<string>('cash_on_delivery');
+    const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(PaymentMethod.COD);
+    const [isSavingAddress, setIsSavingAddress] = useState<boolean>(false);
     const promotion_help = "Áp dụng tối đa 1 Mã giảm giá Sản Phẩm và 1 Mã Vận Chuyển"
+    const router = useRouter();
 
     const initialAddress = {
-        
-    } as AddressType
-
-    const [currentAddress, setCurrentAddress] = useState<AddressType>({
         _id: "datn1",
-        receiverName: "",
-        address: {
-            street: "",
-            idCommune: "",
-            idDistrict: "",
-            idProvince: "",
-            country: ""
-        } as Address,
-        phoneNumber: "",
-        addressType: "residential",
-        selectedAsDefault: false
-    });
+
+    } as ShippingAddress;
+
+    const [currentAddress, setCurrentAddress] = useState<ShippingAddress>(initialAddress);
 
     const handleShowDeleteOneModal = (key: any) => {
         setSelectedKey(key);
@@ -141,6 +130,27 @@ export default function CartPage() {
 
     const handleCancelPromotionModal = () => {
         setShowPromotionModal(false);
+    }
+
+    //transaction process
+    const handleTransaction = async () => {
+        console.log('Transaction processing...');
+
+        //Create order
+        const createOrderResponse = await POST_createOrder(
+            process.env.NEXT_PUBLIC_USER_ID as string, currentAddress._id, "", paymentMethod);
+
+        //Direct call to transaction api
+        const transactionResponse = await POST_processTransaction(
+            process.env.NEXT_PUBLIC_USER_ID as string, 
+            products?.filter(product => selectedRowKeys.includes(product._id))!,
+            total,
+            paymentMethod
+        );
+        if (transactionResponse) {
+            console.log('Navigating to gateway...', transactionResponse.data);
+            transactionResponse.data ? router.push(transactionResponse.data) : router.push('/payment');
+        }
     }
 
     const fetchPromotions = async () => {
@@ -210,49 +220,12 @@ export default function CartPage() {
     }
 
     const fetchProducts = async () => {
-        const data: CartPageType[] = [
-            {
-                key: '1',
-                image: 'https://media3.coolmate.me/cdn-cgi/image/quality=80,format=auto/uploads/March2024/att.sn.xaq.5.png',
-                name: 'Áo Sát Nách Nam Thể Thao Promax',
-                unit_price: 189000,
-                amount: 1
-
-            },
-            {
-                key: '2',
-                image: 'https://media3.coolmate.me/cdn-cgi/image/quality=80,format=auto/uploads/April2023/zDSC05002_copy.jpg',
-                name: 'Áo Singlet chạy bộ Fast & Free',
-                unit_price: 189000,
-                amount: 1
-            },
-            {
-                key: '3',
-                image: 'https://down-vn.img.susercontent.com/file/vn-11134207-23020-4p4muea2hjnv80.png',
-                name: 'Bộ đồ Maid dài',
-                unit_price: 309000,
-                amount: 1
-            },
-            {
-                key: '4',
-                image: 'https://media3.coolmate.me/cdn-cgi/image/quality=80,format=auto/uploads/November2023/Hoodie_Reu_1.jpg',
-                name: 'Áo Hoodie Essential',
-                unit_price: 499000,
-                amount: 1
-            },
-            {
-                key: '5',
-                image: 'https://media3.coolmate.me/cdn-cgi/image/quality=80,format=auto/uploads/April2023/2uIMG_1077_copy.jpg',
-                name: 'Áo Sơ mi dài tay Café-DriS',
-                unit_price: 429000,
-                amount: 1
-            },
-
-        ];
+        await GET_getUserCartProducts(process.env.NEXT_PUBLIC_USER_ID as string)
+            .then(response => setProducts(response.data?.products || undefined));
         setTimeout(() => {
             setLoading(false);
         }, 1000);
-        setProducts(data);
+        ;
     }
 
     const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
@@ -271,9 +244,9 @@ export default function CartPage() {
             return;
         }
         if (products) {
-            const updatedProducts = products.map((product: { key: React.Key; }) => {
-                if (product.key === key) {
-                    return { ...product, amount: value };
+            const updatedProducts = products.map((product: Product) => {
+                if (product._id === key) {
+                    return { ...product, quantity: value };
                 }
                 return product;
             });
@@ -281,37 +254,42 @@ export default function CartPage() {
         }
     }
 
-    const onIncrement = (key: React.Key, value: number) => {
+    const onIncrement = async (key: React.Key, value: number) => {
         if (value === 100) return;
         if (products) {
-            const updatedProducts = products.map((product: { key: React.Key; }) => {
-                if (product.key === key) {
-                    return { ...product, amount: value + 1 };
+            const updatedProducts = products.map((product: Product) => {
+                if (product._id === key) {
+                    return { ...product, quantity: value + 1 };
                 }
                 return product;
             });
+            await PUT_updateCartProduct(process.env.NEXT_PUBLIC_USER_ID as string, key.toString(), value + 1);
             setProducts(updatedProducts);
         }
     }
 
-    const onDecrement = (key: React.Key, value: number) => {
-        if (value === 1) return handleShowDeleteOneModal(key)
+    const onDecrement = async (key: React.Key, value: number) => {
+        if (value === 1) {   
+            return handleShowDeleteOneModal(key);
+        }
 
         if (products) {
-            const updatedProducts = products.map((product: { key: React.Key; }) => {
-                if (product.key === key) {
-                    return { ...product, amount: value - 1 };
+            const updatedProducts = products.map((product: Product) => {
+                if (product._id === key) {
+                    return { ...product, quantity: value - 1 };
                 }
                 return product;
             });
+            await PUT_updateCartProduct(process.env.NEXT_PUBLIC_USER_ID as string, key.toString(), value - 1);
             setProducts(updatedProducts);
         }
     }
 
-    const handleRemoveRow = (key: React.Key) => {
+    const handleRemoveRow = async (key: React.Key) => {
         if (products) {
-            const updatedProducts = products.filter((product: { key: React.Key; }) => product.key !== key);
+            const updatedProducts = products.filter((product: Product) => product._id !== key);
             setProducts(updatedProducts);
+            await PUT_updateCartProduct(process.env.NEXT_PUBLIC_USER_ID as string, key.toString(), 0);
         }
         const updatedRowKeys = selectedRowKeys.filter(beforeKey => beforeKey !== key);
         setSelectedRowKeys(updatedRowKeys);
@@ -320,8 +298,10 @@ export default function CartPage() {
 
     const handleRemoveSelectedRows = () => {
         console.log('handleRemoveSelectedRows', selectedRowKeys)
-        const updatedProducts = products.filter((product: { key: React.Key; }) => !selectedRowKeys.includes(product.key));
+        const updatedProducts = products!.filter((product: Product) => !selectedRowKeys.includes(product._id));
         setProducts(updatedProducts);
+        selectedRowKeys.forEach(async (rowKey: React.Key) => 
+            await PUT_updateCartProduct(process.env.NEXT_PUBLIC_USER_ID as string, rowKey.toString(), 0))
         setSelectedRowKeys([]);
     };
 
@@ -349,11 +329,10 @@ export default function CartPage() {
         setDiscounts(updatedDiscounts);
     }
 
-
     const handleProvisional = () => {
-        const selectedProducts = products ? products.filter((product: { key: React.Key; }) => selectedRowKeys.includes(product.key)) : [];
-        const provisional = selectedProducts ? selectedProducts.reduce((total: number, product: { unit_price: number; amount: any; }) => {
-            return total + (product.unit_price * (product.amount || 1));
+        const selectedProducts = products ? products.filter((product: Product) => selectedRowKeys.includes(product._id)) : [];
+        const provisional = selectedProducts ? selectedProducts.reduce((total: number, product: Product) => {
+            return total + (product.finalPrice * (product.quantity || 1));
         }, 0) : 0;
         setProvisional(provisional);
     }
@@ -388,7 +367,7 @@ export default function CartPage() {
         setTotal(total);
     }
 
-    const columns: TableColumnsType<CartPageType> = [
+    const columns: TableColumnsType<Product> = [
         {
             title: <div className="flex flex-row gap-1 items-center uppercase text-gray-400">
                 <div className="text-base">Sản phẩm ({selectedRowKeys.length})</div>
@@ -396,8 +375,8 @@ export default function CartPage() {
                     <FaRegTrashCan />
                 </Button>
             </div>,
-            dataIndex: ['name'],
-            render: (text: string, record: CartPageType, index: number) =>
+            dataIndex: 'name',
+            render: (text: string, record: Product) =>
                 <Space align="start" size={12} className="flex flex-row">
                     {
                         loading ? <Skeleton.Image active /> :
@@ -438,7 +417,7 @@ export default function CartPage() {
                                             ]}
                                         />
                                     </SelectWrapper>
-                                    <div style={{ width: 75 }} onClick={() => handleShowDeleteOneModal(record.key)}>
+                                    <div style={{ width: 75 }} onClick={() => handleShowDeleteOneModal(record._id)}>
                                         <div className="flex flex-row cursor-pointer items-center gap-1 hover:font-semibold">
                                             <FaRegTrashCan /> Xóa
                                         </div>
@@ -455,13 +434,13 @@ export default function CartPage() {
         },
         {
             title: <span className="text-base uppercase text-gray-400">Số lượng</span>,
-            dataIndex: 'amount',
-            render: (value: number, record: CartPageType) =>
+            dataIndex: 'quantity',
+            render: (value: number, record: Product) =>
                 <div className="flex justify-center">
                     {
                         loading ? <Skeleton.Input active /> : (
                             <QuantityControl
-                                keyProp={record.key} value={value}
+                                keyProp={record._id} value={record.quantity}
                                 minValue={1} maxValue={100} defaultValue={1}
                                 inputWidth={75}
                                 onIncrement={onIncrement}
@@ -476,15 +455,25 @@ export default function CartPage() {
         },
         {
             title: <span className="text-base uppercase text-gray-400">Thành tiền</span>,
-            dataIndex: 'final_price',
-            render: (value: number, record: CartPageType) => (
+            dataIndex: ['finalPrice', 'originalPrice'],
+            render: (value: number, record: Product) => (
                 loading ? <Skeleton.Input active /> : (
-                    <span className="text-red-500 font-bold text-base ">
-                        <Currency value={(record.unit_price * (record.amount || 1))}
-                            locales={"vi-VN"}
-                            currency={"VND"}
-                            minimumFractionDigits={0} />
-                    </span>)
+                    <div className="flex flex-col gap-1">
+                        <span className="text-slate-500 text-base line-through">
+                            <Currency value={(record.originalPrice * (record.quantity || 1))}
+                                locales={"vi-VN"}
+                                currency={"VND"}
+                                minimumFractionDigits={0} />
+                        </span>
+                        <span className="text-red-500 font-bold text-base">
+                            <Currency value={(record.finalPrice * (record.quantity || 1))}
+                                locales={"vi-VN"}
+                                currency={"VND"}
+                                minimumFractionDigits={0} />
+                        </span>
+                    </div>
+
+                )
             ),
             width: '25%',
             align: 'center' as const,
@@ -506,10 +495,9 @@ export default function CartPage() {
     useEffect(() => {
         const storedAddress = localStorage.getItem('shippingAddress');
         if (!storedAddress) return;
-        const storedAddressObject = JSON.parse(storedAddress) as AddressType;
-        const completedAddressObject = { ...storedAddressObject, address: storedAddressObject.address as Address } as AddressType;
-        setCurrentAddress(completedAddressObject);
-        console.log('currentAddress', completedAddressObject);
+        const storedAddressObject = JSON.parse(storedAddress) as ShippingAddress;
+        setCurrentAddress(storedAddressObject);
+        console.log('currentAddress', storedAddressObject);
     }, []);
 
     const goToShippingAddressPage = () => {
@@ -520,19 +508,19 @@ export default function CartPage() {
         {
             label: 'COD',
             description: 'Thanh toán bằng tiền mặt khi nhận hàng',
-            value: 'cash_on_delivery',
+            value: PaymentMethod.COD,
             icon: 'https://cdn-icons-png.flaticon.com/512/1554/1554401.png'
         },
         {
             label: 'Thanh toán bằng ví ZaloPay',
             description: "Thẻ ATM / Thẻ tín dụng (Credit card) / Thẻ ghi nợ (Debit card)",
-            value: 'zalopay_wallet',
+            value: PaymentMethod.ZALOPAY,
             icon: "https://web.venusagency.vn/uploads/public/2021/06/03/1622682588188_zalopay.png"
         },
         {
             label: 'Thanh toán qua Paypal',
             description: "Thẻ tín dụng (Credit card) / Thẻ ghi nợ (Debit card)",
-            value: 'paypal_wallet',
+            value: PaymentMethod.PAYPAL,
             icon: "https://cdn.iconscout.com/icon/free/png-256/free-paypal-58-711793.png"
         },
     ];
@@ -571,7 +559,8 @@ export default function CartPage() {
                             </div>
                             <div className="mt-5">
                                 {loading ? <Skeleton /> :
-                                    <DeliveryInfoForm currentAddress={currentAddress} />
+                                    <DeliveryInfoForm currentAddress={currentAddress}
+                                        setIsSavingAddress={setIsSavingAddress} />
                                 }
                             </div>
                             {/* Hình thức thanh toán section */}
@@ -615,13 +604,13 @@ export default function CartPage() {
 
                                 }}
                                 columns={columns}
-                                dataSource={products}
+                                dataSource={products?.map(product => ({...product, key: product._id} as ProductTableItem))}
                                 // onRow={(record) => ({
                                 //         onClick: () => handleRowClick(record),
                                 //       })}
                                 loading={loading}
                                 pagination={false}
-                                scroll={{ x: 'min-content', y: 480 }}
+                                scroll={{ x: 'min-content' }}
                             />
                             <Divider style={{ height: "auto", border: "0.25px solid silver" }}></Divider>
 
@@ -638,8 +627,11 @@ export default function CartPage() {
                             <TransactionSection
                                 selectedRowKeys={selectedRowKeys}
                                 loading={loading}
-                                provisional={provisional} discount={discount} shippingFee={shippingFee}
-                                total={total} />
+                                provisional={provisional} 
+                                discount={discount} 
+                                shippingFee={shippingFee}
+                                total={total} 
+                                handleTransaction={handleTransaction}/>
                         </div>
                     </div>
                 </div>

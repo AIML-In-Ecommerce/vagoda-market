@@ -9,7 +9,7 @@ import WebFooter from "@/component/user/WebFooter";
 import { NextIntlClientProvider, useMessages } from "next-intl";
 import { Lato } from "next/font/google";
 import { ReactNode, Suspense } from "react";
-import RootLoading from "./loading";
+// import RootLoading from "./loading";
 
 // import UserLayout from "@/component/UserLayout";
 import { AntdRegistry } from '@ant-design/nextjs-registry';
@@ -46,13 +46,13 @@ export default function RootLayout({
             {/* <UserLayout children={children} locale={locale} /> */}
             {/* <UserLayout locale={locale}>{children}</UserLayout> */}
             {/* </AuthProvider> */}
-            <Suspense fallback={<RootLoading />}>
+            {/* <Suspense fallback={<RootLoading />}> */}
               <div className="w-full bg-cover bg-[#f3f3f3]  min-h-screen  overflow-hidden">
                 <Navbar />
                 {children}
                 <AssistantFloatingButtonGroup />
               </div>
-            </Suspense>
+            {/* </Suspense> */}
           </NextIntlClientProvider>
           <WebFooter />
         </AntdRegistry>

@@ -1,3 +1,4 @@
+import { Currency } from '@/component/user/utils/CurrencyDisplay';
 import { Button } from 'antd';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react'
@@ -12,7 +13,7 @@ const navigateToOrderPage = (router: any) => {
 }
 
 interface PaymentStatusComponentProps {
-    paymentMethod: any;
+    order: any;
 }
 
 export default function PaymentStatusComponent(props: PaymentStatusComponentProps) {
@@ -28,7 +29,10 @@ export default function PaymentStatusComponent(props: PaymentStatusComponentProp
                     <div className="md:text-2xl text-3xl text-gray-900 font-semibold text-center">Đặt hàng thành công!</div>
                 </div>
                 <div className="text-center">
-                    <div className="mb-2">Thanh toán thành công xxx.xxxđ với hình thức thanh toán X.</div>
+                    <div className="mb-2">Thanh toán thành công <span><Currency value={0}
+                        locales={"vi-VN"}
+                        currency={"VND"}
+                        minimumFractionDigits={0}></Currency></span> với hình thức thanh toán X.</div>
                     {/* <div className="mb-2">Đã chọn hình thức thanh toán bằng tiền mặt. Vui lòng trả xxx.xxxđ cho người giao hàng.</div> */}
                     <div className="text-gray-600 mb-2">Cảm ơn bạn đã mua hàng tại FashionStyle.</div>
                     <div> Mã số đơn hàng của bạn là ORDER_ID</div>

@@ -1,11 +1,12 @@
 "use client";
 import { Address, AddressType } from '@/model/AddressType'
-import { Checkbox, Input, Select } from 'antd'
+import { Checkbox, CheckboxProps, Input, Select } from 'antd'
 import React, { useEffect, useMemo, useState } from 'react'
-import { getProvince, getDistrict, getCommune } from '@/app/apis/cart/AddressAPI';
+import { getProvince, getDistrict, getCommune, Province, Commune, District, ShippingAddress } from '@/app/apis/cart/AddressAPI';
 
 interface DeliveryInfoFormProps {
-    currentAddress: AddressType | undefined;
+    currentAddress: ShippingAddress | undefined;
+    setIsSavingAddress: (isSavingAddress: boolean) => void;
 }
 
 export default function DeliveryInfoForm(props: DeliveryInfoFormProps) {
@@ -16,17 +17,22 @@ export default function DeliveryInfoForm(props: DeliveryInfoFormProps) {
 
     const [name, setName] = useState<string>(addressInfo!.receiverName || '');
     const [phoneNumber, setPhoneNumber] = useState<string>(addressInfo!.phoneNumber || '');
-    const [address, setAddress] = useState<Address | undefined>(addressInfo!.address);
-    // const [selectedAsDefault, setSelectedAsDefault] = useState<boolean | undefined>(props.currentAddress?.selectedAsDefault);
-
-    const [provinceList, setProvinceList] = React.useState([]);
-    const [districtList, setDistrictList] = React.useState([]);
-    const [communeList, setCommuneList] = React.useState([]);
+    const [address, setAddress] = useState<Address | undefined>({
+        street: addressInfo?.street,
+        idProvince: addressInfo?.idProvince,
+        idDistrict: addressInfo?.idDistrict,
+        idCommune: addressInfo?.idCommune,
+        country: addressInfo?.country,
+    } as Address);
+    const [provinceList, setProvinceList] = React.useState<Province[]>([]);
+    const [districtList, setDistrictList] = React.useState<District[]>([]);
+    const [communeList, setCommuneList] = React.useState<Commune[]>([]);
     const [provinceValue, setProvinceValue] = React.useState(address?.idProvince || "0");
     const [districtValue, setDistrictValue] = React.useState(address?.idDistrict || "0");
     const [communeValue, setCommuneValue] = React.useState(address?.idCommune || "0");
     const [isLoadingDistrict, setIsLoadingDistrict] = React.useState(false);
     const [isLoadingCommune, setIsLoadingCommune] = React.useState(false);
+    const [checked, setIsChecked] = React.useState<boolean>(false);
 
     // useEffect(() => {
     //     getProvince().then((value: any) => setProvinceList(value));
@@ -35,36 +41,28 @@ export default function DeliveryInfoForm(props: DeliveryInfoFormProps) {
     //     handleChangeCommune(communeValue);
     // },[]);
 
+    const onSavingAddress: CheckboxProps['onChange'] = (e) => {
+        props.setIsSavingAddress(e.target.checked);
+        setIsChecked(e.target.checked);
+    }
+
     useEffect(() => {
         const fetchAddressData = async () => {
-            const storedProvinces = localStorage.getItem('provinceList');
-            const storedDistricts = localStorage.getItem('districtList');
-            const storedCommunes = localStorage.getItem('communeList');
+            const provinces = getProvince();
+            setProvinceList(provinces);
 
-            if (storedProvinces && storedDistricts && storedCommunes) {
-                setProvinceList(JSON.parse(storedProvinces));
-                setDistrictList(JSON.parse(storedDistricts));
-                setCommuneList(JSON.parse(storedCommunes));
-            } else {
-                const provinces = await getProvince();
-                setProvinceList(provinces);
-                localStorage.setItem('provinceList', JSON.stringify(provinces));
+            if (provinceValue !== "0") {
+                setIsLoadingDistrict(true);
+                const districts = getDistrict(provinceValue);
+                setDistrictList(districts);
+                setIsLoadingDistrict(false);
+            }
 
-                if (provinceValue !== "0") {
-                    setIsLoadingDistrict(true);
-                    const districts = await getDistrict(provinceValue);
-                    setDistrictList(districts);
-                    localStorage.setItem('districtList', JSON.stringify(districts));
-                    setIsLoadingDistrict(false);
-
-                    if (districtValue !== "0") {
-                        setIsLoadingCommune(true);
-                        const communes = await getCommune(districtValue);
-                        setCommuneList(communes);
-                        localStorage.setItem('communeList', JSON.stringify(communes));
-                        setIsLoadingCommune(false);
-                    }
-                }
+            if (districtValue !== "0") {
+                setIsLoadingCommune(true);
+                const communes = getCommune(districtValue);
+                setCommuneList(communes);
+                setIsLoadingCommune(false);
             }
         };
 
@@ -113,8 +111,12 @@ export default function DeliveryInfoForm(props: DeliveryInfoFormProps) {
             return;
         }
         setIsLoadingDistrict(true);
-        const districtList = await getDistrict(value);
+        const districtList = getDistrict(value);
         setDistrictList(districtList);
+        //Clear commune options, set default values for district and commune
+        setCommuneList([]);
+        setDistrictValue("0");
+        setCommuneValue("0");
         setIsLoadingDistrict(false);
     };
 
@@ -126,8 +128,10 @@ export default function DeliveryInfoForm(props: DeliveryInfoFormProps) {
             setCommuneValue("0");
         } else {
             setIsLoadingCommune(true);
-            const communeList = await getCommune(value);
+            const communeList = getCommune(value);
             setCommuneList(communeList);
+            //Clear commune options, set default value for commune
+            setCommuneValue("0");
             setIsLoadingCommune(false);
         }
     };
@@ -172,7 +176,9 @@ export default function DeliveryInfoForm(props: DeliveryInfoFormProps) {
                 </Select>
             </div>
             <Input className="border-1 border-gray-400 rounded-xl" size="large" placeholder='Ghi chú thêm (Ví dụ: Giao hàng giờ hành chính)'></Input>
-            <Checkbox><div className="font-semibold">Lưu vào sổ địa chỉ để dùng cho lần giao hàng tiếp theo</div></Checkbox>
+            <Checkbox checked={checked} onChange={onSavingAddress}>
+                <div className="font-semibold">Lưu vào sổ địa chỉ để dùng cho lần giao hàng tiếp theo</div>
+            </Checkbox>
         </div>
     )
 }

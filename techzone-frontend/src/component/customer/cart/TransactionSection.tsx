@@ -1,12 +1,7 @@
 import React from 'react'
 import { Currency } from "@/component/user/utils/CurrencyDisplay"
-import { AddressType } from "@/model/AddressType"
-import { Affix, Space, Card, Skeleton, Divider, Tag, Tooltip, Button } from "antd"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { useEffect, useState } from "react";
-import { FaRegCircleQuestion } from "react-icons/fa6"
-import { TiTicket } from "react-icons/ti"
+import { Skeleton, Divider, Button } from "antd"
+import { useEffect } from "react";
 
 interface TransactionSectionProps {
     selectedRowKeys: any;
@@ -15,6 +10,7 @@ interface TransactionSectionProps {
     discount: any;
     shippingFee: any;
     total: any;
+    handleTransaction: () => void;
 }
 
 const isEmpty = (quantity: number) => {
@@ -22,7 +18,9 @@ const isEmpty = (quantity: number) => {
 }
 
 export default function TransactionSection(props: TransactionSectionProps) {
-    const router = useRouter();
+    useEffect(() => {
+        console.log('Provisional', props.provisional);
+    },[props.provisional])
 
     return (
         <div className="bg-white px-4 py-2">
@@ -65,7 +63,7 @@ export default function TransactionSection(props: TransactionSectionProps) {
             )}
             <Button type="primary" size="large" danger block
                 disabled={isEmpty(props.selectedRowKeys.length)}
-                onClick={() => { router.push('/cart/payment') }}>
+                onClick={() => { props.handleTransaction() }}>
                 Mua Hàng ({props.selectedRowKeys.length})
             </Button>
         </div>
