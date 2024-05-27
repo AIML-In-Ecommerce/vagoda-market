@@ -17,6 +17,7 @@ import Image from "next/image";
 import axios from "axios";
 
 type Mode = "MODEL" | "PRODUCT" | "PREVIEW";
+type LoadStatus = "READY" | "RUNNING" | "COMPLETED";
 
 interface VtoProduct {
   _id: string;
@@ -68,8 +69,14 @@ const VirtualTryOn = () => {
   const [mode, setMode] = useState<Mode>("MODEL");
   const [productList, setProductList] = useState<VtoProduct[]>([]);
   const [chosenProduct, setChosenProduct] = useState<VtoProduct>();
-  const fileRef = useRef<HTMLInputElement>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [tryOnLoading, setTryOnLoading] = useState<LoadStatus>("RUNNING");
+
+  const tryOnImageUrl = useRef<string>(
+    "https://res.cloudinary.com/dgsrxvev1/image/upload/v1716443926/vn-11134207-7r98o-lp8u23rvrf4r40_hcpkjk.jpg",
+  );
+  const fileRef = useRef<HTMLInputElement>(null);
+  const userImageUrl = useRef<string | null>(null);
 
   const handleCancelImg = () => {
     setImagePreview(null);
@@ -112,8 +119,9 @@ const VirtualTryOn = () => {
             },
           },
         );
-
         console.log("Image uploaded successfully:", response.data);
+
+        userImageUrl.current = response.data.path;
       } catch (error) {
         console.error("Error uploading image:", error);
       }
@@ -208,9 +216,40 @@ const VirtualTryOn = () => {
           </div>
         );
       case "PREVIEW":
-        return "Preview";
+        return (
+          <div className="w-full h-[calc(100%-100px)]  flex flex-row gap-4 justify-center items-center">
+            {renderTryOnPreview(tryOnLoading)}
+          </div>
+        );
       default:
         return "Ảnh của bạn";
+    }
+  };
+
+  const renderTryOnPreview = (tryOnLoading: string) => {
+    switch (tryOnLoading) {
+      case "READY":
+        return;
+      case "RUNNING":
+        return (
+          <div className="w-full h-full flex flex-row gap-4 justify-center items-center">
+            <span className="loader"></span>
+            <span className="text-loader"></span>
+          </div>
+        );
+      case "COMPLETED":
+        return (
+          <div className="relative w-[40%] aspect-square">
+            <Image
+              src={tryOnImageUrl.current}
+              alt="Preview"
+              layout="fill"
+              objectFit="cover"
+              loading="lazy"
+              className="rounded-xl"
+            />
+          </div>
+        );
     }
   };
 
