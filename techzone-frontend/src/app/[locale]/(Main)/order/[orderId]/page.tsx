@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from 'react'
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { PaymentMethod } from '@/app/apis/payment/PaymentAPI';
 import { GET_getUserCartProducts, Product } from '@/app/apis/cart/CartProductAPI';
 import { Currency } from '@/component/user/utils/CurrencyDisplay';
@@ -8,6 +8,7 @@ import { QuantityControl } from '@/component/user/utils/QuantityControl';
 import { TableColumnsType, Button, Space, Skeleton, Select, Table, Image } from 'antd';
 import { FaRegTrashCan } from 'react-icons/fa6';
 import Link from 'next/link';
+import { GET_getShopInfoById } from '@/app/apis/shop/ShopAPI';
 
 interface OrderDetailPageProps {
 
@@ -70,6 +71,10 @@ const OrderTransaction =
         )
     }
 
+type ShopInfo = {
+    _id: string,
+    name: string,
+}
 
 export default function OrderDetailPage() {
     const params = useParams();
@@ -77,6 +82,8 @@ export default function OrderDetailPage() {
     const paymentMethod = PaymentMethod.ZALOPAY;
     const [loading, setLoading] = useState<boolean>(false);
     const [products, setProducts] = useState<Product[]>();
+    const [shopInfos, setShopInfos] = useState<ShopInfo[]>();
+    const router = useRouter();
 
     const orderMockInfo = {
         id: 'order-info1',
@@ -118,10 +125,44 @@ export default function OrderDetailPage() {
         }, 1000);
         ;
     }
+    const filterShopName = (shopId: string) => {
+        const shopName = shopInfos?.find(shopInfo => shopInfo._id === shopId)?.name;
+        return shopName;
+    }
+
+    const fetchShopInfos = (products: Product[]) => {
+        const shopInfosList: ShopInfo[] = [];
+        const shopIdList: string[] = [];
+        products.forEach(async (product: Product) => {
+            if (!shopIdList.includes(product.shop)) {
+                shopIdList.push(product.shop);
+            }
+        })
+        shopIdList.forEach(async (item: string) => {
+            await GET_getShopInfoById(item)
+                .then((response) => shopInfosList.push({
+                    _id: item,
+                    name: response.data.data.name,
+                } as ShopInfo));
+        })
+        setShopInfos(shopInfosList);
+    }
 
     useEffect(() => {
         fetchProducts();
-    }, [])
+    }, []);
+
+    useEffect(() => {
+        if (products) {
+            fetchShopInfos(products);
+        }
+    }, [products]);
+
+    useEffect(() => {
+        console.log('ShopInfos', shopInfos);
+        router.refresh();
+    }, [shopInfos]);
+
 
     const columns: TableColumnsType<Product> = [
         {
@@ -145,7 +186,7 @@ export default function OrderDetailPage() {
                             <div className="flex flex-row">
                                 <div className="flex flex-col gap-1">
                                     <div className="text-sm font-bold text-ellipsis overflow-hidden">{record.name}</div>
-                                    <div className="text-sm text-gray-500 mb-1 flex flex-row gap-1">Cung cấp bởi <Link href={''}>{record.shop}</Link></div>
+                                    <div className="text-sm text-gray-500 mb-1 flex flex-row gap-1">Cung cấp bởi <Link href={''}>{filterShopName(record.shop)}</Link></div>
                                     <div className="flex flex-row gap-2">
                                         <Button onClick={() => { }}>Viết nhận xét</Button>
                                         <Button onClick={() => { }}>Mua lại</Button>
