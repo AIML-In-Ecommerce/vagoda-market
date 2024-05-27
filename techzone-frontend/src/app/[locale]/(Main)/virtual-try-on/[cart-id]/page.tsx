@@ -15,6 +15,7 @@ import { title } from "process";
 import VtoProduct from "@/component/customer/product/VtoProduct";
 import Image from "next/image";
 import axios from "axios";
+import { Divider } from "antd";
 
 type Mode = "MODEL" | "PRODUCT" | "PREVIEW";
 type LoadStatus = "READY" | "RUNNING" | "COMPLETED";
@@ -70,7 +71,7 @@ const VirtualTryOn = () => {
   const [productList, setProductList] = useState<VtoProduct[]>([]);
   const [chosenProduct, setChosenProduct] = useState<VtoProduct>();
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [tryOnLoading, setTryOnLoading] = useState<LoadStatus>("RUNNING");
+  const [tryOnLoading, setTryOnLoading] = useState<LoadStatus>("READY");
 
   const tryOnImageUrl = useRef<string>(
     "https://res.cloudinary.com/dgsrxvev1/image/upload/v1716443926/vn-11134207-7r98o-lp8u23rvrf4r40_hcpkjk.jpg",
@@ -106,6 +107,7 @@ const VirtualTryOn = () => {
 
   const handleUpload = async () => {
     if (fileRef.current?.files?.length) {
+      console.log("Here");
       const formData = new FormData();
       formData.append("image", fileRef.current.files[0]);
 
@@ -120,8 +122,10 @@ const VirtualTryOn = () => {
           },
         );
         console.log("Image uploaded successfully:", response.data);
-
-        userImageUrl.current = response.data.path;
+        if (response.status == 200) {
+          userImageUrl.current = response.data.path;
+          setMode("PRODUCT");
+        }
       } catch (error) {
         console.error("Error uploading image:", error);
       }
@@ -148,6 +152,37 @@ const VirtualTryOn = () => {
         return "Preview";
       default:
         return "Ảnh của bạn";
+    }
+  };
+
+  const startTryOnClick = () => {
+    setTryOnLoading("RUNNING");
+  };
+
+  const fetchVirtualTryOn = async () => {
+    const postBody = {
+      modelImgUrl: userImageUrl,
+      garmentImgUrl: chosenProduct?.image[0],
+    };
+    try {
+      const response = await fetch(
+        "http://localhost:8000/genai/virtual-try-on",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(postBody),
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      setTryOnLoading("RUNNING");
+      console.log("Reponse: ", response);
+    } catch (error) {
+      console.error("Error fetching virtual try-on:", error);
     }
   };
 
@@ -229,7 +264,16 @@ const VirtualTryOn = () => {
   const renderTryOnPreview = (tryOnLoading: string) => {
     switch (tryOnLoading) {
       case "READY":
-        return;
+        return (
+          <button
+            className="
+            bg-white bg-opacity-50 text-2xl px-8 py-3 rounded-full border-white  flex items-center gap-2  hover:text-slate-500 hover:bg-opacity-80"
+            onClick={fetchVirtualTryOn}
+          >
+            {/* <FiSend /> */}
+            <span>Bắt đầu thử đồ</span>
+          </button>
+        );
       case "RUNNING":
         return (
           <div className="w-full h-full flex flex-row gap-4 justify-center items-center">
@@ -308,6 +352,7 @@ const VirtualTryOn = () => {
         <div className="flex w-[200px] h-[50px] bg-style text-white text-xl justify-center items-center rounded-full">
           {renderTitle(mode)}
         </div>
+
         <div className="w-full h-full flex flex-row justify-center items-center gap-10">
           <div className="w-[200px] flex justify-center items-center">
             <div className="w-[60px] h-[200px] rounded-full bg-style flex flex-col gap-5 justify-center items-center text-white">
@@ -366,7 +411,7 @@ const VirtualTryOn = () => {
             {chosenProduct != undefined &&
               renderChosenProductBox(chosenProduct)}
           </div>
-          <div className="flex w-[200px] h-[50px] bg-style text-white text-xl justify-center items-center rounded-full">
+          <div className="flex w-[200px] h-[50px] bg-style text-white text-xl justify-center items-center rounded-full invisible">
             Tiếp tục
           </div>
         </div>
