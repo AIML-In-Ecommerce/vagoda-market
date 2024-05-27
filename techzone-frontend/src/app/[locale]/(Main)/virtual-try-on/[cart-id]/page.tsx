@@ -71,6 +71,13 @@ const VirtualTryOn = () => {
   const fileRef = useRef<HTMLInputElement>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
+  const handleCancelImg = () => {
+    setImagePreview(null);
+    if (fileRef.current) {
+      fileRef.current.value = "";
+    }
+  };
+
   const handleIconClick = () => {
     if (fileRef.current) {
       fileRef.current.click();
@@ -85,6 +92,8 @@ const VirtualTryOn = () => {
         setImagePreview(reader.result as string);
       };
       reader.readAsDataURL(file);
+    } else {
+      console.log("No File Selected");
     }
   };
 
@@ -94,16 +103,22 @@ const VirtualTryOn = () => {
       formData.append("image", fileRef.current.files[0]);
 
       try {
-        const response = await axios.post("YOUR_API_ENDPOINT", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
+        const response = await axios.post(
+          "http://14.225.218.109:3010/upload",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
           },
-        });
+        );
 
         console.log("Image uploaded successfully:", response.data);
       } catch (error) {
         console.error("Error uploading image:", error);
       }
+    } else {
+      console.log("No file selected or file input is not working");
     }
   };
 
@@ -129,22 +144,55 @@ const VirtualTryOn = () => {
   };
 
   const renderMainBox = (mode: Mode) => {
+    console.log("img preview: ", imagePreview);
     switch (mode) {
       case "MODEL":
         return (
-          <div
-            className="w-full h-[calc(100%-80px)] flex flex-col gap-5 justify-center items-center cursor-pointer"
-            onClick={(e) => handleIconClick()}
-          >
-            <input
-              ref={fileRef}
-              type="file"
-              className="hidden"
-              onChange={handleFileChange}
-              accept="image/*"
-            />
-            <BsPersonBoundingBox className="w-[150px] h-[150px]" />
-            <div className="text-md  italic">Click để lên ảnh của bạn</div>
+          <div className="w-full h-[calc(100%-80px)] flex justify-center items-center">
+            <div
+              className={`w-full h-full flex flex-col gap-5 justify-center items-center cursor-pointer ${
+                imagePreview != null && "hidden"
+              }`}
+              onClick={handleIconClick}
+            >
+              <input
+                ref={fileRef}
+                type="file"
+                className="hidden"
+                onChange={handleFileChange}
+                accept="image/*"
+              />
+              <BsPersonBoundingBox className="w-[150px] h-[150px]" />
+              <div className="text-md italic">Click để lên ảnh của bạn</div>
+            </div>
+            {imagePreview && (
+              <div className="w-full h-full flex flex-col gap-4 justify-center items-center">
+                <div className="relative w-[40%] aspect-square">
+                  <Image
+                    src={imagePreview}
+                    alt="Preview"
+                    layout="fill"
+                    objectFit="cover"
+                    loading="lazy"
+                    className="rounded-xl"
+                  />
+                </div>
+                <div className="w-full flex flex-row justify-center items-center gap-4">
+                  <button
+                    className="bg-white bg-opacity-20 px-4 py-1 rounded-full hover:bg-opacity-50"
+                    onClick={handleCancelImg}
+                  >
+                    Hủy chọn
+                  </button>
+                  <button
+                    className="bg-black bg-opacity-50 px-4 py-1 rounded-full hover:bg-opacity-80"
+                    onClick={handleUpload}
+                  >
+                    Xác nhận
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         );
       case "PRODUCT":
@@ -213,7 +261,7 @@ const VirtualTryOn = () => {
   useEffect(() => {
     renderTitle(mode);
     renderMainBox(mode);
-  }, [mode]);
+  }, [mode, imagePreview]);
 
   return (
     <div className="bg-[url('https://res.cloudinary.com/dgsrxvev1/image/upload/v1716347947/dressing_room_c9bl2n.jpg')] bg-center bg-cover bg-no-repeat w-[100vw] h-[100vh] flex flex-col justify-center items-center">
