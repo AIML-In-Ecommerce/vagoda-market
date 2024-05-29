@@ -180,7 +180,7 @@ const VirtualTryOn = () => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       setTryOnLoading("RUNNING");
-      console.log("Reponse: ", response);
+      console.log("Reponse: ", response.data);
     } catch (error) {
       console.error("Error fetching virtual try-on:", error);
     }
