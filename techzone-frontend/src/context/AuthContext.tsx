@@ -29,8 +29,9 @@ interface AuthContextProps
 interface AuthContextFunctions
 {
     // validateAuthRequest: (sessionInfoID: string) => boolean,
-    login: (receivedSessionInfoID: string, accessToken: string, 
-        refreshToken: string, refreshTokenExpiredDate: string | Date) => boolean,
+    // login: (receivedSessionInfoID: string, accessToken: string, 
+    //     refreshToken: string, refreshTokenExpiredDate: string | Date) => boolean,
+    login: () => boolean
     logout: () => void,
     getAccessToken: () => string | null
 }
@@ -91,8 +92,9 @@ export default function AuthContextProvider({children}: AuthContextProviderInitP
         return true
     }
 
-    function login(receivedSessionInfoID: string, accessToken: string, 
-        refreshToken: string, refreshTokenExpiredDate: string | Date)
+    // function login(receivedSessionInfoID: string, accessToken: string, 
+    //     refreshToken: string, refreshTokenExpiredDate: string | Date)
+    function login()
     {
         const check = validateAuthRequest(receivedSessionInfoID)
         if(check == false)
@@ -100,8 +102,8 @@ export default function AuthContextProvider({children}: AuthContextProviderInitP
             return false
         }
 
-        Cookies.set(accessTokenCookieKey, accessToken)
-        Cookies.set(refreshTokenCookieKey, refreshToken, {expires: new Date(refreshTokenExpiredDate)})
+        // Cookies.set(accessTokenCookieKey, accessToken)
+        // Cookies.set(refreshTokenCookieKey, refreshToken, {expires: new Date(refreshTokenExpiredDate)})
 
         return true
     }

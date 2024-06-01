@@ -110,9 +110,7 @@ export default function AuthForm(props: AuthFormProps) {
       );
 
       const stringifiedString = JSON.stringify(responseData.buyerInfo);
-      const userInfoSessionStorageKey = crypto.randomUUID();
-
-      sessionStorage.setItem(userInfoSessionStorageKey, stringifiedString);
+      
       //set access token and refresh token to cookie
 
       setResultModalState("success");
@@ -122,16 +120,15 @@ export default function AuthForm(props: AuthFormProps) {
 
       if (authContext.methods) {
         const check = authContext.methods.login(
-          userInfoSessionStorageKey,
-          accessToken,
-          refreshToken,
-          refreshTokenExpiredDate
+          // userInfoSessionStorageKey,
+          // accessToken,
+          // refreshToken,
+          // refreshTokenExpiredDate
         );
 
         if (check == true) {
           router.push("/");
         } else {
-          sessionStorage.removeItem(userInfoSessionStorageKey);
           setOpenModalAuthSucess(false);
           setDescriptionMessageOfModal(
             "An involvement has happened that prevents you from your sign-in process"
