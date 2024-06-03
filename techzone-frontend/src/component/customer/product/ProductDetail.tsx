@@ -1,42 +1,27 @@
 "use client";
 import { GET_GetProductDetail } from "@/apis/product/ProductDetailAPI";
-import { ProductStatusToStringConverter } from "@/component/user/utils/ProductStatusConverter";
-import { QuantityControl } from "@/component/user/utils/QuantityControl";
-import { ProductDetailType, ProductStatus } from "@/model/ProductType";
-import {
-  CheckCircleOutlined,
-  CloseCircleOutlined,
-  PercentageOutlined,
-} from "@ant-design/icons";
+import { ProductDetailType } from "@/model/ProductType";
 import {
   Affix,
-  Image as AntdImage,
   Badge,
-  Button,
   ConfigProvider,
   Descriptions,
   DescriptionsProps,
   Divider,
-  Flex,
   FloatButton,
-  List,
-  Rate,
   Skeleton,
   Tabs,
-  Tag,
 } from "antd";
-import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
-import ReactImageMagnify from "react-image-magnify";
 import useOnScreen from "../../user/utils/UseOnScreen";
 import ReviewList from "../review/ReviewList";
 import ReviewSummary from "../review/ReviewSummary";
-import CustomEmpty from "../shop/mini/CustomEmpty";
-import ComboList from "./ComboList";
-import FloatingCartForm from "./FloatingCartForm";
-import CartSummaryModal from "./ProductSummaryModal";
-import SimilarList from "./SimilarList";
+import ComboList from "./productDetail/ComboList";
+import FloatingCartForm from "./productDetail/FloatingCartForm";
+import CartSummaryModal from "./productDetail/ProductSummaryModal";
+import SimilarList from "./productDetail/SimilarList";
+import AboutProduct from "./productDetail/AboutProduct";
 
 export default function ProductDetail() {
   // mock data
@@ -93,53 +78,13 @@ export default function ProductDetail() {
     },
   ];
 
-  const colorOptionsData = [
-    { label: "Cam", value: "#cc4f14" },
-    { label: "Đỏ", value: "#cc1414" },
-    { label: "Vàng", value: "#fae102" },
-  ];
-  const sizeOptionsData = ["XL", "L"];
-
   // end mock data
 
   // variables and functions
   const { productId } = useParams();
 
   const [product, setProduct] = useState<ProductDetailType>();
-
-  const [colorOptions, setColorOptions] = useState<any[]>(colorOptionsData);
-  const [selectedColorOption, setSelectedColorOption] = useState<any>();
-
-  const [sizeOptions, setSizeOptions] = useState<string[]>(sizeOptionsData);
-  const [selectedSizeOption, setSelectedSizeOption] = useState<string>();
-
-  // images for zoom lens
-  type ImageInfoType = {
-    width: number;
-    height: number;
-  };
-
   const [mainImage, setMainImage] = useState<string>("");
-  const [mainImageInfo, setMainImageInfo] = useState<ImageInfoType>({
-    width: 0,
-    height: 0,
-  });
-
-  useEffect(() => {
-    function getMeta(url: string, callback: any) {
-      const img = new Image();
-      img.src = url;
-      img.onload = function () {
-        callback(img.width, img.height);
-      };
-    }
-    getMeta(mainImage, (width: number, height: number) => {
-      // alert(width + "px " + height + "px");
-      let imageInfo = { width, height };
-      setMainImageInfo(imageInfo);
-    });
-  }, [mainImage]);
-
   const [numberOfReview, setNumberOfReview] = useState(0);
 
   // price--------------------------------------------------------
@@ -155,12 +100,6 @@ export default function ProductDetail() {
     return numberOfItem * product.finalPrice + totalComboPrice;
   }, [totalComboPrice, numberOfItem, product]);
   //----------------------------------------------------------------
-
-  // image col
-  const imageCol = useMemo(() => {
-    if (!product) return 1;
-    return product.images.length > 5 ? 2 : 1;
-  }, [product]);
 
   // modal
   const [open, setOpen] = useState(false);
@@ -213,7 +152,12 @@ export default function ProductDetail() {
   const cartVisibility = !useOnScreen(ref2);
 
   // all reviews
-  const allReviews = <ReviewList setNumberOfReview={setNumberOfReview} />;
+  const allReviews = (
+    <ReviewList
+      setNumberOfReview={setNumberOfReview}
+      productId={productId.toString()}
+    />
+  );
   const reviewSummary = (
     <ReviewSummary product={product} numberOfReview={numberOfReview} />
   );
@@ -289,30 +233,6 @@ export default function ProductDetail() {
   ];
 
   // functions
-  const onIncrement = (key: React.Key, value: number) => {
-    if (value === 100) return;
-    setNumberOfItem(value + 1);
-  };
-
-  const onDecrement = (key: React.Key, value: number) => {
-    if (value === 1) return;
-    setNumberOfItem(value - 1);
-  };
-
-  const onQuantityChange = (key: React.Key, value: number) => {
-    // Update the 'amount' field of the product with the specified key
-    if (value) {
-      setNumberOfItem(value);
-    }
-  };
-
-  const discountPercentage = useMemo(() => {
-    if (!product) return 0;
-    return Math.round(
-      ((product.originalPrice - product.finalPrice) / product.originalPrice) *
-        100
-    );
-  }, [product]);
 
   // call api
   useEffect(() => {
@@ -341,271 +261,14 @@ export default function ProductDetail() {
         <div className="justify-between pb-10 gap-5 h-fit overflow-hidden relative">
           <div className="">
             {/* about product */}
-            <div
-              className="bg-white flex lg:flex-row flex-col my-5 lg:max-h-[450px] xl:max-h-[550px] overflow-y-clip"
-              ref={ref2}
-            >
-              <Flex>
-                <div
-                  className={`m-2 flex flex-col min-w-14 mt-6 ${
-                    imageCol == 1 ? "max-w-14" : "max-w-28"
-                  }`}
-                >
-                  <List
-                    grid={{ gutter: 20, column: imageCol }}
-                    dataSource={product.images}
-                    locale={{
-                      emptyText: <CustomEmpty />,
-                    }}
-                    renderItem={(item) => (
-                      <List.Item>
-                        <div
-                          className={`cursor-pointer ${
-                            mainImage == item
-                              ? "border-4 border-blue-400"
-                              : "border-2"
-                          }`}
-                          onClick={() => {
-                            setMainImage(item);
-                          }}
-                        >
-                          <img
-                            className="h-12 w-12 object-fill"
-                            src={item}
-                            // alt={item}
-                          />
-                        </div>
-                      </List.Item>
-                    )}
-                  />
-                </div>
-
-                <div className="bg-white h-fit z-50">
-                  <AntdImage
-                    width={20}
-                    src="https://cdn.icon-icons.com/icons2/1372/PNG/512/resize-3_91066.png"
-                    preview={{
-                      src: mainImage,
-                    }}
-                    className="absolute top-2 left-2 z-50 cursor-pointer border-2 border-white mb-5"
-                  />
-
-                  {/* alt option */}
-                  {/* <AntdImage
-                width={500}
-                src={mainImage}
-                preview={{
-                  src: mainImage,
-                }}
-                className="border-2 border-white"
-              /> */}
-
-                  <ReactImageMagnify
-                    {...{
-                      smallImage: {
-                        alt: product.name,
-                        isFluidWidth: true,
-                        width: 500,
-                        height: 500,
-                        src: mainImage,
-                        // src: mainImage + "?width=500&height=500",
-                      },
-                      largeImage: {
-                        src: mainImage,
-                        // width: mainImageInfo.width * 0.8,
-                        // height: mainImageInfo.height * 0.8,
-                        width: mainImageInfo.width,
-                        height: mainImageInfo.height,
-                      },
-                      enlargedImageContainerDimensions: {
-                        // width: "160%",
-                        // height: "120%",
-                        // width: width > 1000 ? "180%" : "350%",
-                        width: "180%",
-                        height: "100%",
-                      },
-                      // isHintEnabled: true,
-                      // hintTextMouse: "Trỏ để phóng to hoặc nhấn vào kính lúp",
-                      shouldHideHintAfterFirstActivation: false,
-                      // imageClassName: "h-[500px] w-[500px] object-fill",
-                    }}
-                  />
-                </div>
-              </Flex>
-
-              {/* desc */}
-              <div className="p-4 ml-5 md:w-[700px] lg:min-w-[400px] xl:min-w-[600px] xl:min-w-4/7 overflow-hidden ">
-                {/* grid grid-rows-3 */}
-                {product._id == null && <Skeleton active />}
-
-                <Flex vertical gap="small">
-                  {/* name block */}
-                  <div className="flex flex-col gap-2">
-                    <div className="font-bold text-xl lg:text-2xl xl:text-3xl truncate mt-2 xl:mt-10">
-                      {product.name}
-                    </div>
-
-                    <div className="text-xs">
-                      Thương hiệu / Shop:{" "}
-                      <Link href="" className="text-blue-500">
-                        Ecovacs
-                      </Link>
-                    </div>
-                  </div>
-
-                  {/* rating block */}
-                  <Flex
-                    gap="small"
-                    style={{ alignContent: "center" }}
-                    className="flex items-center h-fit"
-                  >
-                    <Rate
-                      disabled
-                      allowHalf
-                      defaultValue={product.avgRating}
-                      style={{ padding: 5, fontSize: 18 }}
-                    />
-                    <div className="font-bold uppercase text-xl">
-                      ({product.avgRating})
-                    </div>
-                    {/* <div className="text-xs font-light mt-2">
-                ({numberOfReview} đánh giá)
-              </div> */}
-                    <Divider
-                      type="vertical"
-                      style={{ height: "auto", border: "1px solid silver" }}
-                    />
-                    <div className="mt-1 text-sm text-slate-600">
-                      Đã bán {product.soldQuantity}
-                    </div>
-                  </Flex>
-
-                  {/* price block */}
-                  <div className="flex flex-col justify-center">
-                    {discountPercentage !== 0 && (
-                      <div className="line-through text-slate-300 uppercase text-sm md:text-lg xl:text-xl">
-                        {priceIndex(product.originalPrice)}
-                      </div>
-                    )}
-
-                    <div className="flex flex-row gap-3">
-                      <div className="font-bold text-red-500 uppercase text-xl md:text-2xl xl:text-4xl">
-                        {priceIndex(product.finalPrice)}
-                      </div>
-                      {discountPercentage !== 0 && (
-                        <div className="text-red-500 uppercase text-xs mt-1">
-                          -{discountPercentage}%
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </Flex>
-
-                {/* attributes and status */}
-                <Flex vertical gap="middle" className="row-start-2 mt-5">
-                  {/* status block */}
-                  <Flex gap="4px 0">
-                    {product.status === ProductStatus.AVAILABLE && (
-                      <Tag color="#55acee" icon={<CheckCircleOutlined />}>
-                        {ProductStatusToStringConverter(product.status)}
-                      </Tag>
-                    )}
-                    {product.status === ProductStatus.SOLD_OUT && (
-                      <Tag color="#cd201f" icon={<CloseCircleOutlined />}>
-                        {ProductStatusToStringConverter(product.status)}
-                      </Tag>
-                    )}
-                    {product.status === ProductStatus.SALE && (
-                      <Tag color="#87d068" icon={<PercentageOutlined />}>
-                        {ProductStatusToStringConverter(product.status)}
-                      </Tag>
-                    )}
-                  </Flex>
-
-                  {/* attributes block */}
-                  <div className="flex text-xs gap-1">
-                    <div>Màu sắc: </div>
-                    <div className="font-bold">{"Đen"}</div>
-                  </div>
-
-                  <Flex gap="4px">
-                    {colorOptions.map((color, index) => (
-                      <div
-                        key={index}
-                        className={`${
-                          selectedColorOption === color
-                            ? "border-2 border-blue-500 rounded-full"
-                            : ""
-                        }`}
-                      >
-                        <Button
-                          type="primary"
-                          size="middle"
-                          style={{ background: color.value, width: 50 }}
-                          className="rounded-full"
-                          onClick={() => setSelectedColorOption(color)}
-                        />
-                      </div>
-                    ))}
-                  </Flex>
-
-                  <div className="flex text-xs gap-1">
-                    <div>Kích thước: </div>
-                    <div className="font-bold">{selectedSizeOption}</div>
-                  </div>
-
-                  <Flex gap="4px">
-                    {sizeOptions.map((size, index) => (
-                      <div
-                        key={index}
-                        className={`${
-                          selectedSizeOption === size
-                            ? "border-2 border-blue-500 rounded-full"
-                            : ""
-                        }`}
-                      >
-                        <Button
-                          type="primary"
-                          size="middle"
-                          style={{ background: "#86997c", width: 50 }}
-                          className="rounded-full"
-                          onClick={() => setSelectedSizeOption(size)}
-                        >
-                          {size}
-                        </Button>
-                      </div>
-                    ))}
-                  </Flex>
-                </Flex>
-
-                {/* buttons block  */}
-                <div className="row-start-3 items-end flex gap-2 mt-5">
-                  <QuantityControl
-                    componentSize={5}
-                    keyProp={0}
-                    value={numberOfItem}
-                    minValue={1}
-                    maxValue={100}
-                    defaultValue={1}
-                    inputWidth={75}
-                    onIncrement={onIncrement}
-                    onDecrement={onDecrement}
-                    onQuantityChange={onQuantityChange}
-                  />
-
-                  <Button
-                    type="primary"
-                    href="/cart"
-                    danger
-                    block
-                    size="large"
-                    style={{ background: "#5c6856" }}
-                    className="rounded-full"
-                  >
-                    Mua ngay
-                  </Button>
-                </div>
-              </div>
+            <div ref={ref2}>
+              <AboutProduct
+                product={product}
+                numberOfItem={numberOfItem}
+                setNumberOfItem={setNumberOfItem}
+                mainImage={mainImage}
+                setMainImage={setMainImage}
+              />
             </div>
 
             {/* top floating cart */}

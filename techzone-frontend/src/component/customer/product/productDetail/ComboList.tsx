@@ -2,11 +2,12 @@
 import { Button, Carousel, Flex } from "antd";
 // import { useTranslations } from "next-intl";
 import ComboItem from "./ComboItem";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { CarouselArrow } from "@/component/user/utils/CarouselArrow";
-import { priceIndex } from "./ProductDetail";
-import CustomEmpty from "../shop/mini/CustomEmpty";
+import { priceIndex } from "../ProductDetail";
+import CustomEmpty from "../../shop/mini/CustomEmpty";
 import { ProductType } from "@/model/ProductType";
+import { POST_GetProductListByShop } from "@/apis/product/ProductDetailAPI";
 
 interface ComboListProps {
   // initial price before adding the combo price
@@ -120,6 +121,22 @@ const ComboList = (comboListData: ComboListProps) => {
     comboListData.updateTotalComboPrice(tempTotalPrice);
   };
 
+  // call api temporarily
+  const mockId = "65f1e8bbc4e39014df775166";
+
+  useEffect(() => {
+    handleGetProductList();
+  }, [mockId]);
+
+  const handleGetProductList = async () => {
+    const response = await POST_GetProductListByShop(mockId);
+    if (response.status == 200) {
+      if (response.data) {
+        setCombo(response.data);
+        // console.log("product", data);
+      }
+    }
+  };
   return (
     <div>
       {(combo.length > 0 && (

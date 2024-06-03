@@ -3,48 +3,78 @@ import { Avatar, Button, Divider, Flex, List, Image, Rate, Modal } from "antd";
 // import { useTranslations } from "next-intl";
 import CommentContainer from "./comment/CommentContainer";
 import { ReviewType } from "@/model/ReviewType";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { PUT_UpdateReview } from "@/apis/review/ReviewAPI";
 
 const Review = (review: ReviewType) => {
   //   const t = useTranslations("Review");
+  const myUserId = "663a174e094abbc113a4bca0"; //mock data
 
-  const [isLiked, setIsLiked] = useState(false);
+  const [user, setUser] = useState<{
+    id: string;
+    name: string;
+    avatar: string;
+  }>({ id: review.user, name: "Thái Văn Thiên", avatar: "" }); //TODO
+
+  const [isLiked, setIsLiked] = useState<boolean>(
+    review.like.includes(myUserId) //TODO
+  );
   const handleLike = () => {
     setIsLiked(!isLiked);
   };
 
-  const like = useMemo(() => {
-    // update db with axios
+  const [open, setOpen] = useState(false);
 
+  const like = useMemo(() => {
     if (isLiked) {
-      let newLike = [...review.like];
-      newLike.push("my id");
-      return newLike;
-    } else return review.like.filter((likeId) => likeId !== "my id"); // ? revise this later
+      if (review.like.includes(myUserId)) return review.like;
+      else {
+        let newLike = [...review.like];
+        newLike.push(myUserId);
+        return newLike;
+      }
+    } else if (review.like.includes(myUserId)) {
+      review.like.filter((likeId) => likeId !== myUserId);
+    } else return review.like;
+    return [];
   }, [isLiked]);
 
-  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    handleUpdateReview();
+  }, [like]);
+
+  const handleUpdateReview = async () => {
+    const response = await PUT_UpdateReview({
+      _id: review.id,
+      product: review.productId,
+      user: review.user,
+      rating: review.starRating,
+      content: review.desc,
+      asset: review.asset,
+      createdAt: review.createdAt,
+      conversation: review.conversation,
+      like: like,
+    });
+    if (response.status == 200) {
+      //
+      console.log("Update review successfully!");
+    } else console.log(response.message);
+  };
 
   return (
     <div className="m-2 bg-white rounded-xl border-2 overflow-hidden relative">
       <div className="m-2 grid grid-cols-3 gap-4">
         <div className="col-span-1 flex flex-col md:flex-row lg:flex-row">
           <div className="m-3">
-            {(review.user.avatar === "" && (
-              <Avatar size="large">{review.user.name}</Avatar>
-            )) || (
-              <Avatar
-                size="large"
-                src={review.user.avatar}
-                alt={review.user.name}
-              />
-            )}
+            {(user.avatar === "" && (
+              <Avatar size="large">{user.name}</Avatar>
+            )) || <Avatar size="large" src={user.avatar} alt={user.name} />}
           </div>
           <div className="m-3">
             <Flex vertical>
-              <b>{review.user.name}</b>
+              <b>{user.name}</b>
               <div className="text-gray-600 font-light text-xs">
-                Đã tham gia 7 năm
+                Đã tham gia 2 tháng
               </div>
             </Flex>
           </div>
@@ -104,8 +134,17 @@ const Review = (review: ReviewType) => {
           </div>
         )}
         <div className="col-start-2 col-span-3 flex flex-row gap-10 text-xs">
-          <div>{review.createdAt}</div>
-          {/* <div>{review.useTime}</div> */}
+          <div>
+            {new Date(review.createdAt).toLocaleDateString("vi-VN", {
+              weekday: "short",
+              day: "numeric",
+              month: "short",
+              year: "numeric",
+              hour: "numeric",
+              minute: "numeric",
+              second: "numeric",
+            })}
+          </div>
         </div>
 
         <div className="col-start-2 col-span-3 flex flex-row gap-2 align-middle h-auto">
@@ -132,7 +171,7 @@ const Review = (review: ReviewType) => {
           </div>
         </div>
       </div>
-      <CommentContainer reviewId={review.id} customerId={review.user.id} />
+      <CommentContainer reviewId={review.id} customerId={review.user} />
 
       <Modal
         title="Thông báo"

@@ -1,5 +1,5 @@
 import { ProductDetailType } from "@/model/ProductType";
-import { Popover, Flex, Rate, Progress } from "antd";
+import { Popover, Flex, Rate, Progress, Collapse } from "antd";
 
 interface ReviewSummaryProps {
   product: ProductDetailType | undefined;
@@ -92,20 +92,25 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
           </div>
 
           <div id="ai-review-summary" className="mb-5 md:pl-5 lg:pl-0">
-            <div className="font-bold md:pt-5 text-sm md:text-lg">
-              TechZone Assistant 🤖
-            </div>
-
-            <div className="font-semibold pt-5 text-xs md:text-sm">
-              Tổng quan đánh giá khách hàng:
-            </div>
-            <div className="pt-2 text-xs md:text-sm">
-              Tổng thể, iRobot Roomba 980 là một sự lựa chọn tốt cho người tiêu
-              dùng muốn đầu tư vào một robot hút bụi thông minh và hiệu quả. Với
-              hiệu suất hút bụi mạnh mẽ, tính năng thông minh và khả năng vận
-              hành linh hoạt, Roomba 980 sẽ giúp giảm bớt công việc lau chùi và
-              mang lại một không gian sống sạch sẽ hơn.
-            </div>
+            <Collapse
+              defaultActiveKey={["1"]}
+              items={[
+                {
+                  key: "1",
+                  label: (
+                    <div className="font-semibold text-xs md:text-sm">
+                      Tổng quan đánh giá khách hàng
+                    </div>
+                  ),
+                  children: (
+                    <div className="pt-2 text-xs md:text-sm max-h-[350px] text-ellipsis overflow-clip">
+                      Tổng thể, sản phẩm là một sự lựa chọn tốt cho người tiêu
+                      dùng muốn đầu tư một cách thông minh và hiệu quả.
+                    </div>
+                  ),
+                },
+              ]}
+            />
           </div>
         </div>
       )}

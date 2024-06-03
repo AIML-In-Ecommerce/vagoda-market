@@ -1,9 +1,10 @@
 import { CarouselArrow } from "@/component/user/utils/CarouselArrow";
 import { ProductType } from "@/model/ProductType";
 import { Carousel, List } from "antd";
-import { useState } from "react";
-import CustomEmpty from "../shop/mini/CustomEmpty";
-import ProductItem from "../ProductItem";
+import { useEffect, useState } from "react";
+import CustomEmpty from "../../shop/mini/CustomEmpty";
+import ProductItem from "../../ProductItem";
+import { POST_GetProductListByShop } from "@/apis/product/ProductDetailAPI";
 
 export default function SimilarList() {
   // mock data
@@ -84,7 +85,24 @@ export default function SimilarList() {
 
   const autoPlayCarouselSpeed = 5000; //ms
 
-  const [products, setProducts] = useState<ProductType[]>(MockData);
+  const [products, setProducts] = useState<ProductType[]>();
+
+  // call api (temporarily)
+  const mockId = "65f1e8bbc4e39014df775166";
+
+  useEffect(() => {
+    handleGetProductList();
+  }, [mockId]);
+
+  const handleGetProductList = async () => {
+    const response = await POST_GetProductListByShop(mockId);
+    if (response.status == 200) {
+      if (response.data) {
+        setProducts(response.data);
+        // console.log("product", data);
+      }
+    }
+  };
 
   return (
     <div>

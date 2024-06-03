@@ -25,7 +25,6 @@ const CommentContainer = (props: CommentContainerInterface) => {
   // const t = useTranslations("Comment");
 
   const [comments, setComments] = useState<CommentType[]>([]);
-  const [trigger, setTrigger] = useState(false);
 
   // useEffect(() => {
   //   (async () => {
@@ -49,7 +48,7 @@ const CommentContainer = (props: CommentContainerInterface) => {
   //           let tempComments: CommentType[] = [];
 
   //           for (let comment of responseData) {
-  //             //TODO: update temp values
+  //             //update temp values
   //             let tempName = comment.isSender ? auth.user.username : "";
 
   //             let tempAvatar = comment.isSender
@@ -92,7 +91,7 @@ const CommentContainer = (props: CommentContainerInterface) => {
   //       console.log(comment.desc);
   //       if (!comment.isSender) {
   //         if (auth.user && auth.user != null) {
-  //           //TODO: get sender name
+  //           //get sender name
   //           await axios
   //             .get(
   //               `${process.env.NEXT_PUBLIC_BACKEND_PREFIX}profile/${comment.user.id}`,

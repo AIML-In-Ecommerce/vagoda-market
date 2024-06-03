@@ -1,7 +1,7 @@
 export type ReviewType = {
   id: string;
   productId: string;
-  user: { id: string; name: string; avatar: string }; // ? edit later
+  user: string; // ? edit later
   //cart info?
   starRating: number;
   desc: string;

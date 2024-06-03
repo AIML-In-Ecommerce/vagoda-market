@@ -1,17 +1,11 @@
 "use client";
-import Link from "next/link";
 import { PlusOutlined } from "@ant-design/icons";
 import { Checkbox } from "antd";
-import { priceIndex } from "./ProductDetail";
-import ProductItem from "../ProductItem";
 import { ProductType } from "@/model/ProductType";
+import ProductItem from "../../ProductItem";
 
 export interface ComboItemProps {
   _id: string;
-  // imageUrl: string;
-  // name: string;
-  // price: number;
-  // productUrl: string;
   product: ProductType;
   handleCheckbox: (isChecked: boolean, id: string, price: number) => void;
 }
@@ -43,29 +37,3 @@ const ComboItem = (combo: ComboItemProps) => {
 };
 
 export default ComboItem;
-
-{
-  /* <div className="max-w-[240px] h-[250px] bg-white rounded-xl overflow-hidden md:max-w-2xl relative">
-<div className="flex flex-col">
-  <Link href={`/${combo.productUrl}`}>
-    <div className="md:shrink-0">
-      <img
-        className="h-40 object-contain w-full"
-        src={combo.imageUrl}
-        alt={combo.name}
-      />
-    </div>
-  </Link>
-  <div className="p-3">
-    <Link href={`/${combo.productUrl}`}>
-      <div className="mt-1 leading-tight font-medium text-black overflow-hidden roboto-bold line-clamp-2">
-        {combo.name}
-      </div>
-    </Link>
-    <div className="mt-1 leading-tight font-medium text-black text-ellipsis overflow-hidden roboto-bold text-wrap-2-line">
-      {priceIndex(combo.price)}
-    </div>
-  </div>
-</div>
-</div> */
-}
