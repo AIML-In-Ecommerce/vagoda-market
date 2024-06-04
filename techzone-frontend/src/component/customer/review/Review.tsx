@@ -6,7 +6,12 @@ import { ReviewType } from "@/model/ReviewType";
 import { useEffect, useMemo, useState } from "react";
 import { PUT_UpdateReview } from "@/apis/review/ReviewAPI";
 
-const Review = (review: ReviewType) => {
+interface ReviewProps {
+  review: ReviewType;
+  updateReviews: () => void;
+}
+
+const Review = (props: ReviewProps) => {
   //   const t = useTranslations("Review");
   const myUserId = "663a174e094abbc113a4bca0"; //mock data
 
@@ -14,52 +19,58 @@ const Review = (review: ReviewType) => {
     id: string;
     name: string;
     avatar: string;
-  }>({ id: review.user, name: "Thái Văn Thiên", avatar: "" }); //TODO
+  }>({ id: props.review.user, name: "Thái Văn Thiên", avatar: "" }); //TODO
 
   const [isLiked, setIsLiked] = useState<boolean>(
-    review.like.includes(myUserId) //TODO
+    props.review.like.includes(myUserId) //TODO
   );
+
   const handleLike = () => {
     setIsLiked(!isLiked);
   };
 
+  useEffect(() => {
+    setIsLiked(props.review.like.includes(myUserId)); //TODO
+  }, [props.review]);
+
   const [open, setOpen] = useState(false);
 
-  const like = useMemo(() => {
-    if (isLiked) {
-      if (review.like.includes(myUserId)) return review.like;
-      else {
-        let newLike = [...review.like];
-        newLike.push(myUserId);
-        return newLike;
-      }
-    } else if (review.like.includes(myUserId)) {
-      review.like.filter((likeId) => likeId !== myUserId);
-    } else return review.like;
-    return [];
-  }, [isLiked]);
-
-  useEffect(() => {
-    handleUpdateReview();
-  }, [like]);
-
-  const handleUpdateReview = async () => {
+  const handleUpdateReview = async (newLike: string[]) => {
     const response = await PUT_UpdateReview({
-      _id: review.id,
-      product: review.productId,
-      user: review.user,
-      rating: review.starRating,
-      content: review.desc,
-      asset: review.asset,
-      createdAt: review.createdAt,
-      conversation: review.conversation,
-      like: like,
+      _id: props.review.id,
+      product: props.review.productId,
+      user: props.review.user,
+      rating: props.review.starRating,
+      content: props.review.desc,
+      asset: props.review.asset,
+      createdAt: props.review.createdAt,
+      conversation: props.review.conversation,
+      like: newLike,
     });
     if (response.status == 200) {
       //
       console.log("Update review successfully!");
+
+      props.review.like = newLike;
+      props.updateReviews();
     } else console.log(response.message);
   };
+
+  const like = useMemo(() => {
+    let tempLike = [...props.review.like];
+
+    if (isLiked) {
+      if (!props.review.like.includes(myUserId)) {
+        tempLike.push(myUserId);
+        handleUpdateReview(tempLike);
+      }
+    } else if (props.review.like.includes(myUserId)) {
+      tempLike = props.review.like.filter((likeId) => likeId !== myUserId);
+      handleUpdateReview(tempLike);
+    }
+
+    return tempLike;
+  }, [isLiked]);
 
   return (
     <div className="m-2 bg-white rounded-xl border-2 overflow-hidden relative">
@@ -85,39 +96,39 @@ const Review = (review: ReviewType) => {
             <Rate
               disabled
               defaultValue={1}
-              value={review.starRating}
+              value={props.review.starRating}
               style={{ padding: 5 }}
             />
             {/* <div className="font-bold ">{satisfactoryStatus}</div> */}
 
-            {review.starRating == 1 && (
+            {props.review.starRating == 1 && (
               <div className="font-bold ">Không hài lòng</div>
             )}
-            {review.starRating == 2 && (
+            {props.review.starRating == 2 && (
               <div className="font-bold ">Hơi kém</div>
             )}
-            {review.starRating == 3 && (
+            {props.review.starRating == 3 && (
               <div className="font-bold ">Bình thường</div>
             )}
-            {review.starRating == 4 && (
+            {props.review.starRating == 4 && (
               <div className="font-bold ">Hài lòng</div>
             )}
-            {review.starRating == 5 && (
+            {props.review.starRating == 5 && (
               <div className="font-bold ">Cực kì hài lòng</div>
             )}
           </Flex>
-          {review.desc}
+          {props.review.desc}
         </div>
         <div className="col-span-1">
           <Button danger onClick={() => setOpen(true)}>
             Báo cáo
           </Button>
         </div>
-        {review.asset.length > 0 && (
+        {props.review.asset.length > 0 && (
           <div className="col-start-2 col-span-2 mx-2">
             <List
               grid={{ gutter: 5, xs: 5, sm: 5, md: 6, lg: 8, xl: 10, xxl: 10 }}
-              dataSource={review.asset}
+              dataSource={props.review.asset}
               renderItem={(item) => (
                 <List.Item>
                   <Image
@@ -135,7 +146,7 @@ const Review = (review: ReviewType) => {
         )}
         <div className="col-start-2 col-span-3 flex flex-row gap-10 text-xs">
           <div>
-            {new Date(review.createdAt).toLocaleDateString("vi-VN", {
+            {new Date(props.review.createdAt).toLocaleDateString("vi-VN", {
               weekday: "short",
               day: "numeric",
               month: "short",
@@ -171,7 +182,12 @@ const Review = (review: ReviewType) => {
           </div>
         </div>
       </div>
-      <CommentContainer reviewId={review.id} customerId={review.user} />
+      <CommentContainer
+        review={props.review}
+        updateReviews={() => {
+          props.updateReviews();
+        }}
+      />
 
       <Modal
         title="Thông báo"

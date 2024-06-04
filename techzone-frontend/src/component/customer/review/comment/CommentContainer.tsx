@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useMemo, useState } from "react";
 import Comment from "./Comment";
 import CommentForm from "./CommentForm";
 import { FiSend } from "react-icons/fi";
@@ -10,21 +10,22 @@ import {
   RawCommentType,
 } from "@/model/CommentType";
 // import { useTranslations } from "next-intl";
-import axios from "axios";
-import { useParams, usePathname } from "next/navigation";
+import { ReviewType } from "@/model/ReviewType";
+import { PUT_UpdateReview } from "@/apis/review/ReviewAPI";
 
 interface CommentContainerInterface {
-  reviewId: string;
-  customerId: string;
+  review: ReviewType;
+  updateReviews: () => void;
 }
 
 const CommentContainer = (props: CommentContainerInterface) => {
   // const auth = useAuth();
-  const { productId } = useParams();
-  const pathname = usePathname();
   // const t = useTranslations("Comment");
 
   const [comments, setComments] = useState<CommentType[]>([]);
+  const rawComments = useMemo(() => {
+    return props.review.conversation;
+  }, [props.review, props.review.conversation]);
 
   // useEffect(() => {
   //   (async () => {
@@ -126,31 +127,24 @@ const CommentContainer = (props: CommentContainerInterface) => {
   //   (comment) => comment.parent === null || undefined
   // );
 
-  const mainComments = comments;
-
   const [affectedComment, setAffectedComment] =
     useState<AffectedCommentType | null>(null);
 
-  const addCommentHandler = async (
-    value: string,
-    parent: string | null,
-    replyOnUser: string | null
-  ) => {
+  const addCommentHandler = async (value: string) => {
     if (value === "") return;
     // if (!auth.user || auth.user == null) return;
 
     const newRawComment = {
-      review_id: "props.reviewId",
-      desc: value,
-      parent: parent,
-      replyOnUser: replyOnUser,
+      _id: undefined,
+      user: "663a174e094abbc113a4bca0", //mockId
+      content: value,
       createdAt: new Date().toISOString(),
-      like: 0,
     };
 
-    console.log("newRawComment", newRawComment);
+    // console.log("newRawComment", newRawComment);
 
-    let newId;
+    // TODO: update with new comment
+    handleUpdateReview([newRawComment, ...rawComments]);
 
     // await axios
     //   .post(
@@ -183,18 +177,14 @@ const CommentContainer = (props: CommentContainerInterface) => {
     //   });
 
     const newComment = {
-      id: newId,
+      id: "", // TODO: update this
       user: {
         id: "auth.user._id",
         name: "auth.user.username",
         avatar: "auth.user.avatarUrl",
       },
       desc: value,
-      parent: parent,
-      replyOnUser: replyOnUser,
       createdAt: newRawComment.createdAt,
-      like: 0,
-      isSender: true,
     };
     setComments((curState: any) => {
       return [newComment, ...curState];
@@ -205,6 +195,7 @@ const CommentContainer = (props: CommentContainerInterface) => {
 
   const updateCommentHandler = async (value: string, commentId: string) => {
     // if (!auth.user || auth.user == null) return;
+
     // await axios
     //   .put(
     //     `${process.env.NEXT_PUBLIC_BACKEND_PREFIX}review/updateComment`,
@@ -236,6 +227,9 @@ const CommentContainer = (props: CommentContainerInterface) => {
     //     console.error("Error updating comment:", error);
     //     return;
     //   });
+
+    // TODO: update with comments updated
+    handleUpdateReview([...rawComments]);
   };
 
   const deleteCommentHandler = async (commentId: string) => {
@@ -263,64 +257,58 @@ const CommentContainer = (props: CommentContainerInterface) => {
     //     console.error("Error deleting comment:", error);
     //     return;
     //   });
+
+    // TODO: update with comments filtered
+    handleUpdateReview(
+      rawComments.filter((comment) => {
+        // return comment._id !== commentId;
+      })
+    );
   };
 
-  // const getRepliesHandler = (commentId: string) => {
-  //   return comments
-  //     .filter((comment) => comment.parent === commentId)
-  //     .sort((former, latter) => {
-  //       return (
-  //         new Date(former.createdAt).getTime() -
-  //         new Date(latter.createdAt).getTime()
-  //       );
-  //     });
-  // };
+  const handleUpdateReview = async (newConversation: RawCommentType[]) => {
+    const response = await PUT_UpdateReview({
+      _id: props.review.id,
+      product: props.review.productId,
+      user: props.review.user,
+      rating: props.review.starRating,
+      content: props.review.desc,
+      asset: props.review.asset,
+      createdAt: props.review.createdAt,
+      conversation: newConversation,
+      like: props.review.like,
+    });
+    if (response.status == 200) {
+      //
+      console.log("Update review successfully!");
 
-  // const likeCommentHandler = (commentId: string) => {
-  //   setComments((curState) => {
-  //     return curState.map((comment) => {
-  //       if (comment.id === commentId) {
-  //         const updatedLikeStatus = !comment.like_status;
-  //         const updatedLikeCount = updatedLikeStatus
-  //           ? comment.like + 1
-  //           : comment.like - 1;
-  //         return {
-  //           ...comment,
-  //           like: updatedLikeCount,
-  //           like_status: updatedLikeStatus,
-  //         };
-  //       }
-  //       return comment;
-  //     });
-  //   });
-  // };
+      props.review.conversation = newConversation;
+      props.updateReviews();
+    } else console.log(response.message);
+  };
 
   return (
     <React.Fragment>
       <div>
         <div className="container m-2 text-left italic text-blue-400 font-roboto">
-          {/* {Object.keys(comments).length} comments */}
           {Object.keys(comments).length} bình luận
         </div>
         <CommentForm
           btnLabel={<FiSend />}
-          formSubmitHandler={(value) => addCommentHandler(value, null, null)}
+          formSubmitHandler={(value) => addCommentHandler(value)}
           formCancelHandler={() => {}}
           initialText=""
         />
         <div className="overflow-auto h-32 space-y-2">
-          {mainComments.map((comment) => (
+          {rawComments.map((comment) => (
             <Comment
-              key={comment.id}
+              key={comment.content}
               comment={comment}
               affectedComment={affectedComment}
               setAffectedComment={setAffectedComment}
               addComment={addCommentHandler}
               updateComment={updateCommentHandler}
               deleteComment={deleteCommentHandler}
-              // likeComment={likeCommentHandler}
-              // replies={getRepliesHandler(comment.id)}
-              // parentId={comment.parent}
             />
           ))}
         </div>

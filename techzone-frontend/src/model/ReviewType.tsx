@@ -1,3 +1,5 @@
+import { RawCommentType } from "./CommentType";
+
 export type ReviewType = {
   id: string;
   productId: string;
@@ -7,15 +9,8 @@ export type ReviewType = {
   desc: string;
   createdAt: string;
   asset: string[]; //image urls
-  conversation: ConversationType[];
+  conversation: RawCommentType[];
   like: string[];
-};
-
-// the comment type
-type ConversationType = {
-  user: string; //user id
-  content: string;
-  asset: string[]; // can we not
 };
 
 export type RawReviewType = {
@@ -26,6 +21,6 @@ export type RawReviewType = {
   content: string; //desc
   asset: string[]; //image urls
   createdAt: string;
-  conversation: ConversationType[];
+  conversation: RawCommentType[];
   like: string[]; //the user id list who liked
 };

@@ -38,16 +38,7 @@ const CommentForm = (props: CommentFormProps) => {
 
   return (
     <React.Fragment>
-      <div className="flex flex-row relative items-center px-3 py-2 rounded-lg bg-gray-100">
-        {/* <div
-          className="rounded-full w-14 h-14 aspect-square mr-5"
-          style={{
-            backgroundImage: `url(${logginedUser.avatar})`,
-            backgroundSize: "cover",
-            backgroundRepeat: "no-repeat",
-          }}
-        /> */}
-
+      <div className="flex flex-row relative items-center px-3 py-2 rounded-lg bg-[#ECECEC]">
         <div className="m-3">
           <Avatar
             size="large"

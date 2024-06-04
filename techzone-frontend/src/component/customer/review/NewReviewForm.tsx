@@ -5,6 +5,7 @@ import MultipleUpload from "./MultipleUpload";
 import { POST_CreateReview } from "@/apis/review/ReviewAPI";
 import { RawReviewType } from "@/model/ReviewType";
 import TextArea from "antd/es/input/TextArea";
+import { useParams } from "next/navigation";
 
 interface ReviewFormProps {
   //   formSubmitHandler: (
@@ -14,7 +15,7 @@ interface ReviewFormProps {
   //   ) => void;
 }
 
-export default function NewReviewForm(props: ReviewFormProps) {
+export default function NewReviewForm() {
   // data
   const desc = [
     "Không hài lòng",
@@ -23,6 +24,8 @@ export default function NewReviewForm(props: ReviewFormProps) {
     "Hài lòng",
     "Cực kì hài lòng",
   ];
+
+  const { productId } = useParams();
 
   // review
   const [rating, setRating] = useState(3);
@@ -34,15 +37,18 @@ export default function NewReviewForm(props: ReviewFormProps) {
   const submitHandler = (e: FormEvent) => {
     // e.preventDefault();
 
-    // props.formSubmitHandler("user", rating, content, asset);
-    handleCreateReview();
+    if (content === "") {
+      alert("Hãy điền cảm nhận");
+    } else {
+      handleCreateReview();
+    }
   };
 
   // call api
   const handleCreateReview = async () => {
     let newReview: RawReviewType = {
       _id: "",
-      product: "663da8175f77ea6b8f5b2e1d", // TODO
+      product: productId.toString(), // 663da8175f77ea6b8f5b2e1d
       user: "663a174e094abbc113a4bca0", // TODO
       rating: rating,
       content: content,
@@ -54,7 +60,7 @@ export default function NewReviewForm(props: ReviewFormProps) {
 
     const response = await POST_CreateReview(newReview);
     if (response.status == 200) {
-      alert("Review created successfully!");
+      alert("Tạo thành công!");
       //
 
       setRating(3);
@@ -85,20 +91,6 @@ export default function NewReviewForm(props: ReviewFormProps) {
           </div>
 
           <div className="flex flex-row gap-3">
-            {/* <textarea
-              id="freeform"
-              name="freeform"
-              rows={6}
-              cols={111}
-              wrap="soft"
-              placeholder="Để lại cảm nhận"
-              className="w-full focus:outline-none mx-auto pl-[8px] pt-[2px] 
-              rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500
-              resize-none"
-              content={content}
-              onChange={(e) => setContent(e.target.value)}
-            /> */}
-
             <TextArea
               rows={6}
               cols={111}

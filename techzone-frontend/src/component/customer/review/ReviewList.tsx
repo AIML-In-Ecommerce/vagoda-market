@@ -66,16 +66,10 @@ const ReviewList = (reviewListProps: ReviewListProps) => {
         <div>
           {filterData.map((item, index) => (
             <Review
-              id={item.id}
-              productId={item.productId}
-              user={item.user}
-              desc={item.desc}
-              createdAt={item.createdAt}
-              starRating={item.starRating}
-              key={index}
-              asset={item.asset}
-              conversation={item.conversation}
-              like={item.like}
+              review={item}
+              updateReviews={() => {
+                setReviews(reviews);
+              }}
             />
           ))}
 

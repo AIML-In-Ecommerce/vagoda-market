@@ -205,7 +205,7 @@ export default function AboutProduct(props: AboutProductProps) {
         <Flex vertical gap="small">
           {/* name block */}
           <div className="flex flex-col gap-2">
-            <div className="font-bold text-xl lg:text-2xl xl:text-3xl truncate mt-2 xl:mt-10">
+            <div className="font-bold text-xl lg:text-2xl xl:text-3xl truncate mt-2 xl:mt-14">
               {props.product.name}
             </div>
 
@@ -266,7 +266,7 @@ export default function AboutProduct(props: AboutProductProps) {
         </Flex>
 
         {/* attributes and status */}
-        <Flex vertical gap="middle" className="row-start-2 mt-5">
+        <Flex vertical gap="small" className="row-start-2 mt-5">
           {/* status block */}
           <Flex gap="4px 0">
             {props.product.status === ProductStatus.AVAILABLE && (
@@ -298,8 +298,8 @@ export default function AboutProduct(props: AboutProductProps) {
                 key={index}
                 className={`${
                   selectedColorOption === color
-                    ? "border-4 border-white rounded-full brightness-75"
-                    : "border-4 border-white rounded-full"
+                    ? "border-2 border-white rounded-full brightness-75"
+                    : "border-2 border-white rounded-full"
                 }`}
               >
                 <Button
@@ -324,8 +324,8 @@ export default function AboutProduct(props: AboutProductProps) {
                 key={index}
                 className={`${
                   selectedSizeOption === size
-                    ? "border-4 border-white rounded-full brightness-75"
-                    : "border-4 border-white rounded-full"
+                    ? "border-2 border-white rounded-full brightness-75"
+                    : "border-2 border-white rounded-full"
                 }`}
               >
                 <Button
