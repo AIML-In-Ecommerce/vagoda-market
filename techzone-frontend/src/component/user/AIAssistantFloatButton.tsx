@@ -11,6 +11,7 @@ import {
   Tooltip,
   Typography,
 } from "antd";
+import axios from "axios";
 import TextArea from "antd/es/input/TextArea";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { BiRefresh, BiSupport } from "react-icons/bi";
@@ -198,24 +199,18 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
   }, [open, bigModalOpen]);
 
   //the function used for testing
-  // function getRamdomDisplay()
-  // {
-  //     const randomNumber = Math.round(Math.random()*1000)
-  //     if(randomNumber % testCaseNumber == 0)
-  //     {
-  //         return <InfiniteProductsList setup={InfiniteProductsListSetup}/>
-  //     }
-  //     else if(randomNumber % testCaseNumber == 1)
-  //     {
-  //         return <InfinitePromotionList setup={InfinitePromotionListSetup}/>
-  //     }
-  //     else if(randomNumber % testCaseNumber == 2)
-  //     {
-  //         return greetingReactNode
-  //     }
+  function getRamdomDisplay() {
+    const randomNumber = Math.round(Math.random() * 1000);
+    if (randomNumber % testCaseNumber == 0) {
+      return <InfiniteProductsList setup={InfiniteProductsListSetup} />;
+    } else if (randomNumber % testCaseNumber == 1) {
+      return <InfinitePromotionList setup={InfinitePromotionListSetup} />;
+    } else if (randomNumber % testCaseNumber == 2) {
+      return greetingReactNode;
+    }
 
-  //     return greetingReactNode
-  // }
+    return greetingReactNode;
+  }
 
   function handleOpenAssistant() {
     if (isExpandedPopUp) {
@@ -347,7 +342,7 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
     }
   }
 
-  function handleSendButtonOnClick() {
+  const handleSendButtonOnClick = async () => {
     if (userInput == undefined) {
       return;
     }
@@ -361,22 +356,44 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
     const newMessages = [...messages];
     newMessages.push(message);
 
-    //for testing:
-    const randomAnswer = getRandomAnswer();
-    newMessages.push(randomAnswer);
-
     setMessages(newMessages);
 
     setUserInput(undefined);
 
-    // setExtraSupportDisplay(getRamdomDisplay())
-
-    if (localStorage) {
-      const stringifiedMessages = JSON.stringify(newMessages);
-      localStorage.setItem(AIAssistantLocalStorageKeyword, stringifiedMessages);
+    const postBody = {
+      prompt: newMessages,
+    };
+    try {
+      const response = await axios.post(
+        "http://localhost:8000/chat/agent",
+        postBody,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+      if (response.status == 200) {
+        const assistantResponse: AssistantMessageProps = {
+          type: AssistantMessageTypes.Assistant,
+          content: response.data.data,
+          actionCode: "",
+        };
+        const newResponseMessages = [...newMessages];
+        newResponseMessages.push(assistantResponse);
+        setMessages(newResponseMessages);
+        if (localStorage) {
+          const stringifiedMessages = JSON.stringify(newMessages);
+          localStorage.setItem(
+            AIAssistantLocalStorageKeyword,
+            stringifiedMessages,
+          );
+        }
+      }
+    } catch (error) {
+      console.error("Error in conservation:", error);
     }
-    //TODO: call API here
-  }
+  };
 
   const ExpandOrShrinkButton =
     isExpandedPopUp == false ? (
@@ -463,7 +480,7 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
           <Button
             disabled={isSendButtonDisabled}
             className={SendButtonStyle}
-            onClick={() => handleSendButtonOnClick()}
+            onClick={(e) => handleSendButtonOnClick()}
             type="default"
           >
             <LuSendHorizonal className="font-light" />
@@ -574,7 +591,7 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
             {CardActions}
           </Card>
           <div className="w-3/5">
-            {/* <InfiniteProductsList setup={InfinityProductsListSetup}/> */}
+            {/* <InfiniteProductsList setup={InfinityProductsListSetup} /> */}
             {extraSupportDisplay}
           </div>
         </Flex>

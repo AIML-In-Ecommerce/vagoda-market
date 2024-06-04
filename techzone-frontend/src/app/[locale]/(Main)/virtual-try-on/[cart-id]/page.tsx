@@ -78,6 +78,7 @@ const VirtualTryOn = () => {
   const tryOnImageUrl = useRef<string>(
     "https://res.cloudinary.com/dgsrxvev1/image/upload/v1716443926/vn-11134207-7r98o-lp8u23rvrf4r40_hcpkjk.jpg",
   );
+
   const fileRef = useRef<HTMLInputElement>(null);
   const userImageUrl = useRef<string | null>(null);
 
