@@ -112,7 +112,7 @@ export async function POST_addUserShippingAddress(userId: string, shippingAddres
             "label": shippingAddress.label,
             "isDefault": shippingAddress.isDefault,
         });
-        if (userId == null) {
+        if (userId === null) {
             return { isDenied: true, message: "Unauthenticated", status: 403, data: undefined }
         }
         if (response.status === 200) {
@@ -142,7 +142,7 @@ export async function PUT_updateUserShippingAddress(userId: string, shippingAddr
             "label": shippingAddress.label,
             "isDefault": shippingAddress.isDefault,
         });
-        if (userId == null) {
+        if (userId === null) {
             return { isDenied: true, message: "Unauthenticated", status: 403, data: undefined }
         }
         if (response.status === 200) {
@@ -161,7 +161,7 @@ export async function DELETE_removeUserShippingAddress(userId: string, _id: stri
     const url = `${BACKEND_PREFIX}:${USER_PORT}/user_info/shipping_address?userId=${userId}&targetId=${_id}`;
     try {
         const response = await axios.delete(url);
-        if (userId == null) {
+        if (userId === null) {
             return { isDenied: true, message: "Unauthenticated", status: 403, data: undefined }
         }
         if (response.status === 200) {
