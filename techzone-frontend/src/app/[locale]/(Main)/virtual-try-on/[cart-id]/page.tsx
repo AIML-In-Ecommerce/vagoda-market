@@ -190,9 +190,9 @@ const VirtualTryOn = () => {
         // setTimeout(() => {
         //   setTryOnLoading("COMPLETED");
         // }, 5000);
-        setTryOnLoading("COMPLETED");
-        tryOnImageUrl.current = response.data.tryOnImage[0];
         console.log("Response: ", response.data);
+        tryOnImageUrl.current = response.data.data.tryOnImage[0];
+        setTryOnLoading("COMPLETED");
       }
     } catch (error) {
       console.error("Error fetching virtual try-on:", error);
