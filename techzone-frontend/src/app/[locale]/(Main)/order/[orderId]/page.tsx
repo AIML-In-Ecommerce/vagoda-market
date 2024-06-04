@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useParams, useRouter } from "next/navigation";
 import { PaymentMethod } from '@/app/apis/payment/PaymentAPI';
 import { Currency } from '@/component/user/utils/CurrencyDisplay';
@@ -25,6 +25,11 @@ enum OrderStatusType {
     SHIPPING = "SHIPPING",
     COMPLETED = "COMPLETED",
     CANCELLED = "CANCELLED",
+}
+
+type ShopInfo = {
+    _id: string,
+    name: string,
 }
 
 const formatDate = (date: Date | undefined) => {
@@ -113,11 +118,6 @@ const OrderTransaction =
         )
     }
 
-type ShopInfo = {
-    _id: string,
-    name: string,
-}
-
 export default function OrderDetailPage() {
     const params = useParams();
     const { orderId } = params;
@@ -131,12 +131,8 @@ export default function OrderDetailPage() {
         router.push('/order')
     }
 
-    const fetchOrder = async () => {
-        await GET_GetOrderById(orderId as string)
-            .then((response) => setOrder(response.data || undefined));
-    }
     const filterShopName = (shopId: string) => {
-        const shopName = shopInfos?.find(shopInfo => shopInfo._id === shopId)?.name;
+        const shopName = shopInfos!.find(shopInfo => shopInfo._id === shopId)!.name;
         return shopName;
     }
 
@@ -159,18 +155,33 @@ export default function OrderDetailPage() {
     }
 
     useEffect(() => {
+        const fetchOrder = async () => {
+            setLoading(true);
+            console.log(`Fetching order Id: ${orderId as string}`);
+            await GET_GetOrderById(orderId as string)
+                .then((response) => {
+                    setOrder(response.data);
+                    console.log('Order fetch', response.data);
+                })
+        }
         fetchOrder();
-        setLoading(false);
+        setTimeout(() => {
+            setLoading(false);
+        }, 1000);
     }, []);
 
     useEffect(() => {
         if (order) {
+            setLoading(true);
             fetchShopInfos(order.products);
+            setTimeout(() => {
+                setLoading(false);
+            }, 1000);
         }
     }, [order]);
 
     useEffect(() => {
-        console.log('ShopInfos', shopInfos);
+        // console.log('ShopInfos', shopInfos);
         router.refresh();
     }, [shopInfos]);
 
@@ -255,10 +266,9 @@ export default function OrderDetailPage() {
             ),
         },
     ];
-
     return (
         <React.Fragment>
-            <div className="container flex flex-col lg:px-24 mx-auto lg:grid lg:grid-cols-3 items-center gap-5 mb-10">
+            <div className="container flex flex-col lg:px-24 px-10 mx-auto lg:grid lg:grid-cols-3 items-center gap-5 mb-10">
                 <div className="lg:col-span-3 text-2xl lg:my-10 my-5">Chi tiết đơn hàng #{orderId}</div>
                 <div className="lg:col-start-3 text-sm text-right">Ngày đặt hàng: {formatDate(new Date(order?.orderStatus[0].time!))}</div>
                 <div className="mt-10 lg:mt-5 flex flex-col h-full w-full">
@@ -299,7 +309,7 @@ export default function OrderDetailPage() {
                     <Table
                         tableLayout='auto'
                         columns={columns}
-                        dataSource={order?.products.map(product => ({ ...product, key: product._id } as ProductTableItem))}
+                        dataSource={order?.products.map((product: Product) => ({ ...product, key: product._id } as ProductTableItem)) || []}
                         // onRow={(record) => ({
                         //         onClick: () => handleRowClick(record),
                         //       })}
@@ -309,11 +319,11 @@ export default function OrderDetailPage() {
                         footer={() =>
                             // OrderTransaction(loading, provisional, discount, shippingFee, total)
                             OrderTransaction(
-                                loading, 
-                                order!.products.reduce((sum, item) => sum + (item.purchasedPrice * item.quantity),0)!,
+                                loading,
+                                order?.products.reduce((sum, item) => sum + (item.purchasedPrice * item.quantity), 0)!,
                                 0,
                                 0,
-                                order!.totalPrice)
+                                order?.totalPrice || 0)
 
                         }
                     />

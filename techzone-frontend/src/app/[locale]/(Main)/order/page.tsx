@@ -70,6 +70,18 @@ const tabs =
 const INITIAL_DISPLAY: number = 3;
 const LOAD_DISPLAY: number = 2;
 
+const filterSearchQuery = (array: any[], query: string) => {
+    const normalizedQuery = query.trim().toLowerCase();
+
+    const filteredArray = array.filter(item => {
+        const includesQuery = Object.values(item).some(value =>
+            typeof value === 'string' && value.toLowerCase().includes(normalizedQuery)
+        );
+        return includesQuery;
+    })
+    return filteredArray;
+}
+
 export default function OrderOverview(props: OrderOverviewProps) {
     const [initLoading, setInitLoading] = useState(true);
     const [loading, setLoading] = useState(false);
@@ -83,6 +95,10 @@ export default function OrderOverview(props: OrderOverviewProps) {
     const router = useRouter();
     const [selectedTabKey, setSelectedTabKey] = useState<string>(activeTabFromUrl)
 
+    const handleSearchQuery = (query: string) => {
+        setDisplayOrders(filterSearchQuery(orders, query));
+    }
+
     const onLoadMore = () => {
         const newDisplayItem = count + LOAD_DISPLAY < orders.length ? count + LOAD_DISPLAY : orders.length;
         setCount(newDisplayItem);
@@ -92,7 +108,7 @@ export default function OrderOverview(props: OrderOverviewProps) {
     };
 
     const loadMore =
-        !initLoading && !loading && (count !== displayOrders.length) ? (
+        !initLoading && !loading && (displayOrders.length < orders.length) ? (
             <div
                 style={{
                     textAlign: 'center',
@@ -159,6 +175,7 @@ export default function OrderOverview(props: OrderOverviewProps) {
                 </div>
                 <div className="bg-white w-[100%] mt-5">
                     <Input prefix={<FaMagnifyingGlass />} size="large"
+                        onChange={(e) => handleSearchQuery(e.target.value)}
                         placeholder="Tìm đơn hàng theo Mã đơn hàng, Nhà bán hoặc Tên sản phẩm"
                         suffix={
                             <div className="border-l-2 border-gray-500 px-4 mx-auto">
