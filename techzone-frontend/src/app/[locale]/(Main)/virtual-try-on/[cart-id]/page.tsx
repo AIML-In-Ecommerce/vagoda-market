@@ -16,9 +16,10 @@ import VtoProduct from "@/component/customer/product/VtoProduct";
 import Image from "next/image";
 import axios from "axios";
 import { Divider } from "antd";
+import { AiFillCloseCircle } from "react-icons/ai";
 
 type Mode = "MODEL" | "PRODUCT" | "PREVIEW";
-type LoadStatus = "READY" | "RUNNING" | "COMPLETED";
+type LoadStatus = "READY" | "RUNNING" | "COMPLETED" | "ERROR";
 
 interface VtoProduct {
   _id: string;
@@ -67,6 +68,7 @@ const mockVtoProductData = [
 ];
 
 const VirtualTryOn = () => {
+  const [continueBtnState, setContinueBtnState] = useState<boolean>(false);
   const [mode, setMode] = useState<Mode>("MODEL");
   const [productList, setProductList] = useState<VtoProduct[]>([]);
   const [chosenProduct, setChosenProduct] = useState<VtoProduct>();
@@ -121,9 +123,9 @@ const VirtualTryOn = () => {
             },
           },
         );
-        console.log("Image uploaded successfully:", response.data);
         if (response.status == 200) {
-          userImageUrl.current = response.data.path;
+          console.log("Image uploaded successfully:", response.data);
+          userImageUrl.current = response.data.data.path;
           setMode("PRODUCT");
         }
       } catch (error) {
@@ -140,6 +142,7 @@ const VirtualTryOn = () => {
 
   const changeChosenProduct = (product: VtoProduct) => {
     setChosenProduct(product);
+    setContinueBtnState(true);
   };
 
   const renderTitle = (mode: Mode) => {
@@ -160,34 +163,42 @@ const VirtualTryOn = () => {
   };
 
   const fetchVirtualTryOn = async () => {
+    setTryOnLoading("RUNNING");
     const postBody = {
-      modelImgUrl: userImageUrl,
+      modelImgUrl: userImageUrl.current,
       garmentImgUrl: chosenProduct?.image[0],
     };
+
     try {
-      const response = await fetch(
+      console.log("first: ", postBody);
+      const response = await axios.post(
         "http://localhost:8000/genai/virtual-try-on",
+        postBody,
         {
-          method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(postBody),
         },
       );
 
-      if (!response.ok) {
+      if (response.status !== 200) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      setTryOnLoading("RUNNING");
-      console.log("Reponse: ", response.data);
+
+      if (response.status == 200) {
+        // setTimeout(() => {
+        //   setTryOnLoading("COMPLETED");
+        // }, 5000);
+        setTryOnLoading("COMPLETED");
+        tryOnImageUrl.current = response.data.tryOnImage[0];
+        console.log("Response: ", response.data);
+      }
     } catch (error) {
       console.error("Error fetching virtual try-on:", error);
     }
   };
 
   const renderMainBox = (mode: Mode) => {
-    console.log("img preview: ", imagePreview);
     switch (mode) {
       case "MODEL":
         return (
@@ -300,7 +311,11 @@ const VirtualTryOn = () => {
   const renderChosenProductBox = (chosenProduct: VtoProduct) => {
     return (
       <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-2/3 w-[45%] h-[20%] bg-style flex flex-row rounded-2xl">
-        <div className="w-[75%] h-full flex flex-col gap-1 justify-center items-start p-4">
+        <AiFillCloseCircle
+          className="w-5 h-5 cursor-pointer"
+          onClick={(e) => setChosenProduct(undefined)}
+        />
+        <div className="w-[75%] h-full flex flex-col gap-1 justify-center items-start py-4 pr-4">
           <div className="text-base font-semibold text-white">
             {chosenProduct.name}
           </div>
@@ -347,7 +362,7 @@ const VirtualTryOn = () => {
   }, [mode, imagePreview]);
 
   return (
-    <div className="bg-[url('https://res.cloudinary.com/dgsrxvev1/image/upload/v1716347947/dressing_room_c9bl2n.jpg')] bg-center bg-cover bg-no-repeat w-[100vw] h-[100vh] flex flex-col justify-center items-center">
+    <div className="bg-[url('https://res.cloudinary.com/dgsrxvev1/image/upload/v1716347947/dressing_room_c9bl2n.jpg')] bg-center bg-cover bg-no-repeat w-[100vw] h-[100vh] flex flex-col justify-center items-center pb-10">
       <div className="w-full h-[80%] flex flex-col gap-10 justify-center items-center">
         <div className="flex w-[200px] h-[50px] bg-style text-white text-xl justify-center items-center rounded-full">
           {renderTitle(mode)}
@@ -411,7 +426,14 @@ const VirtualTryOn = () => {
             {chosenProduct != undefined &&
               renderChosenProductBox(chosenProduct)}
           </div>
-          <div className="flex w-[200px] h-[50px] bg-style text-white text-xl justify-center items-center rounded-full invisible">
+          <div
+            className={`flex w-[200px] h-[50px] bg-style text-white text-xl justify-center items-center rounded-full cursor-pointer hover:bg-black ${
+              continueBtnState && mode === "PRODUCT" ? "" : "invisible"
+            }`}
+            onClick={(e) => {
+              setMode("PREVIEW");
+            }}
+          >
             Tiếp tục
           </div>
         </div>
