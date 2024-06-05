@@ -3,6 +3,7 @@
 import ProductItem from "@/component/customer/ProductItem";
 import { ProductType } from "@/model/ProductType";
 import { Button, Flex, Skeleton } from "antd";
+import Link from "next/link";
 import React, { useEffect, useRef, useState } from "react";
 
 interface SetupProps {
@@ -337,13 +338,13 @@ export default function InfiniteProductsList(setupProps: SetupProps) {
 
       const rowDisplay = slicedData.map(
         (valueWrapper: ProductItemPropsWrapper) => {
-          let isVisible: string = "";
+          let isVisible: string = "text-black";
           if (valueWrapper.type == WrapperType.paddingBlock) {
-            isVisible = "invisible";
+            isVisible = "text-black invisible";
           }
           const value = valueWrapper.productInfo;
           return (
-            <>
+            <Link href={`/product/${value._id}`}>
               <div className={isVisible} key={value._id}>
                 <ProductItem
                   imageLink={value.imageLink}
@@ -353,10 +354,9 @@ export default function InfiniteProductsList(setupProps: SetupProps) {
                   price={value.price}
                   isFlashSale={value.isFlashSale}
                   originalPrice={value.originalPrice}
-                  inWishlist={value.inWishlist}
                 />
               </div>
-            </>
+            </Link>
           );
         }
       );

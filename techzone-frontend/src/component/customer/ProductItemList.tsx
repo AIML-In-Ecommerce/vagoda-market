@@ -16,6 +16,7 @@ import { CiCircleRemove } from "react-icons/ci";
 import { HiOutlineAdjustmentsHorizontal } from "react-icons/hi2";
 import { IoImageOutline } from "react-icons/io5";
 import ProductItem, { formatPrice } from "./ProductItem";
+import Link from "next/link";
 interface ProductListProps {
   total: number;
   totalPages: number;
@@ -283,22 +284,23 @@ export default function ProductItemList(props: ProductListProps) {
                 <Skeleton loading={loading} active></Skeleton>
               </div>
             ) : (
-              <div
-                key={index}
-                className="flex items-center justify-center mx-auto"
-              >
-                <ProductItem
+              <Link href={`/product/${product._id}`}>
+                <div
                   key={index}
-                  name={product.name}
-                  rating={product.avgRating}
-                  soldAmount={product.soldQuantity}
-                  price={product.finalPrice}
-                  isFlashSale={true}
-                  imageLink={product.image}
-                  originalPrice={product.originalPrice}
-                  inWishlist={true}
-                />
-              </div>
+                  className="flex items-center justify-center mx-auto text-black"
+                >
+                  <ProductItem
+                    key={index}
+                    name={product.name}
+                    rating={product.avgRating}
+                    soldAmount={product.soldQuantity}
+                    price={product.finalPrice}
+                    isFlashSale={true}
+                    imageLink={product.image}
+                    originalPrice={product.originalPrice}
+                  />
+                </div>
+              </Link>
             )
           )}
         </div>

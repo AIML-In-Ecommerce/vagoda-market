@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import CustomEmpty from "../../shop/mini/CustomEmpty";
 import ProductItem from "../../ProductItem";
 import { POST_GetProductListByShop } from "@/apis/product/ProductDetailAPI";
+import Link from "next/link";
 
 export default function SimilarList() {
   // mock data
@@ -126,15 +127,19 @@ export default function SimilarList() {
                 }}
                 renderItem={(item) => (
                   <List.Item>
-                    <ProductItem
-                      imageLink={item.imageLink}
-                      name={item.name}
-                      rating={item.rating}
-                      soldAmount={item.soldAmount}
-                      price={item.price}
-                      isFlashSale={item.flashSale}
-                      originalPrice={item.originalPrice}
-                    />
+                    <Link href={`/product/${item._id}`}>
+                      <div className="text-black">
+                        <ProductItem
+                          imageLink={item.imageLink}
+                          name={item.name}
+                          rating={item.rating}
+                          soldAmount={item.soldAmount}
+                          price={item.price}
+                          isFlashSale={item.flashSale}
+                          originalPrice={item.originalPrice}
+                        />
+                      </div>
+                    </Link>
                   </List.Item>
                 )}
               />
@@ -181,17 +186,19 @@ export default function SimilarList() {
               ]}
             >
               {products.map((item, index) => (
-                <div key={index} className="z-50">
-                  <ProductItem
-                    imageLink={item.imageLink}
-                    name={item.name}
-                    rating={item.rating}
-                    soldAmount={item.soldAmount}
-                    price={item.price}
-                    isFlashSale={item.flashSale}
-                    originalPrice={item.originalPrice}
-                  />
-                </div>
+                <Link href={`/product/${item._id}`}>
+                  <div key={index} className="z-50 text-black">
+                    <ProductItem
+                      imageLink={item.imageLink}
+                      name={item.name}
+                      rating={item.rating}
+                      soldAmount={item.soldAmount}
+                      price={item.price}
+                      isFlashSale={item.flashSale}
+                      originalPrice={item.originalPrice}
+                    />
+                  </div>
+                </Link>
               ))}
             </Carousel>
           )}
