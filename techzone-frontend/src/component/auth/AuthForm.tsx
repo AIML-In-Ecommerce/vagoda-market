@@ -110,7 +110,6 @@ export default function AuthForm(props: AuthFormProps) {
       );
 
       const stringifiedString = JSON.stringify(responseData.buyerInfo);
-      
       //set access token and refresh token to cookie
 
       setResultModalState("success");
@@ -120,10 +119,10 @@ export default function AuthForm(props: AuthFormProps) {
 
       if (authContext.methods) {
         const check = authContext.methods.login(
-          // userInfoSessionStorageKey,
-          // accessToken,
-          // refreshToken,
-          // refreshTokenExpiredDate
+          stringifiedString,
+          accessToken,
+          refreshToken,
+          refreshTokenExpiredDate
         );
 
         if (check == true) {
