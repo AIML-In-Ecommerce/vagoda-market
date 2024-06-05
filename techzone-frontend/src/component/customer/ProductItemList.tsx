@@ -155,7 +155,7 @@ export default function ProductItemList(props: ProductListProps) {
                     {formatPrice(item.value.min)
                       ? formatPrice(item.value.max)
                         ? `${formatPrice(item.value.min)} - ${formatPrice(
-                            item.value.max
+                            item.value.max,
                           )}`
                         : `Trên ${formatPrice(item.value.min)}`
                       : `Dưới ${formatPrice(item.value.max)}`}

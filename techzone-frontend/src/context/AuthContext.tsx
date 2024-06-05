@@ -3,8 +3,9 @@
 import { usePathname, useRouter } from "next/navigation";
 import { createContext, ReactNode, useEffect, useMemo, useState } from "react";
 import Cookies from "js-cookie";
-import { SimpleUserInfoType } from "@/model/UserInfoType";
+import { SimpleUserInfoType, UserInfoType } from "@/model/UserInfoType";
 import AuthService, { RefreshTokenReponseData } from "@/service/auth.service";
+import { stringifyError } from "next/dist/shared/lib/utils";
 
 
 interface AuthContextProviderInitProps
@@ -12,7 +13,7 @@ interface AuthContextProviderInitProps
     children: ReactNode
 }
 
-const authLocalStorageID = "#auth-context-session-info-ID"
+const authLocalStorageID = "#auth-context-user-info-record-ID"
 
 const matcher: string[] = 
 [
@@ -22,15 +23,15 @@ const matcher: string[] =
 interface AuthContextProps
 {
     userInfo: SimpleUserInfoType | null,
-    sessionInfoID: string | null,
     methods: AuthContextFunctions | null
 }
 
 interface AuthContextFunctions
 {
     // validateAuthRequest: (sessionInfoID: string) => boolean,
-    login: (receivedSessionInfoID: string, accessToken: string, 
+    login: (stringifiedInfo: string, accessToken: string, 
         refreshToken: string, refreshTokenExpiredDate: string | Date) => boolean,
+    // login: () => boolean,
     logout: () => void,
     getAccessToken: () => string | null
 }
@@ -38,7 +39,6 @@ interface AuthContextFunctions
 const defaultContextValue: AuthContextProps = 
 {
     userInfo: null,
-    sessionInfoID: null,
     methods: null,
 }
 
@@ -50,7 +50,6 @@ export default function AuthContextProvider({children}: AuthContextProviderInitP
     const refreshTokenCookieKey = "#refresh_token@"
 
     const [userInfo, setUserInfo] = useState<SimpleUserInfoType | null>(null)
-    const [sessionInfoID, setSessionInfoID] = useState<string | null>("")
 
     const router = useRouter()
     const currentPathname = usePathname()
@@ -74,36 +73,38 @@ export default function AuthContextProvider({children}: AuthContextProviderInitP
         return 1
     }
 
-    function validateAuthRequest(receivedSessionInfoID: string)
-    {
-        const stringifiedObject = sessionStorage.getItem(receivedSessionInfoID)
-        if(stringifiedObject == null)
-        {
-            return false
-        }
+    // function validateAuthRequest(receivedSessionInfoID: string)
+    // {
+    //     const stringifiedObject = sessionStorage.getItem(receivedSessionInfoID)
+    //     if(stringifiedObject == null)
+    //     {
+    //         return false
+    //     }
 
-        const parsedObject: SimpleUserInfoType = JSON.parse(stringifiedObject)
+    //     const parsedObject: SimpleUserInfoType = JSON.parse(stringifiedObject)
         
-        localStorage.setItem(authLocalStorageID, receivedSessionInfoID)
-        setUserInfo(parsedObject)
-        setSessionInfoID(receivedSessionInfoID)
+    //     localStorage.setItem(authLocalStorageID, receivedSessionInfoID)
+    //     setUserInfo(parsedObject)
+    //     setSessionInfoID(receivedSessionInfoID)
 
-        return true
-    }
+    //     return true
+    // }
 
-    function login(receivedSessionInfoID: string, accessToken: string, 
+    function login(stringifiedInfo: string, accessToken: string, 
         refreshToken: string, refreshTokenExpiredDate: string | Date)
+    // function login()
     {
-        const check = validateAuthRequest(receivedSessionInfoID)
-        if(check == false)
+        try
+        {
+            localStorage.setItem(authLocalStorageID, stringifiedInfo)
+            Cookies.set(accessTokenCookieKey, accessToken)
+            Cookies.set(refreshTokenCookieKey, refreshToken, {expires: new Date(refreshTokenExpiredDate)})
+            return true
+        }
+        catch(error)
         {
             return false
         }
-
-        Cookies.set(accessTokenCookieKey, accessToken)
-        Cookies.set(refreshTokenCookieKey, refreshToken, {expires: new Date(refreshTokenExpiredDate)})
-
-        return true
     }
 
     function getAccessToken()
@@ -139,17 +140,31 @@ export default function AuthContextProvider({children}: AuthContextProviderInitP
     async function reloadUserInfo()
     {
         //should call this function when the accessToken has existed
+        try
+        {
+            if(userInfo == null)
+            {
+                const stringifiedInfo = localStorage.getItem(authLocalStorageID)
+                if(stringifiedInfo != null)
+                {
+                    const initUserInfo = JSON.parse(stringifiedInfo) as UserInfoType
+                    setUserInfo(() => initUserInfo)
+                    return
+                }
+
+                
+            }
+        }
+        catch(error)
+        {
+
+        }
 
     }
 
     function logout()
     {
-        if(sessionInfoID)
-        {
-            sessionStorage.removeItem(sessionInfoID)
-        }
         localStorage.removeItem(authLocalStorageID)
-
         //remove token here
         Cookies.remove(accessTokenCookieKey)
         Cookies.remove(refreshTokenCookieKey)
@@ -164,6 +179,7 @@ export default function AuthContextProvider({children}: AuthContextProviderInitP
     }
 
     const [supportMethods, setSupportMethods] = useState<AuthContextFunctions | null>(supportMethodValue)
+
 
     //check authentication
     useEffect(() =>
@@ -212,13 +228,12 @@ export default function AuthContextProvider({children}: AuthContextProviderInitP
         const newValue: AuthContextProps =
         {
             userInfo: userInfo,
-            sessionInfoID: sessionInfoID,
             methods: supportMethods
         }
 
         return newValue
     },
-    [userInfo, sessionInfoID, supportMethods])
+    [userInfo, supportMethods])
 
     return(
         <AuthContext.Provider value={value}>
