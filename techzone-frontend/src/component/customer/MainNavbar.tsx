@@ -18,6 +18,7 @@ import Searchbar from "../Searchbar";
 import LanguageOption from "./LanguageOption";
 import NavbarCategory from "./NavbarCategory";
 import NavbarMenu from "./NavbarMenu";
+import Link from "next/link";
 
 export default function MainNavbar() {
   const router = useRouter();
@@ -139,20 +140,21 @@ export default function MainNavbar() {
                   </div>
                 </Dropdown>
               </motion.div>
-              <div className="flex items-center text-white   p-2 rounded-lg hover:text-[#5c6856]">
-                <Badge
-                  size="small"
-                  className="site-badge-count-109"
-                  count={countItemsCart > 100 ? 109 : 5}
-                  style={{ backgroundColor: "#f32c2c" }}
-                >
-                  <PiShoppingCart
-                    className="text-white hover:text-[#5c6856]"
-                    size={20}
-                  />
-                </Badge>
-              </div>
-
+              <Link href={`/cart`}>
+                <div className="flex items-center cursor-pointer text-white p-2 rounded-lg hover:text-[#5c6856]">
+                  <Badge
+                    size="small"
+                    className="site-badge-count-109"
+                    count={countItemsCart > 100 ? 109 : 5}
+                    style={{ backgroundColor: "#f32c2c" }}
+                  >
+                    <PiShoppingCart
+                      className="text-white hover:text-[#5c6856]"
+                      size={20}
+                    />
+                  </Badge>
+                </div>
+              </Link>
               <NavbarMenu options={allCategories} />
             </div>
           </div>
@@ -195,19 +197,21 @@ export default function MainNavbar() {
 
             <div className="">
               <div className="right-0 justify-end flex space-x-4 text-sm items-center">
-                <div className="flex items-center text-white   p-4 rounded-lg hover:text-[#5c6856]">
-                  <Badge
-                    size="small"
-                    className="site-badge-count-109"
-                    count={countItemsCart > 100 ? 109 : 5}
-                    style={{ backgroundColor: "#f32c2c" }}
-                  >
-                    <PiShoppingCart
-                      className="text-white hover:text-[#5c6856]"
-                      size={20}
-                    />
-                  </Badge>
-                </div>
+                <Link href={`/cart`}>
+                  <div className="flex items-center cursor-pointer text-white p-4 rounded-lg hover:text-[#5c6856]">
+                    <Badge
+                      size="small"
+                      className="site-badge-count-109"
+                      count={countItemsCart > 100 ? 109 : 5}
+                      style={{ backgroundColor: "#f32c2c" }}
+                    >
+                      <PiShoppingCart
+                        className="text-white hover:text-[#5c6856]"
+                        size={20}
+                      />
+                    </Badge>
+                  </div>
+                </Link>
                 <motion.div whileTap={{ scale: 0.9 }}>
                   <Dropdown
                     menu={{ items }}
