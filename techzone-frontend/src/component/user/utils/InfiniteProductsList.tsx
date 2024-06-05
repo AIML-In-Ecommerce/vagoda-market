@@ -200,7 +200,7 @@ const paddingBlockProps: ProductType = {
 export default function InfiniteProductsList(setupProps: SetupProps) {
   const [products, setProducts] = useState<ProductItemProps[]>([]);
   const [mainDisplay, setMainDisplay] = useState<JSX.Element>(
-    <Skeleton active />
+    <Skeleton active />,
   );
   const [currentPagination, setCurrentPagination] = useState<number>(1);
   const [isLoadingItems, setIsLoadingItems] = useState<boolean>(false);
@@ -310,7 +310,7 @@ export default function InfiniteProductsList(setupProps: SetupProps) {
     //insert padding blocks
     if (remainder != 0 && remainder < setupProps.setup.productsPerRow) {
       const paddingBlocks = new Array(
-        setupProps.setup.productsPerRow - remainder
+        setupProps.setup.productsPerRow - remainder,
       )
         .fill(paddingBlockProps)
         .map((value) => {
@@ -358,7 +358,7 @@ export default function InfiniteProductsList(setupProps: SetupProps) {
               </div>
             </Link>
           );
-        }
+        },
       );
 
       wrapper.push(
@@ -370,7 +370,7 @@ export default function InfiniteProductsList(setupProps: SetupProps) {
           gap={6}
         >
           {rowDisplay}
-        </Flex>
+        </Flex>,
       );
     }
 
