@@ -363,9 +363,10 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
     const postBody = {
       prompt: newMessages,
     };
+    console.log("Prompt: ", postBody.prompt);
     try {
       const response = await axios.post(
-        "http://localhost:8000/chat/agent",
+        "http://18.142.253.31/chat/agent",
         postBody,
         {
           headers: {
@@ -465,6 +466,7 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
           className="w-full absolute bottom-0 left-0 px-5"
           justify="end"
           align="center"
+          gap={4}
         >
           <TextArea
             className="w-full max-h-96 overflow-y-auto"
@@ -475,7 +477,6 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
               setUserInput(e.target.value)
             }
           />
-          ,
           {/* <Input className="w-full" multiple={true} value={userInput} onChange={(e: ChangeEvent<HTMLInputElement>) => setUserInput(e.target.value)}/> */}
           <Button
             disabled={isSendButtonDisabled}

@@ -17,6 +17,7 @@ import Image from "next/image";
 import axios from "axios";
 import { Divider } from "antd";
 import { AiFillCloseCircle } from "react-icons/ai";
+import ImageSwiper from "./swiper";
 
 type Mode = "MODEL" | "PRODUCT" | "PREVIEW";
 type LoadStatus = "READY" | "RUNNING" | "COMPLETED" | "ERROR";
@@ -75,9 +76,7 @@ const VirtualTryOn = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [tryOnLoading, setTryOnLoading] = useState<LoadStatus>("READY");
 
-  const tryOnImageUrl = useRef<string>(
-    "https://res.cloudinary.com/dgsrxvev1/image/upload/v1716443926/vn-11134207-7r98o-lp8u23rvrf4r40_hcpkjk.jpg",
-  );
+  const tryOnImageUrl = useRef<string[]>([]);
 
   const fileRef = useRef<HTMLInputElement>(null);
   const userImageUrl = useRef<string | null>(null);
@@ -172,26 +171,26 @@ const VirtualTryOn = () => {
 
     try {
       console.log("first: ", postBody);
-      const response = await axios.post(
-        "http://localhost:8000/genai/virtual-try-on",
-        postBody,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      );
 
-      if (response.status !== 200) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      // const response = await axios.post(
+      //   "http://54.179.241.224/genai/virtual-try-on",
+      //   postBody,
+      //   {
+      //     headers: {
+      //       "Content-Type": "application/json",
+      //     },
+      //   },
+      // );
+
+      const response = await axios.get("http://47.128.217.104/index", {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
       if (response.status == 200) {
-        // setTimeout(() => {
-        //   setTryOnLoading("COMPLETED");
-        // }, 5000);
         console.log("Response: ", response.data);
-        tryOnImageUrl.current = response.data.data.tryOnImage[0];
+        // tryOnImageUrl.current = response.data.data.tryOnImage;
         setTryOnLoading("COMPLETED");
       }
     } catch (error) {
@@ -295,15 +294,18 @@ const VirtualTryOn = () => {
         );
       case "COMPLETED":
         return (
-          <div className="relative w-[40%] aspect-square">
-            <Image
-              src={tryOnImageUrl.current}
-              alt="Preview"
-              layout="fill"
-              objectFit="cover"
-              loading="lazy"
-              className="rounded-xl"
-            />
+          // <div className="relative w-[40%] aspect-square">
+          //   <Image
+          //     src={tryOnImageUrl.current}
+          //     alt="Preview"
+          //     layout="fill"
+          //     objectFit="cover"
+          //     loading="lazy"
+          //     className="rounded-xl"
+          //   />
+          // </div>
+          <div className="relative h-full ">
+            <ImageSwiper />
           </div>
         );
     }
@@ -365,8 +367,12 @@ const VirtualTryOn = () => {
   return (
     <div className="bg-[url('https://res.cloudinary.com/dgsrxvev1/image/upload/v1716347947/dressing_room_c9bl2n.jpg')] bg-center bg-cover bg-no-repeat w-[100vw] h-[100vh] flex flex-col justify-center items-center pb-10">
       <div className="w-full h-[80%] flex flex-col gap-10 justify-center items-center">
-        <div className="flex w-[200px] h-[50px] bg-style text-white text-xl justify-center items-center rounded-full">
-          {renderTitle(mode)}
+        <div className="w-[40%]">
+          <Divider style={{ borderColor: "white" }}>
+            <div className="flex w-[200px] h-[50px] bg-style text-white text-xl justify-center items-center rounded-full">
+              {renderTitle(mode)}
+            </div>
+          </Divider>
         </div>
 
         <div className="w-full h-full flex flex-row justify-center items-center gap-10">

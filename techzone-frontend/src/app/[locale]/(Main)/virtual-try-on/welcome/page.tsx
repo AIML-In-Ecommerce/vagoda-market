@@ -13,10 +13,10 @@ const VirtualTryOnWelcomePage = () => {
     <div className="w-[100vw] h-[100vh] bg-[#5C6856]">
       <div className="w-full h-full px-24 grid grid-cols-2 gap-8">
         <div className="w-full h-full col-span-1 flex flex-col gap-8 justify-center items-start">
-          <div className="font-semibold text-8xl text-white">
+          <div className="font-semibold text-7xl text-white">
             Phòng thử đồ ảo với công nghệ AI
           </div>
-          <div className="font-normal text-2xl text-white">
+          <div className="font-normal text-xl text-white">
             Tuyệt vời, Techzone mang đến cho bạn một công cụ tiên tiến giúp bạn
             dễ dàng trải nghiệm mặc thử quần áo. Bạn có thể khám phá nhiều kiểu
             dáng và màu sắc quần áo khác nhau từ những bộ sưu tập đặc sắc mà

@@ -33,9 +33,12 @@ export default function MainNavbar() {
         <a
           target="_blank"
           rel="noopener noreferrer"
-          href="https://www.antgroup.com"
+          // href="https://www.antgroup.com"
+          onClick={(e) => {
+            router.push("/");
+          }}
         >
-          My Account
+          Tài khoản
         </a>
       ),
     },
@@ -45,9 +48,12 @@ export default function MainNavbar() {
         <a
           target="_blank"
           rel="noopener noreferrer"
-          href="https://www.aliyun.com"
+          // href="https://www.antgroup.com"
+          onClick={(e) => {
+            router.push("/virtual-try-on/welcome");
+          }}
         >
-          Setting
+          Phòng thử đồ
         </a>
       ),
     },
@@ -57,9 +63,36 @@ export default function MainNavbar() {
         <a
           target="_blank"
           rel="noopener noreferrer"
+          // href="http://localhost:3000/order"
+          onClick={(e) => {
+            router.push("/order");
+          }}
+        >
+          Đơn hàng
+        </a>
+      ),
+    },
+    {
+      key: "4",
+      label: (
+        <a
+          target="_blank"
+          rel="noopener noreferrer"
+          href="https://www.aliyun.com"
+        >
+          Cài đặt
+        </a>
+      ),
+    },
+    {
+      key: "5",
+      label: (
+        <a
+          target="_blank"
+          rel="noopener noreferrer"
           href="https://www.luohanacademy.com"
         >
-          Logout
+          Đăng xuất
         </a>
       ),
     },
@@ -173,7 +206,7 @@ export default function MainNavbar() {
           <header className="flex   items-center justify-between relative h-30 xs:space-x-4 md:space-x-8 ">
             <div className="flex space-x-4 items-center">
               <NavbarMenu options={allCategories} />
-              <div className="mb-0 p-1">
+              <div className="mb-0 p-1 cursor-pointer">
                 <Image
                   src={logo}
                   width={120}
@@ -220,7 +253,7 @@ export default function MainNavbar() {
                   >
                     <div className="flex space-x-2 items-center text-white hover:text-sky  p-[12px] rounded-lg bg-[#5c6856] text-sm">
                       <RxPerson className="" size={20} />
-                      <p className="">Account</p>
+                      <p className="">Thảo Lăng</p>
                     </div>
                   </Dropdown>
                 </motion.div>
