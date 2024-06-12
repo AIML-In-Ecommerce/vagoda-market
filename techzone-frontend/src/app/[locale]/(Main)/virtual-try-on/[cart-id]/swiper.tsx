@@ -15,34 +15,39 @@ const imgList = [
   "https://res.cloudinary.com/dgsrxvev1/image/upload/v1716443926/vn-11134207-7r98o-lp8u23rvrf4r40_hcpkjk.jpg",
 ];
 
-export default function ImageSwiper() {
-  return (
-    <>
-      <Swiper
-        effect={"coverflow"}
-        grabCursor={true}
-        centeredSlides={true}
-        slidesPerView={"auto"}
-        coverflowEffect={{
-          rotate: 50,
-          stretch: 0,
-          depth: 100,
-          modifier: 1,
-          slideShadows: true,
-        }}
-        pagination={true}
-        modules={[EffectCoverflow, Pagination]}
-        className="w-full py-10"
-      >
-        {imgList.map((image, index) => (
-          <SwiperSlide
-            key={index}
-            className="w-[50%] h-[50%] bg-center bg-cover "
-          >
-            <img src={image} className="block  w-full " />
-          </SwiperSlide>
-        ))}
-      </Swiper>
-    </>
-  );
+interface ImageSwiperProps {
+  imgList: string[];
 }
+
+const ImageSwiper: React.FC<ImageSwiperProps> = ({ imgList }) => {
+  return (
+    <Swiper
+      effect="coverflow"
+      grabCursor={true}
+      centeredSlides={true}
+      slidesPerView={"auto"}
+      coverflowEffect={{
+        rotate: 50,
+        stretch: 0,
+        depth: 100,
+        modifier: 1,
+        slideShadows: true,
+      }}
+      pagination={{ clickable: true }}
+      modules={[EffectCoverflow, Pagination]}
+      className="w-full py-10"
+    >
+      {imgList.map((image, index) => (
+        <SwiperSlide key={index} className="w-[50%] h-[50%] bg-center bg-cover">
+          <img
+            src={image}
+            alt={`slide-${index}`}
+            className="block w-full aspect-square"
+          />
+        </SwiperSlide>
+      ))}
+    </Swiper>
+  );
+};
+
+export default ImageSwiper;

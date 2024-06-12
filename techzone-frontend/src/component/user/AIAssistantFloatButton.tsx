@@ -35,52 +35,49 @@ import "@/custom_css/AntdFullscreenModal.css";
 interface AIAssistantFloatButtonProps {}
 
 enum AssistantMessageTypes {
-  User,
-  Assistant,
+  User = "User",
+  Assistant = "Assistant",
 }
-
 interface AssistantMessageProps {
-  type: AssistantMessageTypes;
-  content: string;
-  actionCode: string | null;
+  role: AssistantMessageTypes;
+  message: string;
 }
 
 const GreetingMessage: AssistantMessageProps = {
-  type: AssistantMessageTypes.Assistant,
-  content:
+  role: AssistantMessageTypes.Assistant,
+  message:
     "Xin chào! Mình là trợ lý AI của TechZone.\nMình sẵn sàng giúp đỡ bạn những câu hỏi về tư vấn, tìm kiếm sản phẩm.\n Hôm nay bạn cần mình hỗ trợ gì hông? ^^",
-  actionCode: null,
 };
 
 const AIAssistantLocalStorageKeyword = "ai_assistant";
 
-const AssistantMockData: AssistantMessageProps[] = [
-  {
-    type: AssistantMessageTypes.Assistant,
-    content:
-      "Xin chào! Tiki hiện có bán nhiều loại mặt hàng khác nhau. Dưới đây là một số sản phẩm mà Tiki đang cung cấp \nKhuyên tai chữ c mắt xích phong cách cổ điển Hàn Quốc - Giá: 25.500đ\nVòng tay phong thủy Mã Não trắng 10mm + Mắt Hổ + Charm roi - Giá: 770.000đ\nMóc Chìa Khóa Tỳ Hưu Tài Lộc Đá Mắt Hổ - Nâu - Giá: 126.000đ\nMóc Chìa Khóa Tỳ Hưu Tài Lộc, Đá Mắt Hổ - Nâu - Giá: 139.500đ Nếu bạn có nhu cầu tìm kiếm sản phẩm cụ thể, hãy cho tôi biết thêm thông tin để tôi có thể tư vấn tốt hơn.",
-    actionCode: null,
-  },
-  {
-    type: AssistantMessageTypes.Assistant,
-    content:
-      "Mình sẵn sàng giúp bạn với câu hỏi về chính sách và tìm kiếm sản phẩm.",
-    actionCode: null,
-  },
-  {
-    type: AssistantMessageTypes.Assistant,
-    content: "Mình đã thêm sản phẩm vào giỏ hàng",
-    actionCode: "action_ADD_TO_CART",
-  },
-];
+// const AssistantMockData: AssistantMessageProps[] = [
+//   {
+//     type: AssistantMessageTypes.Assistant,
+//     content:
+//       "Xin chào! Tiki hiện có bán nhiều loại mặt hàng khác nhau. Dưới đây là một số sản phẩm mà Tiki đang cung cấp \nKhuyên tai chữ c mắt xích phong cách cổ điển Hàn Quốc - Giá: 25.500đ\nVòng tay phong thủy Mã Não trắng 10mm + Mắt Hổ + Charm roi - Giá: 770.000đ\nMóc Chìa Khóa Tỳ Hưu Tài Lộc Đá Mắt Hổ - Nâu - Giá: 126.000đ\nMóc Chìa Khóa Tỳ Hưu Tài Lộc, Đá Mắt Hổ - Nâu - Giá: 139.500đ Nếu bạn có nhu cầu tìm kiếm sản phẩm cụ thể, hãy cho tôi biết thêm thông tin để tôi có thể tư vấn tốt hơn.",
+//     actionCode: null,
+//   },
+//   {
+//     type: AssistantMessageTypes.Assistant,
+//     content:
+//       "Mình sẵn sàng giúp bạn với câu hỏi về chính sách và tìm kiếm sản phẩm.",
+//     actionCode: null,
+//   },
+//   {
+//     type: AssistantMessageTypes.Assistant,
+//     content: "Mình đã thêm sản phẩm vào giỏ hàng",
+//     actionCode: "action_ADD_TO_CART",
+//   },
+// ];
 
-function getRandomAnswer() {
-  const time = Date.now();
+// function getRandomAnswer() {
+//   const time = Date.now();
 
-  const index = time % AssistantMockData.length;
+//   const index = time % AssistantMockData.length;
 
-  return AssistantMockData[index];
-}
+//   return AssistantMockData[index];
+// }
 
 const AIAssistantImageLink =
   "https://cdn-icons-png.freepik.com/512/9732/9732800.png";
@@ -271,7 +268,7 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
                   Trợ lý
                 </Typography.Text>
                 <Typography.Paragraph className="text-wrap text-sm">
-                  {message.content}
+                  {message.message}
                 </Typography.Paragraph>
               </Flex>
             </Tag>
@@ -297,7 +294,7 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
           {/* <Tag color={"#92400e"}> */}
           <Tag color={"#797979"}>
             <Typography.Paragraph className="text-wrap text-sm text-white">
-              {message.content}
+              {message.message}
             </Typography.Paragraph>
           </Tag>
         </Flex>
@@ -306,9 +303,9 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
   }
 
   function getMessageDisplay(message: AssistantMessageProps, index: number) {
-    if (message.type == AssistantMessageTypes.Assistant) {
+    if (message.role == AssistantMessageTypes.Assistant) {
       return getAIAssistantMessageDisplay(message, index);
-    } else if (message.type == AssistantMessageTypes.User) {
+    } else if (message.role == AssistantMessageTypes.User) {
       return getUserMessageDisplay(message, index);
     } else {
       return <></>;
@@ -348,25 +345,26 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
     }
 
     const message: AssistantMessageProps = {
-      type: AssistantMessageTypes.User,
-      content: userInput as string,
-      actionCode: null,
+      role: AssistantMessageTypes.User,
+      message: userInput as string,
     };
 
-    const newMessages = [...messages];
-    newMessages.push(message);
-
-    setMessages(newMessages);
+    const history_conservation = [...messages];
 
     setUserInput(undefined);
 
     const postBody = {
-      prompt: newMessages,
+      history_conservation: history_conservation,
+      prompt: message.message,
     };
-    console.log("Prompt: ", postBody.prompt);
+    console.log("PostBody: ", postBody);
+
+    history_conservation.push(message);
+
+    setMessages(history_conservation);
     try {
       const response = await axios.post(
-        "http://18.142.253.31/chat/agent",
+        "http://localhost:8000/chat/agent",
         postBody,
         {
           headers: {
@@ -376,15 +374,14 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
       );
       if (response.status == 200) {
         const assistantResponse: AssistantMessageProps = {
-          type: AssistantMessageTypes.Assistant,
-          content: response.data.data,
-          actionCode: "",
+          role: AssistantMessageTypes.Assistant,
+          message: response.data.data,
         };
-        const newResponseMessages = [...newMessages];
+        const newResponseMessages = [...history_conservation];
         newResponseMessages.push(assistantResponse);
         setMessages(newResponseMessages);
         if (localStorage) {
-          const stringifiedMessages = JSON.stringify(newMessages);
+          const stringifiedMessages = JSON.stringify(history_conservation);
           localStorage.setItem(
             AIAssistantLocalStorageKeyword,
             stringifiedMessages,

@@ -172,25 +172,25 @@ const VirtualTryOn = () => {
     try {
       console.log("first: ", postBody);
 
-      // const response = await axios.post(
-      //   "http://54.179.241.224/genai/virtual-try-on",
-      //   postBody,
-      //   {
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //     },
-      //   },
-      // );
-
-      const response = await axios.get("http://47.128.217.104/index", {
-        headers: {
-          "Content-Type": "application/json",
+      const response = await axios.post(
+        "http://18.143.103.85/genai/virtual-try-on",
+        postBody,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
         },
-      });
+      );
+
+      // const response = await axios.get("http://47.128.217.104/index", {
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      // });
 
       if (response.status == 200) {
         console.log("Response: ", response.data);
-        // tryOnImageUrl.current = response.data.data.tryOnImage;
+        tryOnImageUrl.current = response.data.data.tryOnImage;
         setTryOnLoading("COMPLETED");
       }
     } catch (error) {
@@ -305,7 +305,7 @@ const VirtualTryOn = () => {
           //   />
           // </div>
           <div className="relative h-full ">
-            <ImageSwiper />
+            <ImageSwiper imgList={tryOnImageUrl.current} />
           </div>
         );
     }
