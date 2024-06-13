@@ -62,7 +62,11 @@ const ReviewList = (reviewListProps: ReviewListProps) => {
 
   return (
     <div className="justify-center align-middle">
-      {(filterData.length == 0 && <CustomEmpty />) || (
+      {(filterData.length == 0 && (
+        <div className="m-5">
+          <CustomEmpty />
+        </div>
+      )) || (
         <div>
           {filterData.map((item, index) => (
             <Review
@@ -96,73 +100,3 @@ const ReviewList = (reviewListProps: ReviewListProps) => {
 };
 
 export default ReviewList;
-
-// const reviewsData = [
-//   {
-//     id: "string",
-//     productId: "string",
-//     user: {
-//       id: "string",
-//       name: "Lê Quốc Dũng",
-//       avatar: "https://api.dicebear.com/7.x/miniavs/svg?seed=1",
-//     },
-//     desc: "Shipper rất nhiệt tình và tận tâm, giao hàng nhanh, đóng gói cẩn thận, thử máy rất tốt trong tầm giá. Hy vọng máy xài bền.",
-//     createdAt: "Đánh giá vào 24 ngày trước",
-//     starRating: 4,
-
-//     asset: [
-//       // "https://i.insider.com/5f835d4ebab422001979aaeb",
-//       // "https://robothutbuisky.com/wp-content/uploads/2020/06/t8-max-100-1.jpg?v=1677693356",
-//       // "https://product.hstatic.net/200000805527/product/z3994157810128_ac5e199adba96c46d6d7282b2bfdcdc5-scaled_843ed368395649f6a68bc7c08dd20524_master.jpg",
-//       // "https://product.hstatic.net/200000805527/product/z3994157835398_2b54a80e46f44a6d57b7a7500a87e49e-scaled_37202a4918fa4f03a6e275b8312f0587_master.jpg",
-//       // "https://i.insider.com/5f835d4ebab422001979aaeb",
-//       // "https://robothutbuisky.com/wp-content/uploads/2020/06/t8-max-100-1.jpg?v=1677693356",
-//       // "https://product.hstatic.net/200000805527/product/z3994157810128_ac5e199adba96c46d6d7282b2bfdcdc5-scaled_843ed368395649f6a68bc7c08dd20524_master.jpg",
-//       // "https://product.hstatic.net/200000805527/product/z3994157835398_2b54a80e46f44a6d57b7a7500a87e49e-scaled_37202a4918fa4f03a6e275b8312f0587_master.jpg",
-//       // "https://i.insider.com/5f835d4ebab422001979aaeb",
-//       // "https://robothutbuisky.com/wp-content/uploads/2020/06/t8-max-100-1.jpg?v=1677693356",
-//     ],
-//     conversation: [],
-//     like: [],
-//   },
-//   {
-//     id: "string",
-//     productId: "string",
-//     user: { id: "string", name: "Thuỳ Dương", avatar: "" },
-//     desc: "Đóng gói cẩn thận, mua khuyến mãi nên giá rẻ và miễn Ship, còn được tặng bình nhựa.",
-//     createdAt: "Đánh giá vào 1 năm trước",
-//     starRating: 5,
-
-//     asset: [],
-//     conversation: [],
-//     like: [],
-//   },
-//   {
-//     id: "string",
-//     productId: "string",
-//     user: {
-//       id: "string",
-//       name: "Lê Quốc Dũng",
-//       avatar: "https://api.dicebear.com/7.x/miniavs/svg?seed=1",
-//     },
-//     desc: "Shipper rất nhiệt tình và tận tâm, giao hàng nhanh, đóng gói cẩn thận, thử máy rất tốt trong tầm giá. Hy vọng máy xài bền.",
-//     createdAt: "Đánh giá vào 24 ngày trước",
-//     starRating: 4,
-
-//     asset: [],
-//     conversation: [],
-//     like: [],
-//   },
-//   {
-//     id: "string",
-//     productId: "string",
-//     user: { id: "string", name: "Thuỳ Dương", avatar: "" },
-//     desc: "Đóng gói cẩn thận, mua khuyến mãi nên giá rẻ và miễn Ship, còn được tặng bình nhựa.",
-//     createdAt: "Đánh giá vào 1 năm trước",
-//     starRating: 5,
-
-//     asset: [],
-//     conversation: [],
-//     like: [],
-//   },
-// ];

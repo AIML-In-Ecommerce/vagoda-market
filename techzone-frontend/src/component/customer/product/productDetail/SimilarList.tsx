@@ -4,99 +4,24 @@ import { Carousel, List } from "antd";
 import { useEffect, useState } from "react";
 import CustomEmpty from "../../shop/mini/CustomEmpty";
 import ProductItem from "../../ProductItem";
-import { POST_GetProductListByShop } from "@/apis/product/ProductDetailAPI";
+import { GET_GetRelatedProduct } from "@/apis/product/ProductDetailAPI";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 
 export default function SimilarList() {
-  // mock data
-  const MockData = [
-    {
-      _id: "6645bab5f4c7faf064f1bcdc",
-      imageLink:
-        "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      name: "Lenovo 15i",
-      rating: 4.5,
-      soldAmount: 20,
-      price: 15000000,
-      flashSale: true,
-      originalPrice: 17000000,
-      category: "",
-    },
-    {
-      _id: "6645bab5f4c7faf064f1bcdc",
-      imageLink:
-        "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      name: "Lenovo 15i",
-      rating: 4.5,
-      soldAmount: 20,
-      price: 15000000,
-      flashSale: true,
-      originalPrice: 17000000,
-      category: "",
-    },
-    {
-      _id: "6645bbaef4c7faf064f1bce0",
-      imageLink:
-        "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      name: "Dell Vostro",
-      rating: 4.5,
-      soldAmount: 32,
-      price: 17000000,
-      flashSale: false,
-      originalPrice: 17000000,
-      category: "",
-    },
-    {
-      _id: "sp-03",
-      imageLink:
-        "https://images.unsplash.com/photo-1593642702821-c8da6771f0c6?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      name: "Dell SuperLight",
-      rating: 4.5,
-      soldAmount: 10,
-      price: 22000000,
-      flashSale: true,
-      originalPrice: 20000000,
-      category: "",
-    },
-    {
-      _id: "sp-04",
-      imageLink:
-        "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      name: "Lenovo 15i",
-      rating: 4.5,
-      soldAmount: 20,
-      price: 15000000,
-      flashSale: true,
-      originalPrice: 17000000,
-      category: "",
-    },
-    {
-      _id: "sp-05",
-      imageLink:
-        "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      name: "Lenovo 15i",
-      rating: 4.5,
-      soldAmount: 20,
-      price: 15000000,
-      flashSale: true,
-      originalPrice: 17000000,
-      category: "",
-    },
-  ];
-
   const autoPlayCarouselSpeed = 5000; //ms
 
   const [products, setProducts] = useState<ProductType[]>();
 
-  // call api (temporarily)
-  const mockId = "65f1e8bbc4e39014df775166";
+  // call api
+  const { productId } = useParams();
 
   useEffect(() => {
     handleGetProductList();
-  }, [mockId]);
+  }, [productId]);
 
   const handleGetProductList = async () => {
-    const response = await POST_GetProductListByShop(mockId);
+    const response = await GET_GetRelatedProduct(productId.toString());
     if (response.status == 200) {
       if (response.data) {
         setProducts(response.data);
@@ -211,3 +136,79 @@ export default function SimilarList() {
     </div>
   );
 }
+
+// mock data
+// const MockData = [
+//   {
+//     _id: "6645bab5f4c7faf064f1bcdc",
+//     imageLink:
+//       "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+//     name: "Lenovo 15i",
+//     rating: 4.5,
+//     soldAmount: 20,
+//     price: 15000000,
+//     flashSale: true,
+//     originalPrice: 17000000,
+//     category: "",
+//   },
+//   {
+//     _id: "6645bab5f4c7faf064f1bcdc",
+//     imageLink:
+//       "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+//     name: "Lenovo 15i",
+//     rating: 4.5,
+//     soldAmount: 20,
+//     price: 15000000,
+//     flashSale: true,
+//     originalPrice: 17000000,
+//     category: "",
+//   },
+//   {
+//     _id: "6645bbaef4c7faf064f1bce0",
+//     imageLink:
+//       "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+//     name: "Dell Vostro",
+//     rating: 4.5,
+//     soldAmount: 32,
+//     price: 17000000,
+//     flashSale: false,
+//     originalPrice: 17000000,
+//     category: "",
+//   },
+//   {
+//     _id: "sp-03",
+//     imageLink:
+//       "https://images.unsplash.com/photo-1593642702821-c8da6771f0c6?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+//     name: "Dell SuperLight",
+//     rating: 4.5,
+//     soldAmount: 10,
+//     price: 22000000,
+//     flashSale: true,
+//     originalPrice: 20000000,
+//     category: "",
+//   },
+//   {
+//     _id: "sp-04",
+//     imageLink:
+//       "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+//     name: "Lenovo 15i",
+//     rating: 4.5,
+//     soldAmount: 20,
+//     price: 15000000,
+//     flashSale: true,
+//     originalPrice: 17000000,
+//     category: "",
+//   },
+//   {
+//     _id: "sp-05",
+//     imageLink:
+//       "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+//     name: "Lenovo 15i",
+//     rating: 4.5,
+//     soldAmount: 20,
+//     price: 15000000,
+//     flashSale: true,
+//     originalPrice: 17000000,
+//     category: "",
+//   },
+// ];

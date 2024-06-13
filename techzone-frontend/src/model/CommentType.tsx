@@ -1,7 +1,7 @@
 export type CommentType = {
-  id: string;
-  user: { id: string; name: string; avatar: string };
-  desc: string;
+  _id: string | undefined;
+  user: { _id: string; fullName: string; avatar: string };
+  content: string;
   createdAt: string;
 };
 
@@ -12,10 +12,10 @@ export type AffectedCommentType = {
 
 export type RawCommentType = {
   _id: string | undefined;
-  user: string; //sender-id
-  content: string; //desc
-  createdAt: string;
+  comment: CommentType;
 };
+
+// OLD ----------------------------------------------------------------
 
 // export type CommentType = {
 //   id: string;

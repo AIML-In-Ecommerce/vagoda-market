@@ -27,25 +27,107 @@ interface AboutProductProps {
   setNumberOfItem: (number: number) => void;
   mainImage: string;
   setMainImage: (string: string) => void;
+  //
+  selectedColorOption: any;
+  setSelectedColorOption: (color: any) => void;
+  selectedSizeOption: string;
+  setSelectedSizeOption: (size: string) => void;
 }
 
 export default function AboutProduct(props: AboutProductProps) {
   // mock data
-  const colorOptionsData = [
-    { label: "Cam", value: "#cc4f14" },
-    { label: "Đỏ", value: "#cc1414" },
-    { label: "Vàng", value: "#fae102" },
-  ];
-  const sizeOptionsData = ["XL", "L"];
+
+  // const colorOptionsData = [
+  //   { label: "Cam", value: "#cc4f14" },
+  //   { label: "Đỏ", value: "#cc1414" },
+  //   { label: "Vàng", value: "#fae102" },
+  // ];
+
+  // type Color = {
+  //   link: string;
+  //   color: {
+  //     label: string;
+  //     value: string;
+  //   };
+  // };
+
+  // const mockImages: Color[] = [
+  //   {
+  //     link: "https://images.pexels.com/photos/5693891/pexels-photo-5693891.jpeg?auto=compress&cs=tinysrgb&w=600",
+  //     color: {
+  //       label: "Red",
+  //       value: "#FF0000",
+  //     },
+  //   },
+  //   {
+  //     link: "https://images.pexels.com/photos/5693891/pexels-photo-5693891.jpeg?auto=compress&cs=tinysrgb&w=600",
+  //     color: {
+  //       label: "Green",
+  //       value: "#00FF00",
+  //     },
+  //   },
+  //   {
+  //     link: "https://images.pexels.com/photos/5693891/pexels-photo-5693891.jpeg?auto=compress&cs=tinysrgb&w=600",
+  //     color: {
+  //       label: "Blue",
+  //       value: "#0000FF",
+  //     },
+  //   },
+  //   {
+  //     link: "https://images.pexels.com/photos/5693891/pexels-photo-5693891.jpeg?auto=compress&cs=tinysrgb&w=600",
+  //     color: {
+  //       label: "Yellow",
+  //       value: "#FFFF00",
+  //     },
+  //   },
+  //   {
+  //     link: "https://images.pexels.com/photos/5693891/pexels-photo-5693891.jpeg?auto=compress&cs=tinysrgb&w=600",
+  //     color: {
+  //       label: "Black",
+  //       value: "#000000",
+  //     },
+  //   },
+  //   {
+  //     link: "https://images.pexels.com/photos/5693891/pexels-photo-5693891.jpeg?auto=compress&cs=tinysrgb&w=600",
+  //     color: {
+  //       label: "White",
+  //       value: "#FFFFFF",
+  //     },
+  //   },
+  //   {
+  //     link: "https://images.pexels.com/photos/5693891/pexels-photo-5693891.jpeg?auto=compress&cs=tinysrgb&w=600",
+  //     color: {
+  //       label: "Purple",
+  //       value: "#800080",
+  //     },
+  //   },
+  //   {
+  //     link: "https://images.pexels.com/photos/5693891/pexels-photo-5693891.jpeg?auto=compress&cs=tinysrgb&w=600",
+  //     color: {
+  //       label: "Orange",
+  //       value: "#FFA500",
+  //     },
+  //   },
+  //   {
+  //     link: "https://images.pexels.com/photos/5693891/pexels-photo-5693891.jpeg?auto=compress&cs=tinysrgb&w=600",
+  //     color: {
+  //       label: "Pink",
+  //       value: "#FFC0CB",
+  //     },
+  //   },
+  //   {
+  //     link: "https://images.pexels.com/photos/5693891/pexels-photo-5693891.jpeg?auto=compress&cs=tinysrgb&w=600",
+  //     color: {
+  //       label: "Brown",
+  //       value: "#A52A2A",
+  //     },
+  //   },
+  // ];
 
   // end mock data
 
   // variables and functions
-  const [colorOptions, setColorOptions] = useState<any[]>(colorOptionsData);
-  const [selectedColorOption, setSelectedColorOption] = useState<any>();
-
-  const [sizeOptions, setSizeOptions] = useState<string[]>(sizeOptionsData);
-  const [selectedSizeOption, setSelectedSizeOption] = useState<string>();
+  const [colorOptions, setColorOptions] = useState<any[]>([]);
 
   // images for zoom lens
   type ImageInfoType = {
@@ -75,7 +157,7 @@ export default function AboutProduct(props: AboutProductProps) {
 
   // image col
   const imageCol = useMemo(() => {
-    if (!props.product) return 1;
+    if (!props.product || !props.product.images) return 1;
     return props.product.images.length > 5 ? 2 : 1;
   }, [props.product]);
 
@@ -104,6 +186,14 @@ export default function AboutProduct(props: AboutProductProps) {
         props.product.originalPrice) *
         100
     );
+  }, [props.product]);
+
+  useEffect(() => {
+    let colorData: any[] = [];
+    props.product.attribute.colors.forEach((image) => {
+      colorData.push(image.color);
+    });
+    setColorOptions(colorData);
   }, [props.product]);
 
   return (
@@ -136,12 +226,45 @@ export default function AboutProduct(props: AboutProductProps) {
                   <img
                     className="h-12 w-12 object-fill"
                     src={item}
-                    // alt={item}
+                    alt={"Ảnh sản phẩm"}
                   />
                 </div>
               </List.Item>
             )}
           />
+
+          {/* TODO: new images type */}
+          {/* <List
+            grid={{ gutter: 20, column: imageCol }}
+            dataSource={mockImages.filter(
+              (image) =>
+                !props.selectedColorOption ||
+                image.color.label === props.selectedColorOption.label
+            )}
+            locale={{
+              emptyText: <CustomEmpty />,
+            }}
+            renderItem={(item) => (
+              <List.Item>
+                <div
+                  className={`cursor-pointer ${
+                    props.mainImage == item.link
+                      ? "border-4 border-blue-400"
+                      : "border-2"
+                  }`}
+                  onClick={() => {
+                    props.setMainImage(item.link);
+                  }}
+                >
+                  <img
+                    className="h-12 w-12 object-fill"
+                    src={item.link}
+                    // alt={item}
+                  />
+                </div>
+              </List.Item>
+            )}
+          /> */}
         </div>
 
         <div className="bg-white h-fit z-50">
@@ -212,7 +335,7 @@ export default function AboutProduct(props: AboutProductProps) {
             <div className="text-xs">
               Thương hiệu / Shop:{" "}
               <Link href="" className="text-blue-500">
-                Ecovacs
+                {props.product.brand}
               </Link>
             </div>
           </div>
@@ -266,7 +389,7 @@ export default function AboutProduct(props: AboutProductProps) {
         </Flex>
 
         {/* attributes and status */}
-        <Flex vertical gap="small" className="row-start-2 mt-5">
+        <Flex vertical gap="small" className="row-start-2 my-2">
           {/* status block */}
           <Flex gap="4px 0">
             {props.product.status === ProductStatus.AVAILABLE && (
@@ -287,59 +410,87 @@ export default function AboutProduct(props: AboutProductProps) {
           </Flex>
 
           {/* attributes block */}
-          <div className="flex text-xs gap-1">
-            <div>Màu sắc: </div>
-            <div className="font-bold">{"Đen"}</div>
-          </div>
-
-          <Flex gap="4px">
-            {colorOptions.map((color, index) => (
-              <div
-                key={index}
-                className={`${
-                  selectedColorOption === color
-                    ? "border-2 border-white rounded-full brightness-75"
-                    : "border-2 border-white rounded-full"
-                }`}
-              >
-                <Button
-                  type="primary"
-                  size="middle"
-                  style={{ background: color.value, width: 50 }}
-                  className="rounded-full"
-                  onClick={() => setSelectedColorOption(color)}
-                />
+          {colorOptions && colorOptions.length > 0 && (
+            <div id="color block">
+              <div className="flex text-xs gap-1">
+                <div>Màu sắc: </div>
+                {props.selectedColorOption &&
+                  props.selectedColorOption.label && (
+                    <div className="font-bold">
+                      {props.selectedColorOption.label}
+                    </div>
+                  )}
               </div>
-            ))}
-          </Flex>
 
-          <div className="flex text-xs gap-1">
-            <div>Kích thước: </div>
-            <div className="font-bold">{selectedSizeOption}</div>
-          </div>
+              <Flex gap="4px">
+                {colorOptions.map((color, index) => (
+                  <div
+                    key={index}
+                    className={`${
+                      props.selectedColorOption === color
+                        ? "border-2 border-white rounded-full brightness-75"
+                        : "border-2 border-white rounded-full"
+                    }`}
+                  >
+                    <Button
+                      type="primary"
+                      size="middle"
+                      style={{ background: color.value, width: 50 }}
+                      className="rounded-full"
+                      onClick={() => {
+                        if (props.selectedColorOption === color)
+                          props.setSelectedColorOption(null);
+                        else {
+                          props.setSelectedColorOption(color);
+                        }
+                      }}
+                    />
+                  </div>
+                ))}
+              </Flex>
+            </div>
+          )}
 
-          <Flex gap="4px">
-            {sizeOptions.map((size, index) => (
-              <div
-                key={index}
-                className={`${
-                  selectedSizeOption === size
-                    ? "border-2 border-white rounded-full brightness-75"
-                    : "border-2 border-white rounded-full"
-                }`}
-              >
-                <Button
-                  type="primary"
-                  size="middle"
-                  style={{ background: "#86997c", width: 50 }}
-                  className="rounded-full"
-                  onClick={() => setSelectedSizeOption(size)}
-                >
-                  {size}
-                </Button>
+          {props.product.attribute.size &&
+            props.product.attribute.size.length > 0 && (
+              <div id="size block">
+                <div className="flex text-xs gap-1">
+                  <div>Kích thước: </div>
+                  <div className="font-bold">{props.selectedSizeOption}</div>
+                </div>
+
+                <Flex gap="4px">
+                  {props.product.attribute.size.map((size, index) => (
+                    <div
+                      key={index}
+                      className={`${
+                        props.selectedSizeOption === size
+                          ? "border-2 border-white rounded-full brightness-75"
+                          : "border-2 border-white rounded-full"
+                      }`}
+                    >
+                      <Button
+                        type="primary"
+                        size="middle"
+                        style={{ background: "#86997c", width: 50 }}
+                        className="rounded-full"
+                        onClick={() => {
+                          if (props.selectedSizeOption === size)
+                            props.setSelectedSizeOption("");
+                          else {
+                            props.setSelectedSizeOption(size);
+                          }
+                        }}
+                      >
+                        {size}
+                      </Button>
+                    </div>
+                  ))}
+                </Flex>
               </div>
-            ))}
-          </Flex>
+            )}
+
+          {/* end attributes block */}
         </Flex>
 
         {/* buttons block  */}

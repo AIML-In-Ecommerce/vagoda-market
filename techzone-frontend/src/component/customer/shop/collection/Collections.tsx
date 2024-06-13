@@ -7,16 +7,16 @@ import AllCollections from "./AllCollections";
 import CollectionDetail from "./CollectionDetail";
 import { BsHouseHeart } from "react-icons/bs";
 import { GET_GetCollectionListByShop } from "@/apis/collection/CollectionAPI";
+import { useParams } from "next/navigation";
 
 interface CollectionsProps {
   selectedId: string;
 }
 
 export default function Collections(props: CollectionsProps) {
-  // mock data
-  const mockId = "65f1e8bbc4e39014df775166";
-
   // var
+  const { shopId } = useParams();
+
   const [collections, setCollections] = useState<CollectionType[]>();
   const [option, setOption] = useState<string[]>(["0"]);
 
@@ -32,7 +32,7 @@ export default function Collections(props: CollectionsProps) {
   }, []);
 
   const handleGetCollectionList = async () => {
-    const response = await GET_GetCollectionListByShop(mockId);
+    const response = await GET_GetCollectionListByShop(shopId.toString());
 
     if (response.status === 200) {
       // console.log(response.data);

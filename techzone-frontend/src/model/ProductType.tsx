@@ -27,26 +27,33 @@ export type _ProductType = {
 export type ProductDetailType = {
   _id: string;
   name: string;
-  // attribute: {
-  //   ....
-  // }
   description: string;
   originalPrice: number;
   finalPrice: number;
-  category: string;
-  shopId: string;
+
+  category: string; // TODO
+  subCategory: string; // TODO
+  subCategoryType: any; // TODO
+  attribute: {
+    colors: {
+      link: string;
+      color: { label: string; value: string };
+    }[];
+    size: string[];
+    material: string;
+    warranty: string;
+  }; // TODO
+  isFlashSale: boolean;
+  inventoryAmount: number;
+  platformFee: number;
+  createAt: string; //??
+  createdAt: string; //??
+  brand: string;
+  profit: string;
+
+  shop: string;
   status: ProductStatus;
   images: string[];
-  // image: [
-  //   {
-  //     link: string,
-  //     color: {
-  //         label: string,
-  //         value: string
-  //     },
-  //     type: string,
-  //   },
-  // ],
   avgRating: number;
   soldQuantity: number;
 };
