@@ -363,7 +363,7 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
 
     setMessages(history_conservation);
     try {
-      const response = await axios.post(
+      const rawResponse = await axios.post(
         "http://localhost:8000/chat/agent",
         postBody,
         {
@@ -372,10 +372,13 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
           },
         },
       );
-      if (response.status == 200) {
+      if (rawResponse.status == 200) {
+        let response = JSON.parse(rawResponse.data.data);
+        console.log("AI Response: ", response);
+
         const assistantResponse: AssistantMessageProps = {
           role: AssistantMessageTypes.Assistant,
-          message: response.data.data,
+          message: response.message,
         };
         const newResponseMessages = [...history_conservation];
         newResponseMessages.push(assistantResponse);
