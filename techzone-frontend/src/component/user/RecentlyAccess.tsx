@@ -3,8 +3,9 @@
 import { Col, Flex, Row, Skeleton } from "antd"
 import CenterTitle from "./utils/CenterTitle"
 import { _ProductType, ProductDetailType } from "@/model/ProductType";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import ProductItem from "@/component/customer/ProductItem";
+import { AuthContext } from "@/context/AuthContext";
 
 
 interface RecentlyAccessProps
@@ -278,26 +279,29 @@ function RecentlyAccess({}: RecentlyAccessProps)
 
         //for testing
 
-        const data = MockData.map((value: ProductDetailType) =>
-        {
-            const mapItem: _ProductType =
-            {
-                _id: value._id,
-                name: value.name,
-                image: value.image[0].link,
-                avgRating: value.avgRating,
-                soldQuantity: value.soldQuantity,
-                finalPrice: value.finalPrice,
-                originalPrice: value.originalPrice,
-                isFlashSale: false,
-            }
+        // const data = MockData.map((value: ProductDetailType) =>
+        // {
+        //     const mapItem: _ProductType =
+        //     {
+        //         _id: value._id,
+        //         name: value.name,
+        //         image: value.image[0].link,
+        //         avgRating: value.avgRating,
+        //         soldQuantity: value.soldQuantity,
+        //         finalPrice: value.finalPrice,
+        //         originalPrice: value.originalPrice,
+        //         isFlashSale: false,
+        //     }
 
-            return mapItem
-        })
+        //     return mapItem
+        // })
 
-        setProducts(data)
+        // setProducts(data)
     },
     [])
+
+    const authContext = useContext(AuthContext)
+    
 
     useEffect(() =>
     {
@@ -314,35 +318,21 @@ function RecentlyAccess({}: RecentlyAccessProps)
             })
             setMainDisplay(loadingDisplay)
         }
-        let newDisplay = products.map((item) =>
+        else
         {
-            return(
-                <div className="" key={item._id}>
-                    <ProductItem 
-                    imageLink={item.image} name={item.name} rating={item.avgRating} soldAmount={item.soldQuantity} 
-                    price={item.finalPrice} isFlashSale={item.isFlashSale} originalPrice={item.originalPrice} inWishlist={false} />
-                </div>
-            )
-        })
-
-        // if(newDisplay.length < numberOfProductToDisplay)
-        // {
-        //     const paddings = new Array(numberOfProductToDisplay - newDisplay.length).fill(paddingItem)
-        //     .map((item: _ProductType, index: number) =>
-        //     {
-        //         return(
-        //             <div key={item._id + Math.random().toString() + "i" + index.toString()} className="invisible">
-        //                 <ProductItem 
-        //                     imageLink={item.image} name={item.name} rating={item.avgRating} soldAmount={item.soldQuantity} 
-        //                     price={item.finalPrice} isFlashSale={item.isFlashSale} originalPrice={item.originalPrice} inWishlist={false} />
-        //             </div>
-        //         )
-        //     })
-
-        //     newDisplay = newDisplay.concat(paddings)
-        // }
-
-        setMainDisplay(newDisplay)
+            let newDisplay = products.map((item) =>
+                {
+                    return(
+                        <div className="" key={item._id}>
+                            <ProductItem 
+                            imageLink={item.image} name={item.name} rating={item.avgRating} soldAmount={item.soldQuantity} 
+                            price={item.finalPrice} isFlashSale={item.isFlashSale} originalPrice={item.originalPrice} inWishlist={false} />
+                        </div>
+                    )
+                })
+        
+            setMainDisplay(newDisplay)
+        }
     },
     [products])
 

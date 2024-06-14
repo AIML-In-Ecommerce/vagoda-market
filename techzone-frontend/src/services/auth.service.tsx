@@ -9,6 +9,7 @@ export interface SignInResponseData
 {
     buyerInfo: SimpleUserInfoType,
     accessToken: string,
+    accessTokenExpiredDate: string | Date,
     refreshToken: string,
     refreshTokenExpiredDate: string | Date
 }
@@ -22,6 +23,7 @@ export interface RegisterResponseData
 export interface RefreshTokenReponseData
 {
     accessToken: string,
+    accessTokenExpiredDate: string | Date,
     refreshToken: string,
     refreshTokenExpiredDate: string | Date
 }
