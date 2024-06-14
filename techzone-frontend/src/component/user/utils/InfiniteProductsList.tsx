@@ -6,11 +6,6 @@ import { Button, Flex, Skeleton } from "antd";
 import Link from "next/link";
 import React, { useEffect, useRef, useState } from "react";
 
-interface SetupProps {
-  // fetchDataFuntion: (page: number) => Promise<any>
-  setup: InfiniteScrollProductsProps;
-}
-
 export interface InfiniteScrollProductsProps {
   productsPerRow: number;
   overFlowMaxHeight: string;
