@@ -4,8 +4,9 @@ import { usePathname, useRouter } from "next/navigation";
 import { createContext, ReactNode, useEffect, useMemo, useState } from "react";
 import Cookies from "js-cookie";
 import { SimpleUserInfoType, UserInfoType } from "@/model/UserInfoType";
-import AuthService, { RefreshTokenReponseData } from "@/service/auth.service";
+import AuthService, { RefreshTokenReponseData, SignInResponseData } from "@/services/auth.service";
 import { stringifyError } from "next/dist/shared/lib/utils";
+import UserService from "@/services/user.service";
 
 
 interface AuthContextProviderInitProps
@@ -29,10 +30,10 @@ interface AuthContextProps
 interface AuthContextFunctions
 {
     // validateAuthRequest: (sessionInfoID: string) => boolean,
-    login: (stringifiedInfo: string, accessToken: string, 
-        refreshToken: string, refreshTokenExpiredDate: string | Date) => boolean,
-    // login: () => boolean,
+    login: (authInfo: SignInResponseData) => boolean,
+    forceSignIn: () => void,
     logout: () => void,
+    refreshToken: () => Promise<boolean | null>,
     getAccessToken: () => string | null
 }
 
@@ -46,8 +47,8 @@ export const AuthContext = createContext<AuthContextProps>(defaultContextValue)
 
 export default function AuthContextProvider({children}: AuthContextProviderInitProps)
 {
-    const accessTokenCookieKey = "#access_token@"
-    const refreshTokenCookieKey = "#refresh_token@"
+    const accessTokenCookieKey = "#client_access_token_@"
+    const refreshTokenCookieKey = "#client_refresh_token@"
 
     const [userInfo, setUserInfo] = useState<SimpleUserInfoType | null>(null)
 
@@ -73,32 +74,15 @@ export default function AuthContextProvider({children}: AuthContextProviderInitP
         return 1
     }
 
-    // function validateAuthRequest(receivedSessionInfoID: string)
-    // {
-    //     const stringifiedObject = sessionStorage.getItem(receivedSessionInfoID)
-    //     if(stringifiedObject == null)
-    //     {
-    //         return false
-    //     }
-
-    //     const parsedObject: SimpleUserInfoType = JSON.parse(stringifiedObject)
-        
-    //     localStorage.setItem(authLocalStorageID, receivedSessionInfoID)
-    //     setUserInfo(parsedObject)
-    //     setSessionInfoID(receivedSessionInfoID)
-
-    //     return true
-    // }
-
-    function login(stringifiedInfo: string, accessToken: string, 
-        refreshToken: string, refreshTokenExpiredDate: string | Date)
+    function login(authInfo: SignInResponseData)
     // function login()
     {
         try
         {
-            localStorage.setItem(authLocalStorageID, stringifiedInfo)
-            Cookies.set(accessTokenCookieKey, accessToken)
-            Cookies.set(refreshTokenCookieKey, refreshToken, {expires: new Date(refreshTokenExpiredDate)})
+            const stringifiedBuyerInfo = JSON.stringify(authInfo.buyerInfo)
+            localStorage.setItem(authLocalStorageID, stringifiedBuyerInfo)
+            Cookies.set(accessTokenCookieKey, authInfo.accessToken, {expires: new Date(authInfo.accessTokenExpiredDate)})
+            Cookies.set(refreshTokenCookieKey, authInfo.refreshToken, {expires: new Date(authInfo.refreshTokenExpiredDate)})
             return true
         }
         catch(error)
@@ -128,11 +112,10 @@ export default function AuthContextProvider({children}: AuthContextProviderInitP
         {
             return false
         }
-
         const data = response.data as RefreshTokenReponseData
 
-        Cookies.set(accessTokenCookieKey, data.accessToken)
-        Cookies.set(refreshTokenCookieKey, data.refreshToken, {expires: data.refreshTokenExpiredDate})
+        Cookies.set(accessTokenCookieKey, data.accessToken, {expires: new Date(data.accessTokenExpiredDate)})
+        Cookies.set(refreshTokenCookieKey, data.refreshToken, {expires: new Date(data.refreshTokenExpiredDate)})
 
         return true
     }
@@ -152,12 +135,19 @@ export default function AuthContextProvider({children}: AuthContextProviderInitP
                     return
                 }
 
-                
+                const newUserInfo = await UserService.getUserInfo(getAccessToken(), false)
+                if(newUserInfo == null)
+                {
+                    return false
+                }
+
+                localStorage.setItem(authLocalStorageID, JSON.stringify(newUserInfo))
+                setUserInfo(() => newUserInfo)
             }
         }
         catch(error)
         {
-
+            return false
         }
 
     }
@@ -170,11 +160,19 @@ export default function AuthContextProvider({children}: AuthContextProviderInitP
         Cookies.remove(refreshTokenCookieKey)
     }
 
+    function forceSignIn()
+    {
+        logout()
+        router.replace("/auth/account")
+    }
+
     const supportMethodValue: AuthContextFunctions =
     {
         // validateAuthRequest: validateAuthRequest,
         login: login,
         logout: logout,
+        forceSignIn: forceSignIn,
+        refreshToken: refreshToken,
         getAccessToken: getAccessToken,
     }
 
@@ -189,7 +187,7 @@ export default function AuthContextProvider({children}: AuthContextProviderInitP
         async function checkAuthentication()
         {
             
-        if(matcher.includes(currentPathname) == true)
+            if(matcher.includes(currentPathname) == true)
             {
                 const authCase = await validateClientAuth()
                 switch(authCase)
@@ -208,6 +206,7 @@ export default function AuthContextProvider({children}: AuthContextProviderInitP
                             logout()
                             router.replace("/auth")
                         }
+                        await reloadUserInfo()
                         break;
                     }
                     case -1: // no refresh token -> re-authenticate (login again)
@@ -218,6 +217,7 @@ export default function AuthContextProvider({children}: AuthContextProviderInitP
                     }
                 }
             }
+
         }
 
         checkAuthentication()

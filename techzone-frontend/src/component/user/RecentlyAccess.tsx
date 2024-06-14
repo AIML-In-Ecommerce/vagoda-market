@@ -9,6 +9,7 @@ import {
 } from "@/model/ProductType";
 import { useEffect, useState } from "react";
 import ProductItem from "@/component/customer/ProductItem";
+import { AuthContext } from "@/context/AuthContext";
 import Link from "next/link";
 import { POST_GetProductListByShop } from "@/apis/product/ProductDetailAPI";
 
