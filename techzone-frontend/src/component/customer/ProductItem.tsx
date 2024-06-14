@@ -56,7 +56,7 @@ export default function ProductItem(props: ProductItemProps) {
 
   const soldAmount = formatAmountSold(props.soldAmount);
   const discountPercentage = Math.round(
-    ((props.originalPrice - props.price) / props.originalPrice) * 100
+    ((props.originalPrice - props.price) / props.originalPrice) * 100,
   );
 
   const price = props.price.toLocaleString("vi-VN", {
