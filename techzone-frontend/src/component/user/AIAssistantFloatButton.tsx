@@ -23,6 +23,7 @@ import {
 } from "react-icons/io5";
 import { LuSendHorizonal, LuShrink } from "react-icons/lu";
 import { FiShoppingCart } from "react-icons/fi";
+import { FiMic } from "react-icons/fi";
 
 import InfiniteProductsList, {
   InfiniteScrollProductsProps,
@@ -82,7 +83,7 @@ const InfinitePromotionListSetup: InfinitePromotionListProps = {
 const testCaseNumber = 3;
 
 const fakeResponse = {
-  type: "product_getter",
+  type: "cart_adding",
   data: [
     {
       _id: "666acc8ed40492953e97649d",
@@ -200,6 +201,10 @@ interface ExtendedProductMessageBoxProps {
   handleExpandButtonOnClick: () => void;
 }
 
+interface ExtendedCartMessageBoxProps {
+  handleExpandButtonOnClick: () => void;
+}
+
 const ExtendedProductMessageBox: React.FC<ExtendedProductMessageBoxProps> = ({
   images,
   handleExpandButtonOnClick,
@@ -236,10 +241,6 @@ const ExtendedProductMessageBox: React.FC<ExtendedProductMessageBoxProps> = ({
     </div>
   );
 };
-
-interface ExtendedCartMessageBoxProps {
-  handleExpandButtonOnClick: () => void;
-}
 
 const ExtendedCartMessageBox: React.FC<ExtendedCartMessageBoxProps> = ({
   handleExpandButtonOnClick,
@@ -686,29 +687,43 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
 
   const SendButtonStyle =
     userInput != undefined && userInput.length > 0
-      ? "bg-blue-600 text-white hover:bg-blue-600"
-      : "disabled";
+      ? "bg-blue-600 rounded-xl text-white hover:bg-blue-600"
+      : "disabled rounded-xl";
   const isSendButtonDisabled =
     userInput != undefined && userInput.length > 0 ? false : true;
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey && !isSendButtonDisabled) {
+      e.preventDefault();
+      handleSendButtonOnClick();
+    }
+  };
+
   const CardActions = (
     <>
       <div className="w-full">
         <div className="relative h-10 w-full"></div>
         <Flex
           className="w-full absolute bottom-0 left-0 px-5"
-          justify="end"
-          align="center"
+          justify="center"
+          align="end"
           gap={4}
         >
-          <TextArea
-            className="w-full max-h-96 overflow-y-auto"
-            autoSize={true}
-            value={userInput}
-            placeholder="Nhập nội dung cần hỗ trợ"
-            onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
-              setUserInput(e.target.value)
-            }
-          />
+          <div className="w-full flex flex-row justify-center items-center border rounded-xl ">
+            <TextArea
+              className="w-full max-h-96 overflow-y-auto border-none rounded-xl"
+              autoSize={true}
+              value={userInput}
+              placeholder="Nhập nội dung cần hỗ trợ"
+              onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
+                setUserInput(e.target.value)
+              }
+              onKeyPress={handleKeyPress}
+            />
+            <div className="p-2 rounded-xl hover:bg-slate-200 cursor-pointer">
+              <FiMic />
+            </div>
+          </div>
           {/* <Input className="w-full" multiple={true} value={userInput} onChange={(e: ChangeEvent<HTMLInputElement>) => setUserInput(e.target.value)}/> */}
           <Button
             disabled={isSendButtonDisabled}
@@ -762,7 +777,6 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
 
   return (
     <>
-      {/* <div className="relative w-1/4 bg-blue-500"></div> */}
       <Popover
         open={open}
         trigger={"click"}
@@ -823,10 +837,7 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
             </Flex>
             {CardActions}
           </Card>
-          <div className="w-3/5">
-            {/* <InfiniteProductsList setup={InfinityProductsListSetup} /> */}
-            {extraSupportDisplay}
-          </div>
+          <div className="w-3/5">{extraSupportDisplay}</div>
         </Flex>
       </Modal>
       {/* <FloatButton className="w-full h-full" shape="square" icon={<BiSupport />} type="primary"/> */}
