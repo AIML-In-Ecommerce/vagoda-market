@@ -436,7 +436,7 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
       <Flex
         vertical
         key={Date.now().toString() + index.toString()}
-        className="w-full"
+        className="w-full my-2"
       >
         <Flex className="w-full" justify="start" align="center" gap={8}>
           <Flex className="h-full" justify="center" align="start">
@@ -460,7 +460,7 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
                   <Typography.Text className="text-amber-900 text-sm font-semibold mb-1">
                     Trợ lý AI
                   </Typography.Text>
-                  <ReactMarkdown className="text-wrap text-sm text-black">
+                  <ReactMarkdown className="text-wrap text-sm text-black pb-2">
                     {message.message}
                   </ReactMarkdown>
                 </Flex>
@@ -481,15 +481,15 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
   ) {
     return (
       <Flex
-        className="w-full"
+        className="w-full my-2"
         key={Date.now().toString() + index.toString()}
         justify="end"
         align="center"
       >
-        <Flex className="w-7/12" justify="end" align="center">
+        <Flex className="w-7/12 " justify="end" align="center">
           {/* <Tag color={"#92400e"}> */}
           <Tag color={"#797979"}>
-            <Typography.Paragraph className="text-wrap text-sm text-white">
+            <Typography.Paragraph className="text-wrap text-sm text-white mt-1">
               {message.message}
             </Typography.Paragraph>
           </Tag>
@@ -577,6 +577,8 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
     //     const assistantResponse: AssistantMessageProps = {
     //       role: AssistantMessageTypes.Assistant,
     //       message: response.message,
+    //       type: response.type,
+    //       data: response.data,
     //     };
 
     //     const newResponseMessages = [...history_conservation];
@@ -589,28 +591,11 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
     //         stringifiedMessages,
     //       );
     //     }
+    //     setExtraSupportDisplay(setExtendedDisplay(response));
     //   }
     // } catch (error) {
     //   console.error("Error in conservation:", error);
     // }
-    //     let response = JSON.parse(rawResponse.data.data);
-    //     console.log("AI Response: ", response);
-
-    //     const assistantResponse: AssistantMessageProps = {
-    //       role: AssistantMessageTypes.Assistant,
-    //       message: response.message,
-    //     };
-
-    //     const newResponseMessages = [...history_conservation];
-    //     newResponseMessages.push(assistantResponse);
-    //     setMessages(newResponseMessages);
-    //     if (localStorage) {
-    //       const stringifiedMessages = JSON.stringify(history_conservation);
-    //       localStorage.setItem(
-    //         AIAssistantLocalStorageKeyword,
-    //         stringifiedMessages,
-    //       );
-    //     }
 
     const assistantResponse: AssistantMessageProps = {
       role: AssistantMessageTypes.Assistant,
@@ -798,7 +783,7 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
               >
                 <BiSupport className="w-full h-full text-sm text-white" />
                 <Typography.Text className="text-xs text-white font-medium">
-                  Trợ lý AI
+                  Trợ lý
                 </Typography.Text>
               </Flex>
             </button>
