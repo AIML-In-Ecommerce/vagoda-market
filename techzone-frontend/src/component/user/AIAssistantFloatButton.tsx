@@ -22,6 +22,7 @@ import {
   IoTrashBinOutline,
 } from "react-icons/io5";
 import { LuSendHorizonal, LuShrink } from "react-icons/lu";
+import { FiShoppingCart } from "react-icons/fi";
 
 import InfiniteProductsList, {
   InfiniteScrollProductsProps,
@@ -44,6 +45,7 @@ enum AssistantMessageTypes {
 type ToolType =
   | "product_getter"
   | "promotion_getter"
+  | "cart_adding"
   | "chart_drawing"
   | "text";
 
@@ -193,12 +195,12 @@ const fakeResponse = {
     "Dưới đây là một số gợi ý sản phẩm áo cho bạn: \n1. Áo khoác nữ - Áo Khoác Dù Mùa Hè Năng Động với giá 123.000đ. \n2. Áo sơ mi nam ngắn tay cổ vest form đẹp LADOS 8085 vải đũi thấm hút, sang trọng dễ phối đồ với giá 159.000đ. \n3. Áo thun - Áo thun mùa hè năng động với giá 100.000đ. \nHy vọng bạn sẽ thích những gợi ý này!",
 };
 
-interface ImageListProps {
+interface ExtendedProductMessageBoxProps {
   images: string[];
   handleExpandButtonOnClick: () => void;
 }
 
-const ExtendedMessageBox: React.FC<ImageListProps> = ({
+const ExtendedProductMessageBox: React.FC<ExtendedProductMessageBoxProps> = ({
   images,
   handleExpandButtonOnClick,
 }) => {
@@ -235,6 +237,26 @@ const ExtendedMessageBox: React.FC<ImageListProps> = ({
   );
 };
 
+interface ExtendedCartMessageBoxProps {
+  handleExpandButtonOnClick: () => void;
+}
+
+const ExtendedCartMessageBox: React.FC<ExtendedCartMessageBoxProps> = ({
+  handleExpandButtonOnClick,
+}) => {
+  return (
+    <div
+      className="flex p-2 border border-slate-200 rounded space-x-2 w-fit hover:bg-[#f5f5f4] cursor-pointer"
+      onClick={handleExpandButtonOnClick}
+    >
+      <div className="flex flex-row gap-2 justify-center items-center text-xs font-semibold">
+        <FiShoppingCart />
+        <span>Xem giỏ hàng</span>
+      </div>
+    </div>
+  );
+};
+
 export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) {
   const [open, setOpen] = useState<boolean>(false);
   const [messages, setMessages] = useState<AssistantMessageProps[]>([
@@ -244,7 +266,6 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
   const [bigModalOpen, setBigModalOpen] = useState<boolean>(false);
   const [userInput, setUserInput] = useState<string | undefined>(undefined);
   const [extendedMessage, setExtendedMessage] = useState<ToolType>();
-  const extendedData = useRef<any>();
 
   const ref = useRef(null);
   useEffect(() => {
@@ -336,20 +357,25 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
     scrollToBottom();
   }, [open, bigModalOpen]);
 
-  //the function used for testing
   function setExtendedDisplay(response: any) {
-    if (response.type == "product_getter") {
-      setExtendedMessage("product_getter");
-      return (
-        <InfiniteProductsList
-          setupProps={InfiniteProductsListSetup}
-          additionalData={response.data}
-        />
-      );
-    } else if (response.type == "promotion_getter") {
-      return <InfinitePromotionList setup={InfinitePromotionListSetup} />;
+    switch (response.type) {
+      case "product_getter":
+        setExtendedMessage("product_getter");
+        return (
+          <InfiniteProductsList
+            setupProps={InfiniteProductsListSetup}
+            additionalData={response.data}
+          />
+        );
+      case "promotion_getter":
+        setExtendedMessage("promotion_getter");
+        return <InfinitePromotionList setup={InfinitePromotionListSetup} />;
+      case "cart_adding":
+        setExtendedMessage("cart_adding");
+        return <></>;
+      default:
+        return greetingReactNode;
     }
-    return greetingReactNode;
   }
 
   function handleOpenAssistant() {
@@ -379,12 +405,20 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
 
   ////////////////////////////////////////////////////////////////////////
 
-  function renderExtendedMessageBox() {
-    switch (extendedMessage) {
+  function renderExtendedMessageBox(message: AssistantMessageProps) {
+    switch (message.type) {
       case "product_getter":
+        let extendedData = fakeResponse.data.map((item) => item.images[0]);
         return (
-          <ExtendedMessageBox
-            images={extendedData.current}
+          <ExtendedProductMessageBox
+            images={extendedData}
+            handleExpandButtonOnClick={handleExpandButtonOnClick}
+          />
+        );
+      case "cart_adding":
+        console.log("jj");
+        return (
+          <ExtendedCartMessageBox
             handleExpandButtonOnClick={handleExpandButtonOnClick}
           />
         );
@@ -423,7 +457,7 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
                   align="start"
                 >
                   <Typography.Text className="text-amber-900 text-sm font-semibold mb-1">
-                    Trợ lý
+                    Trợ lý AI
                   </Typography.Text>
                   <ReactMarkdown className="text-wrap text-sm text-black">
                     {message.message}
@@ -433,7 +467,7 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
             </Flex>
             {message.type != "text" &&
               message.data != "" &&
-              renderExtendedMessageBox()}
+              renderExtendedMessageBox(message)}
           </Flex>
         </Flex>
       </Flex>
@@ -591,8 +625,6 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
       const stringifiedMessages = JSON.stringify(history_conservation);
       localStorage.setItem(AIAssistantLocalStorageKeyword, stringifiedMessages);
     }
-
-    extendedData.current = fakeResponse.data.map((item) => item.images[0]);
     setExtraSupportDisplay(setExtendedDisplay(fakeResponse));
   };
 
@@ -699,7 +731,7 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
         width={30}
         height={30}
       />
-      <Typography.Text className="text-lg">Trợ lý TechZone</Typography.Text>
+      <Typography.Text className="text-lg">Trợ lý AI</Typography.Text>
     </Flex>
   );
 
@@ -752,7 +784,7 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
               >
                 <BiSupport className="w-full h-full text-sm text-white" />
                 <Typography.Text className="text-xs text-white font-medium">
-                  Trợ lý
+                  Trợ lý AI
                 </Typography.Text>
               </Flex>
             </button>
