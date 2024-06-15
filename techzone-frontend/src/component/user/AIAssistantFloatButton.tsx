@@ -32,6 +32,7 @@ import InfinitePromotionList, {
 import { BsChatDots } from "react-icons/bs";
 
 import "@/custom_css/AntdFullscreenModal.css";
+import { FaSkating } from "react-icons/fa";
 
 interface AIAssistantFloatButtonProps {}
 
@@ -39,15 +40,26 @@ enum AssistantMessageTypes {
   User = "User",
   Assistant = "Assistant",
 }
+
+type ToolType =
+  | "product_getter"
+  | "promotion_getter"
+  | "chart_drawing"
+  | "text";
+
 interface AssistantMessageProps {
   role: AssistantMessageTypes;
   message: string;
+  type: string;
+  data: any;
 }
 
 const GreetingMessage: AssistantMessageProps = {
   role: AssistantMessageTypes.Assistant,
   message:
     "Xin chào! Mình là trợ lý AI của TechZone.\nMình sẵn sàng giúp đỡ bạn những câu hỏi về tư vấn, tìm kiếm sản phẩm.\n Hôm nay bạn cần mình hỗ trợ gì hông? ^^",
+  type: "text",
+  data: "",
 };
 
 const AIAssistantLocalStorageKeyword = "ai_assistant";
@@ -64,8 +76,6 @@ const InfiniteProductsListSetup: InfiniteScrollProductsProps = {
 const InfinitePromotionListSetup: InfinitePromotionListProps = {
   overflowMaxHeight: "100dvh",
 };
-
-type ToolType = "product_getter" | "promotion_getter" | "chart_drawing";
 
 const testCaseNumber = 3;
 
@@ -386,10 +396,7 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
   function getAIAssistantMessageDisplay(
     message: AssistantMessageProps,
     index: number,
-    length: number,
   ) {
-    console.log("Index: ", index);
-    console.log("Length: ", length);
     return (
       <Flex
         vertical
@@ -424,7 +431,9 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
                 </Flex>
               </Tag>
             </Flex>
-            {index == length - 1 && index != 0 && renderExtendedMessageBox()}
+            {message.type != "text" &&
+              message.data != "" &&
+              renderExtendedMessageBox()}
           </Flex>
         </Flex>
       </Flex>
@@ -454,13 +463,9 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
     );
   }
 
-  function getMessageDisplay(
-    message: AssistantMessageProps,
-    index: number,
-    length: number,
-  ) {
+  function getMessageDisplay(message: AssistantMessageProps, index: number) {
     if (message.role == AssistantMessageTypes.Assistant) {
-      return getAIAssistantMessageDisplay(message, index, length);
+      return getAIAssistantMessageDisplay(message, index);
     } else if (message.role == AssistantMessageTypes.User) {
       return getUserMessageDisplay(message, index);
     } else {
@@ -503,6 +508,8 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
     const message: AssistantMessageProps = {
       role: AssistantMessageTypes.User,
       message: userInput as string,
+      type: "text",
+      data: [],
     };
 
     const history_conservation = [...messages];
@@ -573,6 +580,8 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
     const assistantResponse: AssistantMessageProps = {
       role: AssistantMessageTypes.Assistant,
       message: fakeResponse.message,
+      type: fakeResponse.type,
+      data: fakeResponse.data,
     };
 
     const newResponseMessages = [...history_conservation];
@@ -710,7 +719,7 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
         ref={messageEndRef}
       >
         {messages.map((message: AssistantMessageProps, index: number) => {
-          return getMessageDisplay(message, index, messages.length);
+          return getMessageDisplay(message, index);
         })}
       </Flex>
       {CardActions}
@@ -777,7 +786,7 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
               ref={extendMessagesEndRef}
             >
               {messages.map((message: AssistantMessageProps, index: number) => {
-                return getMessageDisplay(message, index, messages.length);
+                return getMessageDisplay(message, index);
               })}
             </Flex>
             {CardActions}
