@@ -1,5 +1,7 @@
 import { ProductDetailType } from "@/model/ProductType";
 import { Popover, Flex, Rate, Progress, Collapse } from "antd";
+import Link from "next/link";
+import SimplePieChart from "./SimplePieChart";
 
 interface ReviewSummaryProps {
   product: ProductDetailType | undefined;
@@ -106,19 +108,26 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
 
                     <div
                       id="ai-review-summary"
-                      className="mb-5 md:pl-5 lg:pl-0"
+                      className="mb-5 md:pl-5 lg:pl-0 grid grid-cols-3"
                     >
-                      <div className="font-semibold text-xs md:text-sm">
-                        Tổng quan đánh giá khách hàng
+                      <div className="col-span-1">
+                        <SimplePieChart />
                       </div>
 
-                      <div
-                        className="pt-2 text-xs md:text-sm 
+                      <div className="col-span-2 pl-5">
+                        <div className="font-semibold text-xs md:text-sm">
+                          🤖 <Link href="#">Trợ lý AI </Link>
+                          tổng hợp từ các đánh giá mới nhất
+                        </div>
+
+                        <div
+                          className="pt-2 text-xs md:text-sm 
                       "
-                      >
-                        {/* max-h-[350px] text-ellipsis overflow-clip */}
-                        Tổng thể, sản phẩm là một sự lựa chọn tốt cho người tiêu
-                        dùng muốn đầu tư một cách thông minh và hiệu quả.
+                        >
+                          {/* max-h-[350px] text-ellipsis overflow-clip */}
+                          Tổng thể, sản phẩm là một sự lựa chọn tốt cho người
+                          tiêu dùng muốn đầu tư một cách thông minh và hiệu quả.
+                        </div>
                       </div>
                     </div>
                   </div>

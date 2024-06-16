@@ -1,10 +1,11 @@
 "use client";
 
-import { Divider, Flex, Pagination, Skeleton, Typography } from "antd";
+import { Flex, List, Skeleton } from "antd";
 import { useEffect, useState } from "react";
 import ProductItem from "../customer/ProductItem";
 import CenterTitle from "./utils/CenterTitle";
 import Link from "next/link";
+import CustomEmpty from "../customer/shop/mini/CustomEmpty";
 
 interface SpecifiedProductsCarouselProp {}
 
@@ -20,15 +21,15 @@ interface ProductItemProps {
   inWishlist: boolean;
 }
 
-enum WrapperType {
-  paddingBlock,
-  infoBlock,
-}
+// enum WrapperType {
+//   paddingBlock,
+//   infoBlock,
+// }
 
-interface ProductItemPropsWrapper {
-  type: WrapperType;
-  productInfo: ProductItemProps;
-}
+// interface ProductItemPropsWrapper {
+//   type: WrapperType;
+//   productInfo: ProductItemProps;
+// }
 
 const MockData = [
   {
@@ -177,17 +178,17 @@ const MockData = [
   },
 ];
 
-const paddingBlockProps: ProductItemProps = {
-  _id: "",
-  imageLink: "",
-  name: "padding",
-  rating: 0.0,
-  soldAmount: 0,
-  price: 0,
-  isFlashSale: false,
-  originalPrice: 0,
-  inWishlist: false,
-};
+// const paddingBlockProps: ProductItemProps = {
+//   _id: "",
+//   imageLink: "",
+//   name: "padding",
+//   rating: 0.0,
+//   soldAmount: 0,
+//   price: 0,
+//   isFlashSale: false,
+//   originalPrice: 0,
+//   inWishlist: false,
+// };
 
 export default function HotSalesProducts({}: SpecifiedProductsCarouselProp) {
   const titleValue = "Sản phẩm bán chạy";
@@ -195,14 +196,6 @@ export default function HotSalesProducts({}: SpecifiedProductsCarouselProp) {
   const titleBackground = "bg-[#F2F2F2]";
 
   const [products, setProducts] = useState<ProductItemProps[]>([]);
-  const [mainDisplay, setMainDisplay] = useState<JSX.Element>(
-    <Skeleton active />
-  );
-  const [currentPagination, setCurrentPagination] = useState<number>(1);
-  const [totalPage, setTotalPage] = useState<number>(4);
-
-  const productsPerSlide = 10;
-  const productsPerRow = 5;
 
   useEffect(() => {
     //fetch data here
@@ -227,131 +220,144 @@ export default function HotSalesProducts({}: SpecifiedProductsCarouselProp) {
     setProducts(data);
   }, []);
 
-  useEffect(() => {
-    const newDisplay = getSlideOfProductsDisplay(currentPagination - 1);
-    setMainDisplay(newDisplay);
+  // start comment ----------------------------------------------------------------
 
-    const newTotalPage = Math.round(products.length / productsPerSlide);
-    const remainder = products.length % productsPerSlide;
+  // const [mainDisplay, setMainDisplay] = useState<JSX.Element>(
+  //   <Skeleton active />
+  // );
+  // const [currentPagination, setCurrentPagination] = useState<number>(1);
+  // const [totalPage, setTotalPage] = useState<number>(4);
 
-    if (remainder != 0) {
-      setTotalPage(newTotalPage + 1);
-    } else {
-      setTotalPage(newTotalPage);
-    }
-  }, [products]);
+  // const productsPerSlide = 12;
+  // const productsPerRow = 6;
 
-  function getSlideOfProductsDisplay(index: number) {
-    if (products.length < 1) {
-      return <Skeleton active />;
-    }
+  // useEffect(() => {
+  //   const newDisplay = getSlideOfProductsDisplay(currentPagination - 1);
+  //   setMainDisplay(newDisplay);
 
-    let result: JSX.Element = <></>;
+  //   const newTotalPage = Math.round(products.length / productsPerSlide);
+  //   const remainder = products.length % productsPerSlide;
 
-    const startIndex = index * productsPerSlide;
-    const endIndex =
-      startIndex + productsPerSlide > products.length
-        ? products.length
-        : startIndex + productsPerSlide;
-    let data = products
-      .slice(startIndex, endIndex)
-      .map((value: ProductItemProps) => {
-        const item: ProductItemPropsWrapper = {
-          productInfo: value,
-          type: WrapperType.infoBlock,
-        };
+  //   if (remainder != 0) {
+  //     setTotalPage(newTotalPage + 1);
+  //   } else {
+  //     setTotalPage(newTotalPage);
+  //   }
+  // }, [products]);
 
-        return item;
-      });
+  // function getSlideOfProductsDisplay(index: number) {
+  //   if (products.length < 1) {
+  //     return <Skeleton active />;
+  //   }
 
-    //insert padding blocks
-    if (data.length < productsPerSlide) {
-      const paddingBlocks = new Array(productsPerSlide - data.length)
-        .fill(paddingBlockProps)
-        .map((value) => {
-          const item: ProductItemPropsWrapper = {
-            productInfo: value,
-            type: WrapperType.paddingBlock,
-          };
-          return item;
-        });
-      data = data.concat(paddingBlocks);
-    }
+  //   let result: JSX.Element = <></>;
 
-    const numOfRows = productsPerSlide / productsPerRow;
+  //   const startIndex = index * productsPerSlide;
+  //   const endIndex =
+  //     startIndex + productsPerSlide > products.length
+  //       ? products.length
+  //       : startIndex + productsPerSlide;
+  //   let data = products
+  //     .slice(startIndex, endIndex)
+  //     .map((value: ProductItemProps) => {
+  //       const item: ProductItemPropsWrapper = {
+  //         productInfo: value,
+  //         type: WrapperType.infoBlock,
+  //       };
 
-    const wrapper: JSX.Element[] = [];
-    for (let i = 0; i < numOfRows; i++) {
-      const left = i * productsPerRow;
-      const right =
-        left + productsPerRow > data.length
-          ? data.length
-          : left + productsPerRow;
+  //       return item;
+  //     });
 
-      const slicedData = data.slice(left, right);
+  //   //insert padding blocks
+  //   if (data.length < productsPerSlide) {
+  //     const paddingBlocks = new Array(productsPerSlide - data.length)
+  //       .fill(paddingBlockProps)
+  //       .map((value) => {
+  //         const item: ProductItemPropsWrapper = {
+  //           productInfo: value,
+  //           type: WrapperType.paddingBlock,
+  //         };
+  //         return item;
+  //       });
+  //     data = data.concat(paddingBlocks);
+  //   }
 
-      const rowDisplay = slicedData.map(
-        (valueWrapper: ProductItemPropsWrapper) => {
-          let isVisible: string = "text-black";
-          if (valueWrapper.type == WrapperType.paddingBlock) {
-            isVisible = "text-black invisible";
-          }
-          const value = valueWrapper.productInfo;
-          return (
-            <Link href={`/product/${value._id}`}>
-              <div className={isVisible} key={value._id}>
-                <ProductItem
-                  imageLink={value.imageLink}
-                  name={value.name}
-                  rating={value.rating}
-                  soldAmount={value.soldAmount}
-                  price={value.price}
-                  isFlashSale={value.isFlashSale}
-                  originalPrice={value.originalPrice}
-                />
-              </div>
-            </Link>
-          );
-        }
-      );
+  //   const numOfRows = productsPerSlide / productsPerRow;
 
-      wrapper.push(
-        <Flex
-          key={i.toString()}
-          className="w-full"
-          justify="space-evenly"
-          align="center"
-          gap={6}
-        >
-          {rowDisplay}
-        </Flex>
-      );
-    }
+  //   const wrapper: JSX.Element[] = [];
+  //   for (let i = 0; i < numOfRows; i++) {
+  //     const left = i * productsPerRow;
+  //     const right =
+  //       left + productsPerRow > data.length
+  //         ? data.length
+  //         : left + productsPerRow;
 
-    // result = <Flex className="w-11/12" vertical={true} justify="center" align="center">
-    //     {wrapper}
-    // </Flex>
+  //     const slicedData = data.slice(left, right);
 
-    result = (
-      <Flex
-        vertical
-        className="w-full"
-        justify="center"
-        align="center"
-        gap={16}
-      >
-        {wrapper}
-      </Flex>
-    );
+  //     const rowDisplay = slicedData.map(
+  //       (valueWrapper: ProductItemPropsWrapper) => {
+  //         let isVisible: string = "text-black";
+  //         if (valueWrapper.type == WrapperType.paddingBlock) {
+  //           isVisible = "text-black invisible";
+  //         }
+  //         const value = valueWrapper.productInfo;
+  //         return (
+  //           <Link href={`/product/${value._id}`}>
+  //             <div className={isVisible} key={value._id}>
+  //               <ProductItem
+  //                 imageLink={value.imageLink}
+  //                 name={value.name}
+  //                 rating={value.rating}
+  //                 soldAmount={value.soldAmount}
+  //                 price={value.price}
+  //                 isFlashSale={value.isFlashSale}
+  //                 originalPrice={value.originalPrice}
+  //               />
+  //             </div>
+  //           </Link>
+  //         );
+  //       }
+  //     );
 
-    return result;
-  }
+  //     wrapper.push(
+  //       <Flex
+  //         key={i.toString()}
+  //         className="w-full my-3"
+  //         justify="space-evenly"
+  //         align="center"
+  //         gap={3}
+  //       >
+  //         {rowDisplay}
+  //       </Flex>
+  //     );
+  //   }
 
-  function handlePageChange(page: number, pageSize: number) {
-    const newDisplay = getSlideOfProductsDisplay(page - 1);
-    setCurrentPagination(page);
-    setMainDisplay(newDisplay);
-  }
+  //   // result = <Flex className="w-11/12" vertical={true} justify="center" align="center">
+  //   //     {wrapper}
+  //   // </Flex>
+
+  //   result = (
+  //     <Flex
+  //       vertical
+  //       className="w-full"
+  //       justify="center"
+  //       align="center"
+  //       gap={16}
+  //     >
+  //       {wrapper}
+  //     </Flex>
+  //   );
+
+  //   return result;
+  // }
+
+  // function handlePageChange(page: number, pageSize: number) {
+  //   const newDisplay = getSlideOfProductsDisplay(page - 1);
+  //   setCurrentPagination(page);
+  //   setMainDisplay(newDisplay);
+  // }
+
+  // end comment ----------------------------------------------------------------
 
   return (
     <>
@@ -362,17 +368,6 @@ export default function HotSalesProducts({}: SpecifiedProductsCarouselProp) {
           justify="center"
           align="center"
         >
-          {/* <div className="w-full pb-4">
-                        <Flex justify="start" align="center">
-                            <Typography.Text className="text-3xl font-semibold w-full pt-4">
-                                Sản phẩm bán chạy
-                            </Typography.Text>
-                        </Flex>
-                        <Flex className="w-full mt-4" align="baseline">
-                                <div className="w-80 h-1 bg-[#683A25] mb-4"></div>
-                                <div className="w-full h-px bg-gray-200 mb-4"></div>
-                        </Flex>
-                    </div> */}
           <CenterTitle
             title={titleValue}
             subTitle={subTitleValue}
@@ -380,7 +375,7 @@ export default function HotSalesProducts({}: SpecifiedProductsCarouselProp) {
             background={titleBackground}
           />
           <div className="invisible h-10 w-full"></div>
-          {mainDisplay}
+          {/* {mainDisplay}
           <div className="h-10 invisible">hidden block</div>
           <Pagination
             defaultCurrent={1}
@@ -389,6 +384,59 @@ export default function HotSalesProducts({}: SpecifiedProductsCarouselProp) {
             showPrevNextJumpers
             onChange={handlePageChange}
           />
+          <div className="invisible h-10 w-full"></div> */}
+
+          {(products && (
+            <List
+              className="ml-10 w-full"
+              pagination={{
+                align: "center",
+                responsive: true,
+                defaultPageSize: 12,
+                pageSizeOptions: [12, 8, 6, 4],
+                showSizeChanger: true,
+                total: products.length,
+                locale: { jump_to: "Nhảy đến trang", page: "" },
+                showQuickJumper: true,
+                showTotal: (total, range) =>
+                  // `${range[0]}-${range[1]} of ${total} items`
+                  `${range[0]} - ${range[1]} trên tổng ${total} đánh giá`,
+              }}
+              grid={{
+                gutter: { sm: 0, lg: 100, xl: 10 },
+                xs: 2,
+                sm: 2,
+                md: 3,
+                lg: 4,
+                xl: 6,
+                xxl: 6,
+              }}
+              dataSource={products}
+              locale={{
+                emptyText: <CustomEmpty />,
+              }}
+              renderItem={(value, i) => (
+                <div key={i}>
+                  <List.Item>
+                    <Link href={`/product/${value._id}`}>
+                      <div className="text-black my-3" key={value._id}>
+                        <ProductItem
+                          imageLink={value.imageLink}
+                          name={value.name}
+                          rating={value.rating}
+                          soldAmount={value.soldAmount}
+                          price={value.price}
+                          isFlashSale={value.isFlashSale}
+                          originalPrice={value.originalPrice}
+                        />
+                      </div>
+                    </Link>
+                  </List.Item>
+                </div>
+              )}
+            />
+          )) || <Skeleton active />}
+
           <div className="invisible h-10 w-full"></div>
         </Flex>
       </div>

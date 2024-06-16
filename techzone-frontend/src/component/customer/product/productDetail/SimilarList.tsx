@@ -35,7 +35,7 @@ export default function SimilarList() {
       {(products && products.length > 0 && (
         <div>
           {products.length < 4 ? (
-            <div className="px-10">
+            <div className="p-10">
               <List
                 grid={{
                   gutter: 5,

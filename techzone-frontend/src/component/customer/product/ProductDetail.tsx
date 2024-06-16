@@ -3,7 +3,7 @@ import { GET_GetProductDetail } from "@/apis/product/ProductDetailAPI";
 import { ProductDetailType } from "@/model/ProductType";
 import {
   Affix,
-  Badge,
+  ColorPicker,
   ConfigProvider,
   Descriptions,
   DescriptionsProps,
@@ -11,6 +11,7 @@ import {
   FloatButton,
   Skeleton,
   Tabs,
+  Tooltip,
 } from "antd";
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -127,34 +128,36 @@ export default function ProductDetail() {
       key: "1",
       label: "Sản phẩm",
       children: product?.name,
-      // span: 2,
-    },
-    {
-      key: "2",
-      label: "Chất liệu",
-      children: product?.attribute.material,
       span: 2,
     },
     {
-      key: "3",
-      label: "Màu",
+      key: "5",
+      label: "Bảo hành",
+      children: product?.attribute.warranty,
+      span: 2,
+    },
+    {
+      key: "2",
+      label: "Màu sắc",
       children: (
         <div>
           {(product &&
             product.attribute.colors.length > 0 &&
             product.attribute.colors.map((color, index) => (
-              <span>
-                {color.color.label}
-                {index == product.attribute.colors.length - 1 ? "" : ", "}
-              </span>
+              <div className="flex flex-row gap-2">
+                <Tooltip title={color.color.value} className="cursor-pointer">
+                  <ColorPicker defaultValue={color.color.value} disabled />
+                </Tooltip>
+                <div className="mt-1">{color.color.label}</div>
+              </div>
             ))) || <span>Không có</span>}
         </div>
       ),
       span: 5,
     },
     {
-      key: "4",
-      label: "Kích thước",
+      key: "3",
+      label: "Kích cỡ",
       children: (
         <div>
           {(product &&
@@ -169,28 +172,12 @@ export default function ProductDetail() {
       ),
       span: 5,
     },
-
-    // {
-    //   key: "6",
-    //   label: "Config Info",
-    //   children: (
-    //     <>
-    //       Data disk type: MongoDB
-    //       <br />
-    //       Database version: 3.4
-    //       <br />
-    //       Package: dds.mongo.mid
-    //       <br />
-    //       Storage space: 10 GB
-    //       <br />
-    //       Replication factor: 3
-    //       <br />
-    //       Region: East China 1
-    //       <br />
-    //     </>
-    //   ),
-    //   span: 3,
-    // },
+    {
+      key: "4",
+      label: "Chất liệu",
+      children: product?.attribute.material,
+      span: 5,
+    },
   ];
 
   // end mock data
@@ -232,6 +219,7 @@ export default function ProductDetail() {
       children: (
         <Descriptions
           bordered
+          // column={1}
           items={items}
           labelStyle={{ fontWeight: "bold" }}
         />
