@@ -112,7 +112,7 @@ export default function AdvertisementCarousel(
         <Flex className="px-4 w-full" justify="center" align="center">
           <div className="block w-full">
             <Carousel
-              className="w-full h-[280px] lg:h-[480px] overflow-clip"
+              className="w-full h-[280px] lg:h-[550px] overflow-clip"
               autoplay
               autoplaySpeed={carouselAutoplaySpeed}
               arrows

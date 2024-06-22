@@ -6,6 +6,9 @@ import ProductItem from "../customer/ProductItem";
 import CenterTitle from "./utils/CenterTitle";
 import Link from "next/link";
 import CustomEmpty from "../customer/shop/mini/CustomEmpty";
+import { POST_GetProductListByShop } from "@/apis/product/ProductDetailAPI";
+import { ProductType } from "@/model/ProductType";
+import ProductCarousel from "../customer/shop/boothPattern/ProductCarousel";
 
 interface SpecifiedProductsCarouselProp {}
 
@@ -18,7 +21,6 @@ interface ProductItemProps {
   price: number;
   isFlashSale: boolean;
   originalPrice: number;
-  inWishlist: boolean;
 }
 
 // enum WrapperType {
@@ -30,153 +32,6 @@ interface ProductItemProps {
 //   type: WrapperType;
 //   productInfo: ProductItemProps;
 // }
-
-const MockData = [
-  {
-    _id: "sp-01",
-    imageLink:
-      "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    name: "Lenovo 15i",
-    rating: 4.5,
-    soldAmount: 20,
-    price: 15000000,
-    isFlashSale: true,
-    originalPrice: 17000000,
-    inWishlist: false,
-  },
-  {
-    _id: "sp-02",
-    imageLink:
-      "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    name: "Dell Vostro",
-    rating: 4.5,
-    soldAmount: 32,
-    price: 17000000,
-    isFlashSale: false,
-    originalPrice: 17000000,
-    inWishlist: false,
-  },
-  {
-    _id: "sp-03",
-    imageLink:
-      "https://images.unsplash.com/photo-1593642702821-c8da6771f0c6?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    name: "Dell SuperLight",
-    rating: 4.5,
-    soldAmount: 10,
-    price: 22000000,
-    isFlashSale: true,
-    originalPrice: 20000000,
-    inWishlist: false,
-  },
-  {
-    _id: "sp-04",
-    imageLink:
-      "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    name: "Lenovo 15i",
-    rating: 4.5,
-    soldAmount: 20,
-    price: 15000000,
-    isFlashSale: true,
-    originalPrice: 17000000,
-    inWishlist: false,
-  },
-  {
-    _id: "sp-05",
-    imageLink:
-      "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    name: "Dell Vostro",
-    rating: 4.5,
-    soldAmount: 32,
-    price: 17000000,
-    isFlashSale: false,
-    originalPrice: 17000000,
-    inWishlist: false,
-  },
-  {
-    _id: "sp-06",
-    imageLink:
-      "https://images.unsplash.com/photo-1593642702821-c8da6771f0c6?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    name: "Dell SuperLight",
-    rating: 4.5,
-    soldAmount: 10,
-    price: 22000000,
-    isFlashSale: true,
-    originalPrice: 20000000,
-    inWishlist: false,
-  },
-  {
-    _id: "sp-07",
-    imageLink:
-      "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    name: "Lenovo 15i",
-    rating: 4.5,
-    soldAmount: 20,
-    price: 15000000,
-    isFlashSale: true,
-    originalPrice: 17000000,
-    inWishlist: false,
-  },
-  {
-    _id: "sp-08",
-    imageLink:
-      "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    name: "Dell Vostro",
-    rating: 4.5,
-    soldAmount: 32,
-    price: 17000000,
-    isFlashSale: false,
-    originalPrice: 17000000,
-    inWishlist: false,
-  },
-  {
-    _id: "sp-09",
-    imageLink:
-      "https://images.unsplash.com/photo-1593642702821-c8da6771f0c6?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    name: "Dell SuperLight",
-    rating: 4.5,
-    soldAmount: 10,
-    price: 22000000,
-    isFlashSale: true,
-    originalPrice: 20000000,
-    inWishlist: false,
-  },
-  {
-    _id: "sp-10",
-    imageLink:
-      "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    name: "Lenovo 15i",
-    rating: 4.5,
-    soldAmount: 20,
-    price: 15000000,
-    isFlashSale: true,
-    originalPrice: 17000000,
-    inWishlist: false,
-  },
-  {
-    _id: "sp-11",
-    imageLink:
-      "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    name: "Dell Vostro",
-    rating: 4.5,
-    soldAmount: 32,
-    price: 17000000,
-    isFlashSale: false,
-    originalPrice: 17000000,
-    inWishlist: false,
-  },
-  {
-    _id: "sp-12",
-    imageLink:
-      "https://images.unsplash.com/photo-1593642702821-c8da6771f0c6?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    name: "Dell SuperLight",
-    rating: 4.5,
-    soldAmount: 10,
-    price: 22000000,
-    isFlashSale: true,
-    originalPrice: 20000000,
-    inWishlist: false,
-  },
-];
 
 // const paddingBlockProps: ProductItemProps = {
 //   _id: "",
@@ -196,29 +51,10 @@ export default function HotSalesProducts({}: SpecifiedProductsCarouselProp) {
   const titleBackground = "bg-[#F2F2F2]";
 
   const [products, setProducts] = useState<ProductItemProps[]>([]);
+  const [productDisplay, setProductDisplay] = useState<ProductItemProps[]>([]);
 
-  useEffect(() => {
-    //fetch data here
-
-    //for testing
-    const data = MockData.map((value) => {
-      const item: ProductItemProps = {
-        _id: value._id,
-        imageLink: value.imageLink,
-        name: value.name,
-        rating: value.rating,
-        soldAmount: value.soldAmount,
-        price: value.price,
-        isFlashSale: value.isFlashSale,
-        originalPrice: value.originalPrice,
-        inWishlist: value.inWishlist,
-      };
-
-      return item;
-    });
-
-    setProducts(data);
-  }, []);
+  const numberOfProductToDisplay = 6;
+  const [count, setCount] = useState<number>(1); //TODO: consider using reducer instead
 
   // start comment ----------------------------------------------------------------
 
@@ -359,9 +195,55 @@ export default function HotSalesProducts({}: SpecifiedProductsCarouselProp) {
 
   // end comment ----------------------------------------------------------------
 
+  // call api (temporarily)
+  const mockId = "65f1e8bbc4e39014df775166";
+
+  useEffect(() => {
+    handleGetProductList();
+  }, [mockId]);
+
+  const handleGetProductList = async () => {
+    const response = await POST_GetProductListByShop(mockId);
+    if (response.status == 200) {
+      if (response.data) {
+        const data = response.data;
+        const tr_data: ProductItemProps[] = data.map((value: ProductType) => {
+          const tr_item: ProductItemProps = {
+            _id: value._id,
+            imageLink: value.imageLink,
+            name: value.name,
+            rating: value.rating,
+            soldAmount: value.soldAmount,
+            price: value.price,
+            isFlashSale: value.flashSale,
+            originalPrice: value.originalPrice,
+          };
+
+          return tr_item;
+        });
+
+        setProducts([...tr_data]);
+        // console.log("product", data);
+
+        tr_data.splice(numberOfProductToDisplay);
+        setProductDisplay([...tr_data]);
+      }
+    }
+  };
+
+  const handleReadMore = () => {
+    // TODO: get 6 more after click
+
+    console.log("display", productDisplay);
+    let data = [...products];
+    data.splice(numberOfProductToDisplay * (count + 1));
+    setProductDisplay(data);
+    setCount(count + 1);
+  };
+
   return (
     <>
-      <div className="w-full flex flex-col justify-center items-center  py-4">
+      <div className="w-full flex flex-col justify-center items-center py-4">
         <Flex
           vertical
           className="container w-full"
@@ -387,57 +269,68 @@ export default function HotSalesProducts({}: SpecifiedProductsCarouselProp) {
           <div className="invisible h-10 w-full"></div> */}
 
           {(products && (
-            <List
-              className="ml-10 w-full"
-              pagination={{
-                align: "center",
-                responsive: true,
-                defaultPageSize: 12,
-                pageSizeOptions: [12, 8, 6, 4],
-                showSizeChanger: true,
-                total: products.length,
-                locale: { jump_to: "Nhảy đến trang", page: "" },
-                showQuickJumper: true,
-                showTotal: (total, range) =>
-                  // `${range[0]}-${range[1]} of ${total} items`
-                  `${range[0]} - ${range[1]} trên tổng ${total} đánh giá`,
-              }}
-              grid={{
-                gutter: { sm: 0, lg: 100, xl: 10 },
-                xs: 2,
-                sm: 2,
-                md: 3,
-                lg: 4,
-                xl: 6,
-                xxl: 6,
-              }}
-              dataSource={products}
-              locale={{
-                emptyText: <CustomEmpty />,
-              }}
-              renderItem={(value, i) => (
-                <div key={i}>
-                  <List.Item>
-                    <Link href={`/product/${value._id}`}>
-                      <div className="text-black my-3" key={value._id}>
-                        <ProductItem
-                          imageLink={value.imageLink}
-                          name={value.name}
-                          rating={value.rating}
-                          soldAmount={value.soldAmount}
-                          price={value.price}
-                          isFlashSale={value.isFlashSale}
-                          originalPrice={value.originalPrice}
-                        />
-                      </div>
-                    </Link>
-                  </List.Item>
-                </div>
+            <div className="flex flex-col items-center gap-5">
+              <List
+                className="ml-10 w-full"
+                // pagination={{
+                //   align: "center",
+                //   responsive: true,
+                //   defaultPageSize: 12,
+                //   pageSizeOptions: [12, 8, 6, 4],
+                //   showSizeChanger: true,
+                //   total: products.length,
+                //   locale: {
+                //     jump_to: "Nhảy đến trang",
+                //     page: "",
+                //     page_size: "sp/trang",
+                //     items_per_page: "sp/trang",
+                //   },
+                //   showQuickJumper: true,
+                //   showTotal: (total, range) =>
+                //     `${range[0]} - ${range[1]} trên tổng ${total} đánh giá`,
+                // }}
+                grid={{
+                  gutter: { sm: 0, lg: 100, xl: 10 },
+                  xs: 2,
+                  sm: 2,
+                  md: 3,
+                  lg: 4,
+                  xl: 6,
+                  xxl: 6,
+                }}
+                // dataSource={products}
+                dataSource={productDisplay}
+                locale={{
+                  emptyText: <CustomEmpty />,
+                }}
+                renderItem={(value, i) => (
+                  <div key={i}>
+                    <List.Item>
+                      <Link href={`/product/${value._id}`}>
+                        <div className="text-black my-3" key={value._id}>
+                          <ProductItem
+                            imageLink={value.imageLink}
+                            name={value.name}
+                            rating={value.rating}
+                            soldAmount={value.soldAmount}
+                            price={value.price}
+                            isFlashSale={value.isFlashSale}
+                            originalPrice={value.originalPrice}
+                          />
+                        </div>
+                      </Link>
+                    </List.Item>
+                  </div>
+                )}
+              />
+
+              {productDisplay.length !== products.length && (
+                <button onClick={handleReadMore}>Xem thêm</button>
               )}
-            />
+            </div>
           )) || <Skeleton active />}
 
-          <div className="invisible h-10 w-full"></div>
+          <div className="invisible h-16 w-full"></div>
         </Flex>
       </div>
     </>

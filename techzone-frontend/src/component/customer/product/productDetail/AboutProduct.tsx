@@ -10,6 +10,7 @@ import {
 import {
   Image as AntdImage,
   Button,
+  ColorPicker,
   Flex,
   List,
   Rate,
@@ -427,16 +428,11 @@ export default function AboutProduct(props: AboutProductProps) {
                   <div
                     key={index}
                     className={`${
-                      props.selectedColorOption === color
-                        ? "border-2 border-white rounded-full brightness-75"
-                        : "border-2 border-white rounded-full"
+                      props.selectedColorOption === color ? "brightness-75" : ""
                     }`}
                   >
-                    <Button
-                      type="primary"
-                      size="middle"
-                      style={{ background: color.value, width: 50 }}
-                      className="rounded-full"
+                    <div
+                      className="h-fit w-fit mt-1"
                       onClick={() => {
                         if (props.selectedColorOption === color)
                           props.setSelectedColorOption(null);
@@ -444,7 +440,13 @@ export default function AboutProduct(props: AboutProductProps) {
                           props.setSelectedColorOption(color);
                         }
                       }}
-                    />
+                    >
+                      <ColorPicker
+                        className="cursor-pointer"
+                        defaultValue={color.value}
+                        disabled
+                      />
+                    </div>
                   </div>
                 ))}
               </Flex>

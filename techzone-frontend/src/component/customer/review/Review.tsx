@@ -182,12 +182,7 @@ const Review = (props: ReviewProps) => {
           </div>
         </div>
       </div>
-      <CommentContainer
-        review={props.review}
-        updateReviews={() => {
-          props.updateReviews();
-        }}
-      />
+      <CommentContainer review={props.review} />
 
       <Modal
         title="Thông báo"

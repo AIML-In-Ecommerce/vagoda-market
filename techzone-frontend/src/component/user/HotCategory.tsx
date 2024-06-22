@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import CategoryItem from "./utils/CategoryItem";
 import { CategoryType } from "@/model/CategoryType";
 import CenterTitle from "./utils/CenterTitle";
+import { GET_GetAllCategories } from "@/apis/category/_CategoryAPI";
 
 const MockData = [
   {
@@ -191,8 +192,21 @@ export default function HotCategory({}: HotCategoryProps) {
   const [changeFlat, setChangeFlat] = useState<boolean>(false);
   const [isHolding, setIsHolding] = useState<boolean>(false);
 
+  const handleGetCategoryList = async () => {
+    const response = await GET_GetAllCategories();
+    if (response.status == 200) {
+      if (response.data) {
+        console.log("category", response.data);
+        setCategory(response.data);
+
+        setCurrentSlide(0);
+      }
+    }
+  };
+
   useEffect(() => {
     //fetch data here
+    // handleGetCategoryList();
 
     //for testing
     const data = [...MockData];
@@ -263,7 +277,7 @@ export default function HotCategory({}: HotCategoryProps) {
     return (
       <>
         <Row className="w-full" gutter={12}>
-          <Col span={8} style={{ maxHeight: "410px" }} flex={"auto"}>
+          <Col span={8} style={{ maxHeight: "500px" }} flex={"auto"}>
             <CategoryItem
               onHoldingCallback={onHoldingCallback}
               onLeavingCallback={onLeavingCallback}
@@ -273,14 +287,14 @@ export default function HotCategory({}: HotCategoryProps) {
           <Col span={16}>
             <Row gutter={[5, 10]}>
               <Row gutter={10}>
-                <Col span={6} style={{ maxHeight: "200px" }}>
+                <Col span={6} style={{ maxHeight: "250px" }}>
                   <CategoryItem
                     onHoldingCallback={onHoldingCallback}
                     onLeavingCallback={onLeavingCallback}
                     category={data[1]}
                   />
                 </Col>
-                <Col span={9} style={{ maxHeight: "200px" }}>
+                <Col span={9} style={{ maxHeight: "250px" }}>
                   <CategoryItem
                     onHoldingCallback={onHoldingCallback}
                     onLeavingCallback={onLeavingCallback}
@@ -296,7 +310,7 @@ export default function HotCategory({}: HotCategoryProps) {
                 </Col>
               </Row>
               <Row gutter={10}>
-                <Col span={9} style={{ maxHeight: "200px" }}>
+                <Col span={9} style={{ maxHeight: "250px" }}>
                   <CategoryItem
                     onHoldingCallback={onHoldingCallback}
                     onLeavingCallback={onLeavingCallback}
@@ -310,7 +324,7 @@ export default function HotCategory({}: HotCategoryProps) {
                     category={data[5]}
                   />
                 </Col>
-                <Col span={6} style={{ maxHeight: "200px" }}>
+                <Col span={6} style={{ maxHeight: "250px" }}>
                   <CategoryItem
                     onHoldingCallback={onHoldingCallback}
                     onLeavingCallback={onLeavingCallback}
@@ -338,7 +352,7 @@ export default function HotCategory({}: HotCategoryProps) {
           <div className="invisible h-10 w-full"></div>
           <div className="container w-full mt-4">{mainDisplay}</div>
         </Flex>
-        <div className="invisible h-10 w-full"></div>
+        <div className="invisible h-14 w-full"></div>
       </Flex>
     </>
   );

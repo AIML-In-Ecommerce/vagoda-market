@@ -164,7 +164,7 @@ export async function POST_CreateReview(props: RawReviewType) {
             status: 500,
             data: undefined,
           };
-      }, 3000);
+      }, 2000);
     } else {
       const requestBody = {
         product: props.product,
@@ -386,6 +386,52 @@ export async function GET_GetReviewListByProduct(productId: string) {
 //     };
 //   }
 // }
+
+export async function GET_GetAllReviewsByQuery(
+  product: string,
+  rating: number
+) {
+  const url = (
+    BACKEND_PREFIX?.toString() +
+    ":" +
+    REVIEW_PORT?.toString() +
+    "/reviews?product=" +
+    product +
+    "&&rating=" +
+    rating
+  ).toString();
+
+  try {
+    // console.log(url);
+
+    const response = await axios.get(url);
+    const responseData: ReviewListResponse = response.data;
+
+    if (responseData.status == 200) {
+      return {
+        isDenied: false,
+        message: "Get review successfully",
+        status: responseData.status,
+        data: responseData.data,
+      };
+    } else {
+      return {
+        isDenied: true,
+        message: "Failed to get review",
+        status: responseData.status,
+        data: responseData.data,
+      };
+    }
+  } catch (err) {
+    console.error(err);
+    return {
+      isDenied: true,
+      message: "Failed to get review",
+      status: 500,
+      data: undefined,
+    };
+  }
+}
 
 interface CommentResponse {
   status: number;

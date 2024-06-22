@@ -390,6 +390,8 @@ function RecentlyAccess({}: RecentlyAccessProps) {
           return mapItem;
         });
 
+        data.splice(6);
+
         setProducts(data);
         // console.log("product", data);
       }
@@ -415,11 +417,12 @@ function RecentlyAccess({}: RecentlyAccessProps) {
           {mainDisplay}
         </Flex> */}
 
-        <div className="flex ml-10 sm:ml-0 align-middle justify-center items-center">
+        <div className="flex sm:ml-0 align-middle justify-center items-center">
           {(products && (
             <List
+              className="ml-5"
               grid={{
-                gutter: { xs: 0, xl: 100 },
+                gutter: { xs: 0, xl: 30 },
                 xs: 2,
                 sm: 2,
                 md: 3,

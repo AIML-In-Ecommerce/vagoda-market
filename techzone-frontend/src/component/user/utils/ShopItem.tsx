@@ -114,7 +114,7 @@ function ShopItem({ shopInfo, imageHeight, imageWidth }: ShopItemProps) {
                 justify="center"
                 align="center"
               >
-                <p className="text-2xl font-semibold text-white">
+                <p className="text-lg font-semibold text-white overflow-ellipsis">
                   {shopInfo.name}
                 </p>
               </Flex>

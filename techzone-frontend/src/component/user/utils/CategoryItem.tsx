@@ -64,7 +64,7 @@ export default function CategoryItem(props: CategoryItemProps) {
         // }}
       >
         <div className="shadow-black rounded-md hover:scale-105 transition duration-500 cursor-pointer">
-          {props.category.image != undefined ? (
+          {props.category && props.category.image ? (
             <Image
               className={`container relative ${imageOpacity} rounded-md`}
               width={"100%"}

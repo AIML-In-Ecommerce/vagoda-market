@@ -120,8 +120,6 @@ export default function ProductDetail() {
     setTabKey(tabKey);
   };
 
-  // mock data
-  // TODO: replace this with html component from seller page
   const items: DescriptionsProps["items"] = [
     // key can be index, label is title, children is content
     {
@@ -180,8 +178,6 @@ export default function ProductDetail() {
     },
   ];
 
-  // end mock data
-
   // tabs, descriptions and review summary
   const tabItems = [
     {
@@ -239,16 +235,18 @@ export default function ProductDetail() {
       key: "3",
       children: (
         <div>
-          <div className="lg:grid lg:grid-cols-3 gap-5 h-fit">
-            <div className="lg:col-span-1 overflow-y-hidden">
-              <Affix
-                offsetTop={60}
-                className={`${reviewSummaryVisibility ? "" : "invisible"} `}
-              >
-                {reviewSummary}
-              </Affix>
+          <div className="lg:grid lg:grid-cols-5 gap-5 h-fit">
+            <div className="lg:col-span-2 overflow-y-hidden">
+              {(numberOfReview == 1 && <div>{reviewSummary}</div>) || (
+                <Affix
+                  offsetTop={60}
+                  className={`${reviewSummaryVisibility ? "" : "invisible"} `}
+                >
+                  {reviewSummary}
+                </Affix>
+              )}
             </div>
-            <div className="lg:col-span-2">{allReviews}</div>
+            <div className="lg:col-span-3">{allReviews}</div>
           </div>
         </div>
       ),

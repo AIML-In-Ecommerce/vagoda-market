@@ -112,7 +112,10 @@ export default function SimilarList() {
             >
               {products.map((item, index) => (
                 <Link href={`/product/${item._id}`}>
-                  <div key={index} className="z-50 text-black">
+                  <div
+                    key={index}
+                    className="z-50 text-black pt-5 h-72 flex flex-col items-center"
+                  >
                     <ProductItem
                       imageLink={item.imageLink}
                       name={item.name}

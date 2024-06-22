@@ -1,6 +1,7 @@
 import { Flex, Image } from "antd";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PiShoppingCart } from "react-icons/pi";
+import { motion, useAnimation } from "framer-motion";
 
 interface SimpleProductCardProps {
   info: SimpleProductInfo;
@@ -23,9 +24,21 @@ export default function SimpleProductCard({
   imageWidth,
 }: SimpleProductCardProps) {
   //here we can get locale from web locale language hahaha
+  //ok
   const locale = "vi-VN";
   const visibleAdditionalInfo = "transition-opacity duration-1000 opacity-100";
   const hiddenAdditionalInfo = "transition-opacity duration-1000 opacity-0";
+
+  const [isHovered, setIsHovered] = useState(false);
+  const controls = useAnimation();
+
+  useEffect(() => {
+    if (isHovered) {
+      controls.start({ opacity: 1, y: -50 });
+    } else {
+      controls.start({ opacity: 0, y: 0 });
+    }
+  }, [isHovered, controls]);
 
   const currencyFormater = Intl.NumberFormat(locale, {
     style: "currency",
@@ -48,12 +61,14 @@ export default function SimpleProductCard({
   function handleItemOnClick() {}
 
   function handleMouseEnter() {
+    setIsHovered(true);
     setTimeout(() => {
       setVisibleAdditionalInfoState(visibleAdditionalInfo);
     }, 700);
   }
 
   function handleMouseLeave() {
+    setIsHovered(false);
     setTimeout(() => {
       setVisibleAdditionalInfoState(hiddenAdditionalInfo);
     }, 1000);
@@ -89,61 +104,69 @@ export default function SimpleProductCard({
 
   return (
     <>
-      <Flex
-        className="h-64 w-48 rounded-lg bg-white hover:border-2 hover:border-stone-600 py-2 px-1 overflow-hidden"
-        vertical
-        justify="center"
-        onMouseEnter={() => handleMouseEnter()}
-        onMouseLeave={() => handleMouseLeave()}
-        onClick={() => handleItemOnClick()}
+      <motion.div
+        whileHover={{ scale: 1.1 }} // Hiệu ứng mờ khi di chuột qua
+        className="w-52 "
       >
-        <Flex className="relative" vertical justify="center" align="center">
-          <div className="z-0">{ProductImage}</div>
-          <Flex
-            className={`w-full z-20 absolute bottom-0 bg-white py-4 ${visibleAdditionalInfoState}`}
-            justify="center"
-            align="center"
-          >
-            <Flex className="w-2/3 px-2" justify="start" align="baseline">
-              {ProductName}
-            </Flex>
-            <Flex className="w-1/3" justify="end" align="center">
-              <button
-                className="w-full"
-                type="button"
-                onClick={() => handleAddToCartOnClick}
-              >
-                <Flex
-                  className="w-full bg-stone-600 hover:bg-stone-700 font-semibold text-white py-2 rounded-md"
-                  justify="center"
-                  align="center"
-                  gap={4}
+        <Flex
+          className="h-64 w-48 rounded-lg bg-white py-2 px-1"
+          vertical
+          justify="center"
+          onMouseEnter={() => handleMouseEnter()}
+          onMouseLeave={() => handleMouseLeave()}
+          onClick={() => handleItemOnClick()}
+        >
+          <Flex className="relative" vertical justify="center" align="center">
+            <div className="z-0">{ProductImage}</div>
+            <Flex
+              className={`w-full z-20 absolute bottom-0 bg-white py-4 ${visibleAdditionalInfoState}`}
+              justify="center"
+              align="center"
+            >
+              <Flex className="w-2/3 px-2" justify="start" align="baseline">
+                {ProductName}
+              </Flex>
+              <Flex className="w-1/3" justify="end" align="center">
+                <button
+                  className="w-full"
+                  type="button"
+                  onClick={() => handleAddToCartOnClick}
                 >
-                  <PiShoppingCart />
-                  <p>Add</p>
-                </Flex>
-              </button>
+                  <Flex
+                    className="w-full bg-stone-600 hover:bg-stone-700 font-semibold text-white py-2 rounded-md"
+                    justify="center"
+                    align="center"
+                    gap={4}
+                  >
+                    <PiShoppingCart />
+                    <p>Add</p>
+                  </Flex>
+                </button>
+              </Flex>
             </Flex>
           </Flex>
+          <div className="flex justify-between align-middle mt-3 mx-3 ">
+            <Flex className="pl-1" vertical justify="center" align="start">
+              {ProductFinalPrice}
+              {ProductOriginPrice}
+            </Flex>
+            <Flex
+              className="bg-amber-700 h-8 rounded-sm my-2 py-2 px-2"
+              justify="center"
+              align="center"
+            >
+              <p className="text-white text-sm font-semibold">
+                -{" "}
+                {calculateDiscountPercentage(
+                  info.originalPrice,
+                  info.finalPrice
+                )}
+                %
+              </p>
+            </Flex>
+          </div>
         </Flex>
-        <div className="flex justify-between align-middle mt-3 mx-3 ">
-          <Flex className="pl-1" vertical justify="center" align="start">
-            {ProductFinalPrice}
-            {ProductOriginPrice}
-          </Flex>
-          <Flex
-            className="bg-amber-700 h-10 rounded-sm py-5 px-2"
-            justify="center"
-            align="center"
-          >
-            <p className="text-white text-lg">
-              -{" "}
-              {calculateDiscountPercentage(info.originalPrice, info.finalPrice)}
-              %
-            </p>
-          </Flex>
-        </div>
-      </Flex>
+      </motion.div>
     </>
   );
 }

@@ -1,7 +1,9 @@
 import { ProductDetailType } from "@/model/ProductType";
-import { Popover, Flex, Rate, Progress, Collapse } from "antd";
+import { Popover, Flex, Rate, Progress, Collapse, Divider } from "antd";
 import Link from "next/link";
 import SimplePieChart from "./SimplePieChart";
+import { useEffect, useState } from "react";
+import { GET_GetAllReviewsByQuery } from "@/apis/review/ReviewAPI";
 
 interface ReviewSummaryProps {
   product: ProductDetailType | undefined;
@@ -9,6 +11,71 @@ interface ReviewSummaryProps {
 }
 
 export default function ReviewSummary(props: ReviewSummaryProps) {
+  // const [totalNumber, setTotalNumber] = useState(0);
+  const [oneStarNumber, setOneStarNumber] = useState(0);
+  const [twoStarNumber, setTwoStarNumber] = useState(0);
+  const [threeStarNumber, setThreeStarNumber] = useState(0);
+  const [fourStarNumber, setFourStarNumber] = useState(0);
+  const [fiveStarNumber, setFiveStarNumber] = useState(0);
+
+  const [menuMode, setMenuMode] = useState<"horizontal" | "vertical">(
+    "horizontal"
+  );
+
+  const checkWindowSize = () => {
+    if (window.innerWidth < 768 || window.innerWidth > 1024) {
+      setMenuMode("horizontal");
+    } else {
+      setMenuMode("vertical");
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener("resize", checkWindowSize);
+    checkWindowSize();
+    return () => window.removeEventListener("resize", checkWindowSize);
+  }, [checkWindowSize]);
+
+  useEffect(() => {
+    // GET_GetReviewListByProduct(props.product?._id);
+    for (let i = 1; i <= 5; i++) {
+      handleGetNumber(i);
+    }
+  });
+
+  // api
+  const handleGetNumber = async (rating: number) => {
+    if (!props.product || !props.product._id) return;
+    const response = await GET_GetAllReviewsByQuery(props.product?._id, rating);
+
+    if (response.status == 200 && response.data) {
+      switch (rating) {
+        case 1: {
+          setOneStarNumber(response.data.length);
+          break;
+        }
+        case 2: {
+          setTwoStarNumber(response.data.length);
+          break;
+        }
+        case 3: {
+          setThreeStarNumber(response.data.length);
+          break;
+        }
+        case 4: {
+          setFourStarNumber(response.data.length);
+          break;
+        }
+        case 5: {
+          setFiveStarNumber(response.data.length);
+          break;
+        }
+      }
+    } else {
+      console.log(response.message);
+    }
+  };
+
   return (
     <div>
       {props.product && (
@@ -20,14 +87,15 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
               {
                 key: "1",
                 label: (
-                  <div className="flex items-center align-middle justify-center font-bold uppercase text-sm md:text-sm">
+                  <div className="flex items-center align-middle justify-center md:block lg:items-center lg:align-middle lg:justify-center font-bold uppercase text-sm md:text-sm">
                     đánh giá sản phẩm 🌟
                   </div>
                 ),
                 children: (
-                  <div className="flex flex-col md:flex-row lg:flex-col items-center">
+                  <div className="flex flex-col md:flex-row lg:flex-col items-center w-full h-full">
                     <div id="star-review-summary">
                       <Popover
+                        className="mx-5"
                         title="Thống kê chung"
                         content={
                           <div>
@@ -39,7 +107,13 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
                                   style={{ padding: 5, fontSize: 10 }}
                                 />
                                 <Flex gap="small" style={{ width: 180 }}>
-                                  <Progress percent={66} size="small" />
+                                  <Progress
+                                    percent={
+                                      (fiveStarNumber / props.numberOfReview) *
+                                      100
+                                    }
+                                    size="small"
+                                  />
                                 </Flex>
                               </Flex>
                               <Flex gap="small">
@@ -49,7 +123,13 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
                                   style={{ padding: 5, fontSize: 10 }}
                                 />
                                 <Flex gap="small" style={{ width: 180 }}>
-                                  <Progress percent={33} size="small" />
+                                  <Progress
+                                    percent={
+                                      (fourStarNumber / props.numberOfReview) *
+                                      100
+                                    }
+                                    size="small"
+                                  />
                                 </Flex>
                               </Flex>
                               <Flex gap="small">
@@ -59,7 +139,13 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
                                   style={{ padding: 5, fontSize: 10 }}
                                 />
                                 <Flex gap="small" style={{ width: 180 }}>
-                                  <Progress percent={1} size="small" />
+                                  <Progress
+                                    percent={
+                                      (threeStarNumber / props.numberOfReview) *
+                                      100
+                                    }
+                                    size="small"
+                                  />
                                 </Flex>
                               </Flex>
                               <Flex gap="small">
@@ -69,7 +155,13 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
                                   style={{ padding: 5, fontSize: 10 }}
                                 />
                                 <Flex gap="small" style={{ width: 180 }}>
-                                  <Progress percent={0} size="small" />
+                                  <Progress
+                                    percent={
+                                      (twoStarNumber / props.numberOfReview) *
+                                      100
+                                    }
+                                    size="small"
+                                  />
                                 </Flex>
                               </Flex>
                               <Flex gap="small">
@@ -79,7 +171,13 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
                                   style={{ padding: 5, fontSize: 10 }}
                                 />
                                 <Flex gap="small" style={{ width: 180 }}>
-                                  <Progress percent={0} size="small" />
+                                  <Progress
+                                    percent={
+                                      (oneStarNumber / props.numberOfReview) *
+                                      100
+                                    }
+                                    size="small"
+                                  />
                                 </Flex>
                               </Flex>
                             </Flex>
@@ -99,22 +197,31 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
                             defaultValue={props.product.avgRating}
                             style={{ padding: 5, fontSize: 28 }}
                           />
-                          <div className="italic pb-5 text-[9px] md:text-sm">
+                          <div className="italic text-[9px] md:text-sm">
                             {props.numberOfReview} đánh giá
+                            {/* {totalNumber}  */}
                           </div>
                         </div>
                       </Popover>
                     </div>
 
+                    <Divider
+                      type={menuMode}
+                      style={{
+                        height: menuMode === "vertical" ? "200px" : "auto",
+                        border: "0.25px solid #DCDCDC",
+                      }}
+                    />
+
                     <div
                       id="ai-review-summary"
-                      className="mb-5 md:pl-5 lg:pl-0 grid grid-cols-3"
+                      className="md:pl-5 lg:pl-0 grid grid-cols-3 md:grid-cols-5 lg:grid-cols-3 md:min-h-[200px]"
                     >
-                      <div className="col-span-1">
+                      <div className="col-span-1 flex items-center">
                         <SimplePieChart />
                       </div>
 
-                      <div className="col-span-2 pl-5">
+                      <div className="col-span-2 md:col-span-4 lg:col-span-2 pl-5">
                         <div className="font-semibold text-xs md:text-sm">
                           🤖 <Link href="#">Trợ lý AI </Link>
                           tổng hợp từ các đánh giá mới nhất

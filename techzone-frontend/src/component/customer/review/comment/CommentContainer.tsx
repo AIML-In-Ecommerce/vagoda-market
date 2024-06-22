@@ -11,7 +11,6 @@ import { POST_CreateComment, PUT_UpdateReview } from "@/apis/review/ReviewAPI";
 
 interface CommentContainerInterface {
   review: ReviewType;
-  updateReviews: () => void;
 }
 
 const CommentContainer = (props: CommentContainerInterface) => {
@@ -19,6 +18,7 @@ const CommentContainer = (props: CommentContainerInterface) => {
   // const t = useTranslations("Comment");
 
   const [comments, setComments] = useState<RawCommentType[]>([]);
+
   useEffect(() => {
     setComments(props.review.conversation);
   }, [props.review, props.review.conversation]);
@@ -40,7 +40,7 @@ const CommentContainer = (props: CommentContainerInterface) => {
 
     if (response.status === 200 && response.data) {
       let newRawComment: RawCommentType = {
-        _id: undefined,
+        _id: response.data._id,
         comment: response.data,
       };
 
@@ -53,17 +53,36 @@ const CommentContainer = (props: CommentContainerInterface) => {
   };
 
   const updateCommentHandler = async (value: string, commentId: string) => {
+    if (value === "") return;
     // if (!auth.user || auth.user == null) return;
 
-    // TODO: update with comments updated
-    handleUpdateReview([...comments]);
+    let newComments = comments.filter((comment) => {
+      return comment._id !== commentId;
+    });
+
+    const requestBody = {
+      review: props.review._id,
+      user: "663a174e094abbc113a4bca0", //mockId
+      content: value,
+    };
+
+    const response = await POST_CreateComment(requestBody);
+
+    if (response.status === 200 && response.data) {
+      let newRawComment: RawCommentType = {
+        _id: response.data._id,
+        comment: response.data,
+      };
+
+      setComments([newRawComment, ...newComments]);
+      setAffectedComment(null);
+    }
   };
 
   const deleteCommentHandler = async (commentId: string) => {
     console.log("Delete commentId:", commentId);
     // if (!auth.user || auth.user == null) return;
 
-    // TODO: update with comments filtered
     handleUpdateReview(
       comments.filter((comment) => {
         return comment._id !== commentId;
@@ -94,7 +113,6 @@ const CommentContainer = (props: CommentContainerInterface) => {
       console.log("Update review successfully!");
 
       props.review.conversation = newConversation;
-      props.updateReviews();
     } else console.log(response.message);
   };
 
