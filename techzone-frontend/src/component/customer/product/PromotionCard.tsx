@@ -1,93 +1,104 @@
 "use client";
-import { PromotionType } from "@/model/PromotionType"
-import { Card, Tooltip, Button } from "antd"
+import { DiscountType, PromotionType } from "@/model/PromotionType"
+import { Button, Popover } from "antd"
 import { FaRegCircleQuestion } from "react-icons/fa6"
-import TICKET_EXPIRED from "@/app/[locale]/(Main)/cart/(asset)/coupon_unselected_short_fill.png"
-import TICKET_UNSELECTED from "@/app/[locale]/(Main)/cart/(asset)/coupon_unselected_short.png"
-import TICKET_SELECTED from "@/app/[locale]/(Main)/cart/(asset)/coupon_selected_short_fill.png"
-import LOGO from "../../../../public/asset/logo.png"
+import TICKET_UNSELECTED from "@/component/booth-design/decorator/mini/(asset)/coupon-bg.svg"
+import TICKET_SELECTED from "@/component/booth-design/decorator/mini/(asset)/coupon-bg-selected.svg"
+import LOGO from "../../../../../public/asset/logo.png"
 import PromotionCardDetail from "./PromotionCardDetail";
+import { useState, useEffect } from "react";
+import { formatCurrencyFromValue } from "@/component/user/utils/CurrencyDisplay";
 
 interface PromotionCardProps {
     item: PromotionType
-    promotions: Array<PromotionType>
+    isSelected: boolean
     applyDiscount: (item: PromotionType) => void
     removeDiscount: (item: PromotionType) => void
 }
 
-const parseDateString = (dateString: string) => {
-    const [timePart, datePart] = dateString.split(' ');
-    const [hours, minutes] = timePart.split(':').map(Number);
-    const [day, month, year] = datePart.split('/').map(Number);
-
-    // JavaScript months are 0-indexed, so we subtract 1 from the month
-    return new Date(year, month - 1, day, hours, minutes);
-};
-
-const isExpiredPromotion = (item: PromotionType) => {
-    return parseDateString(item.expiredDate!) <= new Date();
-}
-
-const handleBackgroundPromotion = (promotions: PromotionType[], item: PromotionType) => {
-    if (isExpiredPromotion(item)) { return `url(${TICKET_EXPIRED.src})` }
-    return promotions.includes(item) ?
-        `url(${TICKET_SELECTED.src})` : `url(${TICKET_UNSELECTED.src})`
-}
-
 export default function PromotionCard(props: PromotionCardProps) {
+    const [isSelected, setIsSelected] = useState(props.isSelected);
+
+    useEffect(() => {
+        setIsSelected(props.isSelected);
+    }, [props.isSelected]);
+
+    useEffect(() => {
+        if (isSelected) {
+            props.applyDiscount(props.item);
+        } else props.removeDiscount(props.item);
+    }, [isSelected]);
+
     return (
-        <Card type="inner" className="mb-10 h-32 w-[437.2px] select-none"
+        <div className="h-auto select-none grid"
             key={props.item._id}
             style={{
-                backgroundImage: `${handleBackgroundPromotion(props.promotions, props.item)}`,
-                backgroundSize: "100% 100%"
+                backgroundImage: `${isSelected
+                    ? `url(${TICKET_SELECTED.src})`
+                    : `url(${TICKET_UNSELECTED.src})`
+                    }`,
+                backgroundSize: "100% 100%",
+                width: "100%"
             }}>
-            <div className="relative grid h-36">
-                <div className="absolute top-3 z-10 w-16">
-                    <div className="flex flex-col justify-center items-center">
+            <div className="grid grid-cols-3 relative gap-2">
+                <div className="col-span-1 place-self-center">
+                    <div className="flex flex-col justify-center items-center w-16 md:w-20 aspect-square">
                         <img alt="logo" src={LOGO.src}></img>
                         <div className="font-semibold">FashionStyle</div>
                     </div>
                 </div>
-                <div className="absolute right-0 top-1 text-lg w-auto">
-                    <Tooltip title={
+                <div className="absolute right-2 top-2 text-lg">
+                    <Popover content={
                         <div className="text-black">
                             <PromotionCardDetail item={props.item} />
                         </div>}
                         color="white"
                         trigger={["click", "hover", "contextMenu"]}
                         autoAdjustOverflow
-                        placement="right">
+                        arrow={{ pointAtCenter: true }}
+                        overlayInnerStyle={{ width: '350px' }}
+                    >
                         <div className="text-slate-500">
-                            {/* {
-                                isExpiredPromotion(props.item) ?
-                                    <div>Đã hết hạn</div> : <FaRegCircleQuestion />
-                            } */}
                             <FaRegCircleQuestion />
                         </div>
-                    </Tooltip>
+                    </Popover>
                 </div>
-                <div className="absolute left-28 top-1 z-10 text-xl font-semibold">{props.item.name}</div>
-                <div className="absolute left-28 top-8 z-10 text-md">{props.item.description}</div>
-                <div className="absolute left-28 bottom-12 z-10 text-xs">HSD: {props.item.expiredDate}</div>
-                <div className="absolute right-0 bottom-12 z-10 text-xs">
+                <div className="col-span-2 grid grid-rows-4">
+                    <div></div>
                     {
-                        isExpiredPromotion(props.item) ? <Button disabled>Đã hết hạn</Button> :
-                            (
-                                !props.promotions.includes(props.item) ?
-                                    <Button className="w-24 bg-sky-500 text-white font-semibold text-center"
-                                        onClick={() => props.applyDiscount(props.item)}>
-                                        Áp dụng
-                                    </Button> :
-                                    <Button className="w-24 bg-gray-500 text-white font-semibold text-center"
-                                        onClick={() => props.removeDiscount(props.item)}>
-                                        Hủy
-                                    </Button>
-                            )
+                        props.item.discountType === DiscountType.PERCENTAGE ?
+                            <div className="z-10 text-lg font-semibold">Giảm {props.item.discountValue}%</div> :
+                            <div className="z-10 text-lg font-semibold">Giảm {formatCurrencyFromValue({value: props.item.discountValue ?? 0})}</div>
+                    }
+                    <div className="z-10 text-xs">
+                        <span>
+                            {
+                                props.item.upperBound ? `Tối đa ${formatCurrencyFromValue({value: props.item.upperBound ?? 0})}, ` : ""
+                            }
+                        </span>
+                        <span>
+                            {
+                                props.item.lowerBound ? `Đơn từ ${formatCurrencyFromValue({value: props.item.lowerBound ?? 0})}` : `Đơn từ ${formatCurrencyFromValue({value: 0})}`
+                            }
+                        </span>
+                    </div>
+                    <div className="z-10 text-xs lg:text-[8px]">HSD: {props.item.expiredDate}</div>
+                </div>
+                <div className="absolute right-1 bottom-2 z-10 text-xs">
+                    {
+                        !props.isSelected ?
+                            <Button className="w-24 bg-sky-500 text-white font-semibold text-center"
+                                onClick={() => props.applyDiscount(props.item)}>
+                                Áp dụng
+                            </Button> :
+                            <Button className="w-24 bg-gray-500 text-white font-semibold text-center"
+                                onClick={() => props.removeDiscount(props.item)}>
+                                Hủy
+                            </Button>
 
                     }
                 </div>
             </div>
-        </Card>
+        </div>
     )
 }

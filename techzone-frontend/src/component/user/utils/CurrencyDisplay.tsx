@@ -16,3 +16,11 @@ export const Currency = (props: CurrencyProps) => {
             minimumFractionDigits: props.minimumFractionDigits ?? 0
         })}</span>
 }
+
+export function formatCurrencyFromValue(props: CurrencyProps) {
+    return  Number(props.value).toLocaleString(props.locales ?? "vi-VN", {
+        style: "currency",
+        currency: props.currency ?? "VND",
+        minimumFractionDigits: props.minimumFractionDigits ?? 0
+    })
+}
