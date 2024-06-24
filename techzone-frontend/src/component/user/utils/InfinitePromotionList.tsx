@@ -159,7 +159,7 @@ export default function InfinitePromotionList(setupProps: SetupProps)
     {
         return(
             <div key={value._id + index.toString()} className="w-full bg-green-200">
-                <PromotionCard item={value} promotions={selectedPromotions} applyDiscount={handleApplyDiscount} removeDiscount={handleRemoveDiscount}/>
+                <PromotionCard item={value} applyDiscount={handleApplyDiscount} removeDiscount={handleRemoveDiscount} isSelected={false}/>
             </div>
         )
     })
