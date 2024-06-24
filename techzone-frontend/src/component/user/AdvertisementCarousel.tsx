@@ -89,7 +89,7 @@ export default function AdvertisementCarousel(
               key={value._id + "#" + index.toString()}
               preview={false}
               src={value.url}
-              height={"480px"}
+              height={"100%"}
               width={"100%"}
             />
           );
@@ -112,7 +112,7 @@ export default function AdvertisementCarousel(
         <Flex className="px-4 w-full" justify="center" align="center">
           <div className="block w-full">
             <Carousel
-              className="w-full"
+              className="w-full h-[280px] lg:h-[550px] overflow-clip"
               autoplay
               autoplaySpeed={carouselAutoplaySpeed}
               arrows
@@ -120,19 +120,6 @@ export default function AdvertisementCarousel(
               nextArrow={<CarouselArrow direction="right" />}
             >
               {mainDisplay}
-              {/* {
-                                advertisements.map((value: AdvertisementProps, index: number) =>
-                                    {
-                                        return(
-                                            <div className="w-full">
-                                                <Image className="w-full"
-                                                    width={"100%"}
-                                                    height={"480px"}
-                                                    src={value.url}/>
-                                            </div>
-                                        )
-                                    })
-                            } */}
             </Carousel>
           </div>
         </Flex>

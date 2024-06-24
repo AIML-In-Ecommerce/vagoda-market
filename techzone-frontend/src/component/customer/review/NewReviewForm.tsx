@@ -10,14 +10,6 @@ import { ProductDetailType } from "@/model/ProductType";
 import { priceIndex } from "../product/ProductDetail";
 import { GET_GetProductDetail } from "@/apis/product/ProductDetailAPI";
 
-interface ReviewFormProps {
-  //   formSubmitHandler: (
-  //     content: string,
-  //     asset: string[],
-  //     product: string
-  //   ) => void;
-}
-
 export default function NewReviewForm() {
   // data
   const desc = [
@@ -33,7 +25,7 @@ export default function NewReviewForm() {
 
   // review
   const [rating, setRating] = useState(3);
-  const [content, setContent] = useState("");
+  const [content, setContent] = useState<string>("");
   const [asset, setAsset] = useState<string[]>([]);
 
   const [fileList, setFileList] = useState<UploadFile[]>([]);
@@ -53,7 +45,7 @@ export default function NewReviewForm() {
     let newReview: RawReviewType = {
       _id: "",
       product: productId.toString(), // 663da8175f77ea6b8f5b2e1d
-      user: "663a174e094abbc113a4bca0", // TODO
+      user: "6675a954d1a5f8cd2cf610d6", // TODO
       rating: rating,
       content: content,
       asset: asset,
@@ -63,7 +55,10 @@ export default function NewReviewForm() {
     };
 
     const response = await POST_CreateReview(newReview);
-    if (response.status == 200) {
+    setTimeout(() => {
+      // if (response) {
+      // if (response.status == 200) {
+
       alert("Tạo thành công!");
       //
 
@@ -71,17 +66,14 @@ export default function NewReviewForm() {
       setContent("");
       setAsset([]);
       setFileList([]);
-    } else console.log(response.message);
+      // } else console.log(response.message);
+      // } else console.log("No response...");
+    }, 10000);
   };
 
   useEffect(() => {
     handleGetProductDetail();
   }, []);
-
-  // useEffect(() => {
-  //   if (!product) return;
-  //   setMainImage(product.images[0]);
-  // }, [product]);
 
   const handleGetProductDetail = async () => {
     const response = await GET_GetProductDetail(productId.toString());
@@ -129,6 +121,7 @@ export default function NewReviewForm() {
               rows={6}
               cols={111}
               value={content}
+              placeholder="Để lại cảm nhận"
               onChange={(e) => setContent(e.target.value)}
             />
           </div>

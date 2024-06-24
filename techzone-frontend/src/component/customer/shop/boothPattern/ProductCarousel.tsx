@@ -116,9 +116,8 @@ export default function ProductCarousel(props: ProductCarouselProps) {
                 </Typography.Text>
               </Flex>
             </Flex>
-            <div className="invisible h-5">hidden block</div>
             {products.length < 4 ? (
-              <div className="px-10">
+              <div className="px-10 mt-5">
                 <List
                   grid={{
                     gutter: 5,
@@ -194,7 +193,10 @@ export default function ProductCarousel(props: ProductCarouselProps) {
                 {products.length > 0 &&
                   products.map((value, index) => (
                     <Link href={`/product/${value._id}`}>
-                      <div key={index} className="pl-5 text-black">
+                      <div
+                        key={index}
+                        className="pl-5 text-black pt-5 h-72 flex flex-col items-center"
+                      >
                         <ProductItem
                           imageLink={value.imageLink}
                           name={value.name}

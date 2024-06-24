@@ -1,21 +1,14 @@
 "use client";
 import React, { useState } from "react";
-// import { FiSend } from "react-icons/fi";
-// import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { IoIosSave } from "react-icons/io";
 import DeletePopupModal from "./DeletePopupModal";
 import CommentForm from "./CommentForm";
-import {
-  AffectedCommentType,
-  CommentType,
-  RawCommentType,
-} from "@/model/CommentType";
+import { AffectedCommentType, RawCommentType } from "@/model/CommentType";
 // import { useTranslations } from "next-intl";
-import { useParams } from "next/navigation";
+// import { useParams } from "next/navigation";
 import { Avatar } from "antd";
 
 interface CommentProps {
-  // comment: CommentType;
   comment: RawCommentType;
   affectedComment: AffectedCommentType | null;
   setAffectedComment: (affectedComment: AffectedCommentType | null) => void;
@@ -26,32 +19,22 @@ interface CommentProps {
   ) => void;
   updateComment: (value: string, commentId: string) => void;
   deleteComment: (commentId: string) => void;
-  // likeComment: (commentId: string) => void;
-  // replies: CommentType[] | null;
-  // parentId: string | null;
 }
 
 const Comment = (props: CommentProps) => {
   // const t = useTranslations("Comment");
 
-  const isUserLoggined = true;
   // const isCommentBelongsToUser = props.comment.id === "user.id";
   const isCommentBelongsToUser = true;
 
-  // const isReplying =
-  //   props.affectedComment &&
-  //   props.affectedComment.type === "replying" &&
-  //   props.affectedComment.id === props.comment.id;
   const isEditing =
     props.affectedComment &&
     props.affectedComment.type === "editing" &&
     props.affectedComment.id === props.comment._id;
-  // const repliedCommentId = props.parentId ? props.parentId : props.comment.id;
-  // const replyOnUserId = props.comment.user.id;
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [commentToDelete, setCommentToDelete] = useState("");
-  const { locale } = useParams();
+  // const { locale } = useParams();
   // const language = locale === "en" ? "en-EN" : "vi-VN";
   const language = "vi-VN";
 
@@ -83,20 +66,17 @@ const Comment = (props: CommentProps) => {
       <div className="flex flex-row gap-x-3 bg-gray-50 p-3 rounded-xl">
         {!isEditing && (
           <div className="m-3">
-            <Avatar
-              size="large"
-              src="https://api.dicebear.com/7.x/miniavs/svg?seed=1"
-            />
+            <Avatar size="large" src={props.comment.comment.user.avatar} />
           </div>
         )}
         <div className="flex-1 flex flex-col text-start">
           {!isEditing && (
             <>
               <h5 className="font-bold text-dark-hard text-xs">
-                {props.comment.user}
+                {props.comment.comment.user.fullName}
               </h5>
               <span className="text-xs text-dark-light">
-                {new Date(props.comment.createdAt).toLocaleDateString(
+                {new Date(props.comment.comment.createdAt).toLocaleDateString(
                   language,
                   {
                     weekday: "short",
@@ -110,7 +90,7 @@ const Comment = (props: CommentProps) => {
                 )}
               </span>
               <p className="font-roboto mt-[10px] text-dark-light overscroll-x-contain">
-                {props.comment.content}
+                {props.comment.comment.content}
               </p>
             </>
           )}
@@ -126,48 +106,42 @@ const Comment = (props: CommentProps) => {
                 props.setAffectedComment(null);
               }}
               formCancelHandler={() => props.setAffectedComment(null)}
-              initialText={props.comment.content}
+              initialText={props.comment.comment.content}
             />
           )}
           <div className="flex items-center gap-x-3 text-dark-light be-viet-nam-pro-regular text-sm my-3">
-            {/* reply */}
-
-            {/* {isUserLoggined && (
-              <button
-                className="flex items-center space-x-2 hover:font-bold cursor-pointer"
-                type="submit"
-                onClick={() =>
-                  props.setAffectedComment({
-                    type: "replying",
-                    id: props.comment.id,
-                  })
-                }
-              >
-                <span>reply</span>
-              </button>
-            )} */}
             {isCommentBelongsToUser && (
               <>
+                {(isEditing && (
+                  <button
+                    className="flex items-center space-x-2 hover:font-bold cursor-pointer font-semibold text-xs"
+                    type="submit"
+                    onClick={() => props.setAffectedComment(null)}
+                  >
+                    <span>Trở lại</span>
+                  </button>
+                )) || (
+                  <button
+                    className="flex items-center space-x-2 hover:font-bold cursor-pointer font-semibold text-xs"
+                    type="submit"
+                    onClick={() =>
+                      props.setAffectedComment({
+                        type: "editing",
+                        id: props.comment._id ? props.comment._id : "",
+                      })
+                    }
+                  >
+                    <span>Chỉnh sửa</span>
+                  </button>
+                )}
                 <button
-                  className="flex items-center space-x-2 hover:font-bold cursor-pointer"
-                  type="submit"
-                  onClick={() =>
-                    props.setAffectedComment({
-                      type: "editing",
-                      id: props.comment._id ? props.comment._id : "",
-                    })
-                  }
-                >
-                  <span>Chỉnh sửa</span>
-                </button>
-                <button
-                  className="flex items-center space-x-2 text-[#F10000] hover:font-bold cursor-pointer"
+                  className="flex items-center space-x-2 text-[#F10000] hover:font-bold cursor-pointer font-semibold text-xs"
                   type="submit"
                   onClick={(comment) => {
                     openModal(comment);
                   }}
                 >
-                  <span>Xoá</span>
+                  <span>Xoá bình luận</span>
                 </button>
               </>
             )}

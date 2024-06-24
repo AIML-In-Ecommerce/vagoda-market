@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import CenterTitle from "./utils/CenterTitle";
 import ShopItem from "./utils/ShopItem";
 import Link from "next/link";
+import { GET_GetShopList } from "@/apis/shop/ShopAPI";
+import { ShopType } from "@/model/ShopType";
 
 interface HotShopsProps {}
 
@@ -102,12 +104,24 @@ function HotShops({}: HotShopsProps) {
 
   const maxItemLength = 6;
   const [shops, setShops] = useState<SimpleShopInfoType[]>([]);
+  // const [shops, setShops] = useState<ShopType[]>([]);
   const [mainDisplay, setMainDisplay] = useState<JSX.Element>(
     <Skeleton active />
   );
 
+  // const handleGetShopList = async () => {
+  //   const response = await GET_GetShopList();
+  //   if (response.status == 200) {
+  //     // console.log(response.data);
+  //     if (response.data) {
+  //       setShops(response.data);
+  //     }
+  //   }
+  // };
+
   useEffect(() => {
     //fetch data here
+    // handleGetShopList();
 
     setShops(MockData);
   }, []);

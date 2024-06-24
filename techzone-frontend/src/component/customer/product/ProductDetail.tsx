@@ -3,7 +3,7 @@ import { GET_GetProductDetail } from "@/apis/product/ProductDetailAPI";
 import { ProductDetailType } from "@/model/ProductType";
 import {
   Affix,
-  Badge,
+  ColorPicker,
   ConfigProvider,
   Descriptions,
   DescriptionsProps,
@@ -11,6 +11,7 @@ import {
   FloatButton,
   Skeleton,
   Tabs,
+  Tooltip,
 } from "antd";
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -24,68 +25,17 @@ import SimilarList from "./productDetail/SimilarList";
 import AboutProduct from "./productDetail/AboutProduct";
 
 export default function ProductDetail() {
-  // mock data
-  // TODO: replace this with html component from seller page
-  const items: DescriptionsProps["items"] = [
-    // key can be index, label is title, children is content
-    // TODO: make span configurable?
-    {
-      key: "1",
-      label: "Product",
-      children: "Áo Polo Nam Pique Cotton USA",
-    },
-    {
-      key: "2",
-      label: "Usage Time",
-      children: "2019-04-24 18:00:00",
-      span: 2,
-    },
-    {
-      key: "3",
-      label: "Status",
-      children: <Badge status="processing" text="Available" />,
-    },
-    {
-      key: "4",
-      label: "Negotiated Amount",
-      children: "$80.00",
-    },
-    {
-      key: "5",
-      label: "Discount",
-      children: "$20.00",
-    },
-    {
-      key: "6",
-      label: "Config Info",
-      children: (
-        <>
-          Data disk type: MongoDB
-          <br />
-          Database version: 3.4
-          <br />
-          Package: dds.mongo.mid
-          <br />
-          Storage space: 10 GB
-          <br />
-          Replication factor: 3
-          <br />
-          Region: East China 1
-          <br />
-        </>
-      ),
-      span: 3,
-    },
-  ];
-
-  // end mock data
-
   // variables and functions
   const { productId } = useParams();
 
   const [product, setProduct] = useState<ProductDetailType>();
   const [mainImage, setMainImage] = useState<string>("");
   const [numberOfReview, setNumberOfReview] = useState(0);
+
+  // selected attributes--------------------------------------------------------
+  const [selectedColorOption, setSelectedColorOption] = useState<any>();
+  const [selectedSizeOption, setSelectedSizeOption] = useState<string>("");
+  //----------------------------------------------------------------------------
 
   // price--------------------------------------------------------
   // number of main item
@@ -170,6 +120,64 @@ export default function ProductDetail() {
     setTabKey(tabKey);
   };
 
+  const items: DescriptionsProps["items"] = [
+    // key can be index, label is title, children is content
+    {
+      key: "1",
+      label: "Sản phẩm",
+      children: product?.name,
+      span: 2,
+    },
+    {
+      key: "5",
+      label: "Bảo hành",
+      children: product?.attribute.warranty,
+      span: 2,
+    },
+    {
+      key: "2",
+      label: "Màu sắc",
+      children: (
+        <div>
+          {(product &&
+            product.attribute.colors.length > 0 &&
+            product.attribute.colors.map((color, index) => (
+              <div className="flex flex-row gap-2">
+                <Tooltip title={color.color.value} className="cursor-pointer">
+                  <ColorPicker defaultValue={color.color.value} disabled />
+                </Tooltip>
+                <div className="mt-1">{color.color.label}</div>
+              </div>
+            ))) || <span>Không có</span>}
+        </div>
+      ),
+      span: 5,
+    },
+    {
+      key: "3",
+      label: "Kích cỡ",
+      children: (
+        <div>
+          {(product &&
+            product.attribute.size.length > 0 &&
+            product.attribute.size.map((size, index) => (
+              <span>
+                {size}
+                {index == product.attribute.size.length - 1 ? "" : ", "}
+              </span>
+            ))) || <span>Không có</span>}
+        </div>
+      ),
+      span: 5,
+    },
+    {
+      key: "4",
+      label: "Chất liệu",
+      children: product?.attribute.material,
+      span: 5,
+    },
+  ];
+
   // tabs, descriptions and review summary
   const tabItems = [
     {
@@ -185,7 +193,11 @@ export default function ProductDetail() {
       ),
       key: "1",
       children: (
-        <div className="p-2">{product && <div>{product.description}</div>}</div>
+        <div className="p-2">
+          {product && (
+            <td dangerouslySetInnerHTML={{ __html: product.description }} />
+          )}
+        </div>
       ),
     },
     {
@@ -200,7 +212,14 @@ export default function ProductDetail() {
         </div>
       ),
       key: "2",
-      children: <Descriptions bordered items={items} />,
+      children: (
+        <Descriptions
+          bordered
+          // column={1}
+          items={items}
+          labelStyle={{ fontWeight: "bold" }}
+        />
+      ),
     },
     {
       // label: `Review Summary`,
@@ -216,16 +235,18 @@ export default function ProductDetail() {
       key: "3",
       children: (
         <div>
-          <div className="lg:grid lg:grid-cols-3 gap-5 h-fit">
-            <div className="lg:col-span-1 overflow-y-hidden">
-              <Affix
-                offsetTop={60}
-                className={`${reviewSummaryVisibility ? "" : "invisible"} `}
-              >
-                {reviewSummary}
-              </Affix>
+          <div className="lg:grid lg:grid-cols-5 gap-5 h-fit">
+            <div className="lg:col-span-2 overflow-y-hidden">
+              {(numberOfReview == 1 && <div>{reviewSummary}</div>) || (
+                <Affix
+                  offsetTop={60}
+                  className={`${reviewSummaryVisibility ? "" : "invisible"} `}
+                >
+                  {reviewSummary}
+                </Affix>
+              )}
             </div>
-            <div className="lg:col-span-2">{allReviews}</div>
+            <div className="lg:col-span-3">{allReviews}</div>
           </div>
         </div>
       ),
@@ -241,7 +262,8 @@ export default function ProductDetail() {
 
   useEffect(() => {
     if (!product) return;
-    setMainImage(product.images[0]);
+    if (product.images && product.images.length > 0)
+      setMainImage(product.images[0]);
   }, [product]);
 
   const handleGetProductDetail = async () => {
@@ -268,6 +290,10 @@ export default function ProductDetail() {
                 setNumberOfItem={setNumberOfItem}
                 mainImage={mainImage}
                 setMainImage={setMainImage}
+                selectedColorOption={selectedColorOption}
+                setSelectedColorOption={setSelectedColorOption}
+                selectedSizeOption={selectedSizeOption}
+                setSelectedSizeOption={setSelectedSizeOption}
               />
             </div>
 
@@ -284,7 +310,7 @@ export default function ProductDetail() {
                 product={{
                   name: product.name,
                   price: product.finalPrice,
-                  mainImage: product.images[0],
+                  mainImage: mainImage,
                 }}
               />
             </Affix>

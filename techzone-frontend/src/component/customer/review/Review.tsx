@@ -13,13 +13,7 @@ interface ReviewProps {
 
 const Review = (props: ReviewProps) => {
   //   const t = useTranslations("Review");
-  const myUserId = "663a174e094abbc113a4bca0"; //mock data
-
-  const [user, setUser] = useState<{
-    id: string;
-    name: string;
-    avatar: string;
-  }>({ id: props.review.user, name: "Thái Văn Thiên", avatar: "" }); //TODO
+  const myUserId = "6675a954d1a5f8cd2cf610d6"; //mock data
 
   const [isLiked, setIsLiked] = useState<boolean>(
     props.review.like.includes(myUserId) //TODO
@@ -37,11 +31,11 @@ const Review = (props: ReviewProps) => {
 
   const handleUpdateReview = async (newLike: string[]) => {
     const response = await PUT_UpdateReview({
-      _id: props.review.id,
-      product: props.review.productId,
-      user: props.review.user,
-      rating: props.review.starRating,
-      content: props.review.desc,
+      _id: props.review._id,
+      product: props.review.product._id,
+      user: props.review.user._id,
+      rating: props.review.rating,
+      content: props.review.content,
       asset: props.review.asset,
       createdAt: props.review.createdAt,
       conversation: props.review.conversation,
@@ -77,13 +71,19 @@ const Review = (props: ReviewProps) => {
       <div className="m-2 grid grid-cols-3 gap-4">
         <div className="col-span-1 flex flex-col md:flex-row lg:flex-row">
           <div className="m-3">
-            {(user.avatar === "" && (
-              <Avatar size="large">{user.name}</Avatar>
-            )) || <Avatar size="large" src={user.avatar} alt={user.name} />}
+            {(props.review.user.avatar === "" && (
+              <Avatar size="large">{props.review.user.fullName}</Avatar>
+            )) || (
+              <Avatar
+                size="large"
+                src={props.review.user.avatar}
+                alt={props.review.user.fullName}
+              />
+            )}
           </div>
           <div className="m-3">
             <Flex vertical>
-              <b>{user.name}</b>
+              <b>{props.review.user.fullName}</b>
               <div className="text-gray-600 font-light text-xs">
                 Đã tham gia 2 tháng
               </div>
@@ -96,28 +96,28 @@ const Review = (props: ReviewProps) => {
             <Rate
               disabled
               defaultValue={1}
-              value={props.review.starRating}
+              value={props.review.rating}
               style={{ padding: 5 }}
             />
             {/* <div className="font-bold ">{satisfactoryStatus}</div> */}
 
-            {props.review.starRating == 1 && (
+            {props.review.rating == 1 && (
               <div className="font-bold ">Không hài lòng</div>
             )}
-            {props.review.starRating == 2 && (
+            {props.review.rating == 2 && (
               <div className="font-bold ">Hơi kém</div>
             )}
-            {props.review.starRating == 3 && (
+            {props.review.rating == 3 && (
               <div className="font-bold ">Bình thường</div>
             )}
-            {props.review.starRating == 4 && (
+            {props.review.rating == 4 && (
               <div className="font-bold ">Hài lòng</div>
             )}
-            {props.review.starRating == 5 && (
+            {props.review.rating == 5 && (
               <div className="font-bold ">Cực kì hài lòng</div>
             )}
           </Flex>
-          {props.review.desc}
+          {props.review.content}
         </div>
         <div className="col-span-1">
           <Button danger onClick={() => setOpen(true)}>
@@ -182,12 +182,7 @@ const Review = (props: ReviewProps) => {
           </div>
         </div>
       </div>
-      <CommentContainer
-        review={props.review}
-        updateReviews={() => {
-          props.updateReviews();
-        }}
-      />
+      <CommentContainer review={props.review} />
 
       <Modal
         title="Thông báo"

@@ -1,17 +1,14 @@
 "use client";
 
-import { Col, Flex, Row, Skeleton } from "antd";
+import { Flex, List, Skeleton } from "antd";
 import CenterTitle from "./utils/CenterTitle";
-import {
-  _ProductType,
-  ProductDetailType,
-  ProductType,
-} from "@/model/ProductType";
+import { _ProductType, ProductType } from "@/model/ProductType";
 import { useEffect, useState } from "react";
 import ProductItem from "@/component/customer/ProductItem";
 import { AuthContext } from "@/context/AuthContext";
 import Link from "next/link";
 import { POST_GetProductListByShop } from "@/apis/product/ProductDetailAPI";
+import CustomEmpty from "../customer/shop/mini/CustomEmpty";
 
 interface RecentlyAccessProps {}
 
@@ -258,33 +255,37 @@ interface RecentlyAccessProps {}
 //   },
 // ];
 
-const paddingItem: _ProductType = {
-  _id: "pd-",
-  name: "padding",
-  image: "",
-  avgRating: 0,
-  soldQuantity: 0,
-  finalPrice: 0,
-  originalPrice: 0,
-  isFlashSale: false,
-};
+// const paddingItem: _ProductType = {
+//   _id: "pd-",
+//   name: "padding",
+//   image: "",
+//   avgRating: 0,
+//   soldQuantity: 0,
+//   finalPrice: 0,
+//   originalPrice: 0,
+//   isFlashSale: false,
+// };
 
 function RecentlyAccess({}: RecentlyAccessProps) {
-  const numberOfProductToDisplay = 6;
+  // const numberOfProductToDisplay = 6;
   const titleValue = "Truy cập gần đây";
   const subTitle = "Sản phẩm đã truy cập trong tuần";
   const titleBackground = "bg-[#F2F2F2]";
 
   const [products, setProducts] = useState<_ProductType[]>([]);
-  const [mainDisplay, setMainDisplay] = useState<JSX.Element[]>(
-    new Array(numberOfProductToDisplay)
-      .fill(<Skeleton active />)
-      .map((item, index) => (
-        <div key={Math.random() + index.toString()}>{item}</div>
-      ))
-  );
+
+  // start comment--------------------------------------------------------
 
   // LHKN: commented
+  // const [mainDisplay, setMainDisplay] = useState<JSX.Element[]>(
+  //   new Array(numberOfProductToDisplay)
+  //     .fill(<Skeleton active />)
+  //     .map((item, index) => (
+  //       <div key={Math.random() + index.toString()}>{item}</div>
+  //     ))
+  // );
+
+  // LHKN: commented mock data
   //   useEffect(() => {
   //     //load data here
 
@@ -309,57 +310,60 @@ function RecentlyAccess({}: RecentlyAccessProps) {
   //     setProducts(data);
   //   }, []);
 
-  useEffect(() => {
-    if (products.length == 0) {
-      const loadingItems = new Array(numberOfProductToDisplay).fill(
-        <Skeleton active />
-      );
-      const loadingDisplay = loadingItems.map((item, index: number) => {
-        return (
-          <div key={Math.random().toString() + "-" + index.toString()}>
-            {item}
-          </div>
-        );
-      });
-      setMainDisplay(loadingDisplay);
-    }
-    let newDisplay = products.map((item) => {
-      return (
-        <Link href={`/product/${item._id}`}>
-          <div className="text-black" key={item._id}>
-            <ProductItem
-              imageLink={item.image}
-              name={item.name}
-              rating={item.avgRating}
-              soldAmount={item.soldQuantity}
-              price={item.finalPrice}
-              isFlashSale={item.isFlashSale}
-              originalPrice={item.originalPrice}
-            />
-          </div>
-        </Link>
-      );
-    });
+  // LHKN: commented
+  // useEffect(() => {
+  //   if (products.length == 0) {
+  //     const loadingItems = new Array(numberOfProductToDisplay).fill(
+  //       <Skeleton active />
+  //     );
+  //     const loadingDisplay = loadingItems.map((item, index: number) => {
+  //       return (
+  //         <div key={Math.random().toString() + "-" + index.toString()}>
+  //           {item}
+  //         </div>
+  //       );
+  //     });
+  //     setMainDisplay(loadingDisplay);
+  //   }
+  //   let newDisplay = products.map((item) => {
+  //     return (
+  //       <Link href={`/product/${item._id}`}>
+  //         <div className="text-black" key={item._id}>
+  //           <ProductItem
+  //             imageLink={item.image}
+  //             name={item.name}
+  //             rating={item.avgRating}
+  //             soldAmount={item.soldQuantity}
+  //             price={item.finalPrice}
+  //             isFlashSale={item.isFlashSale}
+  //             originalPrice={item.originalPrice}
+  //           />
+  //         </div>
+  //       </Link>
+  //     );
+  //   });
 
-    // if(newDisplay.length < numberOfProductToDisplay)
-    // {
-    //     const paddings = new Array(numberOfProductToDisplay - newDisplay.length).fill(paddingItem)
-    //     .map((item: _ProductType, index: number) =>
-    //     {
-    //         return(
-    //             <div key={item._id + Math.random().toString() + "i" + index.toString()} className="invisible">
-    //                 <ProductItem
-    //                     imageLink={item.image} name={item.name} rating={item.avgRating} soldAmount={item.soldQuantity}
-    //                     price={item.finalPrice} isFlashSale={item.isFlashSale} originalPrice={item.originalPrice} inWishlist={false} />
-    //             </div>
-    //         )
-    //     })
+  //   // if(newDisplay.length < numberOfProductToDisplay)
+  //   // {
+  //   //     const paddings = new Array(numberOfProductToDisplay - newDisplay.length).fill(paddingItem)
+  //   //     .map((item: _ProductType, index: number) =>
+  //   //     {
+  //   //         return(
+  //   //             <div key={item._id + Math.random().toString() + "i" + index.toString()} className="invisible">
+  //   //                 <ProductItem
+  //   //                     imageLink={item.image} name={item.name} rating={item.avgRating} soldAmount={item.soldQuantity}
+  //   //                     price={item.finalPrice} isFlashSale={item.isFlashSale} originalPrice={item.originalPrice} inWishlist={false} />
+  //   //             </div>
+  //   //         )
+  //   //     })
 
-    //     newDisplay = newDisplay.concat(paddings)
-    // }
+  //   //     newDisplay = newDisplay.concat(paddings)
+  //   // }
 
-    setMainDisplay(newDisplay);
-  }, [products]);
+  //   setMainDisplay(newDisplay);
+  // }, [products]);
+
+  // end comment----------------------------------------------------------------
 
   // call api (temporarily)
   const mockId = "65f1e8bbc4e39014df775166";
@@ -387,6 +391,8 @@ function RecentlyAccess({}: RecentlyAccessProps) {
           return mapItem;
         });
 
+        data.splice(6);
+
         setProducts(data);
         // console.log("product", data);
       }
@@ -408,10 +414,49 @@ function RecentlyAccess({}: RecentlyAccessProps) {
           background={titleBackground}
         />
         <div className="invisible h-10 w-full"></div>
-        <Flex className="w-full" justify="center" align="center" gap={8}>
+        {/* <Flex className="w-full" justify="center" align="center" gap={8}>
           {mainDisplay}
-        </Flex>
-        <div className="invisible h-10 w-full"></div>
+        </Flex> */}
+
+        <div className="flex sm:ml-0 align-middle justify-center items-center">
+          {(products && (
+            <List
+              className="ml-5"
+              grid={{
+                gutter: { xs: 0, xl: 30 },
+                xs: 2,
+                sm: 2,
+                md: 3,
+                lg: 4,
+                xl: 6,
+                xxl: 6,
+              }}
+              dataSource={products}
+              locale={{
+                emptyText: <CustomEmpty />,
+              }}
+              renderItem={(item, i) => (
+                <div key={i}>
+                  <List.Item>
+                    <Link href={`/product/${item._id}`}>
+                      <div className="text-black" key={item._id}>
+                        <ProductItem
+                          imageLink={item.image}
+                          name={item.name}
+                          rating={item.avgRating}
+                          soldAmount={item.soldQuantity}
+                          price={item.finalPrice}
+                          isFlashSale={item.isFlashSale}
+                          originalPrice={item.originalPrice}
+                        />
+                      </div>
+                    </Link>
+                  </List.Item>
+                </div>
+              )}
+            />
+          )) || <Skeleton active />}
+        </div>
       </Flex>
     </>
   );

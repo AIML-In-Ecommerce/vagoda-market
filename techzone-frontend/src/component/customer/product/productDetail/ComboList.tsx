@@ -1,5 +1,5 @@
 "use client";
-import { Button, Carousel, Flex } from "antd";
+import { Button, Carousel, Flex, List } from "antd";
 // import { useTranslations } from "next-intl";
 import ComboItem from "./ComboItem";
 import React, { useEffect, useState } from "react";
@@ -176,56 +176,82 @@ const ComboList = (comboListData: ComboListProps) => {
             />
           </div>
         </Flex> */}
-
-            <Carousel
-              // autoplay
-              // autoplaySpeed={autoPlayCarouselSpeed}
-              arrows
-              prevArrow={<CarouselArrow direction="left" />}
-              nextArrow={<CarouselArrow direction="right" />}
-              style={{ padding: 40 }}
-              slidesToShow={3}
-              slidesToScroll={1}
-              initialSlide={0}
-              responsive={[
-                {
-                  breakpoint: 1280,
-                  settings: {
-                    slidesToShow: 2,
-                    slidesToScroll: 1,
-                    infinite: true,
-                    dots: true,
+            {(combo.length < 4 && (
+              <List
+                grid={{
+                  gutter: 5,
+                  xs: 1,
+                  sm: 1,
+                  md: 2,
+                  lg: 2,
+                  xl: 3,
+                  xxl: 3,
+                }}
+                dataSource={combo}
+                locale={{
+                  emptyText: <CustomEmpty />,
+                }}
+                renderItem={(item) => (
+                  <List.Item>
+                    <ComboItem
+                      _id={item._id}
+                      product={item}
+                      handleCheckbox={handleCheckbox}
+                    />
+                  </List.Item>
+                )}
+              />
+            )) || (
+              <Carousel
+                // autoplay
+                // autoplaySpeed={autoPlayCarouselSpeed}
+                arrows
+                prevArrow={<CarouselArrow direction="left" />}
+                nextArrow={<CarouselArrow direction="right" />}
+                style={{ padding: 40 }}
+                slidesToShow={3}
+                slidesToScroll={1}
+                initialSlide={0}
+                responsive={[
+                  {
+                    breakpoint: 1280,
+                    settings: {
+                      slidesToShow: 2,
+                      slidesToScroll: 1,
+                      infinite: true,
+                      dots: true,
+                    },
                   },
-                },
-                {
-                  breakpoint: 1024,
-                  settings: {
-                    slidesToShow: 1,
-                    slidesToScroll: 1,
-                    infinite: true,
-                    dots: true,
+                  {
+                    breakpoint: 1024,
+                    settings: {
+                      slidesToShow: 1,
+                      slidesToScroll: 1,
+                      infinite: true,
+                      dots: true,
+                    },
                   },
-                },
-                {
-                  breakpoint: 768,
-                  settings: {
-                    slidesToShow: 1,
-                    slidesToScroll: 1,
-                    initialSlide: 1,
+                  {
+                    breakpoint: 768,
+                    settings: {
+                      slidesToShow: 1,
+                      slidesToScroll: 1,
+                      initialSlide: 1,
+                    },
                   },
-                },
-              ]}
-            >
-              {combo.map((item, index) => (
-                <div key={index}>
-                  <ComboItem
-                    _id={item._id}
-                    product={item}
-                    handleCheckbox={handleCheckbox}
-                  />
-                </div>
-              ))}
-            </Carousel>
+                ]}
+              >
+                {combo.map((item, index) => (
+                  <div key={index}>
+                    <ComboItem
+                      _id={item._id}
+                      product={item}
+                      handleCheckbox={handleCheckbox}
+                    />
+                  </div>
+                ))}
+              </Carousel>
+            )}
           </div>
 
           <div className="col-span-1 col-start-1 sm:col-start-4 lg:col-start-5 xl:col-end-6 flex flex-col justify-center align-middle">
