@@ -362,38 +362,39 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
     history_conservation.push(message);
 
     setMessages(history_conservation);
-    try {
-      const rawResponse = await axios.post(
-        "http://localhost:8000/chat/agent",
-        postBody,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      );
-      if (rawResponse.status == 200) {
-        let response = JSON.parse(rawResponse.data.data);
-        console.log("AI Response: ", response);
+    // try {
+    //   const rawResponse = await axios.post(
+    //     "http://localhost:8000/chat/agent",
+    //     postBody,
+    //     {
+    //       headers: {
+    //         "Content-Type": "application/json",
+    //       },
+    //     },
+    //   );
+    //   if (rawResponse.status == 200) {
+    //     let response = JSON.parse(rawResponse.data.data);
+    //     console.log("AI Response: ", response);
 
-        const assistantResponse: AssistantMessageProps = {
-          role: AssistantMessageTypes.Assistant,
-          message: response.message,
-        };
-        const newResponseMessages = [...history_conservation];
-        newResponseMessages.push(assistantResponse);
-        setMessages(newResponseMessages);
-        if (localStorage) {
-          const stringifiedMessages = JSON.stringify(history_conservation);
-          localStorage.setItem(
-            AIAssistantLocalStorageKeyword,
-            stringifiedMessages,
-          );
-        }
-      }
-    } catch (error) {
-      console.error("Error in conservation:", error);
-    }
+    //     const assistantResponse: AssistantMessageProps = {
+    //       role: AssistantMessageTypes.Assistant,
+    //       message: response.message,
+    //     };
+    //     const newResponseMessages = [...history_conservation];
+    //     newResponseMessages.push(assistantResponse);
+    //     setMessages(newResponseMessages);
+    //     if (localStorage) {
+    //       const stringifiedMessages = JSON.stringify(history_conservation);
+    //       localStorage.setItem(
+    //         AIAssistantLocalStorageKeyword,
+    //         stringifiedMessages,
+    //       );
+    //     }
+    //   }
+    // } catch (error) {
+    //   console.error("Error in conservation:", error);
+    // }
+    setExtraSupportDisplay(getRamdomDisplay())
   };
 
   const ExpandOrShrinkButton =
