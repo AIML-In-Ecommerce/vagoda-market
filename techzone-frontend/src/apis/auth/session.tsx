@@ -1,25 +1,21 @@
-import axios from "axios"
+import axios from "axios";
 
+export async function fetchSessionId() {
+  //   const publicAPIURL = process.env.NEXT_PUBLIC_API_GATEWAY;
+  const publicAPIURL = process.env.NEXT_PUBLIC_BACKEND_PREFIX;
+  const url = `${publicAPIURL}/auth/session`;
 
-export async function fetchSessionId()
-{
-    const publicAPIURL = process.env.NEXT_PUBLIC_API_GATEWAY
-    const url = `${publicAPIURL}/auth/session`
+  const appTime = new Date();
+  try {
+    const response = await axios.get(url, {
+      params: {
+        appTime: appTime,
+      },
+    });
 
-    const appTime = new Date()
-    try
-    {
-        const response = await axios.get(url, {
-            params: {
-                appTime: appTime
-            }
-        })
-
-        return response
-    }
-    catch(error)
-    {
-        console.log(error)
-        return null
-    }
+    return response;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
 }

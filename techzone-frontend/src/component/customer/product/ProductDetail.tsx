@@ -14,7 +14,7 @@ import {
   Tooltip,
 } from "antd";
 import { useParams } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import useOnScreen from "../../user/utils/UseOnScreen";
 import ReviewList from "../review/ReviewList";
 import ReviewSummary from "../review/ReviewSummary";
@@ -23,6 +23,9 @@ import FloatingCartForm from "./productDetail/FloatingCartForm";
 import CartSummaryModal from "./productDetail/ProductSummaryModal";
 import SimilarList from "./productDetail/SimilarList";
 import AboutProduct from "./productDetail/AboutProduct";
+import { AuthContext } from "@/context/AuthContext";
+import { ProductAccessType } from "@/enum/ProductAccessType";
+import StatisticsService from "@/services/statistics.service";
 
 export default function ProductDetail() {
   // variables and functions
@@ -255,6 +258,10 @@ export default function ProductDetail() {
 
   // functions
 
+  const authContext = useContext(AuthContext);
+
+  console.log("id", authContext.userInfo?._id);
+
   // call api
   useEffect(() => {
     handleGetProductDetail();
@@ -273,9 +280,23 @@ export default function ProductDetail() {
       if (data) {
         setProduct(data);
         console.log("product", data);
+        await setAccessProductByAuthUser(data.shop, data._id);
       }
     } else console.log(response.message);
   };
+
+  async function setAccessProductByAuthUser(shopId: string, productId: string) {
+    const userId =
+      authContext.userInfo != null ? authContext.userInfo._id : null;
+    const accessType = ProductAccessType.WATCH_DETAIL;
+
+    await StatisticsService.setProductAccess(
+      userId,
+      productId,
+      shopId,
+      accessType
+    );
+  }
 
   return (
     <div className="bg-white px-2 lg:px-24 ">
