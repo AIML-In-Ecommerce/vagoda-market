@@ -1,5 +1,6 @@
 import { APIFunctionResponse, APIResponseSchema } from "@/apis/APIResponseSchema"
 import { POST_refreshToken } from "@/apis/auth/refresh"
+import { fetchSessionId } from "@/apis/auth/session"
 import { POST_SignInByEmailPassword } from "@/apis/auth/signin"
 import { POST_SignUpByEmailPassword } from "@/apis/auth/signup"
 import { SimpleUserInfoType } from "@/model/UserInfoType"
@@ -151,7 +152,26 @@ const AuthService =
         }
 
         return result
-    }
+    },
+
+    async fetchSessionId()
+    {
+        const response = await fetchSessionId()
+        if(response == null)
+        {
+            return null
+        }
+        
+        if(response.status == 200)
+        {
+            const data = response.data
+            return data.data
+        }
+        else
+        {
+            return null
+        }
+    },
 }
 
 export default AuthService

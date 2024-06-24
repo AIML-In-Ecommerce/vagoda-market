@@ -8,6 +8,7 @@ import AuthService, { RefreshTokenReponseData, SignInResponseData } from "@/serv
 import { stringifyError } from "next/dist/shared/lib/utils";
 import UserService from "@/services/user.service";
 
+const sessionIdKey = "ssid"
 
 interface AuthContextProviderInitProps
 {
@@ -54,6 +55,24 @@ export default function AuthContextProvider({children}: AuthContextProviderInitP
 
     const router = useRouter()
     const currentPathname = usePathname()
+
+    useEffect(() =>
+    {
+        async function fetchSessionId()
+        {
+            const currentSessionId = Cookies.get(sessionIdKey)
+            if(currentSessionId == null)
+            {
+                const sessionId = await AuthService.fetchSessionId()
+                if(sessionId != null)
+                {
+                    Cookies.set(sessionIdKey, sessionId)
+                }
+            }
+        }
+
+        fetchSessionId()
+    }, [])
 
     async function validateClientAuth()
     {

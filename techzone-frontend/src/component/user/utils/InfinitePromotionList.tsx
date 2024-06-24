@@ -25,9 +25,10 @@ const MockData: PromotionType[] =
         upperBound: 1000000,
         lowerBound: 0,
         quantity: 1000,
-        activeDate: "2024-01-01",
-        expiredDate: "2024-06-01",
-        createdAt: "2023-10-02"
+        activeDate: new Date().toUTCString(),
+        expiredDate: new Date(new Date().setDate(new Date().getDate() + 10)).toUTCString(),
+        createdAt: new Date().toUTCString(),
+        code: "p001"
     },
     {
         _id: "pro-02",
@@ -38,9 +39,10 @@ const MockData: PromotionType[] =
         upperBound: 100000,
         lowerBound: 20000,
         quantity: 1000,
-        activeDate: "2024-01-01",
-        expiredDate: "2024-06-01",
-        createdAt: "2023-10-02"
+        activeDate: new Date().toUTCString(),
+        expiredDate: new Date(new Date().setDate(new Date().getDate() + 10)).toUTCString(),
+        createdAt: new Date().toUTCString(),
+        code: "p001"
     },
     {
         _id: "pro-03",
@@ -51,9 +53,10 @@ const MockData: PromotionType[] =
         upperBound: 1000000,
         lowerBound: 8000000,
         quantity: 1000,
-        activeDate: "2024-01-01",
-        expiredDate: "2024-06-01",
-        createdAt: "2023-10-02"
+        activeDate: new Date().toUTCString(),
+        expiredDate: new Date(new Date().setDate(new Date().getDate() + 10)).toUTCString(),
+        createdAt: new Date().toUTCString(),
+        code: "p001"
     },
     {
         _id: "pro-04",
@@ -64,9 +67,10 @@ const MockData: PromotionType[] =
         upperBound: 1000000,
         lowerBound: 8000000,
         quantity: 1000,
-        activeDate: "2024-01-01",
-        expiredDate: "2024-06-01",
-        createdAt: "2023-10-02"
+        activeDate: new Date().toUTCString(),
+        expiredDate: new Date(new Date().setDate(new Date().getDate() + 10)).toUTCString(),
+        createdAt: new Date().toUTCString(),
+        code: "p001"
     },
     {
         _id: "pro-05",
@@ -77,9 +81,10 @@ const MockData: PromotionType[] =
         upperBound: 1000000,
         lowerBound: 8000000,
         quantity: 1000,
-        activeDate: "2024-01-01",
-        expiredDate: "2024-06-01",
-        createdAt: "2023-10-02"
+        activeDate: new Date().toUTCString(),
+        expiredDate: new Date(new Date().setDate(new Date().getDate() + 10)).toUTCString(),
+        createdAt: new Date().toUTCString(),
+        code: "p001"
     }
 ]
 
@@ -153,7 +158,9 @@ export default function InfinitePromotionList(setupProps: SetupProps)
     promotions.map((value: PromotionType, index: number) =>
     {
         return(
-            <PromotionCard key={value._id + index.toString()} item={value} promotions={selectedPromotions} applyDiscount={handleApplyDiscount} removeDiscount={handleRemoveDiscount}/>
+            <div key={value._id + index.toString()} className="w-full bg-green-200">
+                <PromotionCard item={value} promotions={selectedPromotions} applyDiscount={handleApplyDiscount} removeDiscount={handleRemoveDiscount}/>
+            </div>
         )
     })
 
@@ -164,10 +171,12 @@ export default function InfinitePromotionList(setupProps: SetupProps)
 
     return(
         <>
-            <Flex className="w-full h-full bg-white" vertical justify="center" align="center">
-                <div className="overflow-y-auto py-4 w-full" style={{maxHeight: `${setupProps.setup.overflowMaxHeight}`}}>
+            <Flex className="w-full h-full bg-blue-500 overflow-y-auto py-4" vertical justify="center" align="center"
+                style={{maxHeight: `${setupProps.setup.overflowMaxHeight}`}}
+            >
+                <Flex className="w-4/5" justify="center" vertical align="center">
                     {displayList}
-                </div>
+                </Flex>
                 <Flex className="w-full" justify="center" align="center">
                     {LoadMoreButton}
                 </Flex>
