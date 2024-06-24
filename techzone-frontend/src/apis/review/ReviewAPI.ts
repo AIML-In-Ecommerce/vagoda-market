@@ -3,7 +3,8 @@
 import { RawReviewType, ReviewType } from "@/model/ReviewType";
 import axios from "axios";
 import { GetPathList } from "../widget/WidgetAPI";
-import { CommentType, RawCommentType } from "@/model/CommentType";
+import { CommentType } from "@/model/CommentType";
+import { PUT_UpdateProductRating } from "../product/ProductDetailAPI";
 
 const BACKEND_PREFIX = process.env.NEXT_PUBLIC_BACKEND_PREFIX;
 const REVIEW_PORT = process.env.NEXT_PUBLIC_REVIEW_PORT;
@@ -143,6 +144,8 @@ export async function POST_CreateReview(props: RawReviewType) {
           const responseData: ReviewResponse = response.data;
 
           if (responseData.status == 200) {
+            await PUT_UpdateProductRating(props.product);
+
             return {
               isDenied: false,
               message: "Create review successfully",
@@ -471,6 +474,45 @@ export async function POST_CreateComment(props: any) {
     return {
       isDenied: true,
       message: "Failed to create comment",
+      status: 500,
+      data: undefined,
+    };
+  }
+}
+
+export async function GET_GetProductRating(id: string) {
+  const url = (
+    BACKEND_PREFIX?.toString() +
+    ":" +
+    REVIEW_PORT?.toString() +
+    "/avgRating/" +
+    id
+  ).toString();
+
+  try {
+    // console.log(url);
+    const response = await axios.get(url);
+
+    if (response.data.status == 200) {
+      return {
+        isDenied: false,
+        message: "Get avg rating successfully",
+        status: response.data.status,
+        data: response.data.data,
+      };
+    } else {
+      return {
+        isDenied: true,
+        message: "Failed to get avg rating",
+        status: response.data.status,
+        data: response.data.data,
+      };
+    }
+  } catch (err) {
+    console.error(err);
+    return {
+      isDenied: true,
+      message: "Failed to get avg rating",
       status: 500,
       data: undefined,
     };

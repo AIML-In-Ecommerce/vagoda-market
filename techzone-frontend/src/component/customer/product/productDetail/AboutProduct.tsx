@@ -1,7 +1,11 @@
 "use client";
 import { ProductStatusToStringConverter } from "@/component/user/utils/ProductStatusConverter";
 import { QuantityControl } from "@/component/user/utils/QuantityControl";
-import { ProductDetailType, ProductStatus } from "@/model/ProductType";
+import {
+  CartProductType,
+  ProductDetailType,
+  ProductStatus,
+} from "@/model/ProductType";
 import {
   CheckCircleOutlined,
   CloseCircleOutlined,
@@ -21,6 +25,8 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import ReactImageMagnify from "react-image-magnify";
 import CustomEmpty from "../../shop/mini/CustomEmpty";
+import { useRouter } from "next/navigation";
+import { PUT_UpdateCart } from "@/apis/cart/CartAPI";
 
 interface AboutProductProps {
   product: ProductDetailType;
@@ -128,7 +134,15 @@ export default function AboutProduct(props: AboutProductProps) {
   // end mock data
 
   // variables and functions
-  const [colorOptions, setColorOptions] = useState<any[]>([]);
+
+  const router = useRouter();
+
+  const [colorOptions, setColorOptions] = useState<
+    {
+      link: string;
+      color: { label: string; value: string };
+    }[]
+  >([]);
 
   // images for zoom lens
   type ImageInfoType = {
@@ -190,12 +204,34 @@ export default function AboutProduct(props: AboutProductProps) {
   }, [props.product]);
 
   useEffect(() => {
-    let colorData: any[] = [];
-    props.product.attribute.colors.forEach((image) => {
-      colorData.push(image.color);
-    });
-    setColorOptions(colorData);
+    setColorOptions(props.product.attribute.colors);
   }, [props.product]);
+
+  useEffect(() => {
+    if (props.selectedColorOption) {
+      props.setMainImage(props.selectedColorOption.link);
+    } else props.setMainImage(props.product.images[0]);
+  }, [props.selectedColorOption]);
+
+  const handleAddToCart = async () => {
+    let mockId = "6675a954d1a5f8cd2cf610d6"; //userid
+
+    let products: CartProductType[] = [
+      {
+        product: props.product._id,
+        color: props.selectedColorOption ? props.selectedColorOption : null,
+        size: props.selectedSizeOption,
+        quantity: props.numberOfItem,
+      },
+    ];
+
+    const response = await PUT_UpdateCart(mockId, products);
+    alert("Thêm thành công");
+
+    if (response.status == 200) {
+      // alert("Thêm thành công");
+    } else console.log(response.message);
+  };
 
   return (
     <div className="bg-white flex lg:flex-row flex-col my-5 lg:max-h-[450px] xl:max-h-[550px] overflow-y-clip">
@@ -206,33 +242,63 @@ export default function AboutProduct(props: AboutProductProps) {
             imageCol == 1 ? "max-w-14" : "max-w-28"
           }`}
         >
-          <List
-            grid={{ gutter: 20, column: imageCol }}
-            dataSource={props.product.images}
-            locale={{
-              emptyText: <CustomEmpty />,
-            }}
-            renderItem={(item) => (
-              <List.Item>
-                <div
-                  className={`cursor-pointer ${
-                    props.mainImage == item
-                      ? "border-4 border-blue-400"
-                      : "border-2"
-                  }`}
-                  onClick={() => {
-                    props.setMainImage(item);
-                  }}
-                >
-                  <img
-                    className="h-12 w-12 object-fill"
-                    src={item}
-                    alt={"Ảnh sản phẩm"}
-                  />
-                </div>
-              </List.Item>
-            )}
-          />
+          {(props.selectedColorOption && (
+            <List
+              grid={{ gutter: 20, column: imageCol }}
+              dataSource={[props.selectedColorOption.link]}
+              locale={{
+                emptyText: <CustomEmpty />,
+              }}
+              renderItem={(item) => (
+                <List.Item>
+                  <div
+                    className={`cursor-pointer ${
+                      props.mainImage == item
+                        ? "border-4 border-blue-400"
+                        : "border-2"
+                    }`}
+                    onClick={() => {
+                      props.setMainImage(item);
+                    }}
+                  >
+                    <img
+                      className="h-12 w-12 object-fill"
+                      src={item}
+                      alt={"Ảnh sản phẩm"}
+                    />
+                  </div>
+                </List.Item>
+              )}
+            />
+          )) || (
+            <List
+              grid={{ gutter: 20, column: imageCol }}
+              dataSource={props.product.images}
+              locale={{
+                emptyText: <CustomEmpty />,
+              }}
+              renderItem={(item) => (
+                <List.Item>
+                  <div
+                    className={`cursor-pointer ${
+                      props.mainImage == item
+                        ? "border-4 border-blue-400"
+                        : "border-2"
+                    }`}
+                    onClick={() => {
+                      props.setMainImage(item);
+                    }}
+                  >
+                    <img
+                      className="h-12 w-12 object-fill"
+                      src={item}
+                      alt={"Ảnh sản phẩm"}
+                    />
+                  </div>
+                </List.Item>
+              )}
+            />
+          )}
 
           {/* TODO: new images type */}
           {/* <List
@@ -416,9 +482,9 @@ export default function AboutProduct(props: AboutProductProps) {
               <div className="flex text-xs gap-1">
                 <div>Màu sắc: </div>
                 {props.selectedColorOption &&
-                  props.selectedColorOption.label && (
+                  props.selectedColorOption.color && (
                     <div className="font-bold">
-                      {props.selectedColorOption.label}
+                      {props.selectedColorOption.color.label}
                     </div>
                   )}
               </div>
@@ -443,7 +509,7 @@ export default function AboutProduct(props: AboutProductProps) {
                     >
                       <ColorPicker
                         className="cursor-pointer"
-                        defaultValue={color.value}
+                        defaultValue={color.color.value}
                         disabled
                       />
                     </div>
@@ -512,14 +578,15 @@ export default function AboutProduct(props: AboutProductProps) {
 
           <Button
             type="primary"
-            href="/cart"
+            // href="/cart"
+            onClick={handleAddToCart}
             danger
             block
             size="large"
             style={{ background: "#5c6856" }}
             className="rounded-full"
           >
-            Mua ngay
+            Thêm vào giỏ hàng
           </Button>
         </div>
       </div>

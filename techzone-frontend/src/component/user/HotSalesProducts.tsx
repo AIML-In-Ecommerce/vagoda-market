@@ -53,7 +53,7 @@ export default function HotSalesProducts({}: SpecifiedProductsCarouselProp) {
   const [products, setProducts] = useState<ProductItemProps[]>([]);
   const [productDisplay, setProductDisplay] = useState<ProductItemProps[]>([]);
 
-  const numberOfProductToDisplay = 6;
+  const numberOfProductToDisplay = 12;
   const [count, setCount] = useState<number>(1); //TODO: consider using reducer instead
 
   // start comment ----------------------------------------------------------------

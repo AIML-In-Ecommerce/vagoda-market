@@ -5,6 +5,7 @@ import {
   ProductType,
 } from "@/model/ProductType";
 import axios from "axios";
+import { GET_GetProductRating } from "../review/ReviewAPI";
 
 const BACKEND_PREFIX = process.env.NEXT_PUBLIC_BACKEND_PREFIX;
 const PRODUCT_PORT = process.env.NEXT_PUBLIC_PRODUCT_PORT;
@@ -26,15 +27,16 @@ export async function GET_GetProductDetail(id: string) {
 
   try {
     // console.log(url);
+
+    const ratingResponse = await GET_GetProductRating(id);
+    console.log("rating", ratingResponse);
+
     const response = await axios.get(url);
     const responseData: ProductDetailResponse = response.data;
 
     const processedData: ProductDetailType = {
       _id: id,
       name: responseData.data.name,
-      // attribute: {
-      //   ....
-      // }
       description: responseData.data.description,
       originalPrice: responseData.data.originalPrice,
       finalPrice: responseData.data.finalPrice,
@@ -42,7 +44,8 @@ export async function GET_GetProductDetail(id: string) {
       shop: responseData.data.shop,
       status: responseData.data.status,
       images: responseData.data.images,
-      avgRating: responseData.data.avgRating,
+      // avgRating: responseData.data.avgRating,
+      avgRating: ratingResponse.data,
       soldQuantity: responseData.data.soldQuantity,
       brand: responseData.data.brand,
       subCategory: "",
@@ -69,6 +72,50 @@ export async function GET_GetProductDetail(id: string) {
         message: "Failed to get product detail",
         status: responseData.status,
         data: processedData,
+      };
+    }
+  } catch (err) {
+    console.error(err);
+    return {
+      isDenied: true,
+      message: "Failed to get product detail",
+      status: 500,
+      data: undefined,
+    };
+  }
+}
+
+export async function PUT_UpdateProductRating(id: string) {
+  const url = (
+    BACKEND_PREFIX?.toString() +
+    ":" +
+    PRODUCT_PORT?.toString() +
+    "/product/" +
+    id
+  ).toString();
+
+  try {
+    // console.log(url);
+    const ratingResponse = await GET_GetProductRating(id);
+
+    // console.log("rating", ratingResponse);
+
+    const response = await axios.put(url, { avgRating: ratingResponse.data });
+    const responseData: ProductDetailResponse = response.data;
+
+    if (responseData.status == 200) {
+      return {
+        isDenied: false,
+        message: "Get product detail successfully",
+        status: responseData.status,
+        data: responseData,
+      };
+    } else {
+      return {
+        isDenied: true,
+        message: "Failed to get product detail",
+        status: responseData.status,
+        data: undefined,
       };
     }
   } catch (err) {

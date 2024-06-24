@@ -45,7 +45,7 @@ export default function NewReviewForm() {
     let newReview: RawReviewType = {
       _id: "",
       product: productId.toString(), // 663da8175f77ea6b8f5b2e1d
-      user: "663a174e094abbc113a4bca0", // TODO
+      user: "6675a954d1a5f8cd2cf610d6", // TODO
       rating: rating,
       content: content,
       asset: asset,

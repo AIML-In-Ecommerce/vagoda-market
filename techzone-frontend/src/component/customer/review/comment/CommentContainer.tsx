@@ -32,7 +32,7 @@ const CommentContainer = (props: CommentContainerInterface) => {
 
     const requestBody = {
       review: props.review._id,
-      user: "663a174e094abbc113a4bca0", //mockId
+      user: "6675a954d1a5f8cd2cf610d6", //mockId
       content: value,
     };
 
@@ -62,7 +62,7 @@ const CommentContainer = (props: CommentContainerInterface) => {
 
     const requestBody = {
       review: props.review._id,
-      user: "663a174e094abbc113a4bca0", //mockId
+      user: "6675a954d1a5f8cd2cf610d6", //mockId
       content: value,
     };
 

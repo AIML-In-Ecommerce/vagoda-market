@@ -13,7 +13,7 @@ interface ReviewProps {
 
 const Review = (props: ReviewProps) => {
   //   const t = useTranslations("Review");
-  const myUserId = "663a174e094abbc113a4bca0"; //mock data
+  const myUserId = "6675a954d1a5f8cd2cf610d6"; //mock data
 
   const [isLiked, setIsLiked] = useState<boolean>(
     props.review.like.includes(myUserId) //TODO

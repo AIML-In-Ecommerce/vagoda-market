@@ -58,6 +58,16 @@ export type ProductDetailType = {
   soldQuantity: number;
 };
 
+export type CartProductType = {
+  product: string;
+  color: {
+    link: string;
+    color: { label: string; value: string };
+  };
+  size: string;
+  quantity: number;
+};
+
 export enum ProductStatus {
   AVAILABLE = "AVAILABLE",
   SOLD_OUT = "SOLD_OUT",
