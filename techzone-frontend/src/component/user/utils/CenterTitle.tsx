@@ -60,7 +60,7 @@ function CenterTitle({
             justify="center"
             align="center"
           >
-            <p className="text-[#797979] text-sm italic">{subTitle}</p>
+            <p className="text-[#797979] text-sm">{subTitle}</p>
           </Flex>
         ) : (
           <></>

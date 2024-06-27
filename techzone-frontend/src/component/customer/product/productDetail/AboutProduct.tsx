@@ -22,11 +22,13 @@ import {
   Tag,
 } from "antd";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import ReactImageMagnify from "react-image-magnify";
 import CustomEmpty from "../../shop/mini/CustomEmpty";
-import { useRouter } from "next/navigation";
 import { PUT_UpdateCart } from "@/apis/cart/CartAPI";
+import StatisticsService from "@/services/statistics.service";
+import { AuthContext } from "@/context/AuthContext";
+import { ProductAccessType } from "@/enum/ProductAccessType";
 
 interface AboutProductProps {
   product: ProductDetailType;
@@ -34,6 +36,7 @@ interface AboutProductProps {
   setNumberOfItem: (number: number) => void;
   mainImage: string;
   setMainImage: (string: string) => void;
+  notify(message: string, content: any): void;
   //
   selectedColorOption: any;
   setSelectedColorOption: (color: any) => void;
@@ -42,101 +45,6 @@ interface AboutProductProps {
 }
 
 export default function AboutProduct(props: AboutProductProps) {
-  // mock data
-
-  // const colorOptionsData = [
-  //   { label: "Cam", value: "#cc4f14" },
-  //   { label: "Đỏ", value: "#cc1414" },
-  //   { label: "Vàng", value: "#fae102" },
-  // ];
-
-  // type Color = {
-  //   link: string;
-  //   color: {
-  //     label: string;
-  //     value: string;
-  //   };
-  // };
-
-  // const mockImages: Color[] = [
-  //   {
-  //     link: "https://images.pexels.com/photos/5693891/pexels-photo-5693891.jpeg?auto=compress&cs=tinysrgb&w=600",
-  //     color: {
-  //       label: "Red",
-  //       value: "#FF0000",
-  //     },
-  //   },
-  //   {
-  //     link: "https://images.pexels.com/photos/5693891/pexels-photo-5693891.jpeg?auto=compress&cs=tinysrgb&w=600",
-  //     color: {
-  //       label: "Green",
-  //       value: "#00FF00",
-  //     },
-  //   },
-  //   {
-  //     link: "https://images.pexels.com/photos/5693891/pexels-photo-5693891.jpeg?auto=compress&cs=tinysrgb&w=600",
-  //     color: {
-  //       label: "Blue",
-  //       value: "#0000FF",
-  //     },
-  //   },
-  //   {
-  //     link: "https://images.pexels.com/photos/5693891/pexels-photo-5693891.jpeg?auto=compress&cs=tinysrgb&w=600",
-  //     color: {
-  //       label: "Yellow",
-  //       value: "#FFFF00",
-  //     },
-  //   },
-  //   {
-  //     link: "https://images.pexels.com/photos/5693891/pexels-photo-5693891.jpeg?auto=compress&cs=tinysrgb&w=600",
-  //     color: {
-  //       label: "Black",
-  //       value: "#000000",
-  //     },
-  //   },
-  //   {
-  //     link: "https://images.pexels.com/photos/5693891/pexels-photo-5693891.jpeg?auto=compress&cs=tinysrgb&w=600",
-  //     color: {
-  //       label: "White",
-  //       value: "#FFFFFF",
-  //     },
-  //   },
-  //   {
-  //     link: "https://images.pexels.com/photos/5693891/pexels-photo-5693891.jpeg?auto=compress&cs=tinysrgb&w=600",
-  //     color: {
-  //       label: "Purple",
-  //       value: "#800080",
-  //     },
-  //   },
-  //   {
-  //     link: "https://images.pexels.com/photos/5693891/pexels-photo-5693891.jpeg?auto=compress&cs=tinysrgb&w=600",
-  //     color: {
-  //       label: "Orange",
-  //       value: "#FFA500",
-  //     },
-  //   },
-  //   {
-  //     link: "https://images.pexels.com/photos/5693891/pexels-photo-5693891.jpeg?auto=compress&cs=tinysrgb&w=600",
-  //     color: {
-  //       label: "Pink",
-  //       value: "#FFC0CB",
-  //     },
-  //   },
-  //   {
-  //     link: "https://images.pexels.com/photos/5693891/pexels-photo-5693891.jpeg?auto=compress&cs=tinysrgb&w=600",
-  //     color: {
-  //       label: "Brown",
-  //       value: "#A52A2A",
-  //     },
-  //   },
-  // ];
-
-  // end mock data
-
-  // variables and functions
-
-  const router = useRouter();
-
   const [colorOptions, setColorOptions] = useState<
     {
       link: string;
@@ -164,7 +72,6 @@ export default function AboutProduct(props: AboutProductProps) {
       };
     }
     getMeta(props.mainImage, (width: number, height: number) => {
-      // alert(width + "px " + height + "px");
       let imageInfo = { width, height };
       setMainImageInfo(imageInfo);
     });
@@ -213,8 +120,16 @@ export default function AboutProduct(props: AboutProductProps) {
     } else props.setMainImage(props.product.images[0]);
   }, [props.selectedColorOption]);
 
+  const authContext = useContext(AuthContext);
+
   const handleAddToCart = async () => {
-    let mockId = "6675a954d1a5f8cd2cf610d6"; //userid
+    // let mockId = "6675a954d1a5f8cd2cf610d6"; //userid
+
+    if (!authContext.userInfo || !authContext.userInfo._id) {
+      props.notify("Hãy đăng nhập vào tài khoản nhé!", "");
+      return;
+    }
+    const userId = authContext.userInfo._id;
 
     let products: CartProductType[] = [
       {
@@ -225,11 +140,38 @@ export default function AboutProduct(props: AboutProductProps) {
       },
     ];
 
-    const response = await PUT_UpdateCart(mockId, products);
-    alert("Thêm thành công");
+    const response = await PUT_UpdateCart(userId, products);
 
-    if (response.status == 200) {
-      // alert("Thêm thành công");
+    // if (response.message === "Update cart successfully") {
+    if (response.data) {
+      props.notify(
+        "Bạn đã thêm thành công!",
+        <div className="flex flex-row gap-6 w-max">
+          <img className="m-2 h-20 w-20 object-fill" src={props.mainImage} />
+          <div className="flex flex-col justify-center">
+            <div className="text-sm md:text-lg truncate">
+              {props.product.name}
+            </div>
+            <div className="text-[9px] md:text-sm text-red-500 font-semibold flex">
+              {priceIndex(props.product.finalPrice)}
+            </div>
+          </div>
+        </div>
+      );
+
+      const sessionId =
+        authContext.methods && authContext.methods.getSessionId()
+          ? authContext.methods.getSessionId()
+          : "";
+      const accessType = ProductAccessType.ADD_TO_CART;
+
+      StatisticsService.setProductAccess(
+        userId,
+        sessionId,
+        props.product._id,
+        props.product.shop,
+        accessType
+      );
     } else console.log(response.message);
   };
 
@@ -299,39 +241,6 @@ export default function AboutProduct(props: AboutProductProps) {
               )}
             />
           )}
-
-          {/* TODO: new images type */}
-          {/* <List
-            grid={{ gutter: 20, column: imageCol }}
-            dataSource={mockImages.filter(
-              (image) =>
-                !props.selectedColorOption ||
-                image.color.label === props.selectedColorOption.label
-            )}
-            locale={{
-              emptyText: <CustomEmpty />,
-            }}
-            renderItem={(item) => (
-              <List.Item>
-                <div
-                  className={`cursor-pointer ${
-                    props.mainImage == item.link
-                      ? "border-4 border-blue-400"
-                      : "border-2"
-                  }`}
-                  onClick={() => {
-                    props.setMainImage(item.link);
-                  }}
-                >
-                  <img
-                    className="h-12 w-12 object-fill"
-                    src={item.link}
-                    // alt={item}
-                  />
-                </div>
-              </List.Item>
-            )}
-          /> */}
         </div>
 
         <div className="bg-white h-fit z-50">
@@ -416,7 +325,7 @@ export default function AboutProduct(props: AboutProductProps) {
             <Rate
               disabled
               allowHalf
-              defaultValue={props.product.avgRating}
+              defaultValue={Math.round(props.product.avgRating * 10) / 10}
               style={{ padding: 5, fontSize: 18 }}
             />
             <div className="font-bold uppercase text-xl">
@@ -426,9 +335,9 @@ export default function AboutProduct(props: AboutProductProps) {
                 ({numberOfReview} đánh giá)
               </div> */}
             {/* <Divider
-                      type="vertical"
-                      style={{ height: "auto", border: "1px solid silver" }}
-                    /> */}
+              type="vertical"
+              style={{ height: "auto", border: "1px solid silver" }}
+            /> */}
             <div className="mt-1 text-xs text-slate-600">
               - Đã bán {props.product.soldQuantity}
             </div>

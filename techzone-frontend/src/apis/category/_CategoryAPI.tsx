@@ -1,6 +1,6 @@
 "use client";
 
-import { CategoryType } from "@/model/CategoryType";
+import { CategoryType, SubCategoryType } from "@/model/CategoryType";
 import axios from "axios";
 
 const BACKEND_PREFIX = process.env.NEXT_PUBLIC_BACKEND_PREFIX;
@@ -136,6 +136,53 @@ export async function POST_GetCategoryList(ids: string[]) {
     return {
       isDenied: true,
       message: "Failed to get category",
+      status: 500,
+      data: undefined,
+    };
+  }
+}
+
+interface SubCategoryListResponse {
+  status: number;
+  data: SubCategoryType[];
+  message: string;
+}
+
+export async function GET_GetAllSubCategories() {
+  const url = (
+    BACKEND_PREFIX?.toString() +
+    ":" +
+    CATEGORY_PORT?.toString() +
+    "/subCategories"
+  ).toString();
+
+  try {
+    // console.log(url);
+    const response = await axios.get(url);
+    const responseData: SubCategoryListResponse = response.data;
+
+    console.log(responseData.data);
+
+    if (responseData.status == 200) {
+      return {
+        isDenied: false,
+        message: "Get sub category successfully",
+        status: responseData.status,
+        data: responseData.data,
+      };
+    } else {
+      return {
+        isDenied: true,
+        message: "Failed to get sub category",
+        status: responseData.status,
+        data: responseData.data,
+      };
+    }
+  } catch (err) {
+    console.error(err);
+    return {
+      isDenied: true,
+      message: "Failed to get sub category",
       status: 500,
       data: undefined,
     };

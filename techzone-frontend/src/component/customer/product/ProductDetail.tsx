@@ -27,7 +27,11 @@ import { AuthContext } from "@/context/AuthContext";
 import { ProductAccessType } from "@/enum/ProductAccessType";
 import StatisticsService from "@/services/statistics.service";
 
-export default function ProductDetail() {
+interface ProductDetailProps {
+  notify(message: string, content: any): void;
+}
+
+export default function ProductDetail(props: ProductDetailProps) {
   // variables and functions
   const { productId } = useParams();
 
@@ -288,10 +292,17 @@ export default function ProductDetail() {
   async function setAccessProductByAuthUser(shopId: string, productId: string) {
     const userId =
       authContext.userInfo != null ? authContext.userInfo._id : null;
+
+    let sessionId: string | null = null;
+    if (authContext.methods) {
+      sessionId = authContext.methods.getSessionId();
+    }
+
     const accessType = ProductAccessType.WATCH_DETAIL;
 
     await StatisticsService.setProductAccess(
       userId,
+      sessionId,
       productId,
       shopId,
       accessType
@@ -311,6 +322,7 @@ export default function ProductDetail() {
                 setNumberOfItem={setNumberOfItem}
                 mainImage={mainImage}
                 setMainImage={setMainImage}
+                notify={props.notify}
                 selectedColorOption={selectedColorOption}
                 setSelectedColorOption={setSelectedColorOption}
                 selectedSizeOption={selectedSizeOption}

@@ -8,7 +8,6 @@ import Link from "next/link";
 import CustomEmpty from "../customer/shop/mini/CustomEmpty";
 import { POST_GetProductListByShop } from "@/apis/product/ProductDetailAPI";
 import { ProductType } from "@/model/ProductType";
-import ProductCarousel from "../customer/shop/boothPattern/ProductCarousel";
 
 interface SpecifiedProductsCarouselProp {}
 

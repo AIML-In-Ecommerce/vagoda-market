@@ -21,7 +21,6 @@ const StatisticsAPIs = {
 
     try {
       const response = await axios.post(url, requestBody, {
-        withCredentials: true,
         params: {
           userId: userId,
         },
@@ -35,6 +34,7 @@ const StatisticsAPIs = {
   },
 
   async setAccessProductBySessionId(
+    sessionId: string,
     productId: string,
     shopId: string,
     accessType: string,
@@ -44,6 +44,7 @@ const StatisticsAPIs = {
     const url = `${publicAPIURL}/statistics/access/session/product`;
 
     const requestBody = {
+      ssid: sessionId,
       productId: productId,
       shopId: shopId,
       accessType: accessType,
@@ -51,9 +52,7 @@ const StatisticsAPIs = {
     };
 
     try {
-      const response = await axios.post(url, requestBody, {
-        withCredentials: true,
-      });
+      const response = await axios.post(url, requestBody);
 
       return response;
     } catch (error) {

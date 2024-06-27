@@ -1,6 +1,6 @@
 "use client";
 
-import { CategoryType } from "@/model/CategoryType";
+import { SubCategoryType } from "@/model/CategoryType";
 import { Flex, Image } from "antd";
 import { useState } from "react";
 
@@ -8,9 +8,9 @@ import { useState } from "react";
  * maxSize: [maxWidth, maxHeight]
  */
 interface CategoryItemProps {
-  category: CategoryType;
-  onHoldingCallback: (params: any) => void;
-  onLeavingCallback: (params: any) => void;
+  category: SubCategoryType;
+  // onHoldingCallback: (params: any) => void;
+  // onLeavingCallback: (params: any) => void;
   // maxSize: any[]
 }
 
@@ -33,7 +33,7 @@ export default function CategoryItem(props: CategoryItemProps) {
     setTimeout(() => {
       setImageOpacity(hiddenImageOpacity);
       setIsVisibleName(visibleNameState);
-      props.onHoldingCallback(true);
+      // props.onHoldingCallback(true);
     }, 0);
     // setIsVisibleName(visibleNameState)
   }
@@ -42,7 +42,7 @@ export default function CategoryItem(props: CategoryItemProps) {
     setTimeout(() => {
       setImageOpacity(visibleImageOpacity);
       setIsVisibleName(hiddenNameState);
-      props.onLeavingCallback(false);
+      // props.onLeavingCallback(false);
     }, 0);
   }
 
@@ -50,7 +50,7 @@ export default function CategoryItem(props: CategoryItemProps) {
     <>
       <div
         key={props.category._id}
-        className="container w-full h-full overflow-hidden"
+        className="container w-full h-full overflow-hidden rounded-md"
         onMouseEnter={() => {
           handleMouseEnter();
         }}

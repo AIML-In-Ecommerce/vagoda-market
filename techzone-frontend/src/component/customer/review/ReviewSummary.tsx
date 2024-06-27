@@ -87,7 +87,7 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
               {
                 key: "1",
                 label: (
-                  <div className="flex items-center align-middle justify-center md:block lg:items-center lg:align-middle lg:justify-center font-bold uppercase text-sm md:text-sm">
+                  <div className="flex justify-center md:justify-start lg:justify-center font-bold uppercase text-sm md:text-sm">
                     đánh giá sản phẩm 🌟
                   </div>
                 ),
@@ -108,10 +108,10 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
                                 />
                                 <Flex gap="small" style={{ width: 180 }}>
                                   <Progress
-                                    percent={
+                                    percent={Math.round(
                                       (fiveStarNumber / props.numberOfReview) *
-                                      100
-                                    }
+                                        100
+                                    )}
                                     size="small"
                                   />
                                 </Flex>
@@ -124,10 +124,10 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
                                 />
                                 <Flex gap="small" style={{ width: 180 }}>
                                   <Progress
-                                    percent={
+                                    percent={Math.round(
                                       (fourStarNumber / props.numberOfReview) *
-                                      100
-                                    }
+                                        100
+                                    )}
                                     size="small"
                                   />
                                 </Flex>
@@ -140,10 +140,10 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
                                 />
                                 <Flex gap="small" style={{ width: 180 }}>
                                   <Progress
-                                    percent={
+                                    percent={Math.round(
                                       (threeStarNumber / props.numberOfReview) *
-                                      100
-                                    }
+                                        100
+                                    )}
                                     size="small"
                                   />
                                 </Flex>
@@ -156,10 +156,10 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
                                 />
                                 <Flex gap="small" style={{ width: 180 }}>
                                   <Progress
-                                    percent={
+                                    percent={Math.round(
                                       (twoStarNumber / props.numberOfReview) *
-                                      100
-                                    }
+                                        100
+                                    )}
                                     size="small"
                                   />
                                 </Flex>
@@ -172,10 +172,10 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
                                 />
                                 <Flex gap="small" style={{ width: 180 }}>
                                   <Progress
-                                    percent={
+                                    percent={Math.round(
                                       (oneStarNumber / props.numberOfReview) *
-                                      100
-                                    }
+                                        100
+                                    )}
                                     size="small"
                                   />
                                 </Flex>
@@ -194,7 +194,9 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
                           <Rate
                             disabled
                             allowHalf
-                            defaultValue={props.product.avgRating}
+                            defaultValue={
+                              Math.round(props.product.avgRating * 10) / 10
+                            }
                             style={{ padding: 5, fontSize: 28 }}
                           />
                           <div className="italic text-[9px] md:text-sm">

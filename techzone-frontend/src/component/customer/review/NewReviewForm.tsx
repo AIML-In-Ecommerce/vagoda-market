@@ -10,7 +10,11 @@ import { ProductDetailType } from "@/model/ProductType";
 import { priceIndex } from "../product/ProductDetail";
 import { GET_GetProductDetail } from "@/apis/product/ProductDetailAPI";
 
-export default function NewReviewForm() {
+interface NewReviewFormProps {
+  notify(message: string, content: any): void;
+}
+
+export default function NewReviewForm(props: NewReviewFormProps) {
   // data
   const desc = [
     "Không hài lòng",
@@ -34,7 +38,7 @@ export default function NewReviewForm() {
     // e.preventDefault();
 
     if (content === "") {
-      alert("Hãy điền cảm nhận");
+      props.notify("Hãy điền cảm nhận", "");
     } else {
       handleCreateReview();
     }
@@ -42,6 +46,7 @@ export default function NewReviewForm() {
 
   // call api
   const handleCreateReview = async () => {
+    if (!product) return;
     let newReview: RawReviewType = {
       _id: "",
       product: productId.toString(), // 663da8175f77ea6b8f5b2e1d
@@ -55,20 +60,30 @@ export default function NewReviewForm() {
     };
 
     const response = await POST_CreateReview(newReview);
-    setTimeout(() => {
-      // if (response) {
-      // if (response.status == 200) {
 
-      alert("Tạo thành công!");
-      //
+    props.notify(
+      "Chia sẻ cảm nhận thành công!",
+      <div className="flex flex-row gap-6 w-max">
+        <img className="m-2 h-20 w-20 object-fill" src={product.images[0]} />
+        <div className="flex flex-col justify-center">
+          <div className="text-sm md:text-lg truncate">{product.name}</div>
+          <div className="text-[9px] md:text-sm text-red-500 font-semibold flex">
+            {priceIndex(product.finalPrice)}
+          </div>
+        </div>
+      </div>
+    );
 
-      setRating(3);
-      setContent("");
-      setAsset([]);
-      setFileList([]);
-      // } else console.log(response.message);
-      // } else console.log("No response...");
-    }, 10000);
+    if (response) {
+      setTimeout(() => {
+        // if (response.status == 200) {
+        setRating(3);
+        setContent("");
+        setAsset([]);
+        setFileList([]);
+        // } else console.log(response.message);
+      }, 10000);
+    } else console.log("No response...");
   };
 
   useEffect(() => {

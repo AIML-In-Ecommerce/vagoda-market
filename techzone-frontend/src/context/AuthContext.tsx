@@ -33,6 +33,7 @@ interface AuthContextFunctions {
   logout: () => void;
   refreshToken: () => Promise<boolean | null>;
   getAccessToken: () => string | null;
+  getSessionId: () => string | null;
 }
 
 const defaultContextValue: AuthContextProps = {
@@ -168,6 +169,10 @@ export default function AuthContextProvider({
     router.replace("/auth/account");
   }
 
+  function getSessionId() {
+    return Cookies.get(sessionIdKey);
+  }
+
   const supportMethodValue: AuthContextFunctions = {
     // validateAuthRequest: validateAuthRequest,
     login: login,
@@ -175,6 +180,7 @@ export default function AuthContextProvider({
     forceSignIn: forceSignIn,
     refreshToken: refreshToken,
     getAccessToken: getAccessToken,
+    getSessionId: getSessionId,
   };
 
   const [supportMethods, setSupportMethods] =
