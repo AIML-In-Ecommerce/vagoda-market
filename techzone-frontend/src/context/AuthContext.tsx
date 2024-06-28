@@ -213,8 +213,11 @@ export default function AuthContextProvider({
               logout();
               router.replace("/auth");
             }
-            await reloadUserInfo(refreshUserId as string);
-            break;
+            else
+            {
+              await reloadUserInfo(refreshUserId as string);
+              break;
+            }
           }
           case -1: {
             // no refresh token -> re-authenticate (login again)
@@ -226,7 +229,7 @@ export default function AuthContextProvider({
       // }
     }
 
-    // checkAuthentication();
+    checkAuthentication();
   }, [currentPathname]);
 
   const value: AuthContextProps = useMemo(() => {
