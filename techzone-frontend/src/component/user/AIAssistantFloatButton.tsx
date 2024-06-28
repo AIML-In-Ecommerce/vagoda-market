@@ -83,7 +83,7 @@ const InfinitePromotionListSetup: InfinitePromotionListProps = {
 const testCaseNumber = 3;
 
 const fakeResponse = {
-  type: "cart_adding",
+  type: "product_getter",
   data: [
     {
       _id: "666acc8ed40492953e97649d",
@@ -686,8 +686,8 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
 
   const CardActions = (
     <>
-      <div className="w-full">
-        <div className="relative h-10 w-full"></div>
+      <div className="w-full h-full">
+        {/* <div className="relative h-10 w-full"></div> */}
         <Flex
           className="w-full absolute bottom-0 left-0 px-5"
           justify="center"
@@ -808,7 +808,7 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
           >
             <Flex
               key={"modal-conversation-content"}
-              style={{ maxHeight: `calc(100dvh/100*70)`, height: "100dvh" }}
+              style={{ maxHeight: `calc(100dvh/100*75)`, height: "100dvh" }}
               className="overflow-y-auto"
               vertical
               justify="start"
