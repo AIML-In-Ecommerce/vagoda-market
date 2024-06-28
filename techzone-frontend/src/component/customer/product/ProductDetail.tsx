@@ -149,7 +149,7 @@ export default function ProductDetail(props: ProductDetailProps) {
           {(product &&
             product.attribute.colors.length > 0 &&
             product.attribute.colors.map((color, index) => (
-              <div className="flex flex-row gap-2">
+              <div className="flex flex-row gap-2" key={index}>
                 <Tooltip title={color.color.value} className="cursor-pointer">
                   <ColorPicker defaultValue={color.color.value} disabled />
                 </Tooltip>
@@ -168,7 +168,7 @@ export default function ProductDetail(props: ProductDetailProps) {
           {(product &&
             product.attribute.size.length > 0 &&
             product.attribute.size.map((size, index) => (
-              <span>
+              <span key={index}>
                 {size}
                 {index == product.attribute.size.length - 1 ? "" : ", "}
               </span>
@@ -305,7 +305,7 @@ export default function ProductDetail(props: ProductDetailProps) {
       sessionId,
       productId,
       shopId,
-      accessType
+      accessType,
     );
   }
 

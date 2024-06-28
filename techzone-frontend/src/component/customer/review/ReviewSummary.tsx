@@ -19,7 +19,7 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
   const [fiveStarNumber, setFiveStarNumber] = useState(0);
 
   const [menuMode, setMenuMode] = useState<"horizontal" | "vertical">(
-    "horizontal"
+    "horizontal",
   );
 
   const checkWindowSize = () => {
@@ -110,7 +110,7 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
                                   <Progress
                                     percent={Math.round(
                                       (fiveStarNumber / props.numberOfReview) *
-                                        100
+                                        100,
                                     )}
                                     size="small"
                                   />
@@ -126,7 +126,7 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
                                   <Progress
                                     percent={Math.round(
                                       (fourStarNumber / props.numberOfReview) *
-                                        100
+                                        100,
                                     )}
                                     size="small"
                                   />
@@ -142,7 +142,7 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
                                   <Progress
                                     percent={Math.round(
                                       (threeStarNumber / props.numberOfReview) *
-                                        100
+                                        100,
                                     )}
                                     size="small"
                                   />
@@ -158,7 +158,7 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
                                   <Progress
                                     percent={Math.round(
                                       (twoStarNumber / props.numberOfReview) *
-                                        100
+                                        100,
                                     )}
                                     size="small"
                                   />
@@ -174,7 +174,7 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
                                   <Progress
                                     percent={Math.round(
                                       (oneStarNumber / props.numberOfReview) *
-                                        100
+                                        100,
                                     )}
                                     size="small"
                                   />
