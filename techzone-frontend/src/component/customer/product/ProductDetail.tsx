@@ -26,6 +26,8 @@ import AboutProduct from "./productDetail/AboutProduct";
 import { AuthContext } from "@/context/AuthContext";
 import { ProductAccessType } from "@/enum/ProductAccessType";
 import StatisticsService from "@/services/statistics.service";
+import { GET_GetReviewListByProduct } from "@/apis/review/ReviewAPI";
+import { ReviewType } from "@/model/ReviewType";
 
 interface ProductDetailProps {
   notify(message: string, content: any): void;
@@ -37,7 +39,8 @@ export default function ProductDetail(props: ProductDetailProps) {
 
   const [product, setProduct] = useState<ProductDetailType>();
   const [mainImage, setMainImage] = useState<string>("");
-  const [numberOfReview, setNumberOfReview] = useState(0);
+
+  const [reviews, setReviews] = useState<ReviewType[]>([]);
 
   // selected attributes--------------------------------------------------------
   const [selectedColorOption, setSelectedColorOption] = useState<any>();
@@ -111,13 +114,12 @@ export default function ProductDetail(props: ProductDetailProps) {
   // all reviews
   const allReviews = (
     <ReviewList
-      setNumberOfReview={setNumberOfReview}
       productId={productId.toString()}
+      reviews={reviews}
+      setReviews={setReviews}
     />
   );
-  const reviewSummary = (
-    <ReviewSummary product={product} numberOfReview={numberOfReview} />
-  );
+  const reviewSummary = <ReviewSummary product={product} reviews={reviews} />;
 
   // selected tab key
   const [tabKey, setTabKey] = useState("1");
@@ -244,7 +246,7 @@ export default function ProductDetail(props: ProductDetailProps) {
         <div>
           <div className="lg:grid lg:grid-cols-5 gap-5 h-fit">
             <div className="lg:col-span-2 overflow-y-hidden">
-              {(numberOfReview == 1 && <div>{reviewSummary}</div>) || (
+              {(reviews.length == 1 && <div>{reviewSummary}</div>) || (
                 <Affix
                   offsetTop={60}
                   className={`${reviewSummaryVisibility ? "" : "invisible"} `}
@@ -269,6 +271,7 @@ export default function ProductDetail(props: ProductDetailProps) {
   // call api
   useEffect(() => {
     handleGetProductDetail();
+    handleGetReviews();
   }, []);
 
   useEffect(() => {
@@ -305,9 +308,20 @@ export default function ProductDetail(props: ProductDetailProps) {
       sessionId,
       productId,
       shopId,
-      accessType,
+      accessType
     );
   }
+
+  const handleGetReviews = async () => {
+    const response = await GET_GetReviewListByProduct(productId.toString());
+    if (response.status == 200) {
+      let data = response.data;
+      if (data) {
+        // console.log("review", data);
+        setReviews(data);
+      }
+    } else console.log(response.message);
+  };
 
   return (
     <div className="bg-white px-2 lg:px-24 ">

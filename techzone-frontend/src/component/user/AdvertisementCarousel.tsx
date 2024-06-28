@@ -67,16 +67,16 @@ const MockData = [
     image_url:
       "https://assets.vogue.com/photos/61f03bfdc5d8ae2d1a907cbd/master/w_2560%2Cc_limit/00_story.jpg",
   },
-  {
-    _id: "testing_06",
-    image_url:
-      "https://cloudfront-eu-central-1.images.arcpublishing.com/businessoffashion/T275FM3ICFDBBNOXPPEVXWX3WA.jpg",
-  },
-  {
-    _id: "testing_07",
-    image_url:
-      "https://assets.vogue.com/photos/5fb56f2accd3e78b7ee64ca7/16:9/w_1280,c_limit/01%20MTS%20x%20Fashion%20Nova_0239.jpg",
-  },
+  // {
+  //   _id: "testing_06",
+  //   image_url:
+  //     "https://cloudfront-eu-central-1.images.arcpublishing.com/businessoffashion/T275FM3ICFDBBNOXPPEVXWX3WA.jpg",
+  // },
+  // {
+  //   _id: "testing_07",
+  //   image_url:
+  //     "https://assets.vogue.com/photos/5fb56f2accd3e78b7ee64ca7/16:9/w_1280,c_limit/01%20MTS%20x%20Fashion%20Nova_0239.jpg",
+  // },
   {
     _id: "testing_08",
     image_url:

@@ -2,12 +2,13 @@ import { ProductDetailType } from "@/model/ProductType";
 import { Popover, Flex, Rate, Progress, Collapse, Divider } from "antd";
 import Link from "next/link";
 import SimplePieChart from "./SimplePieChart";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { GET_GetAllReviewsByQuery } from "@/apis/review/ReviewAPI";
+import { ReviewType } from "@/model/ReviewType";
 
 interface ReviewSummaryProps {
   product: ProductDetailType | undefined;
-  numberOfReview: number;
+  reviews: ReviewType[];
 }
 
 export default function ReviewSummary(props: ReviewSummaryProps) {
@@ -19,7 +20,7 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
   const [fiveStarNumber, setFiveStarNumber] = useState(0);
 
   const [menuMode, setMenuMode] = useState<"horizontal" | "vertical">(
-    "horizontal",
+    "horizontal"
   );
 
   const checkWindowSize = () => {
@@ -42,6 +43,15 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
       handleGetNumber(i);
     }
   });
+
+  const reviewContentList = useMemo(() => {
+    let list: string[] = [];
+    props.reviews.forEach((review) => {
+      list.push(review.content);
+    });
+    console.log("list", list);
+    return list;
+  }, [props.reviews]);
 
   // api
   const handleGetNumber = async (rating: number) => {
@@ -109,8 +119,8 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
                                 <Flex gap="small" style={{ width: 180 }}>
                                   <Progress
                                     percent={Math.round(
-                                      (fiveStarNumber / props.numberOfReview) *
-                                        100,
+                                      (fiveStarNumber / props.reviews.length) *
+                                        100
                                     )}
                                     size="small"
                                   />
@@ -125,8 +135,8 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
                                 <Flex gap="small" style={{ width: 180 }}>
                                   <Progress
                                     percent={Math.round(
-                                      (fourStarNumber / props.numberOfReview) *
-                                        100,
+                                      (fourStarNumber / props.reviews.length) *
+                                        100
                                     )}
                                     size="small"
                                   />
@@ -141,8 +151,8 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
                                 <Flex gap="small" style={{ width: 180 }}>
                                   <Progress
                                     percent={Math.round(
-                                      (threeStarNumber / props.numberOfReview) *
-                                        100,
+                                      (threeStarNumber / props.reviews.length) *
+                                        100
                                     )}
                                     size="small"
                                   />
@@ -157,8 +167,8 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
                                 <Flex gap="small" style={{ width: 180 }}>
                                   <Progress
                                     percent={Math.round(
-                                      (twoStarNumber / props.numberOfReview) *
-                                        100,
+                                      (twoStarNumber / props.reviews.length) *
+                                        100
                                     )}
                                     size="small"
                                   />
@@ -173,8 +183,8 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
                                 <Flex gap="small" style={{ width: 180 }}>
                                   <Progress
                                     percent={Math.round(
-                                      (oneStarNumber / props.numberOfReview) *
-                                        100,
+                                      (oneStarNumber / props.reviews.length) *
+                                        100
                                     )}
                                     size="small"
                                   />
@@ -200,7 +210,7 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
                             style={{ padding: 5, fontSize: 28 }}
                           />
                           <div className="italic text-[9px] md:text-sm">
-                            {props.numberOfReview} đánh giá
+                            {props.reviews.length} đánh giá
                             {/* {totalNumber}  */}
                           </div>
                         </div>
@@ -220,7 +230,11 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
                       className="md:pl-5 lg:pl-0 grid grid-cols-3 md:grid-cols-5 lg:grid-cols-3 md:min-h-[200px]"
                     >
                       <div className="col-span-1 flex items-center">
-                        <SimplePieChart />
+                        <SimplePieChart
+                          positiveValue={70}
+                          negativeValue={20}
+                          trashValue={30}
+                        />
                       </div>
 
                       <div className="col-span-2 md:col-span-4 lg:col-span-2 pl-5">

@@ -1,7 +1,13 @@
 import { useState } from "react";
 import { PieChart } from "react-minimal-pie-chart";
 
-export default function SimplePieChart() {
+interface SimplePieChartProps {
+  positiveValue: number;
+  negativeValue: number;
+  trashValue: number;
+}
+
+export default function SimplePieChart(props: SimplePieChartProps) {
   const [shiftedIndex, setShiftedIndex] = useState<number>(-1);
   // const calculateLabelPosition = (index: number, shiftedIndex: number) => {
   //   const basePosition = 50; // Vị trí trung tâm cơ bản
@@ -15,14 +21,14 @@ export default function SimplePieChart() {
     <div className="flex flex-col gap-2 items-center">
       <PieChart
         data={[
-          { title: "Tích cực", value: 80, color: "#5593ec" },
-          { title: "Tiêu cực", value: 25, color: "#FF0000" },
-          { title: "Phản hồi rác", value: 15, color: "#808080" },
+          { title: "Tích cực", value: props.positiveValue, color: "#5593ec" },
+          { title: "Tiêu cực", value: props.negativeValue, color: "#FF0000" },
+          { title: "Phản hồi rác", value: props.trashValue, color: "#808080" },
         ]}
         label={({ dataEntry }) => `${Math.round(dataEntry.percentage)} %`}
         labelPosition={60}
         labelStyle={{
-          fontSize: "10px",
+          fontSize: "7px",
           fontFamily: "sans-serif",
           fill: "#ffffff",
         }}
