@@ -296,7 +296,7 @@ export default function ProductItemList(props: ProductListProps) {
                   isFlashSale={true}
                   imageLink={product.image}
                   originalPrice={product.originalPrice}
-                  inWishlist={true}
+                  // inWishlist={true}
                 />
               </div>
             )
