@@ -13,7 +13,8 @@ import { PiShoppingCart } from "react-icons/pi";
 import { RxPerson } from "react-icons/rx";
 import { TbBrandYoutubeFilled } from "react-icons/tb";
 import { TfiHeadphoneAlt } from "react-icons/tfi";
-import logo from "../../../public/asset/logo.png";
+import logo from "../../../public/asset/vagoda.png";
+import logo2 from "../../../public/asset/v.jpg";
 import Searchbar from "../Searchbar";
 import LanguageOption from "./LanguageOption";
 import NavbarCategory from "./NavbarCategory";
@@ -149,7 +150,7 @@ export default function MainNavbar() {
       </div>
       {menuMode == "mobileMode" ? (
         <header
-          className="navbar  items-center relative space-x-8 w-full px-2  justify-center "
+          className="navbar items-center relative space-x-8 w-full px-2  justify-center "
           style={{ backgroundColor: "rgba(151, 151, 151, 0.8)" }}
         >
           <div className="flex items-center justify-between ">
@@ -160,6 +161,7 @@ export default function MainNavbar() {
               alt="Logo"
               onClick={() => router.push("/")}
             />
+
             <div className="flex space-x-2 items-center">
               <motion.div whileTap={{ scale: 0.9 }}>
                 <Dropdown
@@ -200,20 +202,29 @@ export default function MainNavbar() {
         </header>
       ) : (
         <header
-          className="navbar  items-center relative space-x-8 w-full px-24  to-transparent "
+          className="navbar  items-center relative space-x-8 w-full px-24  to-transparent"
           style={{ backgroundColor: "rgba(151, 151, 151, 0.8)" }}
         >
           <header className="flex   items-center justify-between relative h-30 xs:space-x-4 md:space-x-8 ">
             <div className="flex space-x-4 items-center">
               <NavbarMenu options={allCategories} />
               <div className="mb-0 p-1 cursor-pointer">
-                <Image
-                  src={logo}
-                  width={120}
-                  height={60}
-                  alt="Logo"
-                  onClick={() => router.push("/")}
-                />
+                <div className="flex justify-center items-center">
+                  {/* <Image
+                    src={logo2}
+                    width={50}
+                    height={50}
+                    alt="Logo"
+                    className="rounded-lg"
+                    onClick={() => router.push("/")}
+                  /> */}
+                  <Image
+                    src={logo}
+                    alt="Logo"
+                    className="w-auto h-[45px] "
+                    onClick={() => router.push("/")}
+                  />
+                </div>
               </div>
             </div>
             <div className="">
