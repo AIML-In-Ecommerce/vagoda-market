@@ -55,7 +55,7 @@ export default function PromotionSection(props: PromotionSectionProps) {
                   <PromotionCard
                     key={item._id}
                     item={item}
-                    promotions={props.allPromotions}
+                    isSelected={props.selectedDiscounts.includes(item)}
                     applyDiscount={props.applyDiscount}
                     removeDiscount={props.removeDiscount} />
                 )

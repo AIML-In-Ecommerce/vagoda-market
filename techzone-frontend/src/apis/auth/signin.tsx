@@ -1,45 +1,38 @@
 import axios from "axios";
 
-interface SignInByEmailPasswordProps
-{
-    email: string,
-    password: string,
+interface SignInByEmailPasswordProps {
+  email: string;
+  password: string;
 }
 
+const accountType = "BUYER";
 
-const accountType = "BUYER"
+export async function POST_SignInByEmailPassword(
+  props: SignInByEmailPasswordProps
+) {
+  //TODO: ask about the url please
+  //   const publicAPIURL = process.env.NEXT_PUBLIC_API_GATEWAY;
+  const publicAPIURL = process.env.NEXT_PUBLIC_BACKEND_PREFIX;
 
-export async function POST_SignInByEmailPassword(props: SignInByEmailPasswordProps)
-{
-    //TODO: ask about the url please
-    const API_URL: string = process.env.NEXT_PUBLIC_AUTH_API_URL as string
-    const AUTH_PORT:string = process.env.NEXT_PUBLIC_AUTH_PORT as string
-    const url = `${API_URL}:${AUTH_PORT}/auth/login/`
+  const url = `${publicAPIURL}/auth/login/`;
 
-    try
-    {
-        const requestBody =
-        {
-            email: props.email,
-            password: props.password,
-            type: accountType
-        }
+  try {
+    const requestBody = {
+      email: props.email,
+      password: props.password,
+      type: accountType,
+    };
 
-        const response = await axios.post(url, requestBody,
-            {
-                headers: 
-                {
-                    "Content-Type": "application/json",
-                    "Accept": "*",
-                },
-            }
-        )
+    const response = await axios.post(url, requestBody, {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "*",
+      },
+    });
 
-        return response
-    }
-    catch(err)
-    {
-        console.error(err)
-        return null
-    }
+    return response;
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
 }

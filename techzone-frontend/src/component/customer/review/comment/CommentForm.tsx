@@ -1,6 +1,6 @@
 // import { useAuth } from "@/context/AuthContext";
 // import { useTranslations } from "next-intl";
-import { Avatar } from "antd";
+import { Avatar, Tooltip } from "antd";
 import React, { FormEvent, ReactNode, useState } from "react";
 import { IoMdTrash } from "react-icons/io";
 
@@ -38,16 +38,7 @@ const CommentForm = (props: CommentFormProps) => {
 
   return (
     <React.Fragment>
-      <div className="flex flex-row relative items-center px-3 py-2 rounded-lg bg-gray-100">
-        {/* <div
-          className="rounded-full w-14 h-14 aspect-square mr-5"
-          style={{
-            backgroundImage: `url(${logginedUser.avatar})`,
-            backgroundSize: "cover",
-            backgroundRepeat: "no-repeat",
-          }}
-        /> */}
-
+      <div className="flex flex-row relative items-center px-3 py-2 rounded-lg bg-[#ECECEC]">
         <div className="m-3">
           <Avatar
             size="large"
@@ -71,21 +62,25 @@ const CommentForm = (props: CommentFormProps) => {
               value={value}
               onChange={(e) => setValue(e.target.value)}
             />
-            <button
-              type="reset"
-              className="btn btn-ghost rounded-full
-                text-xl md:text-2xl lg:text-2xl text-[#1AA1D5] cursor-pointer"
-              onClick={() => formCancelHandler()}
-            >
-              <IoMdTrash />
-            </button>
-            <button
-              type="submit"
-              className="btn btn-ghost rounded-full
+            <Tooltip placement="top" title={"Làm sạch"}>
+              <button
+                type="reset"
+                className="btn btn-ghost rounded-full
               text-xl md:text-2xl lg:text-2xl text-[#1AA1D5] cursor-pointer"
-            >
-              {props.btnLabel}
-            </button>
+                onClick={() => formCancelHandler()}
+              >
+                <IoMdTrash />
+              </button>
+            </Tooltip>
+            <Tooltip placement="top" title={"Lưu"}>
+              <button
+                type="submit"
+                className="btn btn-ghost rounded-full
+              text-xl md:text-2xl lg:text-2xl text-[#1AA1D5] cursor-pointer"
+              >
+                {props.btnLabel}
+              </button>
+            </Tooltip>
           </div>
         </form>
       </div>

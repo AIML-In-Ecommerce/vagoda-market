@@ -1,13 +1,8 @@
 export type CommentType = {
-  id: string;
-  reviewId: string;
-  user: { id: string; name: string; avatar: string };
-  desc: string;
-  // parent: string | null;
-  // replyOnUser: string | null;
-  // like: string[] | null;
+  _id: string | undefined;
+  user: { _id: string; fullName: string; avatar: string };
+  content: string;
   createdAt: string;
-  // isSender: boolean; //not need if can get cur user id
 };
 
 export type AffectedCommentType = {
@@ -16,11 +11,23 @@ export type AffectedCommentType = {
 };
 
 export type RawCommentType = {
-  _id: string;
-  user: string; //sender-id
-  content: string; //desc
-  createdAt: string;
+  _id: string | undefined;
+  comment: CommentType;
 };
+
+// OLD ----------------------------------------------------------------
+
+// export type CommentType = {
+//   id: string;
+//   reviewId: string;
+//   user: { id: string; name: string; avatar: string };
+//   desc: string;
+//   parent: string | null;
+//   replyOnUser: string | null;
+//   like: string[] | null;
+//   createdAt: string;
+//   isSender: boolean; //not need if can get cur user id
+// };
 
 // export type RawCommentType = {
 //   _id: string;

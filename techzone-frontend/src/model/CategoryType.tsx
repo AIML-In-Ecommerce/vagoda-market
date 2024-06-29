@@ -15,3 +15,12 @@ export type _CategoryType = {
   image: string;
   subCategories: _CategoryType[];
 };
+
+export type SubCategoryType = {
+  _id: string;
+  name: string; //ex: Laptop, Màn hình máy tính, Ổ cứng
+  image: string;
+  category: string;
+  subCategories: SubCategoryType[];
+  subCategoryType: string[]; // objectid []
+};

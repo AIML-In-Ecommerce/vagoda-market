@@ -686,11 +686,15 @@ export default function CartPage() {
                                     promotions.sort(
                                         (a, b) => compareDateString(a.expiredDate!, b.expiredDate!)
                                     ).map(item => {
+                                        const isExpiredPromotion = (item: PromotionType) => {
+                                            return parseDateString(item.expiredDate!) <= new Date();
+                                        }
+                                        if (isExpiredPromotion(item)) return;
                                         return (
                                             <PromotionCard
                                                 key={item._id}
                                                 item={item}
-                                                promotions={discounts}
+                                                isSelected={discounts.includes(item)}
                                                 applyDiscount={applyDiscount}
                                                 removeDiscount={removeDiscount} />
                                         )

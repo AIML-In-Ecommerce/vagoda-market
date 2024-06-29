@@ -6,11 +6,15 @@ import HotShops from "@/component/user/HotShops";
 import RecentlyAccess from "@/component/user/RecentlyAccess";
 import { Flex } from "antd";
 
-
 export default function Home() {
   return (
     <>
-      <Flex vertical className="w-full h-full bg-[#F3F3F3]" align="center" justify="center">
+      <Flex
+        vertical
+        className="w-full h-full bg-[#F3F3F3]"
+        align="center"
+        justify="center"
+      >
         <AdvertisementCarousel />
         {/* <HomeCarousel /> */}
         <HotCategory />
@@ -20,7 +24,6 @@ export default function Home() {
 
         {/* <HomeSuggestedProduct /> */}
         <HotSalesProducts />
-
       </Flex>
     </>
   );

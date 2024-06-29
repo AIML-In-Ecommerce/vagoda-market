@@ -1,48 +1,39 @@
-'use client';
+"use client";
 
-import axios from 'axios'
-import { APIFunctionResponse, APIResponseSchema } from '../APIResponseSchema'
+import axios from "axios";
+import { APIFunctionResponse, APIResponseSchema } from "../APIResponseSchema";
 
-interface SignUpProps
-{
-    email: string,
-    password: string,
-    fullName: string
+interface SignUpProps {
+  email: string;
+  password: string;
+  fullName: string;
 }
 
-const accountType = "BUYER"
+const accountType = "BUYER";
 
-export async function POST_SignUpByEmailPassword(props: SignUpProps)
-{
-    const API_URL: string = process.env.NEXT_PUBLIC_AUTH_API_URL as string
-    const AUTH_PORT: string = process.env.NEXT_PUBLIC_AUTH_PORT as string
-    const url = `${API_URL}:${AUTH_PORT}/auth/register/`
-    
-    const requestBody = 
-    {
-        email: props.email,
-        password: props.password,
-        fullName: props.fullName,
-        type: accountType
-    }
+export async function POST_SignUpByEmailPassword(props: SignUpProps) {
+  //   const publicAPIURL = process.env.NEXT_PUBLIC_API_GATEWAY;
+  const publicAPIURL = process.env.NEXT_PUBLIC_BACKEND_PREFIX;
 
+  const url = `${publicAPIURL}/auth/register/`;
 
-    try
-    {
-        const response = await axios.post(url, requestBody,
-            {
-                headers:
-                {
-                    "Accept": "*",
-                },
-            }
-        )
+  const requestBody = {
+    email: props.email,
+    password: props.password,
+    fullName: props.fullName,
+    type: accountType,
+  };
 
-        return response
-    }
-    catch(err)
-    {
-        console.error(err)
-        return null
-    }
+  try {
+    const response = await axios.post(url, requestBody, {
+      headers: {
+        Accept: "*",
+      },
+    });
+
+    return response;
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
 }

@@ -32,18 +32,15 @@ export default function BannerCarousel(props: BannerCarouselProps) {
     return (
       <div
         key={index}
-        className="flex max-w-1/2 h-96 items-center"
-        // style={{
-        //   backgroundImage: `url(${value})`,
-        //   backgroundSize: "cover",
-        //   backgroundRepeat: "repeat",
-        // }}
+        className="flex justify-center align-middle items-center"
       >
-        <Image
-          className="w-full h-full"
-          src={value}
-          onClick={handleCarouselOnClick}
-        />
+        <div className="max-w-1/2 h-[400px]">
+          <Image
+            className="w-full h-full"
+            src={value}
+            onClick={handleCarouselOnClick}
+          />
+        </div>
       </div>
     );
   });
