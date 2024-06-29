@@ -112,7 +112,7 @@ export default function HotCategory({}: HotCategoryProps) {
   function get7ItemsDisplay(data: SubCategoryType[]) {
     return (
       <>
-        <Row className="w-full" gutter={12}>
+        {/* <Row className="w-full" gutter={12}>
           <Col span={8} style={{ maxHeight: "500px" }} flex={"auto"}>
             <CategoryItem
               // onHoldingCallback={onHoldingCallback}
@@ -123,21 +123,36 @@ export default function HotCategory({}: HotCategoryProps) {
           <Col span={16}>
             <Row gutter={[5, 10]}>
               <Row gutter={10}>
-                <Col span={6} style={{ maxHeight: "250px" }}>
+                <Col
+                  span={6}
+                  style={{
+                    height: "250px",
+                  }}
+                >
                   <CategoryItem
                     // onHoldingCallback={onHoldingCallback}
                     // onLeavingCallback={onLeavingCallback}
                     category={data[1]}
                   />
                 </Col>
-                <Col span={9} style={{ maxHeight: "250px" }}>
+                <Col
+                  span={9}
+                  style={{
+                    height: "250px",
+                  }}
+                >
                   <CategoryItem
                     // onHoldingCallback={onHoldingCallback}
                     // onLeavingCallback={onLeavingCallback}
                     category={data[2]}
                   />
                 </Col>
-                <Col span={9} style={{ maxHeight: "200px" }}>
+                <Col
+                  span={9}
+                  style={{
+                    height: "250px",
+                  }}
+                >
                   <CategoryItem
                     // onHoldingCallback={onHoldingCallback}
                     // onLeavingCallback={onLeavingCallback}
@@ -146,21 +161,36 @@ export default function HotCategory({}: HotCategoryProps) {
                 </Col>
               </Row>
               <Row gutter={10}>
-                <Col span={9} style={{ maxHeight: "250px" }}>
+                <Col
+                  span={9}
+                  style={{
+                    height: "240px",
+                  }}
+                >
                   <CategoryItem
                     // onHoldingCallback={onHoldingCallback}
                     // onLeavingCallback={onLeavingCallback}
                     category={data[4]}
                   />
                 </Col>
-                <Col span={9} style={{ maxHeight: "200px" }}>
+                <Col
+                  span={9}
+                  style={{
+                    height: "240px",
+                  }}
+                >
                   <CategoryItem
                     // onHoldingCallback={onHoldingCallback}
                     // onLeavingCallback={onLeavingCallback}
                     category={data[5]}
                   />
                 </Col>
-                <Col span={6} style={{ maxHeight: "250px" }}>
+                <Col
+                  span={6}
+                  style={{
+                    height: "240px",
+                  }}
+                >
                   <CategoryItem
                     // onHoldingCallback={onHoldingCallback}
                     // onLeavingCallback={onLeavingCallback}
@@ -170,13 +200,41 @@ export default function HotCategory({}: HotCategoryProps) {
               </Row>
             </Row>
           </Col>
-        </Row>
+        </Row> */}
+
+        <div className="grid grid-cols-3 gap-2">
+          <div className="h-[320px] lg:h-[510px]">
+            <CategoryItem category={data[0]} />
+          </div>
+          <div className="col-span-2 grid grid-cols-3 grid-rows-2 gap-2">
+            <div className="h-[150px] lg:h-[250px]">
+              <CategoryItem category={data[1]} />
+            </div>
+            <div className="h-[150px] lg:h-[250px]">
+              <CategoryItem category={data[2]} />
+            </div>
+            <div className="h-[150px] lg:h-[250px]">
+              <CategoryItem category={data[3]} />
+            </div>
+
+            <div className="row-start-2 h-[150px] lg:h-[250px]">
+              <CategoryItem category={data[4]} />
+            </div>
+            <div className="row-start-2 h-[150px] lg:h-[250px]">
+              <CategoryItem category={data[5]} />
+            </div>
+            <div className="row-start-2 h-[150px] lg:h-[250px]">
+              <CategoryItem category={data[6]} />
+            </div>
+          </div>
+        </div>
       </>
     );
   }
 
   return (
     <div
+      className="mx-5"
       onMouseEnter={() => {
         onHoldingCallback();
       }}

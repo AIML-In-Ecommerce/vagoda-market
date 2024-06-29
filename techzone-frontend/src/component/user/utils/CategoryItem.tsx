@@ -50,7 +50,7 @@ export default function CategoryItem(props: CategoryItemProps) {
     <>
       <div
         key={props.category._id}
-        className="container w-full h-full overflow-hidden rounded-md"
+        className={`w-full h-full overflow-hidden rounded-md`}
         onMouseEnter={() => {
           handleMouseEnter();
         }}
@@ -58,12 +58,12 @@ export default function CategoryItem(props: CategoryItemProps) {
           handleMouseLeave();
         }}
         // style={{
-        //   // backgroundImage: `url(${props.category.image})`,
-        //   backgroundSize: "contain",
+        //   backgroundImage: `url(${props.category.image})`,
+        //   backgroundSize: "cover",
         //   backgroundPosition: "center",
         // }}
       >
-        <div className="shadow-black rounded-md hover:scale-105 transition duration-500 cursor-pointer">
+        <div className="shadow-black rounded-md hover:scale-105 transition duration-500 cursor-pointer w-full h-full">
           {props.category && props.category.image ? (
             <Image
               className={`container relative ${imageOpacity} rounded-md`}
@@ -74,7 +74,7 @@ export default function CategoryItem(props: CategoryItemProps) {
             />
           ) : (
             <Image
-              className="container relative"
+              className="container relative rounded-md"
               width={"100%"}
               height={"100%"}
               preview={false}
