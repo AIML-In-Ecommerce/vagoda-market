@@ -1,21 +1,26 @@
-export type ReviewType = {
-  id: string;
-  productId: string;
-  user: { id: string; name: string; avatar: string }; // ? edit later
-  //cart info?
-  starRating: number;
-  desc: string;
-  createdAt: string;
-  asset: string[]; //image urls
-  conversation: ConversationType[];
-  like: string[];
+import { RawCommentType } from "./CommentType";
+
+type JustProductId = {
+  _id: string;
 };
 
-// the comment type
-type ConversationType = {
-  user: string; //user id
+type UserSummary = {
+  _id: string;
+  avatar: string;
+  fullName: string;
+  //account: string
+}; // ? edit later
+
+export type ReviewType = {
+  _id: string;
+  product: JustProductId;
+  user: UserSummary;
+  rating: number;
   content: string;
-  asset: string[]; // can we not
+  createdAt: string;
+  asset: string[]; //image urls
+  conversation: RawCommentType[];
+  like: string[];
 };
 
 export type RawReviewType = {
@@ -26,6 +31,6 @@ export type RawReviewType = {
   content: string; //desc
   asset: string[]; //image urls
   createdAt: string;
-  conversation: ConversationType[];
+  conversation: RawCommentType[];
   like: string[]; //the user id list who liked
 };

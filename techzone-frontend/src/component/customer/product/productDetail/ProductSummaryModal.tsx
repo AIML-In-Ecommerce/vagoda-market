@@ -2,8 +2,8 @@
 import { Flex, Modal, Spin } from "antd";
 // import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
-import { priceIndex } from "./ProductDetail";
-import CustomEmpty from "../shop/mini/CustomEmpty";
+import { priceIndex } from "../ProductDetail";
+import CustomEmpty from "../../shop/mini/CustomEmpty";
 import { ProductDetailType, ProductType } from "@/model/ProductType";
 import {
   GET_GetProductDetail,

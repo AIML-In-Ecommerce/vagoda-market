@@ -54,13 +54,13 @@ export default function AboutShop(aboutProps: AboutProps) {
 
   return (
     <div className="p-5 grid grid-cols-10 gap-3">
-      <div className="col-span-3 col-start-1 row-start-3 row-span-2 text-center items-center">
-        <Row gutter={16}>
+      <div className="hidden lg:block col-span-3 col-start-1 row-start-3 row-span-2 text-center items-center">
+        <Row gutter={10}>
           <Col span={12}>
             <Card bordered={false}>
               <Statistic
                 title={
-                  <div>
+                  <div className="text-sm">
                     Tỉ lệ hủy
                     <Tooltip
                       title={<div className="m-5 w-fit">Trong 4 tuần qua</div>}
@@ -88,10 +88,10 @@ export default function AboutShop(aboutProps: AboutProps) {
             <Card bordered={false}>
               <Statistic
                 title={
-                  <div>
+                  <div className="text-sm">
                     Tỉ lệ đổi trả
                     <Tooltip
-                      title={<div className="m-5 w-fit">Trong 4 tuần qua</div>}
+                      title={<div className="my-5 w-fit">Trong 4 tuần qua</div>}
                       placement="top"
                     >
                       <InfoCircleOutlined
@@ -115,53 +115,53 @@ export default function AboutShop(aboutProps: AboutProps) {
         </Row>
       </div>
 
-      <div className="col-start-4 col-span-1 row-span-6 text-center items-center">
+      <div className="hidden lg:block col-start-4 col-span-1 row-span-6 text-center items-center">
         <Divider
           type="vertical"
           style={{ height: "100%", border: "0.25px solid silver" }}
         />
       </div>
 
-      <div className="m-2 col-span-2 col-start-5 font-semibold text-gray-600">
+      <div className="m-2 col-span-3 col-start-1 lg:col-span-2 lg:col-start-5 font-semibold text-gray-600">
         <CalendarOutlined /> Thành viên từ năm:{" "}
       </div>
-      <div className="m-2 col-span-4 col-start-7">
+      <div className="m-2 col-span-6 col-start-4 lg:col-span-3 lg:col-start-7">
         {aboutProps.shopDetail.sinceYear}
       </div>
 
-      <div className="m-2 col-span-2 col-start-5 font-semibold text-gray-600">
+      <div className="m-2 col-span-3 col-start-1 lg:col-span-2 lg:col-start-5 font-semibold text-gray-600">
         <AppstoreOutlined /> Số sản phẩm:{" "}
       </div>
-      <div className="m-2 col-span-4 col-start-7">
+      <div className="m-2 col-span-6 col-start-4 lg:col-span-3 lg:col-start-7">
         {aboutProps.shopDetail.totalProductNumber}
       </div>
 
-      <div className="m-2 col-span-2 col-start-5 font-semibold text-gray-600">
+      <div className="m-2 col-span-3 col-start-1 lg:col-span-2 lg:col-start-5 font-semibold text-gray-600">
         <ShopOutlined /> Mô tả cửa hàng:{" "}
       </div>
-      <div className="m-2 col-span-4 col-start-7">
+      <div className="m-2 col-span-6 col-start-4 lg:col-span-3 lg:col-start-7">
         {aboutProps.shopDetail.description}
       </div>
 
-      <div className="m-2 col-span-2 col-start-5 font-semibold text-gray-600">
+      <div className="m-2 col-span-3 col-start-1 lg:col-span-2 lg:col-start-5 font-semibold text-gray-600">
         <StarOutlined /> Đánh giá:{" "}
       </div>
-      <div className="m-2 col-span-4 col-start-7">
+      <div className="m-2 col-span-6 col-start-4 lg:col-span-3 lg:col-start-7">
         <StarFilled style={{ color: "gold" }} /> {aboutProps.shopDetail.rating}{" "}
         / 5
       </div>
 
-      <div className="m-2 col-span-2 col-start-5 font-semibold text-gray-600">
+      <div className="m-2 col-span-3 col-start-1 lg:col-span-2 lg:col-start-5 font-semibold text-gray-600">
         <MessageOutlined /> Phản hồi chat:{" "}
       </div>
-      <div className="m-2 col-span-4 col-start-7">
+      <div className="m-2 col-span-6 col-start-4 lg:col-span-3 lg:col-start-7">
         {aboutProps.shopDetail.replyPercentage * 100}%
       </div>
 
-      <div className="m-2 col-span-2 col-start-5 font-semibold text-gray-600">
+      <div className="m-2 col-span-3 col-start-1 lg:col-span-2 lg:col-start-5 font-semibold text-gray-600">
         <AimOutlined /> Địa chỉ:{" "}
       </div>
-      <div className="m-2 col-span-4 col-start-7">
+      <div className="m-2 col-span-6 col-start-4 lg:col-span-3 lg:col-start-7">
         <Flex>
           {aboutProps.shopDetail.address}
           <div

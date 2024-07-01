@@ -50,3 +50,48 @@ export async function GET_GetShop(id: string) {
     };
   }
 }
+
+interface ShopListResponse {
+  status: number;
+  data: ShopType[];
+  message: string;
+}
+
+export async function GET_GetShopList() {
+  const url = (
+    BACKEND_PREFIX?.toString() +
+    ":" +
+    SHOP_PORT?.toString() +
+    "/shops"
+  ).toString();
+
+  try {
+    // console.log(url);
+    const response = await axios.get(url);
+    const responseData: ShopResponse = response.data;
+
+    if (responseData.status == 200) {
+      return {
+        isDenied: false,
+        message: "Get shop successfully",
+        status: responseData.status,
+        data: responseData.data,
+      };
+    } else {
+      return {
+        isDenied: true,
+        message: "Failed to get shop",
+        status: responseData.status,
+        data: responseData.data,
+      };
+    }
+  } catch (err) {
+    console.error(err);
+    return {
+      isDenied: true,
+      message: "Failed to get shop",
+      status: 500,
+      data: undefined,
+    };
+  }
+}

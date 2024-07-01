@@ -4,7 +4,7 @@ import { Divider, List } from "antd";
 import CustomEmpty from "../mini/CustomEmpty";
 import { CategoryType } from "@/model/CategoryType";
 import { useEffect, useState } from "react";
-import { POST_GetCategoryList } from "@/apis/category/CategoryAPI";
+import { POST_GetCategoryList } from "@/apis/category/_CategoryAPI";
 import CategoryItem from "../mini/CategoryItem";
 
 interface CategoryGridProps {

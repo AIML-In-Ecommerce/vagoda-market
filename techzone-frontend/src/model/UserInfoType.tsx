@@ -28,7 +28,7 @@ export type UserInfoType =
     avatar: string,
     dob: string,
     phoneNumber: string,
-    address: UserShippingAddressType[],
+    // address: UserShippingAddressType[],
     createAt: Date | string
     account: string,
     __v: number

@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import React, { useContext, useRef, useState } from "react";
 
 import { AuthContext } from "@/context/AuthContext";
-import AuthService, { SignInResponseData } from "@/service/auth.service";
+import AuthService, { SignInResponseData } from "@/services/auth.service";
 import { Divider, Flex, Modal, Result } from "antd";
 import { ResultStatusType } from "antd/es/result";
 import { useTranslations } from "next-intl";
@@ -103,16 +103,6 @@ export default function AuthForm(props: AuthFormProps) {
       setValidAuthMsg(localErrorMessage);
     } else if (response.statusCode == 200 || response.statusCode == 201) {
       const responseData: SignInResponseData = response.data;
-      const accessToken = responseData.accessToken as string;
-      const refreshToken = responseData.refreshToken as string;
-      const refreshTokenExpiredDate = new Date(
-        responseData.refreshTokenExpiredDate
-      );
-
-      const stringifiedString = JSON.stringify(responseData.buyerInfo);
-      const userInfoSessionStorageKey = crypto.randomUUID();
-
-      sessionStorage.setItem(userInfoSessionStorageKey, stringifiedString);
       //set access token and refresh token to cookie
 
       setResultModalState("success");
@@ -121,17 +111,11 @@ export default function AuthForm(props: AuthFormProps) {
       setOpenModalAuthSucess(true);
 
       if (authContext.methods) {
-        const check = authContext.methods.login(
-          userInfoSessionStorageKey,
-          accessToken,
-          refreshToken,
-          refreshTokenExpiredDate
-        );
+        const check = authContext.methods.login(responseData)
 
         if (check == true) {
           router.push("/");
         } else {
-          sessionStorage.removeItem(userInfoSessionStorageKey);
           setOpenModalAuthSucess(false);
           setDescriptionMessageOfModal(
             "An involvement has happened that prevents you from your sign-in process"

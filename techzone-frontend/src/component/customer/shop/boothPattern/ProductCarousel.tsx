@@ -116,9 +116,8 @@ export default function ProductCarousel(props: ProductCarouselProps) {
                 </Typography.Text>
               </Flex>
             </Flex>
-            <div className="invisible h-5">hidden block</div>
             {products.length < 4 ? (
-              <div className="px-10">
+              <div className="px-10 mt-5">
                 <List
                   grid={{
                     gutter: 5,
@@ -135,15 +134,19 @@ export default function ProductCarousel(props: ProductCarouselProps) {
                   }}
                   renderItem={(item) => (
                     <List.Item>
-                      <ProductItem
-                        imageLink={item.imageLink}
-                        name={item.name}
-                        rating={item.rating}
-                        soldAmount={item.soldAmount}
-                        price={item.price}
-                        isFlashSale={item.isFlashSale}
-                        originalPrice={item.originalPrice}
-                      />
+                      <Link href={`/product/${item._id}`}>
+                        <div className="text-black">
+                          <ProductItem
+                            imageLink={item.imageLink}
+                            name={item.name}
+                            rating={item.rating}
+                            soldAmount={item.soldAmount}
+                            price={item.price}
+                            isFlashSale={item.isFlashSale}
+                            originalPrice={item.originalPrice}
+                          />
+                        </div>
+                      </Link>
                     </List.Item>
                   )}
                 />
@@ -189,17 +192,22 @@ export default function ProductCarousel(props: ProductCarouselProps) {
               >
                 {products.length > 0 &&
                   products.map((value, index) => (
-                    <div key={index} className="pl-5">
-                      <ProductItem
-                        imageLink={value.imageLink}
-                        name={value.name}
-                        rating={value.rating}
-                        soldAmount={value.soldAmount}
-                        price={value.price}
-                        isFlashSale={value.isFlashSale}
-                        originalPrice={value.originalPrice}
-                      />
-                    </div>
+                    <Link href={`/product/${value._id}`}>
+                      <div
+                        key={index}
+                        className="pl-5 text-black pt-5 h-72 flex flex-col items-center"
+                      >
+                        <ProductItem
+                          imageLink={value.imageLink}
+                          name={value.name}
+                          rating={value.rating}
+                          soldAmount={value.soldAmount}
+                          price={value.price}
+                          isFlashSale={value.isFlashSale}
+                          originalPrice={value.originalPrice}
+                        />
+                      </div>
+                    </Link>
                   ))}
               </Carousel>
             )}

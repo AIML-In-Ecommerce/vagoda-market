@@ -6,6 +6,7 @@ import { ProductType } from "@/model/ProductType";
 import { POST_GetProductList } from "@/apis/product/ProductDetailAPI";
 import { CollectionType } from "@/model/CollectionType";
 import { GET_GetCollection } from "@/apis/collection/CollectionAPI";
+import Link from "next/link";
 
 interface CollectionDetailProps {
   collectionId: string;
@@ -70,15 +71,19 @@ export default function CollectionDetail(props: CollectionDetailProps) {
             }}
             renderItem={(item) => (
               <List.Item>
-                <ProductItem
-                  imageLink={item.imageLink}
-                  name={item.name}
-                  rating={item.rating}
-                  soldAmount={item.soldAmount}
-                  price={item.price}
-                  isFlashSale={item.flashSale}
-                  originalPrice={item.originalPrice}
-                />
+                <Link href={`/product/${item._id}`}>
+                  <div className="text-black">
+                    <ProductItem
+                      imageLink={item.imageLink}
+                      name={item.name}
+                      rating={item.rating}
+                      soldAmount={item.soldAmount}
+                      price={item.price}
+                      isFlashSale={item.flashSale}
+                      originalPrice={item.originalPrice}
+                    />
+                  </div>
+                </Link>
               </List.Item>
             )}
           />

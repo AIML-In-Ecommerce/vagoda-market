@@ -10,6 +10,7 @@ import {
   Skeleton,
   Space,
 } from "antd";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { CiCircleRemove } from "react-icons/ci";
@@ -154,7 +155,7 @@ export default function ProductItemList(props: ProductListProps) {
                     {formatPrice(item.value.min)
                       ? formatPrice(item.value.max)
                         ? `${formatPrice(item.value.min)} - ${formatPrice(
-                            item.value.max
+                            item.value.max,
                           )}`
                         : `Trên ${formatPrice(item.value.min)}`
                       : `Dưới ${formatPrice(item.value.max)}`}
@@ -283,22 +284,23 @@ export default function ProductItemList(props: ProductListProps) {
                 <Skeleton loading={loading} active></Skeleton>
               </div>
             ) : (
-              <div
-                key={index}
-                className="flex items-center justify-center mx-auto"
-              >
-                <ProductItem
+              <Link href={`/product/${product._id}`}>
+                <div
                   key={index}
-                  name={product.name}
-                  rating={product.avgRating}
-                  soldAmount={product.soldQuantity}
-                  price={product.finalPrice}
-                  isFlashSale={true}
-                  imageLink={product.image}
-                  originalPrice={product.originalPrice}
-                  inWishlist={true}
-                />
-              </div>
+                  className="flex items-center justify-center mx-auto text-black"
+                >
+                  <ProductItem
+                    key={index}
+                    name={product.name}
+                    rating={product.avgRating}
+                    soldAmount={product.soldQuantity}
+                    price={product.finalPrice}
+                    isFlashSale={true}
+                    imageLink={product.image}
+                    originalPrice={product.originalPrice}
+                  />
+                </div>
+              </Link>
             )
           )}
         </div>
