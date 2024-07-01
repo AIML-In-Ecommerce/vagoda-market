@@ -2,6 +2,8 @@ import axios from 'axios'
 
 const BACKEND_PREFIX = process.env.NEXT_PUBLIC_BACKEND_PREFIX
 const ORDER_PORT = process.env.NEXT_PUBLIC_ORDER_PORT
+// const HTTP_BACKEND_PREFIX = `${BACKEND_PREFIX}:${ORDER_PORT}`
+const GATEWAY_PREFIX = process.env.NEXT_PUBLIC_GATEWAY_PREFIX
 
 export interface Order {
     _id:             string;
@@ -111,7 +113,7 @@ export interface User {
 
 
 export async function GET_GetAllOrders(userId: string) {
-    const url = `${BACKEND_PREFIX}:${ORDER_PORT}/buyer/orders?userId=${userId}`
+    const url = `${GATEWAY_PREFIX}/buyer/orders?userId=${userId}`
     try {
         const response = await axios.get(url);
         if (userId == null) {
@@ -132,7 +134,7 @@ export async function GET_GetAllOrders(userId: string) {
 }
 
 export async function GET_GetOrderById(orderId: string) {
-    const url = `${BACKEND_PREFIX}:${ORDER_PORT}/buyer/order?orderId=${orderId}`
+    const url = `${GATEWAY_PREFIX}/buyer/order?orderId=${orderId}`
     try {
         const response = await axios.get(url);
         let responseData = response.data;
@@ -153,16 +155,16 @@ export async function POST_createOrder(
     userId: string, 
     shippingAddressId: string,
     promotionId: string,
-    paymentMethodKind: string) 
+    paymentMethodId: string) 
 {
-    const url = `${BACKEND_PREFIX}:${ORDER_PORT}/buyer/order/create?userId=${userId}`
+    const url = `${GATEWAY_PREFIX}/buyer/order/create?userId=${userId}`
     try {
         const response = await axios.post(url, {
             shippingAddressId: shippingAddressId,
-            promotionId: promotionId,
-            paymentMethod: paymentMethodKind
+            promotionIds: [],
+            paymentMethodId: paymentMethodId
         });
-        if (userId == null) {
+        if (userId === null) {
             return { isDenied: true, message: "Unauthenticated", status: 403, data: undefined }
         }
         let responseData = response.data;

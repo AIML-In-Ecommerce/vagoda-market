@@ -1,5 +1,5 @@
 'use client';
-import { GET_GetAllOrders, Order } from '@/app/apis/order/OrderAPI';
+import { GET_GetAllOrders, Order } from '@/apis/order/OrderAPI';
 import OrderInfoComponent from '@/component/customer/order/OrderInfoComponent';
 import { Button, Divider, Flex, Input, List, Tabs, Typography } from 'antd';
 import Search from 'antd/es/input/Search';

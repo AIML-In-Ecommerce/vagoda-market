@@ -2,7 +2,7 @@
 import { Address, AddressType } from '@/model/AddressType'
 import { Checkbox, CheckboxProps, Input, Select } from 'antd'
 import React, { useEffect, useMemo, useState } from 'react'
-import { getProvince, getDistrict, getCommune, Province, Commune, District, ShippingAddress } from '@/app/apis/cart/AddressAPI';
+import { getProvince, getDistrict, getCommune, Province, Commune, District, ShippingAddress } from '@/apis/cart/AddressAPI';
 
 interface DeliveryInfoFormProps {
     currentAddress: ShippingAddress | undefined;

@@ -1,3 +1,4 @@
+"use client";
 import React from 'react'
 import { Currency } from "@/component/user/utils/CurrencyDisplay"
 import { Skeleton, Divider, Button } from "antd"
@@ -18,10 +19,6 @@ const isEmpty = (quantity: number) => {
 }
 
 export default function TransactionSection(props: TransactionSectionProps) {
-    useEffect(() => {
-        console.log('Provisional', props.provisional);
-    },[props.provisional])
-
     return (
         <div className="bg-white px-4 py-2">
             {props.loading ? <Skeleton active /> : (

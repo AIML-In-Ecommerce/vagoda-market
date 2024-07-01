@@ -1,14 +1,14 @@
 "use client";
 import React, { useEffect, useMemo, useState } from 'react'
 import { useParams, useRouter } from "next/navigation";
-import { PaymentMethod } from '@/app/apis/payment/PaymentAPI';
+import { PaymentMethod } from '@/apis/payment/PaymentAPI';
 import { Currency } from '@/component/user/utils/CurrencyDisplay';
 import { TableColumnsType, Button, Space, Skeleton, Table, Image } from 'antd';
 import Link from 'next/link';
-import { GET_getShopInfoById } from '@/app/apis/shop/ShopAPI';
+import { GET_GetShop } from '@/apis/shop/ShopAPI';
 import { FaAngleDoubleLeft } from 'react-icons/fa';
-import { GET_GetOrderById, Order, Product } from '@/app/apis/order/OrderAPI';
-import { getFullAddress } from '@/app/apis/cart/AddressAPI';
+import { GET_GetOrderById, Order, Product } from '@/apis/order/OrderAPI';
+import { getFullAddress } from '@/apis/cart/AddressAPI';
 import { Address } from '@/model/AddressType';
 
 interface OrderDetailPageProps {
@@ -145,10 +145,10 @@ export default function OrderDetailPage() {
             }
         })
         shopIdList.forEach(async (item: string) => {
-            await GET_getShopInfoById(item)
+            await GET_GetShop(item)
                 .then((response) => shopInfosList.push({
                     _id: item,
-                    name: response.data.data.name,
+                    name: response.data?.name,
                 } as ShopInfo));
         })
         setShopInfos(shopInfosList);

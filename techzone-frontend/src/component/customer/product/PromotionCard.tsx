@@ -2,9 +2,9 @@
 import { DiscountType, PromotionType } from "@/model/PromotionType"
 import { Button, Popover } from "antd"
 import { FaRegCircleQuestion } from "react-icons/fa6"
-import TICKET_UNSELECTED from "@/component/booth-design/decorator/mini/(asset)/coupon-bg.svg"
-import TICKET_SELECTED from "@/component/booth-design/decorator/mini/(asset)/coupon-bg-selected.svg"
-import LOGO from "../../../../../public/asset/logo.png"
+import TICKET_UNSELECTED from "@/app/[locale]/(Main)/cart/(asset)/coupon-bg.svg"
+import TICKET_SELECTED from "@/app/[locale]/(Main)/cart/(asset)/coupon-bg-selected.svg"
+import LOGO from "../../../../public/asset/logo.png"
 import PromotionCardDetail from "./PromotionCardDetail";
 import { useState, useEffect } from "react";
 import { formatCurrencyFromValue } from "@/component/user/utils/CurrencyDisplay";

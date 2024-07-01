@@ -5,7 +5,7 @@ import { FaPlus } from "react-icons/fa6"
 import { useRouter } from "next/navigation"
 import { AddressForm } from "@/component/customer/shipping/AddressForm";
 // import { Address, ShippingAddress } from "@/model/ShippingAddress";
-import { DELETE_removeUserShippingAddress, GET_getUserShippingAddress, POST_addUserShippingAddress, PUT_updateUserShippingAddress, ShippingAddress, getFullAddress } from "@/app/apis/cart/AddressAPI";
+import { DELETE_removeUserShippingAddress, GET_getUserShippingAddress, POST_addUserShippingAddress, PUT_updateUserShippingAddress, ShippingAddress, getFullAddress } from "@/apis/cart/AddressAPI";
 import { Address } from "@/model/AddressType";
 
 //utils for testing process

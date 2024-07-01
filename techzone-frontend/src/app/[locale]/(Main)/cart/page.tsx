@@ -16,11 +16,11 @@ import { RiContactsBookLine } from "react-icons/ri";
 import DeliveryInfoForm from "@/component/customer/cart/DeliveryInfoForm";
 import TransactionSection from "@/component/customer/cart/TransactionSection";
 import PromotionSection from "@/component/customer/cart/PromotionSection";
-import { Product, GET_getUserCartProducts, PUT_updateCartProduct } from "@/app/apis/cart/CartProductAPI";
-import { ShippingAddress } from "@/app/apis/cart/AddressAPI";
+import { Product, GET_getUserCartProducts, PUT_updateCartProduct, ColorAttribute, CartItem } from "@/apis/cart/CartProductAPI";
+import { ShippingAddress } from "@/apis/cart/AddressAPI";
 import { useRouter } from "next/navigation";
-import { POST_processTransaction, PaymentMethod } from "@/app/apis/payment/PaymentAPI";
-import { POST_createOrder } from "@/app/apis/order/OrderAPI";
+import { POST_processTransaction, PaymentMethod } from "@/apis/payment/PaymentAPI";
+import { POST_createOrder } from "@/apis/order/OrderAPI";
 
 const formatDate = (date: Date) => {
     const hours = date.getHours().toString().padStart(2, '0');
@@ -68,15 +68,23 @@ const SelectWrapper = styled.div`
         border-color: rgba(0, 0, 0);
         border-width: 2px;
     }
+
+    .ant-select-dropdown {
+            width: 100% !important;
+    }
+
+    .ant-select-dropdown-menu-item {
+            width: 100%;
+    }
 `
 
-interface ProductTableItem extends Product {
+interface CartTableItem extends CartItem {
     key: React.Key
 }
 
 export default function CartPage() {
     const [selectionType, setSelectionType] = useState<'checkbox' | 'radio'>('checkbox');
-    const [products, setProducts] = useState<Product[]>();
+    const [products, setProducts] = useState<CartItem[]>();
     const [promotions, setPromotions] = useState<PromotionType[]>([]);
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
     const [selectedKey, setSelectedKey] = useState<React.Key | null>(null)
@@ -142,8 +150,8 @@ export default function CartPage() {
 
         //Direct call to transaction api
         const transactionResponse = await POST_processTransaction(
-            process.env.NEXT_PUBLIC_USER_ID as string, 
-            products?.filter(product => selectedRowKeys.includes(product._id))!,
+            process.env.NEXT_PUBLIC_USER_ID as string,
+            products?.filter(item => selectedRowKeys.includes(item.itemId))!,
             total,
             paymentMethod
         );
@@ -244,11 +252,11 @@ export default function CartPage() {
             return;
         }
         if (products) {
-            const updatedProducts = products.map((product: Product) => {
-                if (product._id === key) {
-                    return { ...product, quantity: value };
+            const updatedProducts = products.map((item: CartItem) => {
+                if (item.itemId === key) {
+                    return { ...item, quantity: value };
                 }
-                return product;
+                return item;
             });
             setProducts(updatedProducts);
         }
@@ -257,39 +265,39 @@ export default function CartPage() {
     const onIncrement = async (key: React.Key, value: number) => {
         if (value === 100) return;
         if (products) {
-            const updatedProducts = products.map((product: Product) => {
-                if (product._id === key) {
-                    return { ...product, quantity: value + 1 };
+            const updatedProducts = products.map((item: CartItem) => {
+                if (item.itemId === key) {
+                    return { ...item, quantity: value + 1 };
                 }
-                return product;
+                return item;
             });
-            await PUT_updateCartProduct(process.env.NEXT_PUBLIC_USER_ID as string, key.toString(), value + 1);
+            await PUT_updateCartProduct(process.env.NEXT_PUBLIC_USER_ID as string, updatedProducts);
             setProducts(updatedProducts);
         }
     }
 
     const onDecrement = async (key: React.Key, value: number) => {
-        if (value === 1) {   
+        if (value === 1) {
             return handleShowDeleteOneModal(key);
         }
 
         if (products) {
-            const updatedProducts = products.map((product: Product) => {
-                if (product._id === key) {
-                    return { ...product, quantity: value - 1 };
+            const updatedProducts = products.map((item: CartItem) => {
+                if (item.itemId === key) {
+                    return { ...item, quantity: value - 1 };
                 }
-                return product;
+                return item;
             });
-            await PUT_updateCartProduct(process.env.NEXT_PUBLIC_USER_ID as string, key.toString(), value - 1);
+            await PUT_updateCartProduct(process.env.NEXT_PUBLIC_USER_ID as string, updatedProducts);
             setProducts(updatedProducts);
         }
     }
 
     const handleRemoveRow = async (key: React.Key) => {
         if (products) {
-            const updatedProducts = products.filter((product: Product) => product._id !== key);
+            const updatedProducts = products.filter((item: CartItem) => item.itemId !== key);
             setProducts(updatedProducts);
-            await PUT_updateCartProduct(process.env.NEXT_PUBLIC_USER_ID as string, key.toString(), 0);
+            await PUT_updateCartProduct(process.env.NEXT_PUBLIC_USER_ID as string, updatedProducts);
         }
         const updatedRowKeys = selectedRowKeys.filter(beforeKey => beforeKey !== key);
         setSelectedRowKeys(updatedRowKeys);
@@ -298,12 +306,42 @@ export default function CartPage() {
 
     const handleRemoveSelectedRows = () => {
         console.log('handleRemoveSelectedRows', selectedRowKeys)
-        const updatedProducts = products!.filter((product: Product) => !selectedRowKeys.includes(product._id));
+        const updatedProducts = products!.filter((item: CartItem) => !selectedRowKeys.includes(item.itemId));
         setProducts(updatedProducts);
-        selectedRowKeys.forEach(async (rowKey: React.Key) => 
-            await PUT_updateCartProduct(process.env.NEXT_PUBLIC_USER_ID as string, rowKey.toString(), 0))
+        selectedRowKeys.forEach(async (rowKey: React.Key) =>
+            await PUT_updateCartProduct(process.env.NEXT_PUBLIC_USER_ID as string, updatedProducts))
         setSelectedRowKeys([]);
     };
+
+    const handleColorChange = async (key: React.Key, colorValue: string) => {
+        console.log("ATTRIBUTE_COLOR: ", colorValue);
+        if (products) {
+            const updatedProducts = products.map((item: CartItem) => {
+                if (item.itemId === key) {
+                    const colorAttribute = item.attribute.colors.find(item => item.color.value === colorValue)!;
+                    console.log("ATTRIBUTE_COLOR_STRUCTURE: ", colorAttribute);
+                    return { ...item, color: colorAttribute };
+                }
+                return item;
+            });
+            await PUT_updateCartProduct(process.env.NEXT_PUBLIC_USER_ID as string, updatedProducts);
+            setProducts(updatedProducts);
+        }
+    }
+
+    const handleSizeChange = async (key: React.Key, size: string) => {
+        console.log("ATTRIBUTE_SIZE: ", size);
+        if (products) {
+            const updatedProducts = products.map((item: CartItem) => {
+                if (item.itemId === key) {
+                    return { ...item, size: size };
+                }
+                return item;
+            });
+            await PUT_updateCartProduct(process.env.NEXT_PUBLIC_USER_ID as string, updatedProducts);
+            setProducts(updatedProducts);
+        }
+    }
 
     // const handleRowClick = (record: any) => {
     //     // Toggle selection for clicked row
@@ -330,11 +368,14 @@ export default function CartPage() {
     }
 
     const handleProvisional = () => {
-        const selectedProducts = products ? products.filter((product: Product) => selectedRowKeys.includes(product._id)) : [];
-        const provisional = selectedProducts ? selectedProducts.reduce((total: number, product: Product) => {
-            return total + (product.finalPrice * (product.quantity || 1));
+        const selectedProducts = products ? products.filter((item: CartItem) => selectedRowKeys.includes(item.itemId)) : [];
+        const provisional = selectedProducts ? selectedProducts.reduce((total: number, item: CartItem) => {
+            return total + (item.finalPrice * (item.quantity || 1));
         }, 0) : 0;
+        console.log('handleProvisional called', provisional, selectedProducts);
         setProvisional(provisional);
+        const total = provisional !== 0 ? provisional - discount : 0;
+        setTotal(total);
     }
 
     const calculateDirectPricePromotion = (value: number, lowerBound: number, upperBound: number) => {
@@ -363,11 +404,12 @@ export default function CartPage() {
     }
 
     const handleTotalPrice = () => {
+        // console.log('handleTotalPrice called', provisional);
         const total = provisional !== 0 ? provisional - discount : 0;
         setTotal(total);
     }
 
-    const columns: TableColumnsType<Product> = [
+    const columns: TableColumnsType<CartTableItem> = [
         {
             title: <div className="flex flex-row gap-1 items-center uppercase text-gray-400">
                 <div className="text-base">Sản phẩm ({selectedRowKeys.length})</div>
@@ -376,14 +418,17 @@ export default function CartPage() {
                 </Button>
             </div>,
             dataIndex: 'name',
-            render: (text: string, record: Product) =>
+            render: (text: string, record: CartItem) =>
                 <Space align="start" size={12} className="flex flex-row">
                     {
                         loading ? <Skeleton.Image active /> :
-                            <Image
-                                width={120}
-                                src={record.image}
-                                alt={""} />
+                            <Image.PreviewGroup
+                                items={record.images}>
+                                <Image
+                                    width={120}
+                                    src={record.images ? record.images[0] : ""}
+                                    alt={""} />
+                            </Image.PreviewGroup>
                     }
                     {
                         loading ? <Skeleton paragraph={{ rows: 2 }
@@ -391,33 +436,38 @@ export default function CartPage() {
                             <div className="flex flex-row">
                                 <div className="flex flex-col gap-1">
                                     <div className="text-sm font-bold text-ellipsis overflow-hidden">{record.name}</div>
-                                    <div className="text-sm text-gray-500 mb-1">Vàng / XS</div>
+                                    <div className="text-sm text-gray-500 mb-1">{record.color.color.label.toUpperCase()} / {record.size.toUpperCase()}</div>
                                     <SelectWrapper className="flex flex-row gap-2 mb-1">
-                                        <Select
-                                            defaultValue="yellow"
-                                            style={{ width: 75 }}
-                                            // onChange={handleChange}
-                                            options={[
-                                                { value: 'red', label: 'Đỏ' },
-                                                { value: 'green', label: 'Xanh' },
-                                                { value: 'yellow', label: 'Vàng' },
-                                            ]}
-                                        />
-                                        <Select
-                                            defaultValue="xs"
-                                            style={{ width: 75 }}
-                                            // onChange={handleChange}
-                                            options={[
-                                                { value: 'xs', label: 'XS' },
-                                                { value: 's', label: 'S' },
-                                                { value: 'm', label: 'M' },
-                                                { value: 'l', label: 'L' },
-                                                { value: 'xl', label: 'XL' },
-                                                { value: '2xl', label: '2XL' },
-                                            ]}
-                                        />
+                                        {
+                                            (record.attribute.colors && record.attribute.colors.length !== 0) ? (
+                                                <Select
+                                                    labelInValue
+                                                    value={record.color.color}
+                                                    style={{ width: 100 }}
+                                                    onChange={(e) => handleColorChange(record.itemId, e.value)}
+                                                    options={record.attribute.colors.map((item) => {
+                                                        return { value: item.color.value, label: item.color.label }
+                                                    })}
+                                                />
+                                            ) : <></>
+                                        }
+                                        {
+                                            (record.attribute.size && record.attribute.size.length !== 0) ? (
+                                                <Select
+                                                    value={record.size}
+                                                    style={{ width: 75 }}
+                                                    onChange={(e) => handleSizeChange(record.itemId, e)}
+                                                    options={record.attribute.size.map((item) => {
+                                                        return { value: item, label: item.toUpperCase() }
+                                                    })}
+                                                />
+                                            ) : <></>
+
+                                        }
+
+
                                     </SelectWrapper>
-                                    <div style={{ width: 75 }} onClick={() => handleShowDeleteOneModal(record._id)}>
+                                    <div style={{ width: 75 }} onClick={() => handleShowDeleteOneModal(record.itemId)}>
                                         <div className="flex flex-row cursor-pointer items-center gap-1 hover:font-semibold">
                                             <FaRegTrashCan /> Xóa
                                         </div>
@@ -435,12 +485,12 @@ export default function CartPage() {
         {
             title: <span className="text-base uppercase text-gray-400">Số lượng</span>,
             dataIndex: 'quantity',
-            render: (value: number, record: Product) =>
+            render: (value: number, record: CartItem) =>
                 <div className="flex justify-center">
                     {
                         loading ? <Skeleton.Input active /> : (
                             <QuantityControl
-                                keyProp={record._id} value={record.quantity}
+                                keyProp={record.itemId} value={record.quantity}
                                 minValue={1} maxValue={100} defaultValue={1}
                                 inputWidth={75}
                                 onIncrement={onIncrement}
@@ -456,7 +506,7 @@ export default function CartPage() {
         {
             title: <span className="text-base uppercase text-gray-400">Thành tiền</span>,
             dataIndex: ['finalPrice', 'originalPrice'],
-            render: (value: number, record: Product) => (
+            render: (value: number, record: CartItem) => (
                 loading ? <Skeleton.Input active /> : (
                     <div className="flex flex-col gap-1">
                         <span className="text-slate-500 text-base line-through">
@@ -489,8 +539,9 @@ export default function CartPage() {
     useEffect(() => {
         handleProvisional();
         handleDiscount();
-        handleTotalPrice();
-    }, [products, provisional, discount, total, selectedRowKeys, discounts])
+        // handleTotalPrice();
+        console.log('UPDATE_CART', products);
+    }, [products, selectedRowKeys, discounts])
 
     useEffect(() => {
         const storedAddress = localStorage.getItem('shippingAddress');
@@ -604,7 +655,7 @@ export default function CartPage() {
 
                                 }}
                                 columns={columns}
-                                dataSource={products?.map(product => ({...product, key: product._id} as ProductTableItem))}
+                                dataSource={products?.map((item: CartItem) => ({ ...item, key: item.itemId } as CartTableItem))}
                                 // onRow={(record) => ({
                                 //         onClick: () => handleRowClick(record),
                                 //       })}
@@ -627,11 +678,11 @@ export default function CartPage() {
                             <TransactionSection
                                 selectedRowKeys={selectedRowKeys}
                                 loading={loading}
-                                provisional={provisional} 
-                                discount={discount} 
+                                provisional={provisional}
+                                discount={discount}
                                 shippingFee={shippingFee}
-                                total={total} 
-                                handleTransaction={handleTransaction}/>
+                                total={total}
+                                handleTransaction={handleTransaction} />
                         </div>
                     </div>
                 </div>
