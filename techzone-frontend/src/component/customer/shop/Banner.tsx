@@ -9,6 +9,7 @@ interface BannerProps {
   avatarUrl: string | undefined;
   bannerUrl: string | undefined;
   replyPercentage: number;
+  rating: number;
 }
 
 export default function Banner(shopInfo: BannerProps) {
@@ -77,7 +78,7 @@ export default function Banner(shopInfo: BannerProps) {
             <div className="mt-2 font-bold text-lg">{shopInfo.name} ®</div>
             <Flex>
               <div>
-                <StarFilled style={{ color: "gold" }} /> 4.5 / 5
+                <StarFilled style={{ color: "gold" }} /> {shopInfo.rating} / 5
               </div>
               <Divider
                 type="vertical"

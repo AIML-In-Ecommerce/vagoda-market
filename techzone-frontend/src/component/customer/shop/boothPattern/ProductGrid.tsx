@@ -7,11 +7,11 @@ import CustomEmpty from "../mini/CustomEmpty";
 import { GET_GetCollection } from "@/apis/collection/CollectionAPI";
 import { POST_GetProductList } from "@/apis/product/ProductDetailAPI";
 import { CollectionType } from "@/model/CollectionType";
-import { useState, useEffect } from "react";
-import Link from "next/link";
+import { useState, useEffect, ReactElement } from "react";
 
 interface ProductGridProps {
   widget: WidgetType;
+  notify(message: string, content: ReactElement): void;
 }
 
 export default function ProductGrid(props: ProductGridProps) {
@@ -93,19 +93,20 @@ export default function ProductGrid(props: ProductGridProps) {
         }}
         renderItem={(item) => (
           <List.Item>
-            <Link href={`/product/${item._id}`}>
-              <div className="text-black">
-                <ProductItem
-                  imageLink={item.imageLink}
-                  name={item.name}
-                  rating={item.rating}
-                  soldAmount={item.soldAmount}
-                  price={item.price}
-                  isFlashSale={item.flashSale}
-                  originalPrice={item.originalPrice}
-                />
-              </div>
-            </Link>
+            <div className="text-black">
+              <ProductItem
+                _id={item._id}
+                imageLink={item.imageLink}
+                name={item.name}
+                rating={item.rating}
+                soldAmount={item.soldAmount}
+                price={item.price}
+                isFlashSale={item.flashSale}
+                originalPrice={item.originalPrice}
+                shop={item.shop}
+                notify={props.notify}
+              />
+            </div>
           </List.Item>
         )}
       />

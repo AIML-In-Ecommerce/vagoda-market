@@ -1,16 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import SimpleProductCard from "./utils/SimpleProductCard";
 import { Carousel, List } from "antd";
 import { CarouselArrow } from "./utils/CarouselArrow";
 import CenterTitle from "./utils/CenterTitle";
-import { POST_GetProductListByShop } from "@/apis/product/ProductDetailAPI";
-import { _ProductType, ProductType } from "@/model/ProductType";
+import { _ProductType } from "@/model/ProductType";
 import CustomEmpty from "../customer/shop/mini/CustomEmpty";
-import Link from "next/link";
+import StatisticsService from "@/services/statistics.service";
 
-interface HomeFlashSalesProps {}
+interface HomeFlashSalesProps {
+  notify(message: string, content: ReactElement): void;
+}
 
 interface SimpleProductInfo {
   _id: string;
@@ -19,6 +20,7 @@ interface SimpleProductInfo {
   finalPrice: number;
   status: string;
   image: string;
+  shop: string;
 }
 
 // enum WrapperType {
@@ -40,7 +42,7 @@ interface SimpleProductInfo {
 //   image: "",
 // };
 
-export default function HomeFlashSales({}: HomeFlashSalesProps) {
+export default function HomeFlashSales({ notify }: HomeFlashSalesProps) {
   const titleValue = "Giảm giá sốc ";
   const subTitleValue = "MUA NGAY chỉ hôm nay";
   const titleBackground = "bg-[#F2F2F2]";
@@ -181,33 +183,45 @@ export default function HomeFlashSales({}: HomeFlashSalesProps) {
   // };
 
   // call api (temporarily)
-  const mockId = "65f1e8bbc4e39014df775166";
+  // const mockId = "65f1e8bbc4e39014df775166";
+
+  // useEffect(() => {
+  //   handleGetProductList();
+  // }, [mockId]);
+
+  // const handleGetProductList = async () => {
+  //   const response = await POST_GetProductListByShop(mockId);
+  //   if (response.status == 200) {
+  //     if (response.data) {
+  //       const data = response.data;
+  //       const tr_data: SimpleProductInfo[] = data.map((value: ProductType) => {
+  //         const tr_item: SimpleProductInfo = {
+  //           _id: value._id,
+  //           name: value.name,
+  //           originalPrice: value.originalPrice,
+  //           finalPrice: value.price,
+  //           image: value.imageLink,
+  //           status: "SALE",
+  //         };
+
+  //         return tr_item;
+  //       });
+
+  //       setProducts(tr_data);
+  //       // console.log("product", data);
+  //     }
+  //   }
+  // };
 
   useEffect(() => {
     handleGetProductList();
-  }, [mockId]);
+  }, []);
 
   const handleGetProductList = async () => {
-    const response = await POST_GetProductListByShop(mockId);
-    if (response.status == 200) {
-      if (response.data) {
-        const data = response.data;
-        const tr_data: SimpleProductInfo[] = data.map((value: ProductType) => {
-          const tr_item: SimpleProductInfo = {
-            _id: value._id,
-            name: value.name,
-            originalPrice: value.originalPrice,
-            finalPrice: value.price,
-            image: value.imageLink,
-            status: "SALE",
-          };
-
-          return tr_item;
-        });
-
-        setProducts(tr_data);
-        // console.log("product", data);
-      }
+    const response = await StatisticsService.getSaleProducts();
+    console.log("products response", response);
+    if (response && response.length > 0) {
+      setProducts(response);
     }
   };
 
@@ -256,13 +270,12 @@ export default function HomeFlashSales({}: HomeFlashSalesProps) {
                     }}
                     renderItem={(item: SimpleProductInfo) => (
                       <List.Item>
-                        <Link href={`/product/${item._id}`}>
-                          <SimpleProductCard
-                            info={item}
-                            imageWidth={cardImageWidth}
-                            imageHeight={cardImageHeight}
-                          />
-                        </Link>
+                        <SimpleProductCard
+                          info={item}
+                          imageWidth={cardImageWidth}
+                          imageHeight={cardImageHeight}
+                          notify={notify}
+                        />
                       </List.Item>
                     )}
                   />
@@ -308,18 +321,17 @@ export default function HomeFlashSales({}: HomeFlashSalesProps) {
                 >
                   {products.length > 0 &&
                     products.map((value, index) => (
-                      <Link href={`/product/${value._id}`}>
-                        <div
-                          key={index}
-                          className="pl-5 text-black pt-5 h-72 flex flex-col items-center"
-                        >
-                          <SimpleProductCard
-                            info={value}
-                            imageWidth={cardImageWidth}
-                            imageHeight={cardImageHeight}
-                          />
-                        </div>
-                      </Link>
+                      <div
+                        key={index}
+                        className="pl-5 text-black pt-5 h-72 flex flex-col items-center"
+                      >
+                        <SimpleProductCard
+                          info={value}
+                          imageWidth={cardImageWidth}
+                          imageHeight={cardImageHeight}
+                          notify={notify}
+                        />
+                      </div>
                     ))}
                 </Carousel>
               )}

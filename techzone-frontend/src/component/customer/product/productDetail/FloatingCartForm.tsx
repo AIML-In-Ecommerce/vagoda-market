@@ -1,18 +1,14 @@
 "use client";
-import { Button } from "antd";
+import { Button, Image } from "antd";
 // import { useTranslations } from "next-intl";
 import { priceIndex } from "../ProductDetail";
 import { QuantityControl } from "@/component/user/utils/QuantityControl";
 import { BsQuestionCircle } from "react-icons/bs";
 
-interface ProductProps {
+interface FormProps {
   name: string;
   price: number;
   mainImage: string;
-}
-
-interface FormProps {
-  product: ProductProps;
   numberOfItem: number;
   updateItemNumber: (value: number) => void;
   totalPrice: number;
@@ -29,12 +25,12 @@ const FloatingCartForm = (formData: FormProps) => {
   //   );
   // }, [formData.totalComboPrice, formData.numberOfItem]);
 
-  const onIncrement = (key: React.Key, value: number) => {
+  const onIncrement = (value: number) => {
     if (value === 100) return;
     formData.updateItemNumber(value + 1);
   };
 
-  const onDecrement = (key: React.Key, value: number) => {
+  const onDecrement = (value: number) => {
     if (value === 1) return;
     formData.updateItemNumber(value - 1);
   };
@@ -49,14 +45,15 @@ const FloatingCartForm = (formData: FormProps) => {
   return (
     <div className={`bg-white h-16 border-2 border-x-0 border-t-0 `}>
       <div className="grid grid-cols-12">
-        <img
+        {/* <img
           className="m-2 h-12 w-12 object-fill"
           src={formData.product.mainImage}
-        />
+          alt=""
+        /> */}
+        <Image src={formData.mainImage} preview={false} width={12} alt="" />
+
         <div className="col-start-3 md:col-start-2 col-span-4 flex flex-col justify-center">
-          <div className="text-sm md:text-lg truncate">
-            {formData.product.name}
-          </div>
+          <div className="text-sm md:text-lg truncate">{formData.name}</div>
           <div className="text-[9px] md:text-sm text-red-500 font-semibold flex">
             {/* {priceIndex(formData.product.price)} */}
             {priceIndex(formData.totalPrice)}

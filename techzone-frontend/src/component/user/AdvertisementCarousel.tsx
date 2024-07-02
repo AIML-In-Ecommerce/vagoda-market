@@ -129,9 +129,11 @@ export default function AdvertisementCarousel(
   const [advertisements, setAdvertisements] = useState<AdvertisementProps[]>(
     []
   );
-  const [mainDisplay, setMainDisplay] = useState<JSX.Element[]>(
-    new Array(3).fill(<Skeleton active />)
-  );
+  const [mainDisplay, setMainDisplay] = useState<JSX.Element[]>([
+    <Skeleton active key="1" />,
+    <Skeleton active key="2" />,
+    <Skeleton active key="3" />,
+  ]);
 
   const carouselAutoplaySpeed = 6000; //ms
 
@@ -154,7 +156,12 @@ export default function AdvertisementCarousel(
   //get advertisements display
   useEffect(() => {
     if (advertisements.length == 0) {
-      setMainDisplay(new Array(3).fill(<Skeleton active />));
+      // setMainDisplay(new Array(3).fill(<Skeleton active />));
+      setMainDisplay([
+        <Skeleton active key="1" />,
+        <Skeleton active key="2" />,
+        <Skeleton active key="3" />,
+      ]);
     } else {
       const advertisementDisplays = advertisements.map(
         (value: AdvertisementProps, index: number) => {
@@ -179,7 +186,7 @@ export default function AdvertisementCarousel(
     <>
       <Flex className="w-full py-4" vertical align="center" justify="center">
         <Flex
-          className="px-4 w-full h-[280px] lg:h-screen items-center"
+          className={`px-4 w-full h-[280px] sm:h-[600px] lg:h-[calc(100vh-80px)] items-center`}
           justify="center"
           align="center"
         >

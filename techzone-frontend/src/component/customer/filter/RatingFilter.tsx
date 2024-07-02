@@ -44,7 +44,7 @@ export default function RatingFilter(props: RadioFilterProps) {
       >
         <Space direction="vertical">
           <Radio value={0} className="text-xs">
-            All
+            Tất cả
           </Radio>
           <Radio value={5}>
             <div className="flex space-x-2 items-center text-xs">
