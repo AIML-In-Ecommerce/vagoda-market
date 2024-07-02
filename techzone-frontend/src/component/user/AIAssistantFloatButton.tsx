@@ -23,6 +23,7 @@ import {
 } from "react-icons/io5";
 import { LuSendHorizonal, LuShrink } from "react-icons/lu";
 import { FiShoppingCart } from "react-icons/fi";
+import { FaChartLine } from "react-icons/fa6";
 import { FiMic } from "react-icons/fi";
 
 import InfiniteProductsList, {
@@ -212,6 +213,10 @@ interface ExtendedCartMessageBoxProps {
   handleExpandButtonOnClick: () => void;
 }
 
+interface ExtendedChartMessageBoxProps {
+  handleExpandButtonOnClick: () => void;
+}
+
 const ExtendedProductMessageBox: React.FC<ExtendedProductMessageBoxProps> = ({
   images,
   handleExpandButtonOnClick,
@@ -260,6 +265,22 @@ const ExtendedCartMessageBox: React.FC<ExtendedCartMessageBoxProps> = ({
       <div className="flex flex-row gap-2 justify-center items-center text-xs font-semibold">
         <FiShoppingCart />
         <span>Xem giỏ hàng</span>
+      </div>
+    </div>
+  );
+};
+
+const ExtendedChartMessageBox: React.FC<ExtendedChartMessageBoxProps> = ({
+  handleExpandButtonOnClick,
+}) => {
+  return (
+    <div
+      className="flex p-2 border border-slate-200 rounded space-x-2 w-fit hover:bg-[#f5f5f4] cursor-pointer"
+      onClick={handleExpandButtonOnClick}
+    >
+      <div className="flex flex-row gap-2 justify-center items-center text-xs font-semibold">
+        <FaChartLine />
+        <span>Xem biểu đồ</span>
       </div>
     </div>
   );
@@ -383,7 +404,7 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
         setExtendedMessage("cart_adding");
         return <></>;
       case "gen_chart":
-        setExtendedMessage("cart_adding");
+        setExtendedMessage("gen_chart");
         switch (response.data.type) {
           case "line":
             return (
@@ -446,6 +467,12 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
       case "cart_adding":
         return (
           <ExtendedCartMessageBox
+            handleExpandButtonOnClick={handleExpandButtonOnClick}
+          />
+        );
+      case "gen_chart":
+        return (
+          <ExtendedChartMessageBox
             handleExpandButtonOnClick={handleExpandButtonOnClick}
           />
         );
@@ -801,7 +828,7 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
       extra={extraAiAssistantPopoverContentButton}
     >
       <Flex
-        className="overflow-y-auto h-96 max-h-96 max-w-screen-md mb-8"
+        className="overflow-y-auto h-96 max-h-96 max-w-screen-md mb-8 pr-2"
         vertical
         justify="start"
         align="center"
@@ -890,7 +917,7 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
       >
         <Flex className="w-full h-full bg-gray-200">
           <Card
-            className="w-2/5"
+            className="w-2/5 "
             style={{ boxShadow: "none", borderRadius: "0 0 0 0" }}
             title={cardTitle}
             bordered={false}
@@ -899,7 +926,7 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
             <Flex
               key={"modal-conversation-content"}
               style={{ maxHeight: `calc(100dvh/100*75)`, height: "100dvh" }}
-              className="overflow-y-auto"
+              className="overflow-y-auto pr-2"
               vertical
               justify="start"
               align="center"
