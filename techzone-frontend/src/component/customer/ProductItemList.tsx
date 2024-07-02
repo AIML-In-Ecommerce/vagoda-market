@@ -10,6 +10,7 @@ import {
   Skeleton,
   Space,
 } from "antd";
+
 import { useSearchParams } from "next/navigation";
 import { ReactElement, useEffect, useState } from "react";
 import { CiCircleRemove } from "react-icons/ci";
