@@ -35,6 +35,11 @@ import { BsChatDots } from "react-icons/bs";
 
 import "@/custom_css/AntdFullscreenModal.css";
 import { FaSkating } from "react-icons/fa";
+import InfiniteChart from "./utils/InfiniteChart";
+import LineChart from "./utils/Chart/LineChart";
+import BarChart from "./utils/Chart/BarChar";
+import PieChart from "./utils/Chart/PieChart";
+import "../../custom_css/Loader.css";
 
 interface AIAssistantFloatButtonProps {}
 
@@ -47,8 +52,10 @@ type ToolType =
   | "product_getter"
   | "promotion_getter"
   | "cart_adding"
-  | "chart_drawing"
+  | "gen_chart"
   | "text";
+
+type AIState = "THINKING" | "RESPONSED";
 
 interface AssistantMessageProps {
   role: AssistantMessageTypes;
@@ -83,7 +90,7 @@ const InfinitePromotionListSetup: InfinitePromotionListProps = {
 const testCaseNumber = 3;
 
 const fakeResponse = {
-  type: "product_getter",
+  type: "gen_chart",
   data: [
     {
       _id: "666acc8ed40492953e97649d",
@@ -267,6 +274,7 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
   const [bigModalOpen, setBigModalOpen] = useState<boolean>(false);
   const [userInput, setUserInput] = useState<string | undefined>(undefined);
   const [extendedMessage, setExtendedMessage] = useState<ToolType>();
+  const [aiState, setAiState] = useState<AIState>("RESPONSED");
 
   const ref = useRef(null);
   useEffect(() => {
@@ -374,6 +382,9 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
       case "cart_adding":
         setExtendedMessage("cart_adding");
         return <></>;
+      case "gen_chart":
+        setExtendedMessage("cart_adding");
+        return <LineChart />;
       default:
         return greetingReactNode;
     }
@@ -535,6 +546,15 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
     }
   }
 
+  function isJsonString(str: string) {
+    try {
+      JSON.parse(str);
+    } catch (e) {
+      return false;
+    }
+    return true;
+  }
+
   const handleSendButtonOnClick = async () => {
     if (userInput == undefined) {
       return;
@@ -560,58 +580,81 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
     history_conservation.push(message);
 
     setMessages(history_conservation);
-    try {
-      const rawResponse = await axios.post(
-        "http://localhost:8000/chat/agent",
-        postBody,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      );
-      if (rawResponse.status == 200) {
-        let response = JSON.parse(rawResponse.data.data);
-        console.log("AI Response: ", response);
+    // try {
+    //   setAiState("THINKING");
 
-        const assistantResponse: AssistantMessageProps = {
-          role: AssistantMessageTypes.Assistant,
-          message: response.message,
-          type: response.type,
-          data: response.data,
-        };
+    //   const rawResponse = await axios.post(
+    //     "http://localhost:8000/chat/agent",
+    //     postBody,
+    //     {
+    //       headers: {
+    //         "Content-Type": "application/json",
+    //       },
+    //     },
+    //   );
+    //   if (rawResponse.status == 200) {
+    //     console.log("AI Response: ", rawResponse.data);
 
-        const newResponseMessages = [...history_conservation];
-        newResponseMessages.push(assistantResponse);
-        setMessages(newResponseMessages);
-        if (localStorage) {
-          const stringifiedMessages = JSON.stringify(history_conservation);
-          localStorage.setItem(
-            AIAssistantLocalStorageKeyword,
-            stringifiedMessages,
-          );
-        }
-        setExtraSupportDisplay(setExtendedDisplay(response));
-      }
-    } catch (error) {
-      console.error("Error in conservation:", error);
-    }
+    //     let type = "";
+    //     let message = "";
+    //     let data = "";
+    //     if (!isJsonString(rawResponse.data.data)) {
+    //       message = rawResponse.data.data;
+    //     } else {
+    //       let response = JSON.parse(rawResponse.data.data);
 
-    // const assistantResponse: AssistantMessageProps = {
-    //   role: AssistantMessageTypes.Assistant,
-    //   message: fakeResponse.message,
-    //   type: fakeResponse.type,
-    //   data: fakeResponse.data,
-    // };
+    //       message = response.message != undefined ? response.message : "";
+    //       type = response.type != undefined ? response.type : "";
+    //       data = response.data != undefined ? response.data : "";
+    //       setExtraSupportDisplay(setExtendedDisplay(response));
+    //     }
 
-    // const newResponseMessages = [...history_conservation];
-    // newResponseMessages.push(assistantResponse);
-    // setMessages(newResponseMessages);
-    // if (localStorage) {
-    //   const stringifiedMessages = JSON.stringify(history_conservation);
-    //   localStorage.setItem(AIAssistantLocalStorageKeyword, stringifiedMessages);
+    //     const assistantResponse: AssistantMessageProps = {
+    //       role: AssistantMessageTypes.Assistant,
+    //       message: message,
+    //       type: type,
+    //       data: data,
+    //     };
+
+    //     const newResponseMessages = [...history_conservation];
+    //     newResponseMessages.push(assistantResponse);
+    //     setMessages(newResponseMessages);
+    //     setAiState("RESPONSED");
+
+    //     if (localStorage) {
+    //       const stringifiedMessages = JSON.stringify(history_conservation);
+    //       localStorage.setItem(
+    //         AIAssistantLocalStorageKeyword,
+    //         stringifiedMessages,
+    //       );
+    //     }
+    //   }
+    // } catch (error) {
+    //   console.error("Error in conservation:", error);
     // }
-    // setExtraSupportDisplay(setExtendedDisplay(fakeResponse));
+
+    setAiState("THINKING");
+    setTimeout(() => {
+      setAiState("RESPONSED");
+      const assistantResponse: AssistantMessageProps = {
+        role: AssistantMessageTypes.Assistant,
+        message: fakeResponse.message,
+        type: fakeResponse.type,
+        data: fakeResponse.data,
+      };
+
+      const newResponseMessages = [...history_conservation];
+      newResponseMessages.push(assistantResponse);
+      setMessages(newResponseMessages);
+      if (localStorage) {
+        const stringifiedMessages = JSON.stringify(history_conservation);
+        localStorage.setItem(
+          AIAssistantLocalStorageKeyword,
+          stringifiedMessages,
+        );
+      }
+      setExtraSupportDisplay(setExtendedDisplay(fakeResponse));
+    }, 5000);
   };
 
   const ExpandOrShrinkButton =
@@ -743,7 +786,7 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
       extra={extraAiAssistantPopoverContentButton}
     >
       <Flex
-        className="overflow-y-auto h-96 max-h-96 max-w-screen-md"
+        className="overflow-y-auto h-96 max-h-96 max-w-screen-md mb-8"
         vertical
         justify="start"
         align="center"
@@ -753,6 +796,38 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
         {messages.map((message: AssistantMessageProps, index: number) => {
           return getMessageDisplay(message, index);
         })}
+        {aiState === "THINKING" && (
+          <Flex vertical key={"thinking"} className="w-full my-2">
+            <Flex className="w-full" justify="start" align="center" gap={8}>
+              <Flex className="h-full" justify="center" align="start">
+                <Image
+                  className="rounded-full"
+                  width={35}
+                  height={35}
+                  src={AIAssistantImageLink}
+                  preview={false}
+                />
+              </Flex>
+              <Flex vertical gap={6} className="w-9/12">
+                <Flex className="w-full" justify="start" align="center">
+                  <Tag bordered={false} color={"#f5f5f4"}>
+                    <Flex
+                      className="px-1 pt-2"
+                      vertical
+                      justify="center"
+                      align="start"
+                    >
+                      <Typography.Text className="text-amber-900 text-sm font-semibold mb-1">
+                        Trợ lý AI
+                      </Typography.Text>
+                      <span className="loader p-3 mr-[12px] mb-2"></span>
+                    </Flex>
+                  </Tag>
+                </Flex>
+              </Flex>
+            </Flex>
+          </Flex>
+        )}
       </Flex>
       {CardActions}
     </Card>
@@ -819,6 +894,44 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
               {messages.map((message: AssistantMessageProps, index: number) => {
                 return getMessageDisplay(message, index);
               })}
+
+              {aiState === "THINKING" && (
+                <Flex vertical key={"thinking"} className="w-full my-2">
+                  <Flex
+                    className="w-full"
+                    justify="start"
+                    align="center"
+                    gap={8}
+                  >
+                    <Flex className="h-full" justify="center" align="start">
+                      <Image
+                        className="rounded-full"
+                        width={35}
+                        height={35}
+                        src={AIAssistantImageLink}
+                        preview={false}
+                      />
+                    </Flex>
+                    <Flex vertical gap={6} className="w-9/12">
+                      <Flex className="w-full" justify="start" align="center">
+                        <Tag bordered={false} color={"#f5f5f4"}>
+                          <Flex
+                            className="px-1 pt-2"
+                            vertical
+                            justify="center"
+                            align="start"
+                          >
+                            <Typography.Text className="text-amber-900 text-sm font-semibold mb-1">
+                              Trợ lý AI
+                            </Typography.Text>
+                            <span className="loader p-3 mr-[12px] mb-2"></span>
+                          </Flex>
+                        </Tag>
+                      </Flex>
+                    </Flex>
+                  </Flex>
+                </Flex>
+              )}
             </Flex>
             {CardActions}
           </Card>
