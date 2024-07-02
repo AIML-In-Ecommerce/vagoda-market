@@ -5,11 +5,6 @@ import { ProductType } from "@/model/ProductType";
 import { Button, Flex, message, Skeleton } from "antd";
 import React, { ReactElement, useEffect, useRef, useState } from "react";
 
-interface SetupProps {
-  // fetchDataFuntion: (page: number) => Promise<any>
-  setup: InfiniteScrollProductsProps;
-}
-
 export interface InfiniteScrollProductsProps {
   productsPerRow: number;
   overFlowMaxHeight: string;
@@ -18,14 +13,16 @@ export interface InfiniteScrollProductsProps {
 
 interface ProductItemProps {
   _id: string;
-  imageLink: string;
   name: string;
-  rating: number;
-  soldAmount: number;
-  price: number;
-  isFlashSale: boolean;
+  description: string;
+  material: string;
   originalPrice: number;
+  finalPrice: number;
   shop: string;
+  brand: string;
+  soldQuantity: number;
+  avgRating: number;
+  images: string[];
 }
 
 enum WrapperType {
@@ -37,163 +34,6 @@ interface ProductItemPropsWrapper {
   type: WrapperType;
   productInfo: ProductItemProps;
 }
-
-const MockData: ProductType[] = [
-  {
-    _id: "sp-01",
-    imageLink:
-      "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    name: "Lenovo 15i",
-    rating: 4.5,
-    soldAmount: 20,
-    price: 15000000,
-    flashSale: true,
-    originalPrice: 17000000,
-    category: "CA",
-    shop: "",
-  },
-  {
-    _id: "sp-02",
-    imageLink:
-      "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    name: "Dell Vostro",
-    rating: 4.5,
-    soldAmount: 32,
-    price: 17000000,
-    flashSale: false,
-    originalPrice: 17000000,
-    category: "C2",
-    shop: "",
-  },
-  {
-    _id: "sp-03",
-    imageLink:
-      "https://images.unsplash.com/photo-1593642702821-c8da6771f0c6?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    name: "Dell SuperLight",
-    rating: 4.5,
-    soldAmount: 10,
-    price: 22000000,
-    flashSale: true,
-    originalPrice: 20000000,
-    category: "C1",
-    shop: "",
-  },
-  {
-    _id: "sp-04",
-    imageLink:
-      "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    name: "Lenovo 15i",
-    rating: 4.5,
-    soldAmount: 20,
-    price: 15000000,
-    flashSale: true,
-    originalPrice: 17000000,
-    category: "CA",
-    shop: "",
-  },
-  {
-    _id: "sp-05",
-    imageLink:
-      "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    name: "Dell Vostro",
-    rating: 4.5,
-    soldAmount: 32,
-    price: 17000000,
-    flashSale: false,
-    originalPrice: 17000000,
-    category: "C2",
-    shop: "",
-  },
-  {
-    _id: "sp-06",
-    imageLink:
-      "https://images.unsplash.com/photo-1593642702821-c8da6771f0c6?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    name: "Dell SuperLight",
-    rating: 4.5,
-    soldAmount: 10,
-    price: 22000000,
-    flashSale: true,
-    originalPrice: 20000000,
-    category: "C3",
-    shop: "",
-  },
-  {
-    _id: "sp-07",
-    imageLink:
-      "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    name: "Lenovo 15i",
-    rating: 4.5,
-    soldAmount: 20,
-    price: 15000000,
-    flashSale: true,
-    originalPrice: 17000000,
-    category: "CA",
-    shop: "",
-  },
-  {
-    _id: "sp-08",
-    imageLink:
-      "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    name: "Dell Vostro",
-    rating: 4.5,
-    soldAmount: 32,
-    price: 17000000,
-    flashSale: false,
-    originalPrice: 17000000,
-    category: "C2",
-    shop: "",
-  },
-  {
-    _id: "sp-09",
-    imageLink:
-      "https://images.unsplash.com/photo-1593642702821-c8da6771f0c6?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    name: "Dell SuperLight",
-    rating: 4.5,
-    soldAmount: 10,
-    price: 22000000,
-    flashSale: true,
-    originalPrice: 20000000,
-    category: "CA",
-    shop: "",
-  },
-  {
-    _id: "sp-10",
-    imageLink:
-      "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    name: "Lenovo 15i",
-    rating: 4.5,
-    soldAmount: 20,
-    price: 15000000,
-    flashSale: true,
-    originalPrice: 17000000,
-    category: "C2",
-    shop: "",
-  },
-  {
-    _id: "sp-11",
-    imageLink:
-      "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    name: "Dell Vostro",
-    rating: 4.5,
-    soldAmount: 32,
-    price: 17000000,
-    flashSale: false,
-    originalPrice: 17000000,
-    category: "CA",
-    shop: "",
-  },
-  // {
-  //     _id: "sp-12",
-  //     imageLink: "https://images.unsplash.com/photo-1593642702821-c8da6771f0c6?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-  //     name: "Dell SuperLight",
-  //     rating: 4.5,
-  //     soldAmount: 10,
-  //     price: 22000000,
-  //     flashSale: true,
-  //     originalPrice: 20000000,
-  //     category: "C2"
-  // }
-];
 
 const paddingBlockProps: ProductType = {
   _id: "",
@@ -208,18 +48,18 @@ const paddingBlockProps: ProductType = {
   shop: "",
 };
 
-export default function InfiniteProductsList(setupProps: SetupProps) {
-  const [products, setProducts] = useState<ProductItemProps[]>([]);
-  const [mainDisplay, setMainDisplay] = useState<JSX.Element>(
-    <Skeleton active />
-  );
-  const [currentPagination, setCurrentPagination] = useState<number>(1);
+const InfiniteProductsList: React.FC<{
+  setupProps: InfiniteScrollProductsProps;
+  additionalData: ProductItemProps[];
+}> = ({ setupProps, additionalData }) => {
+  const [products, setProducts] = useState<ProductItemProps[]>(additionalData);
   const [isLoadingItems, setIsLoadingItems] = useState<boolean>(false);
 
   const ref = useRef(null);
   React.useEffect(() => {
     require("@lottiefiles/lottie-player");
   });
+
   const lottie = (
     <lottie-player
       id="firstLottie"
@@ -232,189 +72,9 @@ export default function InfiniteProductsList(setupProps: SetupProps) {
     ></lottie-player>
   );
 
-  useEffect(() => {
-    setIsLoadingItems(true);
-    setTimeout(() => {
-      setIsLoadingItems(false);
-    }, 3000);
-    //fetch data here
-
-    //for testing
-    const data = MockData.map((value) => {
-      const item: ProductItemProps = {
-        _id: value._id,
-        imageLink: value.imageLink,
-        name: value.name,
-        rating: value.rating,
-        soldAmount: value.soldAmount,
-        price: value.price,
-        isFlashSale: value.flashSale,
-        originalPrice: value.originalPrice,
-        shop: value.shop,
-      };
-
-      return item;
-    });
-
-    setProducts(data);
-  }, []);
-
-  useEffect(() => {
-    setIsLoadingItems(true);
-    setTimeout(() => {
-      const newDisplay = getSlideOfProductsDisplay();
-      setMainDisplay(newDisplay);
-      setIsLoadingItems(false);
-    }, 3000);
-  }, [products]);
-
-  function handleLoadMoreOnClick() {
-    setIsLoadingItems(true);
-    setTimeout(() => {
-      setIsLoadingItems(false);
-      setCurrentPagination(currentPagination + 1);
-      const data = [...MockData];
-      const mappedData = data.map((value: ProductType) => {
-        const item: ProductItemProps = {
-          _id: value._id,
-          imageLink: value.imageLink,
-          name: value.name,
-          rating: value.rating,
-          soldAmount: value.soldAmount,
-          price: value.price,
-          isFlashSale: value.flashSale,
-          originalPrice: value.originalPrice,
-          shop: value.shop,
-        };
-
-        return item;
-      });
-
-      const newProductsItems = [...products].concat(mappedData);
-      setProducts(newProductsItems);
-    }, 3000);
-    //TODO: fetch more data here
-    //await fetchDataFunction(currentPage)
-  }
-
-  // TODO: temporarily
-  const openNotification = (title: string, content: ReactElement) => {
-    // api.info({
-    //   message: `${title}`,
-    //   description: content,
-    //   placement,
-    // });
-    message.success(title);
-  };
-  function getSlideOfProductsDisplay() {
-    if (products.length < 1) {
-      return <Skeleton active />;
-    }
-
-    let result: JSX.Element = <></>;
-
-    let data = products.map((value: ProductItemProps) => {
-      const item: ProductItemPropsWrapper = {
-        productInfo: value,
-        type: WrapperType.infoBlock,
-      };
-
-      return item;
-    });
-
-    let numOfRows = data.length / setupProps.setup.productsPerRow;
-
-    const remainder = data.length % setupProps.setup.productsPerRow;
-    //insert padding blocks
-    if (remainder != 0 && remainder < setupProps.setup.productsPerRow) {
-      const paddingBlocks = new Array(
-        setupProps.setup.productsPerRow - remainder
-      )
-        .fill(paddingBlockProps)
-        .map((value) => {
-          const item: ProductItemPropsWrapper = {
-            productInfo: value,
-            type: WrapperType.paddingBlock,
-          };
-          return item;
-        });
-      data = data.concat(paddingBlocks);
-
-      numOfRows = numOfRows + 1;
-    }
-
-    const wrapper: JSX.Element[] = [];
-
-    for (let i = 0; i < numOfRows; i++) {
-      const left = i * setupProps.setup.productsPerRow;
-      const right =
-        left + setupProps.setup.productsPerRow > data.length
-          ? data.length
-          : left + setupProps.setup.productsPerRow;
-
-      const slicedData = data.slice(left, right);
-
-      const rowDisplay = slicedData.map(
-        (valueWrapper: ProductItemPropsWrapper) => {
-          let isVisible: string = "text-black";
-          if (valueWrapper.type == WrapperType.paddingBlock) {
-            isVisible = "text-black invisible";
-          }
-          const value = valueWrapper.productInfo;
-          return (
-            <div className={isVisible} key={value._id}>
-              <ProductItem
-                _id={value._id}
-                imageLink={value.imageLink}
-                name={value.name}
-                rating={value.rating}
-                soldAmount={value.soldAmount}
-                price={value.price}
-                isFlashSale={value.isFlashSale}
-                originalPrice={value.originalPrice}
-                shop={value.shop}
-                notify={openNotification} // TODO: temporarily
-              />
-            </div>
-          );
-        }
-      );
-
-      wrapper.push(
-        <Flex
-          key={i.toString()}
-          className="w-full"
-          justify="center"
-          align="center"
-          gap={6}
-        >
-          {rowDisplay}
-        </Flex>
-      );
-    }
-
-    // result = <Flex className="w-11/12" vertical={true} justify="center" align="center">
-    //     {wrapper}
-    // </Flex>
-
-    result = (
-      <Flex
-        vertical
-        className="w-full"
-        justify="center"
-        align="center"
-        gap={20}
-      >
-        {wrapper}
-      </Flex>
-    );
-
-    return result;
-  }
-
   const LoadMoreButton =
     isLoadingItems == false ? (
-      <Button className="border-none" onClick={handleLoadMoreOnClick}>
+      <Button className="border-none" onClick={() => {}}>
         Xem thêm
       </Button>
     ) : (
@@ -430,10 +90,25 @@ export default function InfiniteProductsList(setupProps: SetupProps) {
         align="center"
       >
         <div
-          className="overflow-y-auto py-4 w-full"
-          style={{ maxHeight: `${setupProps.setup.overFlowMaxHeight}` }}
+          className="overflow-y-auto py-4 w-full grid lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 gap-4"
+          style={{ maxHeight: `${setupProps.overFlowMaxHeight}` }}
         >
-          {mainDisplay}
+          {additionalData.map((value, index) => (
+            <div
+              key={index}
+              className="lg:col-span-1 md:col-span-1 sm:col-span-1 "
+            >
+              <ProductItem
+                imageLink={value.images[0]}
+                name={value.name}
+                rating={value.avgRating}
+                soldAmount={value.soldQuantity}
+                price={value.finalPrice}
+                isFlashSale={true}
+                originalPrice={value.originalPrice}
+              />
+            </div>
+          ))}
         </div>
         <Flex className="w-full" justify="center" align="center">
           {LoadMoreButton}
@@ -441,4 +116,6 @@ export default function InfiniteProductsList(setupProps: SetupProps) {
       </Flex>
     </>
   );
-}
+};
+
+export default InfiniteProductsList;
