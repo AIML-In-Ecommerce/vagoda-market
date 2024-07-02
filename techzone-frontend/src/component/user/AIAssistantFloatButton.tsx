@@ -420,7 +420,7 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
   function renderExtendedMessageBox(message: AssistantMessageProps) {
     switch (message.type) {
       case "product_getter":
-        let extendedData = fakeResponse.data.map((item) => item.images[0]);
+        let extendedData = message.data.map((item: any) => item.images[0]);
         return (
           <ExtendedProductMessageBox
             images={extendedData}
@@ -428,7 +428,6 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
           />
         );
       case "cart_adding":
-        console.log("jj");
         return (
           <ExtendedCartMessageBox
             handleExpandButtonOnClick={handleExpandButtonOnClick}
