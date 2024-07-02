@@ -6,9 +6,10 @@ ChartJS.register(ArcElement, Tooltip, Legend, Title);
 
 interface PieChartProp {
   data: any;
+  title: string;
 }
 
-const PieChart = (prop: PieChartProp) => {
+const PieChart = (props: PieChartProp) => {
   const data = {
     labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
     datasets: [
@@ -65,14 +66,14 @@ const PieChart = (prop: PieChartProp) => {
       },
       title: {
         display: true,
-        text: "Pie Chart",
+        text: props.title,
       },
     },
   };
 
   return (
     <div className="w-full h-full  flex p-10 justify-center items-center">
-      <Pie data={prop.data} options={options} />
+      <Pie data={props.data} options={options} />
     </div>
   );
 };

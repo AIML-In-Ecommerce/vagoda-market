@@ -23,6 +23,7 @@ ChartJS.register(
 
 interface LineChartProps {
   data: any;
+  title: string;
 }
 
 const LineChart = (props: LineChartProps) => {
@@ -54,7 +55,7 @@ const LineChart = (props: LineChartProps) => {
       },
       title: {
         display: true,
-        text: "Line Chart",
+        text: props.title,
       },
     },
   };

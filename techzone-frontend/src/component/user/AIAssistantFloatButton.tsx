@@ -386,11 +386,20 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
         setExtendedMessage("cart_adding");
         switch (response.data.type) {
           case "line":
-            return <LineChart data={response.data.data} />;
+            return (
+              <LineChart
+                data={response.data.data}
+                title={response.data.title}
+              />
+            );
           case "bar":
-            return <BarChart />;
+            return (
+              <BarChart data={response.data.data} title={response.data.title} />
+            );
           case "pie":
-            return <PieChart />;
+            return (
+              <PieChart data={response.data.data} title={response.data.title} />
+            );
         }
       default:
         return greetingReactNode;
