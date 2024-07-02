@@ -580,81 +580,81 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
     history_conservation.push(message);
 
     setMessages(history_conservation);
-    // try {
-    //   setAiState("THINKING");
+    try {
+      setAiState("THINKING");
 
-    //   const rawResponse = await axios.post(
-    //     "http://localhost:8000/chat/agent",
-    //     postBody,
-    //     {
-    //       headers: {
-    //         "Content-Type": "application/json",
-    //       },
-    //     },
-    //   );
-    //   if (rawResponse.status == 200) {
-    //     console.log("AI Response: ", rawResponse.data);
+      const rawResponse = await axios.post(
+        "http://localhost:8000/chat/agent",
+        postBody,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+      if (rawResponse.status == 200) {
+        console.log("AI Response: ", rawResponse.data);
 
-    //     let type = "";
-    //     let message = "";
-    //     let data = "";
-    //     if (!isJsonString(rawResponse.data.data)) {
-    //       message = rawResponse.data.data;
-    //     } else {
-    //       let response = JSON.parse(rawResponse.data.data);
+        let type = "";
+        let message = "";
+        let data = "";
+        if (!isJsonString(rawResponse.data.data)) {
+          message = rawResponse.data.data;
+        } else {
+          let response = JSON.parse(rawResponse.data.data);
 
-    //       message = response.message != undefined ? response.message : "";
-    //       type = response.type != undefined ? response.type : "";
-    //       data = response.data != undefined ? response.data : "";
-    //       setExtraSupportDisplay(setExtendedDisplay(response));
-    //     }
+          message = response.message != undefined ? response.message : "";
+          type = response.type != undefined ? response.type : "";
+          data = response.data != undefined ? response.data : "";
+          setExtraSupportDisplay(setExtendedDisplay(response));
+        }
 
-    //     const assistantResponse: AssistantMessageProps = {
-    //       role: AssistantMessageTypes.Assistant,
-    //       message: message,
-    //       type: type,
-    //       data: data,
-    //     };
+        const assistantResponse: AssistantMessageProps = {
+          role: AssistantMessageTypes.Assistant,
+          message: message,
+          type: type,
+          data: data,
+        };
 
-    //     const newResponseMessages = [...history_conservation];
-    //     newResponseMessages.push(assistantResponse);
-    //     setMessages(newResponseMessages);
-    //     setAiState("RESPONSED");
+        const newResponseMessages = [...history_conservation];
+        newResponseMessages.push(assistantResponse);
+        setMessages(newResponseMessages);
+        setAiState("RESPONSED");
 
-    //     if (localStorage) {
-    //       const stringifiedMessages = JSON.stringify(history_conservation);
-    //       localStorage.setItem(
-    //         AIAssistantLocalStorageKeyword,
-    //         stringifiedMessages,
-    //       );
-    //     }
-    //   }
-    // } catch (error) {
-    //   console.error("Error in conservation:", error);
-    // }
-
-    setAiState("THINKING");
-    setTimeout(() => {
-      setAiState("RESPONSED");
-      const assistantResponse: AssistantMessageProps = {
-        role: AssistantMessageTypes.Assistant,
-        message: fakeResponse.message,
-        type: fakeResponse.type,
-        data: fakeResponse.data,
-      };
-
-      const newResponseMessages = [...history_conservation];
-      newResponseMessages.push(assistantResponse);
-      setMessages(newResponseMessages);
-      if (localStorage) {
-        const stringifiedMessages = JSON.stringify(history_conservation);
-        localStorage.setItem(
-          AIAssistantLocalStorageKeyword,
-          stringifiedMessages,
-        );
+        if (localStorage) {
+          const stringifiedMessages = JSON.stringify(history_conservation);
+          localStorage.setItem(
+            AIAssistantLocalStorageKeyword,
+            stringifiedMessages,
+          );
+        }
       }
-      setExtraSupportDisplay(setExtendedDisplay(fakeResponse));
-    }, 5000);
+    } catch (error) {
+      console.error("Error in conservation:", error);
+    }
+
+    // setAiState("THINKING");
+    // setTimeout(() => {
+    //   setAiState("RESPONSED");
+    //   const assistantResponse: AssistantMessageProps = {
+    //     role: AssistantMessageTypes.Assistant,
+    //     message: fakeResponse.message,
+    //     type: fakeResponse.type,
+    //     data: fakeResponse.data,
+    //   };
+
+    //   const newResponseMessages = [...history_conservation];
+    //   newResponseMessages.push(assistantResponse);
+    //   setMessages(newResponseMessages);
+    //   if (localStorage) {
+    //     const stringifiedMessages = JSON.stringify(history_conservation);
+    //     localStorage.setItem(
+    //       AIAssistantLocalStorageKeyword,
+    //       stringifiedMessages,
+    //     );
+    //   }
+    //   setExtraSupportDisplay(setExtendedDisplay(fakeResponse));
+    // }, 5000);
   };
 
   const ExpandOrShrinkButton =
