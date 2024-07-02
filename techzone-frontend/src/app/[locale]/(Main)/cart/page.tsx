@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
-import { Button, Card, Modal, Space, Table, Image, Tooltip, Skeleton, Select, Radio, Divider } from 'antd';
+import { Button, Card, Modal, Space, Table, Image, Tooltip, Skeleton, Select, Radio, Divider, Spin } from 'antd';
 import type { RadioChangeEvent, TableColumnsType } from 'antd';
 import { FaRegTrashCan, FaRegCircleQuestion } from "react-icons/fa6";
 import { Currency } from "@/component/user/utils/CurrencyDisplay";
@@ -21,6 +21,8 @@ import { ShippingAddress } from "@/apis/cart/AddressAPI";
 import { useRouter } from "next/navigation";
 import { POST_processTransaction, PaymentMethod } from "@/apis/payment/PaymentAPI";
 import { POST_createOrder } from "@/apis/order/OrderAPI";
+import { GET_GetAllPromotionByShopId, Promotion } from "@/apis/cart/promotion/PromotionAPI";
+import { GET_GetShop } from "@/apis/shop/ShopAPI";
 
 const formatDate = (date: Date) => {
     const hours = date.getHours().toString().padStart(2, '0');
@@ -82,17 +84,29 @@ interface CartTableItem extends CartItem {
     key: React.Key
 }
 
+type ShopInfo = {
+    _id: string,
+    name: string,
+}
+
+type PromotionDisplay = {
+    shopInfo: ShopInfo,
+    promotions: Promotion[]
+}
+
 export default function CartPage() {
     const [selectionType, setSelectionType] = useState<'checkbox' | 'radio'>('checkbox');
     const [products, setProducts] = useState<CartItem[]>();
+    const [shopInfos, setShopInfos] = useState<ShopInfo[]>();
     const [promotions, setPromotions] = useState<PromotionType[]>([]);
+    const [promotionDisplayList, setPromotionDisplayList] = useState<PromotionDisplay[]>();
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
     const [selectedKey, setSelectedKey] = useState<React.Key | null>(null)
     const [loading, setLoading] = useState(false);
     const [provisional, setProvisional] = useState(0);
     const [discount, setDiscount] = useState(0);
+    const [selectedPromotions, setSelectedPromotions] = useState<PromotionType[]>([]);
     const [shippingFee, setShippingFee] = useState(0);
-    const [discounts, setDiscounts] = useState<PromotionType[]>([]);
     const [total, setTotal] = useState(0);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showDeleteManyModal, setShowDeleteManyModal] = useState(false);
@@ -102,12 +116,45 @@ export default function CartPage() {
     const promotion_help = "Áp dụng tối đa 1 Mã giảm giá Sản Phẩm và 1 Mã Vận Chuyển"
     const router = useRouter();
 
-    const initialAddress = {
-        _id: "datn1",
+    const [currentAddress, setCurrentAddress] = useState<ShippingAddress>({
+        _id: 'datn'
+    } as ShippingAddress);
 
-    } as ShippingAddress;
+    const filterShopName = (shopId: string) => {
+        const shopName = shopInfos!.find(shopInfo => shopInfo._id === shopId)!.name;
+        return shopName;
+    }
 
-    const [currentAddress, setCurrentAddress] = useState<ShippingAddress>(initialAddress);
+    const fetchShopInfos = (products: CartItem[]) => {
+        const shopInfosList: ShopInfo[] = [];
+        const shopIdList: string[] = [];
+        products.forEach(async (product: CartItem) => {
+            if (!shopIdList.includes(product.shop)) {
+                shopIdList.push(product.shop);
+            }
+        })
+        shopIdList.forEach(async (item: string) => {
+            await GET_GetShop(item)
+                .then((response) => shopInfosList.push({
+                    _id: item,
+                    name: response.data?.name,
+                } as ShopInfo));
+        })
+        setShopInfos(shopInfosList);
+    }
+
+    useEffect(() => {
+        if (products) {
+            setLoading(true);
+            fetchShopInfos(products);
+            setLoading(false);
+        }
+    }, [products]);
+
+    useEffect(() => {
+        console.log('ShopInfos', shopInfos);
+        router.refresh();
+    }, [shopInfos]);
 
     const handleShowDeleteOneModal = (key: any) => {
         setSelectedKey(key);
@@ -144,96 +191,135 @@ export default function CartPage() {
     const handleTransaction = async () => {
         console.log('Transaction processing...');
 
-        //Create order
+        //Create order, response gateway url and transaction
         const createOrderResponse = await POST_createOrder(
-            process.env.NEXT_PUBLIC_USER_ID as string, currentAddress._id, "", paymentMethod);
+            process.env.NEXT_PUBLIC_USER_ID as string, currentAddress._id, [], [], paymentMethod);
+        if (createOrderResponse) {
+            console.log('Navigating to gateway...', createOrderResponse.data.order_url);
+            if (paymentMethod === PaymentMethod.ZALOPAY) {
+                router.push(createOrderResponse.data.order_url)
+            }
+            else { router.push('/payment') }
+        }
 
         //Direct call to transaction api
-        const transactionResponse = await POST_processTransaction(
-            process.env.NEXT_PUBLIC_USER_ID as string,
-            products?.filter(item => selectedRowKeys.includes(item.itemId))!,
-            total,
-            paymentMethod
-        );
-        if (transactionResponse) {
-            console.log('Navigating to gateway...', transactionResponse.data);
-            transactionResponse.data ? router.push(transactionResponse.data) : router.push('/payment');
-        }
+        // const transactionResponse = await POST_processTransaction(
+        //     process.env.NEXT_PUBLIC_USER_ID as string,
+        //     products?.filter(item => selectedRowKeys.includes(item.itemId))!,
+        //     total,
+        //     paymentMethod
+        // );
+        // if (transactionResponse) {
+        //     console.log('Navigating to gateway...', transactionResponse.data);
+        //     transactionResponse.data ? router.push(transactionResponse.data) : router.push('/payment');
+        // }
+        // 
     }
 
-    const fetchPromotions = async () => {
-        const data: PromotionType[] = [
-            {
-                _id: '1',
-                name: "Giảm 50%",
-                description: "Áp dụng cho thanh toán qua ví điện tử MoMo (tối đa 100k)",
-                discountType: DiscountType.PERCENTAGE,
-                discountValue: 50,
-                quantity: 6,
-                upperBound: 100000,
-                expiredDate: formatDate(new Date('2024-05-30T12:30:00')), // 
-                code: ""
-            },
-            {
-                _id: '2',
-                name: "Giảm 200k",
-                description: "Áp dụng cho mọi đối tượng khách hàng (cho đơn tối thiểu 400k)",
-                discountType: DiscountType.DIRECT_PRICE,
-                discountValue: 200000,
-                quantity: 20,
-                lowerBound: 400000,
-                expiredDate: formatDate(new Date('2024-06-27T12:30:00')),
-                code: ""
-            },
-            {
-                _id: '3',
-                name: "Giảm 20%",
-                description: "Áp dụng cho tất cả khách hàng (tối đa 50k)",
-                discountType: DiscountType.PERCENTAGE,
-                discountValue: 20,
-                quantity: 15,
-                upperBound: 50000,
-                expiredDate: formatDate(new Date('2024-03-22T12:30:00')),
-                code: ""
-            },
-            {
-                _id: '4',
-                name: "Giảm 50k",
-                description: "Chỉ áp dụng cho khách hàng VIP",
-                discountType: DiscountType.DIRECT_PRICE,
-                discountValue: 50000,
-                quantity: 10,
-                lowerBound: 0,
-                expiredDate: formatDate(new Date('2024-04-30T12:30:00')),
-                code: ""
-            },
-            {
-                _id: '5',
-                name: "Giảm 10%",
-                description: "Áp dụng cho thanh toán qua thẻ tín dụng (tối đa 50k)",
-                discountType: DiscountType.PERCENTAGE,
-                discountValue: 10,
-                quantity: 8,
-                upperBound: 50000,
-                expiredDate: formatDate(new Date('2024-03-25T12:30:00')),
-                code: ""
-            }
-        ]
-        // Generate code for each promotion
-        const fixedData: PromotionType[] = data.map((promotion: PromotionType) => { return { ...promotion, code: generatePromotionCode(promotion.description).toUpperCase() } })
-        setTimeout(() => {
-            setLoading(false);
-        }, 1000);
-        setPromotions(fixedData);
+    const fetchPromotions = async (shopInfos: ShopInfo[]) => {
+        // const data: PromotionType[] = [
+        //     {
+        //         _id: '1',
+        //         name: "Giảm 50%",
+        //         description: "Áp dụng cho thanh toán qua ví điện tử MoMo (tối đa 100k)",
+        //         discountType: DiscountType.PERCENTAGE,
+        //         discountValue: 50,
+        //         quantity: 6,
+        //         upperBound: 100000,
+        //         expiredDate: formatDate(new Date('2024-05-30T12:30:00')), // 
+        //         code: ""
+        //     },
+        //     {
+        //         _id: '2',
+        //         name: "Giảm 200k",
+        //         description: "Áp dụng cho mọi đối tượng khách hàng (cho đơn tối thiểu 400k)",
+        //         discountType: DiscountType.DIRECT_PRICE,
+        //         discountValue: 200000,
+        //         quantity: 20,
+        //         lowerBound: 400000,
+        //         expiredDate: formatDate(new Date('2024-07-27T12:30:00')),
+        //         code: ""
+        //     },
+        //     {
+        //         _id: '3',
+        //         name: "Giảm 20%",
+        //         description: "Áp dụng cho tất cả khách hàng (tối đa 50k)",
+        //         discountType: DiscountType.PERCENTAGE,
+        //         discountValue: 20,
+        //         quantity: 15,
+        //         upperBound: 50000,
+        //         expiredDate: formatDate(new Date('2024-07-22T12:30:00')),
+        //         code: ""
+        //     },
+        //     {
+        //         _id: '4',
+        //         name: "Giảm 50k",
+        //         description: "Chỉ áp dụng cho khách hàng VIP",
+        //         discountType: DiscountType.DIRECT_PRICE,
+        //         discountValue: 50000,
+        //         quantity: 10,
+        //         lowerBound: 0,
+        //         expiredDate: formatDate(new Date('2024-07-30T12:30:00')),
+        //         code: ""
+        //     },
+        //     {
+        //         _id: '5',
+        //         name: "Giảm 10%",
+        //         description: "Áp dụng cho thanh toán qua thẻ tín dụng (tối đa 50k)",
+        //         discountType: DiscountType.PERCENTAGE,
+        //         discountValue: 10,
+        //         quantity: 8,
+        //         upperBound: 50000,
+        //         expiredDate: formatDate(new Date('2024-03-25T12:30:00')),
+        //         code: ""
+        //     }
+        // ]
+        // // Generate code for each promotion
+        // const fixedData: PromotionType[] = data.map((promotion: PromotionType) => { return { ...promotion, code: generatePromotionCode(promotion.description).toUpperCase() } })
+        // setTimeout(() => {
+        //     setLoading(false);
+        // }, 1000);
+        // setPromotions(fixedData);
+
+        const promotionList: PromotionDisplay[] = [];
+        const promotions: PromotionType[] = [];
+        shopInfos.forEach(async (item: ShopInfo) => {
+            const response = await GET_GetAllPromotionByShopId(item._id);
+            if (response) promotionList.push(
+                {
+                    shopInfo: item,
+                    promotions: response.data
+                } as PromotionDisplay
+            )
+        })
+        setPromotionDisplayList(promotionList);
+        promotionList.forEach((item: PromotionDisplay) => {
+            item.promotions.forEach((promotion: Promotion) => {
+                const convertedPromotion = {
+                    _id: promotion._id,
+                    name: promotion.name,
+                    description: promotion.description,
+                    discountType: promotion.discountTypeInfo.type as unknown as DiscountType,
+                    discountValue: promotion.discountTypeInfo.value,
+                    upperBound: promotion.discountTypeInfo?.limitAmountToReduce,
+                    lowerBound: promotion.discountTypeInfo.lowerBoundaryForOrder,
+                    quantity: promotion.quantity,
+                    activeDate: formatDate(new Date(promotion.activeDate)),
+                    expiredDate: formatDate(new Date(promotion.expiredDate)),
+                    createdAt: formatDate(new Date(promotion.createAt)),
+                    code: promotion.code,
+                } as PromotionType
+                promotions.push(convertedPromotion);
+            })
+        })
+        setPromotions(promotions);
+        console.log('promotions', promotionList);
+
     }
 
     const fetchProducts = async () => {
         await GET_getUserCartProducts(process.env.NEXT_PUBLIC_USER_ID as string)
             .then(response => setProducts(response.data?.products || undefined));
-        setTimeout(() => {
-            setLoading(false);
-        }, 1000);
-        ;
     }
 
     const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
@@ -353,18 +439,18 @@ export default function CartPage() {
     // };
 
     const applyDiscount = (promotion: PromotionType) => {
-        if (discounts.length === 1) {
-            alert("Giới hạn Áp dụng Mã Sản Phẩm!")
+        if (selectedPromotions.length === 2) {
+            // alert("Giới hạn Áp dụng Mã Sản Phẩm!")
             return;
         }
-        let updatedDiscounts = discounts.slice();
+        let updatedDiscounts = selectedPromotions.slice();
         updatedDiscounts.push(promotion);
-        setDiscounts(updatedDiscounts);
+        setSelectedPromotions(updatedDiscounts);
     }
 
     const removeDiscount = (promotion: PromotionType) => {
-        let updatedDiscounts = discounts.filter(discount => discount._id !== promotion._id)
-        setDiscounts(updatedDiscounts);
+        let updatedDiscounts = selectedPromotions.filter(discount => discount._id !== promotion._id)
+        setSelectedPromotions(updatedDiscounts);
     }
 
     const handleProvisional = () => {
@@ -390,7 +476,7 @@ export default function CartPage() {
 
     const handleDiscount = () => {
         let totalDiscount = 0;
-        discounts.forEach((item: PromotionType) => {
+        selectedPromotions.forEach((item: PromotionType) => {
             if (item.discountType === DiscountType.DIRECT_PRICE) {
                 if (item.discountValue)
                     totalDiscount += calculateDirectPricePromotion(item.discountValue, item.lowerBound!, item.upperBound!) ?? 0;
@@ -436,7 +522,8 @@ export default function CartPage() {
                             <div className="flex flex-row">
                                 <div className="flex flex-col gap-1">
                                     <div className="text-sm font-bold text-ellipsis overflow-hidden">{record.name}</div>
-                                    <div className="text-sm text-gray-500 mb-1">{record.color.color.label.toUpperCase()} / {record.size.toUpperCase()}</div>
+                                    <div className="text-sm text-gray-500 mb-1">
+                                        {record.color?.color.label.toUpperCase() ?? ""} {record.color ? "/" : ""} {record.size ? record.size.toUpperCase() : ""}</div>
                                     <SelectWrapper className="flex flex-row gap-2 mb-1">
                                         {
                                             (record.attribute.colors && record.attribute.colors.length !== 0) ? (
@@ -533,21 +620,28 @@ export default function CartPage() {
     useEffect(() => {
         setLoading(true);
         fetchProducts();
-        fetchPromotions();
+        setLoading(false);
     }, [])
+
+    useEffect(() => {
+        if (shopInfos)
+            fetchPromotions(shopInfos);
+    }, [shopInfos])
 
     useEffect(() => {
         handleProvisional();
         handleDiscount();
         // handleTotalPrice();
         console.log('UPDATE_CART', products);
-    }, [products, selectedRowKeys, discounts])
+    }, [products, selectedRowKeys, selectedPromotions])
 
     useEffect(() => {
+        setLoading(false);
         const storedAddress = localStorage.getItem('shippingAddress');
         if (!storedAddress) return;
         const storedAddressObject = JSON.parse(storedAddress) as ShippingAddress;
         setCurrentAddress(storedAddressObject);
+        setLoading(true);
         console.log('currentAddress', storedAddressObject);
     }, []);
 
@@ -668,7 +762,7 @@ export default function CartPage() {
                             <PromotionSection
                                 loading={loading}
                                 showPromotionModal={handleShowPromotionModal}
-                                selectedDiscounts={discounts}
+                                selectedDiscounts={selectedPromotions}
                                 allPromotions={promotions}
                                 applyDiscount={applyDiscount}
                                 removeDiscount={removeDiscount} />
@@ -732,9 +826,51 @@ export default function CartPage() {
                                 <Search placeholder="Nhập để tìm mã"></Search>
                                 <Button className="bg-blue-500 font-semibold text-white">Áp dụng</Button>
                             </div>
-                            <Card className="overflow-auto h-96">
+                            <div className="overflow-auto h-96">
                                 {
-                                    promotions.sort(
+                                    loading ? <Spin /> : promotionDisplayList?.map((item: PromotionDisplay) => {
+                                        return (
+                                            <Card key={item.shopInfo._id} title={<div className="font-semibold">{item.shopInfo.name}</div>}>
+                                                <div className="flex flex-col gap-5 mx-3">
+                                                    {
+                                                        item.promotions.sort(
+                                                            (a, b) => (a.expiredDate! >= b.expiredDate! ? -1 : 1)
+                                                        ).map(item => {
+                                                            const convertedPromotion = {
+                                                                _id: item._id,
+                                                                name: item.name,
+                                                                description: item.description,
+                                                                discountType: item.discountTypeInfo.type as unknown as DiscountType,
+                                                                discountValue: item.discountTypeInfo.value,
+                                                                upperBound: item.discountTypeInfo?.limitAmountToReduce,
+                                                                lowerBound: item.discountTypeInfo.lowerBoundaryForOrder,
+                                                                quantity: item.quantity,
+                                                                activeDate: formatDate(new Date(item.activeDate)),
+                                                                expiredDate: formatDate(new Date(item.expiredDate)),
+                                                                createdAt: formatDate(new Date(item.createAt)),
+                                                                code: item.code,
+                                                            } as PromotionType
+
+                                                            const isExpiredPromotion = (item: PromotionType) => {
+                                                                return parseDateString(item.expiredDate!) <= new Date();
+                                                            }
+                                                            if (isExpiredPromotion(convertedPromotion)) return;
+                                                            return (
+                                                                <PromotionCard
+                                                                    key={convertedPromotion._id}
+                                                                    item={convertedPromotion}
+                                                                    isSelected={selectedPromotions.includes(convertedPromotion)}
+                                                                    applyDiscount={applyDiscount}
+                                                                    removeDiscount={removeDiscount} />
+                                                            )
+                                                        })
+                                                    }
+                                                </div>
+                                            </Card>
+                                        )
+                                    })
+                                /* {
+                                    promotion.sort(
                                         (a, b) => compareDateString(a.expiredDate!, b.expiredDate!)
                                     ).map(item => {
                                         const isExpiredPromotion = (item: PromotionType) => {
@@ -745,17 +881,17 @@ export default function CartPage() {
                                             <PromotionCard
                                                 key={item._id}
                                                 item={item}
-                                                isSelected={discounts.includes(item)}
+                                                isSelected={selectedPromotions.includes(item)}
                                                 applyDiscount={applyDiscount}
                                                 removeDiscount={removeDiscount} />
                                         )
                                     })
-                                }
-                            </Card>
+                                } */}
+                            </div>
                             <div className="my-5 flex flex-row justify-center items-center">
                                 <div>Bạn đã chọn &nbsp;</div>
-                                <div className={`${discounts.length > 0 ? "text-red-500" : ""} font-bold text-2xl`}>
-                                    {discounts.length}
+                                <div className={`${selectedPromotions.length > 0 ? "text-red-500" : ""} font-bold text-2xl`}>
+                                    {selectedPromotions.length}
                                 </div>
                                 <div>&nbsp; mã giảm giá Sản Phẩm &nbsp;</div>
                                 <Tooltip title={promotion_help}>

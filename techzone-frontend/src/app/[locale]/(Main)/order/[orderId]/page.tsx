@@ -158,7 +158,7 @@ export default function OrderDetailPage() {
         const fetchOrder = async () => {
             setLoading(true);
             console.log(`Fetching order Id: ${orderId as string}`);
-            await GET_GetOrderById(orderId as string)
+            await GET_GetOrderById(orderId as string, process.env.NEXT_PUBLIC_USER_ID as string)
                 .then((response) => {
                     setOrder(response.data);
                     console.log('Order fetch', response.data);

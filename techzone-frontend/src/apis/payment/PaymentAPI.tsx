@@ -36,7 +36,7 @@ export async function POST_processTransaction(userId: string, items: CartItem[],
             amount: totalPrice,
             userId: userId,
         });
-        if (userId == null) {
+        if (userId === null) {
             return {
                 isDenied: true,
                 message: "Unauthenticated",

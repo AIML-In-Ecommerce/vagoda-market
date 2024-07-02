@@ -6,114 +6,114 @@ const ORDER_PORT = process.env.NEXT_PUBLIC_ORDER_PORT
 const GATEWAY_PREFIX = process.env.NEXT_PUBLIC_GATEWAY_PREFIX
 
 export interface Order {
-    _id:             string;
-    user:            User;
-    shop:            Shop;
-    products:        Product[];
-    promotion:       null;
-    paymentMethod:   PaymentMethod;
-    shippingFee:     number;
-    totalPrice:      number;
-    profit:          number;
+    _id: string;
+    user: User;
+    shop: Shop;
+    products: Product[];
+    promotion: null;
+    paymentMethod: PaymentMethod;
+    shippingFee: number;
+    totalPrice: number;
+    profit: number;
     shippingAddress: ShippingAddress;
-    orderStatus:     OrderStatus[];
-    __v:             number;
+    orderStatus: OrderStatus[];
+    __v: number;
 }
 
 export interface OrderStatus {
-    status:   string;
+    status: string;
     complete: Date | null;
-    time:     Date;
+    time: Date;
     deadline: Date;
-    _id:      string;
+    _id: string;
 }
 
 export interface PaymentMethod {
-    kind:       string;
-    name:       string;
-    zpTransId:  number;
-    zpUserId:   string;
+    kind: string;
+    name: string;
+    zpTransId: number;
+    zpUserId: string;
     appTransId: string;
-    isPaid:     boolean;
-    paidAt:     Date;
+    isPaid: boolean;
+    paidAt: Date;
 }
 
 export interface Product {
-    brand:           string;
-    isFlashSale:     boolean;
+    brand: string;
+    isFlashSale: boolean;
     inventoryAmount: number;
-    _id:             string;
-    name:            string;
-    attribute:       any[];
-    description:     string;
-    originalPrice:   number;
-    category:        Category;
-    subCategory:     SubCategory;
-    shop:            string;
-    platformFee:     number;
-    status:          string;
-    avgRating:       number;
-    createAt:        Date;
-    soldQuantity:    number;
+    _id: string;
+    name: string;
+    attribute: any[];
+    description: string;
+    originalPrice: number;
+    category: Category;
+    subCategory: SubCategory;
+    shop: string;
+    platformFee: number;
+    status: string;
+    avgRating: number;
+    createAt: Date;
+    soldQuantity: number;
     subCategoryType: SubCategoryType;
-    images:          string[];
-    createdAt:       Date;
-    purchasedPrice:  number;
-    quantity:        number;
+    images: string[];
+    createdAt: Date;
+    purchasedPrice: number;
+    quantity: number;
 }
 
 export interface Category {
-    _id:           string;
-    name:          string;
+    _id: string;
+    name: string;
     subCategories: any[];
-    __v:           number;
-    image:         string;
+    __v: number;
+    image: string;
 }
 
 export interface SubCategory {
-    _id:              string;
-    name:             string;
-    category:         string;
-    subCategories:    any[];
+    _id: string;
+    name: string;
+    category: string;
+    subCategories: any[];
     subCategoryTypes: any[];
-    __v:              number;
+    __v: number;
 }
 
 export interface SubCategoryType {
-    _id:         string;
-    name:        string;
+    _id: string;
+    name: string;
     subCategory: string;
-    __v:         number;
+    __v: number;
 }
 
 export interface ShippingAddress {
     receiverName: string;
-    street:       string;
-    idProvince:   string;
-    idDistrict:   string;
-    idCommune:    string;
-    country:      string;
-    phoneNumber:  string;
-    label:        string;
-    isDefault:    boolean;
-    _id:          string;
+    street: string;
+    idProvince: string;
+    idDistrict: string;
+    idCommune: string;
+    country: string;
+    phoneNumber: string;
+    label: string;
+    isDefault: boolean;
+    _id: string;
 }
 
 export interface Shop {
-    _id:      string;
-    name:     string;
+    _id: string;
+    name: string;
     location: string;
 }
 
 export interface User {
-    _id:      string;
+    _id: string;
     fullName: string;
 }
 
 
 
 export async function GET_GetAllOrders(userId: string) {
-    const url = `${GATEWAY_PREFIX}/buyer/orders?userId=${userId}`
+    const url = `${GATEWAY_PREFIX}/order/buyer/orders?userId=${userId}`
     try {
         const response = await axios.get(url);
         if (userId == null) {
@@ -133,8 +133,8 @@ export async function GET_GetAllOrders(userId: string) {
     }
 }
 
-export async function GET_GetOrderById(orderId: string) {
-    const url = `${GATEWAY_PREFIX}/buyer/order?orderId=${orderId}`
+export async function GET_GetOrderById(orderId: string, userId: string) {
+    const url = `${GATEWAY_PREFIX}/order/buyer/order?orderId=${orderId}&userId=${userId}`
     try {
         const response = await axios.get(url);
         let responseData = response.data;
@@ -152,17 +152,20 @@ export async function GET_GetOrderById(orderId: string) {
 }
 
 export async function POST_createOrder(
-    userId: string, 
+    userId: string,
     shippingAddressId: string,
-    promotionId: string,
-    paymentMethodId: string) 
-{
-    const url = `${GATEWAY_PREFIX}/buyer/order/create?userId=${userId}`
+    promotionIds: string[],
+    itemIds: string[],
+    paymentMethodId: string
+) {
+    const url = `${GATEWAY_PREFIX}/order/buyer/create?userId=${userId}`
     try {
         const response = await axios.post(url, {
             shippingAddressId: shippingAddressId,
-            promotionIds: [],
-            paymentMethodId: paymentMethodId
+            promotionIds: promotionIds,
+            itemIds: itemIds,
+            paymentMethodId: paymentMethodId,
+            execTime: new Date().getTime()
         });
         if (userId === null) {
             return { isDenied: true, message: "Unauthenticated", status: 403, data: undefined }
@@ -178,5 +181,26 @@ export async function POST_createOrder(
     } catch (error) {
         console.error("Failed to create order: ", error)
         return { isDenied: true, message: "Failed to create order", status: 500, data: undefined }
+    }
+}
+export async function GET_GetLatestOrder(userId: string) {
+    const url = `${GATEWAY_PREFIX}/order/buyer/orders?userId=${userId}`
+    try {
+        const response = await axios.get(url);
+        if (userId == null) {
+            return { isDenied: true, message: "Unauthenticated", status: 403, data: undefined }
+        }
+        let responseData = response.data;
+        if (response.status === 200) {
+            let ordersData = responseData.data;
+            let latestOrder = ordersData[ordersData.length - 1];
+            return { isDenied: false, message: "Get latest order successfully", status: response.status, data: latestOrder }
+        }
+        else {
+            return { isDenied: true, message: "Failed to get order", status: 500, data: undefined }
+        }
+    } catch (error) {
+        console.error("Failed to get orders: ", error)
+        return { isDenied: true, message: "Failed to get orders", status: 500, data: undefined }
     }
 }
