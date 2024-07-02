@@ -1,21 +1,21 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Comment from "./Comment";
 import CommentForm from "./CommentForm";
 import { FiSend } from "react-icons/fi";
-// import { useAuth } from "@/context/AuthContext";
 import { AffectedCommentType, RawCommentType } from "@/model/CommentType";
 // import { useTranslations } from "next-intl";
 import { ReviewType } from "@/model/ReviewType";
 import { POST_CreateComment, PUT_UpdateReview } from "@/apis/review/ReviewAPI";
+import { AuthContext } from "@/context/AuthContext";
 
 interface CommentContainerInterface {
   review: ReviewType;
 }
 
 const CommentContainer = (props: CommentContainerInterface) => {
-  // const auth = useAuth();
   // const t = useTranslations("Comment");
+  const authContext = useContext(AuthContext);
 
   const [comments, setComments] = useState<RawCommentType[]>([]);
 
@@ -27,12 +27,19 @@ const CommentContainer = (props: CommentContainerInterface) => {
     useState<AffectedCommentType | null>(null);
 
   const addCommentHandler = async (value: string) => {
-    if (value === "") return;
-    // if (!auth.user || auth.user == null) return;
+    if (
+      value === "" ||
+      !authContext ||
+      !authContext.userInfo ||
+      !authContext.userInfo._id
+    )
+      return;
+
+    const userId = authContext.userInfo._id;
 
     const requestBody = {
       review: props.review._id,
-      user: "6675a954d1a5f8cd2cf610d6", //mockId
+      user: userId,
       content: value,
     };
 
@@ -53,8 +60,15 @@ const CommentContainer = (props: CommentContainerInterface) => {
   };
 
   const updateCommentHandler = async (value: string, commentId: string) => {
-    if (value === "") return;
-    // if (!auth.user || auth.user == null) return;
+    if (
+      value === "" ||
+      !authContext ||
+      !authContext.userInfo ||
+      !authContext.userInfo._id
+    )
+      return;
+
+    const userId = authContext.userInfo._id;
 
     let newComments = comments.filter((comment) => {
       return comment._id !== commentId;
@@ -62,7 +76,7 @@ const CommentContainer = (props: CommentContainerInterface) => {
 
     const requestBody = {
       review: props.review._id,
-      user: "6675a954d1a5f8cd2cf610d6", //mockId
+      user: userId,
       content: value,
     };
 

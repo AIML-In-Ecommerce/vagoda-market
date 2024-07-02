@@ -2,9 +2,8 @@
 
 import ProductItem from "@/component/customer/ProductItem";
 import { ProductType } from "@/model/ProductType";
-import { Button, Flex, Skeleton } from "antd";
-import Link from "next/link";
-import React, { useEffect, useRef, useState } from "react";
+import { Button, Flex, message, Skeleton } from "antd";
+import React, { ReactElement, useEffect, useRef, useState } from "react";
 
 interface SetupProps {
   // fetchDataFuntion: (page: number) => Promise<any>
@@ -26,7 +25,7 @@ interface ProductItemProps {
   price: number;
   isFlashSale: boolean;
   originalPrice: number;
-  inWishlist: boolean;
+  shop: string;
 }
 
 enum WrapperType {
@@ -51,6 +50,7 @@ const MockData: ProductType[] = [
     flashSale: true,
     originalPrice: 17000000,
     category: "CA",
+    shop: "",
   },
   {
     _id: "sp-02",
@@ -63,6 +63,7 @@ const MockData: ProductType[] = [
     flashSale: false,
     originalPrice: 17000000,
     category: "C2",
+    shop: "",
   },
   {
     _id: "sp-03",
@@ -75,6 +76,7 @@ const MockData: ProductType[] = [
     flashSale: true,
     originalPrice: 20000000,
     category: "C1",
+    shop: "",
   },
   {
     _id: "sp-04",
@@ -87,6 +89,7 @@ const MockData: ProductType[] = [
     flashSale: true,
     originalPrice: 17000000,
     category: "CA",
+    shop: "",
   },
   {
     _id: "sp-05",
@@ -99,6 +102,7 @@ const MockData: ProductType[] = [
     flashSale: false,
     originalPrice: 17000000,
     category: "C2",
+    shop: "",
   },
   {
     _id: "sp-06",
@@ -111,6 +115,7 @@ const MockData: ProductType[] = [
     flashSale: true,
     originalPrice: 20000000,
     category: "C3",
+    shop: "",
   },
   {
     _id: "sp-07",
@@ -123,6 +128,7 @@ const MockData: ProductType[] = [
     flashSale: true,
     originalPrice: 17000000,
     category: "CA",
+    shop: "",
   },
   {
     _id: "sp-08",
@@ -135,6 +141,7 @@ const MockData: ProductType[] = [
     flashSale: false,
     originalPrice: 17000000,
     category: "C2",
+    shop: "",
   },
   {
     _id: "sp-09",
@@ -147,6 +154,7 @@ const MockData: ProductType[] = [
     flashSale: true,
     originalPrice: 20000000,
     category: "CA",
+    shop: "",
   },
   {
     _id: "sp-10",
@@ -159,6 +167,7 @@ const MockData: ProductType[] = [
     flashSale: true,
     originalPrice: 17000000,
     category: "C2",
+    shop: "",
   },
   {
     _id: "sp-11",
@@ -171,6 +180,7 @@ const MockData: ProductType[] = [
     flashSale: false,
     originalPrice: 17000000,
     category: "CA",
+    shop: "",
   },
   // {
   //     _id: "sp-12",
@@ -195,12 +205,13 @@ const paddingBlockProps: ProductType = {
   flashSale: false,
   originalPrice: 0,
   category: "Unknown",
+  shop: "",
 };
 
 export default function InfiniteProductsList(setupProps: SetupProps) {
   const [products, setProducts] = useState<ProductItemProps[]>([]);
   const [mainDisplay, setMainDisplay] = useState<JSX.Element>(
-    <Skeleton active />,
+    <Skeleton active />
   );
   const [currentPagination, setCurrentPagination] = useState<number>(1);
   const [isLoadingItems, setIsLoadingItems] = useState<boolean>(false);
@@ -239,8 +250,7 @@ export default function InfiniteProductsList(setupProps: SetupProps) {
         price: value.price,
         isFlashSale: value.flashSale,
         originalPrice: value.originalPrice,
-        inWishlist: false,
-        //TODO: fix the inWishlist variable assignment
+        shop: value.shop,
       };
 
       return item;
@@ -274,8 +284,7 @@ export default function InfiniteProductsList(setupProps: SetupProps) {
           price: value.price,
           isFlashSale: value.flashSale,
           originalPrice: value.originalPrice,
-          inWishlist: false,
-          //TODO: fix the inWishlist variable assignment
+          shop: value.shop,
         };
 
         return item;
@@ -288,6 +297,15 @@ export default function InfiniteProductsList(setupProps: SetupProps) {
     //await fetchDataFunction(currentPage)
   }
 
+  // TODO: temporarily
+  const openNotification = (title: string, content: ReactElement) => {
+    // api.info({
+    //   message: `${title}`,
+    //   description: content,
+    //   placement,
+    // });
+    message.success(title);
+  };
   function getSlideOfProductsDisplay() {
     if (products.length < 1) {
       return <Skeleton active />;
@@ -310,7 +328,7 @@ export default function InfiniteProductsList(setupProps: SetupProps) {
     //insert padding blocks
     if (remainder != 0 && remainder < setupProps.setup.productsPerRow) {
       const paddingBlocks = new Array(
-        setupProps.setup.productsPerRow - remainder,
+        setupProps.setup.productsPerRow - remainder
       )
         .fill(paddingBlockProps)
         .map((value) => {
@@ -344,21 +362,22 @@ export default function InfiniteProductsList(setupProps: SetupProps) {
           }
           const value = valueWrapper.productInfo;
           return (
-            <Link href={`/product/${value._id}`}>
-              <div className={isVisible} key={value._id}>
-                <ProductItem
-                  imageLink={value.imageLink}
-                  name={value.name}
-                  rating={value.rating}
-                  soldAmount={value.soldAmount}
-                  price={value.price}
-                  isFlashSale={value.isFlashSale}
-                  originalPrice={value.originalPrice}
-                />
-              </div>
-            </Link>
+            <div className={isVisible} key={value._id}>
+              <ProductItem
+                _id={value._id}
+                imageLink={value.imageLink}
+                name={value.name}
+                rating={value.rating}
+                soldAmount={value.soldAmount}
+                price={value.price}
+                isFlashSale={value.isFlashSale}
+                originalPrice={value.originalPrice}
+                shop={value.shop}
+                notify={openNotification} // TODO: temporarily
+              />
+            </div>
           );
-        },
+        }
       );
 
       wrapper.push(
@@ -370,7 +389,7 @@ export default function InfiniteProductsList(setupProps: SetupProps) {
           gap={6}
         >
           {rowDisplay}
-        </Flex>,
+        </Flex>
       );
     }
 

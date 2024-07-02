@@ -1,9 +1,17 @@
-import { Rate } from "antd";
+import { message, Rate } from "antd";
 import { motion, useAnimation } from "framer-motion";
-import { useEffect, useState } from "react";
+import Link from "next/link";
+import { ReactElement, useContext, useEffect, useState } from "react";
 import { PiShoppingCart } from "react-icons/pi";
+import { ProductAccessType } from "@/enum/ProductAccessType";
+import { CartProductType } from "@/model/ProductType";
+import { AuthContext } from "@/context/AuthContext";
+
+import { POST_AddToCart } from "@/apis/cart/CartAPI";
+import StatisticsService from "@/services/statistics.service";
 
 interface ProductItemProps {
+  _id: string;
   imageLink: string;
   name: string;
   rating: number;
@@ -11,6 +19,8 @@ interface ProductItemProps {
   price: number;
   isFlashSale: boolean;
   originalPrice: number;
+  shop: string;
+  notify(message: string, content: ReactElement): void;
 }
 
 export const formatPrice = (value: number | null): string => {
@@ -55,9 +65,9 @@ export default function ProductItem(props: ProductItemProps) {
   }, [isHovered, controls]);
 
   const soldAmount = formatAmountSold(props.soldAmount);
-  const discountPercentage = Math.round(
-    ((props.originalPrice - props.price) / props.originalPrice) * 100
-  );
+  // const discountPercentage = Math.round(
+  //   ((props.originalPrice - props.price) / props.originalPrice) * 100
+  // );
 
   const price = props.price.toLocaleString("vi-VN", {
     style: "currency",
@@ -69,6 +79,61 @@ export default function ProductItem(props: ProductItemProps) {
     currency: "VND",
   });
 
+  const authContext = useContext(AuthContext);
+
+  const handleAddToCart = async () => {
+    if (!authContext.userInfo || !authContext.userInfo._id) {
+      message.error("Hãy đăng nhập vào tài khoản nhé!");
+      return;
+    }
+    const userId = authContext.userInfo._id;
+
+    let products: CartProductType[] = [
+      {
+        product: props._id,
+        quantity: 1,
+      },
+    ];
+
+    const response = await POST_AddToCart(userId, products);
+
+    // if (response.message === "Update cart successfully") {
+    if (response.data) {
+      props.notify(
+        `Bạn đã thêm thành công!`,
+        <div className="flex flex-row gap-6 w-max">
+          <img className="m-2 h-20 w-20 object-fill" src={props.imageLink} />
+          <div className="flex flex-col justify-center">
+            <div className="text-sm md:text-lg truncate">
+              {props.name.substring(0, 15) + "..."}
+            </div>
+            <div className="text-[9px] md:text-sm text-red-500 font-semibold flex">
+              {price}
+            </div>
+          </div>
+        </div>
+      );
+
+      const sessionId =
+        authContext.methods && authContext.methods.getSessionId()
+          ? authContext.methods.getSessionId()
+          : "";
+      const accessType = ProductAccessType.ADD_TO_CART;
+
+      StatisticsService.setProductAccess(
+        userId,
+        sessionId,
+        props._id,
+        props.shop,
+        accessType
+      );
+    } else {
+      message.error("Thêm sản phẩm thất bại... Hãy thử lại sau!");
+
+      // console.log(response.message);
+    }
+  };
+
   return (
     <div
       onMouseEnter={() => setIsHovered(true)}
@@ -77,54 +142,63 @@ export default function ProductItem(props: ProductItemProps) {
     >
       <motion.div
         whileHover={{ scale: 1.1 }} // Hiệu ứng mờ khi di chuột qua
-        className="w-52 "
+        className="w-52"
       >
-        <div
-          className={`${
-            isHovered ? "opacity-50" : ""
-          } relative w-full h-full overflow-hidden rounded-tl-lg rounded-tr-lg`}
-        >
-          {props.isFlashSale && (
-            <div className="absolute top-2 left-2 z-20 p-1  text-white font-bold text-[8px]   ">
-              <img
-                src="https://cdn-icons-png.flaticon.com/128/1374/1374072.png"
-                width={30}
-              />
-            </div>
-          )}
-          <img src={props.imageLink} alt="Product" className="w-full h-52" />
-        </div>
+        <Link href={`/product/${props._id}`}>
+          <div
+            className={`${
+              isHovered ? "opacity-50" : ""
+            } relative w-full h-full overflow-hidden rounded-tl-lg rounded-tr-lg text-black`}
+          >
+            {props.isFlashSale && (
+              <div className="absolute top-2 left-2 z-20 p-1 text-white font-bold text-[8px]">
+                <img
+                  src="https://cdn-icons-png.flaticon.com/128/1374/1374072.png"
+                  width={30}
+                />
+              </div>
+            )}
+            <img
+              src={props.imageLink}
+              alt="ảnh minh họa sản phẩm"
+              className="w-full h-52"
+            />
+          </div>
+        </Link>
 
         <motion.button
+          onClick={() => handleAddToCart()}
           initial={{ opacity: 0, y: 0 }}
           animate={controls}
-          className={`flex space-x-1 justify-center ml-8 text-xs text-white absolute  z-10 transform  -translate-y-1/4 p-2 bg-[#797979] shadow-sm rounded-lg`}
+          className={`flex space-x-1 justify-center ml-8 text-xs text-white absolute z-10 transform -translate-y-1/4 p-2 bg-[#797979] shadow-sm rounded-lg`}
         >
           <PiShoppingCart size={16} color="white" />
           <p>Thêm vào giỏ hàng</p>
         </motion.button>
 
-        <div className="transform w-full bg-white rounded-bl-lg rounded-br-lg shadow-sm">
-          <div className="p-3 text-xs">
-            <p className="font-bold overflow-hidden line-clamp-2">
-              {props.name}
-            </p>
-            <div className="flex mt-1 justify-between items-center text-[10px]">
-              <div>{soldAmount} sold</div>
-              <Rate
-                disabled
-                defaultValue={props.rating}
-                style={{ fontSize: 10 }}
-              />
-            </div>
-            <div className="flex mt-2 space-x-2 items-center">
-              <p className="font-semibold text-green-500 text-sm">{price}</p>
-              <p className="font-semibold text-gray-500 line-through text-[10px]">
-                {originalPrice}
+        <Link href={`/product/${props._id}`}>
+          <div className="transform w-full bg-white rounded-bl-lg rounded-br-lg shadow-sm text-black">
+            <div className="p-3 text-xs">
+              <p className="font-bold overflow-hidden line-clamp-2">
+                {props.name}
               </p>
+              <div className="flex mt-1 justify-between items-center text-[10px]">
+                <div>{soldAmount} sold</div>
+                <Rate
+                  disabled
+                  defaultValue={props.rating}
+                  style={{ fontSize: 10 }}
+                />
+              </div>
+              <div className="flex mt-2 space-x-2 items-center">
+                <p className="font-semibold text-green-500 text-sm">{price}</p>
+                <p className="font-semibold text-gray-500 line-through text-[10px]">
+                  {originalPrice}
+                </p>
+              </div>
             </div>
           </div>
-        </div>
+        </Link>
       </motion.div>
     </div>
   );

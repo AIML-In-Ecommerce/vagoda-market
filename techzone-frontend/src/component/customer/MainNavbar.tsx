@@ -222,8 +222,8 @@ export default function MainNavbar() {
                 <Searchbar />
               </div>
               <div className="flex space-x-10 text-sm  items-center justify-center text-[#5c6856] pr-8">
-                {allCategories.map((category) => (
-                  <NavbarCategory category={category} />
+                {allCategories.map((category, index) => (
+                  <NavbarCategory category={category} key={index} />
                 ))}
               </div>
             </div>

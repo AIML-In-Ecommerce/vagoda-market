@@ -1,6 +1,4 @@
 "use client";
-import { GET_GetProductDetail } from "@/apis/product/ProductDetailAPI";
-import { ProductDetailType } from "@/model/ProductType";
 import {
   Affix,
   ColorPicker,
@@ -15,7 +13,9 @@ import {
 } from "antd";
 import { useParams } from "next/navigation";
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
+import { AuthContext } from "@/context/AuthContext";
 import useOnScreen from "../../user/utils/UseOnScreen";
+
 import ReviewList from "../review/ReviewList";
 import ReviewSummary from "../review/ReviewSummary";
 import ComboList from "./productDetail/ComboList";
@@ -23,11 +23,14 @@ import FloatingCartForm from "./productDetail/FloatingCartForm";
 import CartSummaryModal from "./productDetail/ProductSummaryModal";
 import SimilarList from "./productDetail/SimilarList";
 import AboutProduct from "./productDetail/AboutProduct";
-import { AuthContext } from "@/context/AuthContext";
+
 import { ProductAccessType } from "@/enum/ProductAccessType";
+import { ReviewType } from "@/model/ReviewType";
+import { ProductDetailType } from "@/model/ProductType";
+
 import StatisticsService from "@/services/statistics.service";
 import { GET_GetReviewListByProduct } from "@/apis/review/ReviewAPI";
-import { ReviewType } from "@/model/ReviewType";
+import { GET_GetProductDetail } from "@/apis/product/ProductDetailAPI";
 
 interface ProductDetailProps {
   notify(message: string, content: any): void;
@@ -204,7 +207,7 @@ export default function ProductDetail(props: ProductDetailProps) {
       children: (
         <div className="p-2">
           {product && (
-            <td dangerouslySetInnerHTML={{ __html: product.description }} />
+            <div dangerouslySetInnerHTML={{ __html: product.description }} />
           )}
         </div>
       ),
@@ -296,6 +299,8 @@ export default function ProductDetail(props: ProductDetailProps) {
     const userId =
       authContext.userInfo != null ? authContext.userInfo._id : null;
 
+    if (!userId) return;
+
     let sessionId: string | null = null;
     if (authContext.methods) {
       sessionId = authContext.methods.getSessionId();
@@ -354,11 +359,9 @@ export default function ProductDetail(props: ProductDetailProps) {
                 numberOfItem={numberOfItem}
                 updateItemNumber={setNumberOfItem}
                 totalPrice={totalPrice}
-                product={{
-                  name: product.name,
-                  price: product.finalPrice,
-                  mainImage: mainImage,
-                }}
+                name={product.name}
+                price={product.finalPrice}
+                mainImage={mainImage}
               />
             </Affix>
 
@@ -392,6 +395,7 @@ export default function ProductDetail(props: ProductDetailProps) {
               }}
               comboIdList={comboIdList}
               setComboIdList={setComboIdList}
+              notify={props.notify}
             />
 
             {/* tabs, descriptions and review summary */}
@@ -448,7 +452,7 @@ export default function ProductDetail(props: ProductDetailProps) {
                   </Divider>
                 </div>
               </div>
-              <SimilarList />
+              <SimilarList notify={props.notify} />
             </div>
           </div>
 

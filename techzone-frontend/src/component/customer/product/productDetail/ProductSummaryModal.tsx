@@ -129,7 +129,7 @@ const ProductSummaryModal = (modalData: ModalProps) => {
         null
       }
     >
-      <div className="flex flex-col gap-3 m-5 truncate">
+      <div className="flex flex-col gap-3 m-5 truncate line-clamp-1">
         <div className="bg-white max-w-1/4 h-fit p-4 grid grid-cols-4">
           <div className="col-span-1 col-start-1">Tên sản phẩm</div>
           <div className="col-span-1 col-start-2">Đơn giá</div>
@@ -138,7 +138,9 @@ const ProductSummaryModal = (modalData: ModalProps) => {
         </div>
 
         <div className="bg-white border-2 rounded-xl max-w-1/4 h-fit p-4 grid grid-cols-4">
-          <div className="col-span-1 col-start-1">{mainProduct?.name}</div>
+          <div className="col-span-1 col-start-1">
+            {mainProduct?.name.substring(0, 20)}
+          </div>
           <div className="col-span-1 col-start-2">
             {priceIndex(modalData.mainProductPrice)}
           </div>
@@ -161,7 +163,11 @@ const ProductSummaryModal = (modalData: ModalProps) => {
                 key={index}
                 className="bg-white border-2 rounded-xl max-w-1/4 h-fit p-4 grid grid-cols-4"
               >
-                <div className="col-span-1 col-start-1">{item.name}</div>
+                <div className="col-span-1 col-start-1">
+                  {item.name.length > 10
+                    ? item.name.substring(0, 10) + "..."
+                    : item.name}
+                </div>
                 <div className="col-span-1 col-start-2">
                   {priceIndex(item.price)}
                 </div>

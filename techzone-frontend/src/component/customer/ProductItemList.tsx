@@ -1,4 +1,4 @@
-import { FilterCriteria } from "@/app/[locale]/(Main)/product-list/page";
+import { FilterCriteria } from "./shop/ShopProductList";
 import { _ProductType } from "@/model/ProductType";
 import {
   Button,
@@ -10,13 +10,14 @@ import {
   Skeleton,
   Space,
 } from "antd";
+
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import { CiCircleRemove } from "react-icons/ci";
 import { HiOutlineAdjustmentsHorizontal } from "react-icons/hi2";
 import { IoImageOutline } from "react-icons/io5";
 import ProductItem, { formatPrice } from "./ProductItem";
-import Link from "next/link";
+
 interface ProductListProps {
   total: number;
   totalPages: number;
@@ -25,6 +26,7 @@ interface ProductListProps {
   filterList: FilterCriteria[];
   products: _ProductType[];
   removeFilter: (key: string, value: any) => void;
+  notify(message: string, content: ReactElement): void;
 }
 
 const sortOptions = [
@@ -103,7 +105,7 @@ export default function ProductItemList(props: ProductListProps) {
             Chúng tôi tìm thấy {props.total} sản phẩm cho bạn!
           </div>
         </div>
-        <Space className=" items-end  rounded-lg p-1  m-2 text-xs items-center ">
+        <Space className="rounded-lg p-1 m-2 text-xs items-center">
           Sắp xếp theo:
           <ConfigProvider
             theme={{
@@ -284,23 +286,23 @@ export default function ProductItemList(props: ProductListProps) {
                 <Skeleton loading={loading} active></Skeleton>
               </div>
             ) : (
-              <Link href={`/product/${product._id}`}>
-                <div
-                  key={index}
-                  className="flex items-center justify-center mx-auto text-black"
-                >
-                  <ProductItem
-                    key={index}
-                    name={product.name}
-                    rating={product.avgRating}
-                    soldAmount={product.soldQuantity}
-                    price={product.finalPrice}
-                    isFlashSale={true}
-                    imageLink={product.image}
-                    originalPrice={product.originalPrice}
-                  />
-                </div>
-              </Link>
+              <div
+                key={index}
+                className="flex items-center justify-center mx-auto text-black"
+              >
+                <ProductItem
+                  _id={product._id}
+                  name={product.name}
+                  rating={product.avgRating}
+                  soldAmount={product.soldQuantity}
+                  price={product.finalPrice}
+                  isFlashSale={true}
+                  imageLink={product.image}
+                  originalPrice={product.originalPrice}
+                  shop={product.shop}
+                  notify={props.notify}
+                />
+              </div>
             )
           )}
         </div>

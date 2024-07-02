@@ -1,6 +1,6 @@
 "use client";
 import { Button, Rate, Skeleton, UploadFile } from "antd";
-import React, { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useContext, useEffect, useState } from "react";
 import MultipleUpload from "./MultipleUpload";
 import { POST_CreateReview } from "@/apis/review/ReviewAPI";
 import { RawReviewType } from "@/model/ReviewType";
@@ -9,6 +9,7 @@ import { useParams } from "next/navigation";
 import { ProductDetailType } from "@/model/ProductType";
 import { priceIndex } from "../product/ProductDetail";
 import { GET_GetProductDetail } from "@/apis/product/ProductDetailAPI";
+import { AuthContext } from "@/context/AuthContext";
 
 interface NewReviewFormProps {
   notify(message: string, content: any): void;
@@ -44,13 +45,24 @@ export default function NewReviewForm(props: NewReviewFormProps) {
     }
   };
 
+  const authContext = useContext(AuthContext);
+
   // call api
   const handleCreateReview = async () => {
-    if (!product) return;
+    if (
+      !product ||
+      !authContext ||
+      !authContext.userInfo ||
+      !authContext.userInfo._id
+    )
+      return;
+
+    const userId = authContext.userInfo._id;
+
     let newReview: RawReviewType = {
       _id: "",
-      product: productId.toString(), // 663da8175f77ea6b8f5b2e1d
-      user: "6675a954d1a5f8cd2cf610d6", // TODO
+      product: productId.toString(),
+      user: userId,
       rating: rating,
       content: content,
       asset: asset,
@@ -61,20 +73,20 @@ export default function NewReviewForm(props: NewReviewFormProps) {
 
     const response = await POST_CreateReview(newReview);
 
-    props.notify(
-      "Chia sẻ cảm nhận thành công!",
-      <div className="flex flex-row gap-6 w-max">
-        <img className="m-2 h-20 w-20 object-fill" src={product.images[0]} />
-        <div className="flex flex-col justify-center">
-          <div className="text-sm md:text-lg truncate">{product.name}</div>
-          <div className="text-[9px] md:text-sm text-red-500 font-semibold flex">
-            {priceIndex(product.finalPrice)}
+    if (response) {
+      props.notify(
+        "Chia sẻ cảm nhận thành công!",
+        <div className="flex flex-row gap-6 w-max">
+          <img className="m-2 h-20 w-20 object-fill" src={product.images[0]} />
+          <div className="flex flex-col justify-center">
+            <div className="text-sm md:text-lg truncate">{product.name}</div>
+            <div className="text-[9px] md:text-sm text-red-500 font-semibold flex">
+              {priceIndex(product.finalPrice)}
+            </div>
           </div>
         </div>
-      </div>
-    );
+      );
 
-    if (response) {
       setTimeout(() => {
         // if (response.status == 200) {
         setRating(3);

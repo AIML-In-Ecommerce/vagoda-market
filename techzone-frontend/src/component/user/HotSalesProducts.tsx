@@ -1,15 +1,16 @@
 "use client";
 
 import { Flex, List, Skeleton } from "antd";
-import { useEffect, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import ProductItem from "../customer/ProductItem";
 import CenterTitle from "./utils/CenterTitle";
-import Link from "next/link";
 import CustomEmpty from "../customer/shop/mini/CustomEmpty";
-import { POST_GetProductListByShop } from "@/apis/product/ProductDetailAPI";
-import { ProductType } from "@/model/ProductType";
+import { _ProductType } from "@/model/ProductType";
+import StatisticsService from "@/services/statistics.service";
 
-interface SpecifiedProductsCarouselProp {}
+interface SpecifiedProductsCarouselProp {
+  notify(message: string, content: ReactElement): void;
+}
 
 interface ProductItemProps {
   _id: string;
@@ -20,6 +21,7 @@ interface ProductItemProps {
   price: number;
   isFlashSale: boolean;
   originalPrice: number;
+  shop: string;
 }
 
 // enum WrapperType {
@@ -44,7 +46,9 @@ interface ProductItemProps {
 //   inWishlist: false,
 // };
 
-export default function HotSalesProducts({}: SpecifiedProductsCarouselProp) {
+export default function HotSalesProducts({
+  notify,
+}: SpecifiedProductsCarouselProp) {
   const titleValue = "Sản phẩm bán chạy";
   const subTitleValue = "Sản phẩm được lựa chọn nhiều trong tuần";
   const titleBackground = "bg-[#F2F2F2]";
@@ -53,7 +57,7 @@ export default function HotSalesProducts({}: SpecifiedProductsCarouselProp) {
   const [productDisplay, setProductDisplay] = useState<ProductItemProps[]>([]);
 
   const numberOfProductToDisplay = 12;
-  const [count, setCount] = useState<number>(1); //TODO: consider using reducer instead
+  const [count, setCount] = useState<number>(1); //consider using reducer instead
 
   // start comment ----------------------------------------------------------------
 
@@ -194,44 +198,44 @@ export default function HotSalesProducts({}: SpecifiedProductsCarouselProp) {
 
   // end comment ----------------------------------------------------------------
 
-  // call api (temporarily)
-  const mockId = "65f1e8bbc4e39014df775166";
-
+  // call api
   useEffect(() => {
     handleGetProductList();
-  }, [mockId]);
+  }, []);
 
   const handleGetProductList = async () => {
-    const response = await POST_GetProductListByShop(mockId);
-    if (response.status == 200) {
-      if (response.data) {
-        const data = response.data;
-        const tr_data: ProductItemProps[] = data.map((value: ProductType) => {
-          const tr_item: ProductItemProps = {
-            _id: value._id,
-            imageLink: value.imageLink,
-            name: value.name,
-            rating: value.rating,
-            soldAmount: value.soldAmount,
-            price: value.price,
-            isFlashSale: value.flashSale,
-            originalPrice: value.originalPrice,
-          };
+    const response = await StatisticsService.getHotProducts();
+    if (response && response.length > 0) {
+      // console.log("product response", response);
 
-          return tr_item;
-        });
+      const data: ProductItemProps[] = response.map((value: any) => {
+        const mapItem: ProductItemProps = {
+          _id: value.productInfo._id,
+          name: value.productInfo.name,
+          imageLink:
+            value.productInfo.images && value.productInfo.images.length > 0
+              ? value.productInfo.images[0]
+              : "",
+          rating: value.productInfo.avgRating,
+          soldAmount: value.productInfo.soldQuantity,
+          price: value.productInfo.finalPrice,
+          originalPrice: value.productInfo.originalPrice,
+          isFlashSale: value.productInfo.isFlashSale,
+          shop: value.productInfo.shop,
+        };
+        return mapItem;
+      });
 
-        setProducts([...tr_data]);
-        // console.log("product", data);
+      setProducts([...data]);
+      // console.log("product", data);
 
-        tr_data.splice(numberOfProductToDisplay);
-        setProductDisplay([...tr_data]);
-      }
+      data.splice(numberOfProductToDisplay);
+
+      setProductDisplay([...data]);
     }
   };
-
   const handleReadMore = () => {
-    // TODO: get 6 more after click
+    // get 6 more after click
 
     console.log("display", productDisplay);
     let data = [...products];
@@ -268,7 +272,7 @@ export default function HotSalesProducts({}: SpecifiedProductsCarouselProp) {
           <div className="invisible h-10 w-full"></div> */}
 
           {(products && (
-            <div className="flex flex-col items-center gap-5">
+            <div className="w-full">
               <List
                 className="ml-10 w-full"
                 // pagination={{
@@ -305,19 +309,20 @@ export default function HotSalesProducts({}: SpecifiedProductsCarouselProp) {
                 renderItem={(value, i) => (
                   <div key={i}>
                     <List.Item>
-                      <Link href={`/product/${value._id}`}>
-                        <div className="text-black my-3" key={value._id}>
-                          <ProductItem
-                            imageLink={value.imageLink}
-                            name={value.name}
-                            rating={value.rating}
-                            soldAmount={value.soldAmount}
-                            price={value.price}
-                            isFlashSale={value.isFlashSale}
-                            originalPrice={value.originalPrice}
-                          />
-                        </div>
-                      </Link>
+                      <div className="text-black my-3" key={value._id}>
+                        <ProductItem
+                          _id={value._id}
+                          imageLink={value.imageLink}
+                          name={value.name}
+                          rating={value.rating}
+                          soldAmount={value.soldAmount}
+                          price={value.price}
+                          isFlashSale={value.isFlashSale}
+                          originalPrice={value.originalPrice}
+                          shop={value.shop}
+                          notify={notify}
+                        />
+                      </div>
                     </List.Item>
                   </div>
                 )}
