@@ -4,7 +4,11 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend, Title } from "chart.js";
 
 ChartJS.register(ArcElement, Tooltip, Legend, Title);
 
-const PieChart = () => {
+interface PieChartProp {
+  data: any;
+}
+
+const PieChart = (prop: PieChartProp) => {
   const data = {
     labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
     datasets: [
@@ -61,14 +65,14 @@ const PieChart = () => {
       },
       title: {
         display: true,
-        text: "Chart.js Pie Chart",
+        text: "Pie Chart",
       },
     },
   };
 
   return (
     <div className="w-full h-full  flex p-10 justify-center items-center">
-      <Pie data={data} options={options} />
+      <Pie data={prop.data} options={options} />
     </div>
   );
 };

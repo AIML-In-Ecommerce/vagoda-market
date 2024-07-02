@@ -19,7 +19,11 @@ ChartJS.register(
   Legend,
 );
 
-const BarChart = () => {
+interface BarChartProps {
+  data: any;
+}
+
+const BarChart = (prop: BarChartProps) => {
   const data = {
     labels: ["January", "February", "March", "April", "May", "June", "July"],
     datasets: [
@@ -48,7 +52,7 @@ const BarChart = () => {
 
   return (
     <div className="w-full h-full  flex p-10 justify-center items-center">
-      <Bar data={data} options={options} />
+      <Bar data={prop.data} options={options} />
     </div>
   );
 };

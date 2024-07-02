@@ -384,7 +384,14 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
         return <></>;
       case "gen_chart":
         setExtendedMessage("cart_adding");
-        return <LineChart />;
+        switch (response.data.type) {
+          case "line":
+            return <LineChart data={response.data.data} />;
+          case "bar":
+            return <BarChart />;
+          case "pie":
+            return <PieChart />;
+        }
       default:
         return greetingReactNode;
     }
