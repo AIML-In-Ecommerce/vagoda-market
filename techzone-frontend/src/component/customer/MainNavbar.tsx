@@ -34,7 +34,6 @@ export default function MainNavbar() {
         <a
           target="_blank"
           rel="noopener noreferrer"
-          // href="https://www.antgroup.com"
           onClick={(e) => {
             router.push("/");
           }}
@@ -49,7 +48,6 @@ export default function MainNavbar() {
         <a
           target="_blank"
           rel="noopener noreferrer"
-          // href="https://www.antgroup.com"
           onClick={(e) => {
             router.push("/virtual-try-on/welcome");
           }}
@@ -64,7 +62,6 @@ export default function MainNavbar() {
         <a
           target="_blank"
           rel="noopener noreferrer"
-          // href="http://localhost:3000/order"
           onClick={(e) => {
             router.push("/order");
           }}
@@ -125,15 +122,15 @@ export default function MainNavbar() {
   return (
     <div>
       <div
-        className={`flex text-xs  justify-between bg-[#5c6856]  items-center ${
+        className={`flex text-xs  justify-end bg-[#5c6856]  items-center ${
           menuMode == "mobileMode" ? "px-2" : "px-24"
         }  `}
       >
-        <div className="flex  items-center text-white space-x-2">
+        {/* <div className="flex  items-center text-white space-x-2">
           <TfiHeadphoneAlt />
           <p>24/7</p>
           <p>037-2324-9816</p>
-        </div>
+        </div> */}
         <div className="flex space-x-8 items-center ">
           <div className="flex space-x-1">
             {" "}
@@ -150,7 +147,7 @@ export default function MainNavbar() {
       </div>
       {menuMode == "mobileMode" ? (
         <header
-          className="navbar items-center relative space-x-8 w-full px-2  justify-center "
+          className="navbar items-center relative space-x-8 w-full px-2 py-2  justify-center "
           style={{ backgroundColor: "rgba(151, 151, 151, 0.8)" }}
         >
           <div className="flex items-center justify-between ">
@@ -195,14 +192,14 @@ export default function MainNavbar() {
           </div>
           <div
             className="rounded-full"
-            style={{ width: `${window.innerWidth * 0.6}` }}
+            style={{ width: `${window.innerWidth * 0.4}` }}
           >
             <Searchbar />
           </div>
         </header>
       ) : (
         <header
-          className="navbar  items-center relative space-x-8 w-full px-24  to-transparent"
+          className="navbar  items-center relative space-x-8 w-full px-24 py-2 to-transparent"
           style={{ backgroundColor: "rgba(151, 151, 151, 0.8)" }}
         >
           <header className="flex   items-center justify-between relative h-30 xs:space-x-4 md:space-x-8 ">
@@ -232,11 +229,11 @@ export default function MainNavbar() {
               <div className="rounded-full " style={{ width: 550 }}>
                 <Searchbar />
               </div>
-              <div className="flex space-x-10 text-sm  items-center justify-center text-[#5c6856] pr-8">
+              {/* <div className="flex space-x-10 text-sm  items-center justify-center text-[#5c6856] pr-8">
                 {allCategories.map((category, index) => (
                   <NavbarCategory category={category} key={index} />
                 ))}
-              </div>
+              </div> */}
             </div>
 
             <div className="">
