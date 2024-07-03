@@ -72,7 +72,7 @@ export default function CategoryItem(props: CategoryItemProps) {
             />
           ) : (
             <Image
-              className="rounded-md"
+              className="container rounded-md"
               width={"100%"}
               height={"100%"}
               preview={false}

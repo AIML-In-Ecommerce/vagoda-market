@@ -42,27 +42,6 @@ export default function HotCategory({}: HotCategoryProps) {
     }
   };
 
-  // const handleGetSubCategoryList = async () => {
-  //   const response = await StatisticsService.getHotCategories();
-  //   if (response && response.length > 0) {
-  //     // console.log("category", response);
-
-  //     let newList: SubCategoryType[] = [];
-
-  //     // let data = [...response, ...response, ...response]; //for testing purposes
-
-  //     response.forEach((category: { subCategory: SubCategoryType }) => {
-  //       newList.push(category.subCategory);
-  //     });
-
-  //     // console.log("new category", newList);
-
-  //     setCategory(newList);
-
-  //     setCurrentSlide(0);
-  //   }
-  // };
-
   useEffect(() => {
     //fetch data here
     handleGetSubCategoryList();
@@ -218,29 +197,34 @@ export default function HotCategory({}: HotCategoryProps) {
           </Col>
         </Row> */}
 
-        <div className="grid grid-cols-3 gap-2">
-          <div className="relative h-[210px] lg:h-[490px] overflow-hidden rounded-md">
-            <CategoryItem category={data[0]} />
-          </div>
-          <div className="col-span-2 grid grid-cols-8 grid-rows-2 gap-2">
-            <div className="relative col-span-2 h-[100px] lg:h-[240px] overflow-hidden rounded-md">
-              <CategoryItem category={data[1]} />
-            </div>
-            <div className="relative col-span-3 h-[100px] lg:h-[240px] overflow-hidden rounded-md">
-              <CategoryItem category={data[2]} />
-            </div>
-            <div className="relative col-span-3 h-[100px] lg:h-[240px] overflow-hidden rounded-md">
-              <CategoryItem category={data[3]} />
+        <div className="grid grid-cols-1 grid-rows-1">
+          {/* <div className="relative h-[210px] lg:h-[490px] overflow-hidden rounded-md">
+              <CategoryItem category={data[0]} />
+          </div> */}
+
+          <div className="grid grid-rows-2">
+            <div className="grid grid-cols-8 gap-2">
+              <div className="relative col-span-2 h-[120px] lg:h-[280px] overflow-hidden rounded-md">
+                <CategoryItem category={data[0]} />
+              </div>
+              <div className="relative col-span-3 h-[120px] lg:h-[280px] overflow-hidden rounded-md">
+                <CategoryItem category={data[1]} />
+              </div>
+              <div className="relative col-span-3 h-[120px] lg:h-[280px] overflow-hidden rounded-md">
+                <CategoryItem category={data[2]} />
+              </div>
             </div>
 
-            <div className="relative col-span-3 row-start-2 h-[100px] lg:h-[240px] overflow-hidden rounded-md">
-              <CategoryItem category={data[4]} />
-            </div>
-            <div className="relative col-span-3 row-start-2 h-[100px] lg:h-[240px] overflow-hidden rounded-md">
-              <CategoryItem category={data[5]} />
-            </div>
-            <div className="relative col-span-2 row-start-2 h-[100px] lg:h-[240px] overflow-hidden rounded-md">
-              <CategoryItem category={data[6]} />
+            <div className="grid grid-cols-8 gap-2">
+              <div className="relative col-span-3 row-start-2 h-[120px] lg:h-[280px] overflow-hidden rounded-md">
+                <CategoryItem category={data[3]} />
+              </div>
+              <div className="relative col-span-3 row-start-2 h-[120px] lg:h-[280px] overflow-hidden rounded-md">
+                <CategoryItem category={data[4]} />
+              </div>
+              <div className="relative col-span-2 row-start-2 h-[120px] lg:h-[280px] overflow-hidden rounded-md">
+                <CategoryItem category={data[5]} />
+              </div>     
             </div>
           </div>
         </div>
