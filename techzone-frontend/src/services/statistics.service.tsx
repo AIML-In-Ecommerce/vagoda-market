@@ -123,6 +123,18 @@ const StatisticsService = {
 
     return result;
   },
+
+  async getComboProducts(productId: string) {
+    let result = null;
+
+    const response = await StatisticsAPIs.getComboProducts(productId);
+    if (response != null && response.status == 200) {
+      const data = response.data;
+      result = data.data;
+    }
+
+    return result;
+  },
 };
 
 export default StatisticsService;

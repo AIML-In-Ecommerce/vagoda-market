@@ -171,6 +171,7 @@ export async function POST_GetProductList(idList: string[]) {
         originalPrice: responseData.data[i].originalPrice,
         flashSale: responseData.data[i].status === ProductStatus.SALE,
         category: responseData.data[i].category,
+        shop: responseData.data[i].shop,
       });
     }
 
@@ -239,6 +240,7 @@ export async function POST_GetProductListByShop(shopId: string) {
         originalPrice: responseData.data[i].originalPrice,
         flashSale: responseData.data[i].status === ProductStatus.SALE,
         category: responseData.data[i].category,
+        shop: responseData.data[i].shop,
       });
     }
 
@@ -307,6 +309,7 @@ export async function GET_GetRelatedProduct(id: string) {
         originalPrice: responseData.data[i].originalPrice,
         flashSale: responseData.data[i].status === ProductStatus.SALE,
         category: responseData.data[i].category,
+        shop: responseData.data[i].shop,
       });
     }
 
