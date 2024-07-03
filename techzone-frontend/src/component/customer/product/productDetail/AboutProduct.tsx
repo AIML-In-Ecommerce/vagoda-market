@@ -310,9 +310,12 @@ export default function AboutProduct(props: AboutProductProps) {
               {props.product.name}
             </div>
 
-            <div className="text-xs">
+            <div className="text-xs flex gap-1">
               Thương hiệu / Shop:{" "}
-              <Link href="" className="text-blue-500">
+              <Link
+                href={`/seller/${props.product.shop}`}
+                className="text-blue-500"
+              >
                 {props.product.brand}
               </Link>
             </div>

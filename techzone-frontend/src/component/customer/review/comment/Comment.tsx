@@ -63,91 +63,97 @@ const Comment = (props: CommentProps) => {
           onDelete={handleDelete}
         />
       )}
-      <div className="flex flex-row gap-x-3 bg-gray-50 p-3 rounded-xl">
-        {!isEditing && (
-          <div className="m-3">
-            <Avatar size="large" src={props.comment.comment.user.avatar} />
-          </div>
-        )}
-        <div className="flex-1 flex flex-col text-start">
+      {props.comment.comment.user && (
+        <div className="flex flex-row gap-x-3 bg-gray-50 p-3 rounded-xl">
           {!isEditing && (
-            <>
-              <h5 className="font-bold text-dark-hard text-xs">
-                {props.comment.comment.user.fullName}
-              </h5>
-              <span className="text-xs text-dark-light">
-                {new Date(props.comment.comment.createdAt).toLocaleDateString(
-                  language,
-                  {
-                    weekday: "short",
-                    day: "numeric",
-                    month: "short",
-                    year: "numeric",
-                    hour: "numeric",
-                    minute: "numeric",
-                    second: "numeric",
-                  }
-                )}
-              </span>
-              <p className="font-roboto mt-[10px] text-dark-light overscroll-x-contain">
-                {props.comment.comment.content}
-              </p>
-            </>
+            <div className="m-3">
+              <Avatar
+                size="large"
+                src={props.comment.comment.user.avatar}
+                alt=""
+              />
+            </div>
           )}
-
-          {isEditing && (
-            <CommentForm
-              btnLabel={<IoIosSave />}
-              formSubmitHandler={(value) => {
-                props.updateComment(
-                  value,
-                  props.comment._id ? props.comment._id : ""
-                );
-                props.setAffectedComment(null);
-              }}
-              formCancelHandler={() => props.setAffectedComment(null)}
-              initialText={props.comment.comment.content}
-            />
-          )}
-          <div className="flex items-center gap-x-3 text-dark-light be-viet-nam-pro-regular text-sm my-3">
-            {isCommentBelongsToUser && (
+          <div className="flex-1 flex flex-col text-start">
+            {!isEditing && (
               <>
-                {(isEditing && (
-                  <button
-                    className="flex items-center space-x-2 hover:font-bold cursor-pointer font-semibold text-xs"
-                    type="submit"
-                    onClick={() => props.setAffectedComment(null)}
-                  >
-                    <span>Trở lại</span>
-                  </button>
-                )) || (
-                  <button
-                    className="flex items-center space-x-2 hover:font-bold cursor-pointer font-semibold text-xs"
-                    type="submit"
-                    onClick={() =>
-                      props.setAffectedComment({
-                        type: "editing",
-                        id: props.comment._id ? props.comment._id : "",
-                      })
+                <h5 className="font-bold text-dark-hard text-xs">
+                  {props.comment.comment.user.fullName}
+                </h5>
+                <span className="text-xs text-dark-light">
+                  {new Date(props.comment.comment.createdAt).toLocaleDateString(
+                    language,
+                    {
+                      weekday: "short",
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                      hour: "numeric",
+                      minute: "numeric",
+                      second: "numeric",
                     }
-                  >
-                    <span>Chỉnh sửa</span>
-                  </button>
-                )}
-                <button
-                  className="flex items-center space-x-2 text-[#F10000] hover:font-bold cursor-pointer font-semibold text-xs"
-                  type="submit"
-                  onClick={(comment) => {
-                    openModal(comment);
-                  }}
-                >
-                  <span>Xoá bình luận</span>
-                </button>
+                  )}
+                </span>
+                <p className="font-roboto mt-[10px] text-dark-light overscroll-x-contain">
+                  {props.comment.comment.content}
+                </p>
               </>
             )}
+
+            {isEditing && (
+              <CommentForm
+                btnLabel={<IoIosSave />}
+                formSubmitHandler={(value) => {
+                  props.updateComment(
+                    value,
+                    props.comment._id ? props.comment._id : ""
+                  );
+                  props.setAffectedComment(null);
+                }}
+                formCancelHandler={() => props.setAffectedComment(null)}
+                initialText={props.comment.comment.content}
+              />
+            )}
+            <div className="flex items-center gap-x-3 text-dark-light be-viet-nam-pro-regular text-sm my-3">
+              {isCommentBelongsToUser && (
+                <>
+                  {(isEditing && (
+                    <button
+                      className="flex items-center space-x-2 hover:font-bold cursor-pointer font-semibold text-xs"
+                      type="submit"
+                      onClick={() => props.setAffectedComment(null)}
+                    >
+                      <span>Trở lại</span>
+                    </button>
+                  )) || (
+                    <button
+                      className="flex items-center space-x-2 hover:font-bold cursor-pointer font-semibold text-xs"
+                      type="submit"
+                      onClick={() =>
+                        props.setAffectedComment({
+                          type: "editing",
+                          id: props.comment._id ? props.comment._id : "",
+                        })
+                      }
+                    >
+                      <span>Chỉnh sửa</span>
+                    </button>
+                  )}
+                  <button
+                    className="flex items-center space-x-2 text-[#F10000] hover:font-bold cursor-pointer font-semibold text-xs"
+                    type="submit"
+                    onClick={(comment) => {
+                      openModal(comment);
+                    }}
+                  >
+                    <span>Xoá bình luận</span>
+                  </button>
+                </>
+              )}
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </React.Fragment>
   );
 };

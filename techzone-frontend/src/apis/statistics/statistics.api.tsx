@@ -170,6 +170,20 @@ const StatisticsAPIs = {
       return null;
     }
   },
+
+  async getComboProducts(productId: string) {
+    const publicAPIURL = process.env.NEXT_PUBLIC_GATEWAY_PREFIX;
+    const url = `${publicAPIURL}/statistics/product/able_to_combine`;
+
+    try {
+      const response = await axios.post(url, { productId: productId });
+
+      return response;
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  },
 };
 
 export default StatisticsAPIs;

@@ -26,7 +26,7 @@ import AboutProduct from "./productDetail/AboutProduct";
 
 import { ProductAccessType } from "@/enum/ProductAccessType";
 import { ReviewType } from "@/model/ReviewType";
-import { ProductDetailType } from "@/model/ProductType";
+import { ProductDetailType, ProductType } from "@/model/ProductType";
 
 import StatisticsService from "@/services/statistics.service";
 import { GET_GetReviewListByProduct } from "@/apis/review/ReviewAPI";
@@ -44,6 +44,7 @@ export default function ProductDetail(props: ProductDetailProps) {
   const [mainImage, setMainImage] = useState<string>("");
 
   const [reviews, setReviews] = useState<ReviewType[]>([]);
+  const [combo, setCombo] = useState<ProductType[]>([]);
 
   // selected attributes--------------------------------------------------------
   const [selectedColorOption, setSelectedColorOption] = useState<any>();
@@ -117,7 +118,7 @@ export default function ProductDetail(props: ProductDetailProps) {
   // all reviews
   const allReviews = (
     <ReviewList
-      productId={productId.toString()}
+      productId={productId ? productId.toString() : ""}
       reviews={reviews}
       setReviews={setReviews}
     />
@@ -275,6 +276,7 @@ export default function ProductDetail(props: ProductDetailProps) {
   useEffect(() => {
     handleGetProductDetail();
     handleGetReviews();
+    handleGetComboList();
   }, []);
 
   useEffect(() => {
@@ -284,6 +286,7 @@ export default function ProductDetail(props: ProductDetailProps) {
   }, [product]);
 
   const handleGetProductDetail = async () => {
+    if (!productId) return;
     const response = await GET_GetProductDetail(productId.toString());
     if (response.status == 200) {
       let data = response.data as ProductDetailType;
@@ -316,6 +319,7 @@ export default function ProductDetail(props: ProductDetailProps) {
   }
 
   const handleGetReviews = async () => {
+    if (!productId) return;
     const response = await GET_GetReviewListByProduct(productId.toString());
     if (response.status == 200) {
       let data = response.data;
@@ -323,6 +327,35 @@ export default function ProductDetail(props: ProductDetailProps) {
         // console.log("review", data);
         setReviews(data);
       }
+    } else console.log(response.message);
+  };
+
+  const handleGetComboList = async () => {
+    if (!productId) return;
+    const response = await StatisticsService.getComboProducts(
+      productId.toString()
+    );
+    if (response && response.length > 0) {
+      console.log("combo response", response);
+      let data: ProductType[] = [];
+
+      response.forEach((item: ProductDetailType) => {
+        data.push({
+          _id: item._id,
+          name: item.name,
+          imageLink: item.images[0],
+          rating: item.avgRating,
+          soldAmount: item.soldQuantity,
+          price: item.finalPrice,
+          originalPrice: item.originalPrice,
+          flashSale: item.isFlashSale,
+          category: item.category,
+          shop: item.shop,
+        });
+      });
+
+      console.log("combo data", data);
+      setCombo(data);
     } else console.log(response.message);
   };
 
@@ -364,37 +397,42 @@ export default function ProductDetail(props: ProductDetailProps) {
             </Affix>
 
             {/* related products to buy with  */}
-            <div className="w-full flex align-middle justify-center items-center">
-              <div className="w-1/2">
-                <Divider
-                  className="mt-8"
-                  style={{
-                    border: "2px solid silver",
-                    borderTop: 0,
-                    borderBottom: 0,
-                    borderLeft: 0,
-                    borderRight: 0,
-                    paddingBottom: 0,
-                    marginBottom: 0,
-                  }}
-                >
-                  <div className="px-5 text-lg uppercase">
-                    Sản phẩm có thể kết hợp
+            {combo.length > 0 && (
+              <div className="w-full">
+                <div className="w-full flex flex-col align-middle justify-center items-center">
+                  <div className="w-1/2">
+                    <Divider
+                      className="mt-8"
+                      style={{
+                        border: "2px solid silver",
+                        borderTop: 0,
+                        borderBottom: 0,
+                        borderLeft: 0,
+                        borderRight: 0,
+                        paddingBottom: 0,
+                        marginBottom: 0,
+                      }}
+                    >
+                      <div className="px-5 text-lg uppercase">
+                        Sản phẩm có thể kết hợp
+                      </div>
+                    </Divider>
                   </div>
-                </Divider>
-              </div>
-            </div>
+                </div>
 
-            <ComboList
-              totalPrice={totalPrice}
-              totalComboPrice={totalComboPrice}
-              updateTotalComboPrice={(price) => {
-                setTotalComboPrice(price);
-              }}
-              comboIdList={comboIdList}
-              setComboIdList={setComboIdList}
-              notify={props.notify}
-            />
+                <ComboList
+                  combo={combo}
+                  totalPrice={totalPrice}
+                  totalComboPrice={totalComboPrice}
+                  updateTotalComboPrice={(price) => {
+                    setTotalComboPrice(price);
+                  }}
+                  comboIdList={comboIdList}
+                  setComboIdList={setComboIdList}
+                  notify={props.notify}
+                />
+              </div>
+            )}
 
             {/* tabs, descriptions and review summary */}
             <div className="my-5">

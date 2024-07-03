@@ -6,7 +6,6 @@ import CategoryItem from "./utils/CategoryItem";
 import { SubCategoryType } from "@/model/CategoryType";
 import CenterTitle from "./utils/CenterTitle";
 import StatisticsService from "@/services/statistics.service";
-
 import { GET_GetAllSubCategories } from "@/apis/category/_CategoryAPI";
 
 interface HotCategoryProps {}
@@ -31,16 +30,36 @@ export default function HotCategory({}: HotCategoryProps) {
   const [isHolding, setIsHolding] = useState<boolean>(false);
 
   const handleGetSubCategoryList = async () => {
-    const response = await GET_GetAllSubCategories();
-    if (response.status == 200) {
-      if (response.data) {
-        console.log("category", response.data);
-        setCategory(response.data);
+    const response = await StatisticsService.getHotCategories();
+    if (response && response.length > 0) {
+      // console.log("category", response);
+      let newList: SubCategoryType[] = [];
 
-        setCurrentSlide(0);
-      }
+      // let data = [...response, ...response, ...response]; //for testing purposes
+      response.forEach((category: { subCategory: SubCategoryType }) => {
+        newList.push(category.subCategory);
+      });
+
+      // console.log("new category", newList);
+      setCategory(newList);
+
+      setCurrentSlide(0);
     }
   };
+
+  // for testing
+
+  // const handleGetSubCategoryList = async () => {
+  //   const response = await GET_GetAllSubCategories();
+  //   if (response.status == 200) {
+  //     if (response.data) {
+  //       console.log("category", response.data);
+  //       setCategory(response.data);
+
+  //       setCurrentSlide(0);
+  //     }
+  //   }
+  // };
 
   useEffect(() => {
     //fetch data here
@@ -202,7 +221,7 @@ export default function HotCategory({}: HotCategoryProps) {
               <CategoryItem category={data[0]} />
           </div> */}
 
-          <div className="grid grid-rows-2">
+          <div className={`${data.length > 3 ? "grid grid-rows-2" : ""}`}>
             <div className="grid grid-cols-8 gap-2">
               <div className="relative col-span-2 h-[120px] lg:h-[280px] overflow-hidden rounded-md">
                 <CategoryItem category={data[0]} />
@@ -214,18 +233,19 @@ export default function HotCategory({}: HotCategoryProps) {
                 <CategoryItem category={data[2]} />
               </div>
             </div>
-
-            <div className="grid grid-cols-8 gap-2">
-              <div className="relative col-span-3 row-start-2 h-[120px] lg:h-[280px] overflow-hidden rounded-md">
-                <CategoryItem category={data[3]} />
+            {data.length > 3 && (
+              <div className="grid grid-cols-8 gap-2">
+                <div className="relative col-span-3 row-start-2 h-[120px] lg:h-[280px] overflow-hidden rounded-md">
+                  <CategoryItem category={data[3]} />
+                </div>
+                <div className="relative col-span-3 row-start-2 h-[120px] lg:h-[280px] overflow-hidden rounded-md">
+                  <CategoryItem category={data[4]} />
+                </div>
+                <div className="relative col-span-2 row-start-2 h-[120px] lg:h-[280px] overflow-hidden rounded-md">
+                  <CategoryItem category={data[5]} />
+                </div>
               </div>
-              <div className="relative col-span-3 row-start-2 h-[120px] lg:h-[280px] overflow-hidden rounded-md">
-                <CategoryItem category={data[4]} />
-              </div>
-              <div className="relative col-span-2 row-start-2 h-[120px] lg:h-[280px] overflow-hidden rounded-md">
-                <CategoryItem category={data[5]} />
-              </div>     
-            </div>
+            )}
           </div>
         </div>
       </>

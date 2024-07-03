@@ -25,7 +25,7 @@ export default function Home() {
   };
 
   return (
-    <>
+    <div>
       {contextHolder}
       <Flex
         vertical
@@ -35,6 +35,7 @@ export default function Home() {
       >
         <AdvertisementCarousel />
         {/* <HomeCarousel /> */}
+        <div className="invisible h-0 lg:h-14 w-full" />
         <HotCategory />
         <RecentlyAccess notify={openNotification} />
         <HomeFlashSales notify={openNotification} />
@@ -43,6 +44,6 @@ export default function Home() {
         {/* <HomeSuggestedProduct /> */}
         <HotSalesProducts notify={openNotification} />
       </Flex>
-    </>
+    </div>
   );
 }

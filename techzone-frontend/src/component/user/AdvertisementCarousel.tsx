@@ -124,10 +124,10 @@ interface AdvertisementProps {
 }
 
 export default function AdvertisementCarousel(
-  props: AdvertisementCarouselProps,
+  props: AdvertisementCarouselProps
 ) {
   const [advertisements, setAdvertisements] = useState<AdvertisementProps[]>(
-    [],
+    []
   );
   const [mainDisplay, setMainDisplay] = useState<JSX.Element[]>([
     <Skeleton active key="1" />,
@@ -175,7 +175,7 @@ export default function AdvertisementCarousel(
             />
           );
           return display;
-        },
+        }
       );
 
       setMainDisplay(advertisementDisplays);
@@ -186,7 +186,7 @@ export default function AdvertisementCarousel(
     <>
       <Flex className="w-full " vertical align="center" justify="center">
         <Flex
-          className={` w-full sm:h-[600px] lg:h-[calc(100vh-80px)] items-start`}
+          className={` w-full max-h-[600px] xl:max-h-screen xl:h-[calc(100vh-80px)] items-start`}
           justify="center"
           align="center"
         >
