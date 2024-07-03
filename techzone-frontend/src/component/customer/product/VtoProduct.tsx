@@ -8,8 +8,11 @@ interface VtoProductProps {
   originalPrice: number;
   finalPrice: number;
   size: string;
-  color: string;
-  image: string[];
+  color: {
+    label: string;
+    value: string;
+  };
+  image: string;
 }
 
 const VtoProduct: React.FC<{
@@ -27,8 +30,8 @@ const VtoProduct: React.FC<{
       onClick={(e) => setChosenProduct(product)}
       className="w-full flex flex-col  rounded-2xl bg-[#615A5A] bg-opacity-80"
     >
-      <div className="w-full px-4 py-4 flex flex-row  justify-between items-start">
-        <div className="w-[65%] flex flex-col gap-1">
+      <div className="w-full px-4 py-4 flex flex-row gap-2 justify-between items-start">
+        <div className="w-[70%] flex flex-col gap-1">
           <div className="text-base font-bold text-white truncate overflow-hidden overflow-ellipsis whitespace-nowrap">
             {product.name}
           </div>
@@ -39,7 +42,9 @@ const VtoProduct: React.FC<{
             </div>
             <div className="px-2 py-1 text-[10px] font-normal text-white ">
               Màu sắc{" "}
-              <span className="text-xs font-bold ml-1">{product.color}</span>
+              <span className="text-xs font-bold ml-1">
+                {product.color.label}
+              </span>
             </div>
           </div>
         </div>
@@ -54,7 +59,7 @@ const VtoProduct: React.FC<{
       </div>
       <div className="relative  w-full aspect-square">
         <Image
-          src={product.image[0]}
+          src={product.image}
           alt="Image of product"
           layout="fill"
           objectFit="cover"

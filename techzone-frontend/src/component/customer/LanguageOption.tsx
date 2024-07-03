@@ -52,7 +52,7 @@ export default function LanguageOption() {
           <GrLanguage className="" />
         </div>
       </Dropdown>
-      <p className="text-xs">{language}</p>
+      <p className="text-sm">{language}</p>
     </div>
   );
 }
