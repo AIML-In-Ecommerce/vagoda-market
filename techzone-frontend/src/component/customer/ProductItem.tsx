@@ -111,7 +111,7 @@ export default function ProductItem(props: ProductItemProps) {
               {price}
             </div>
           </div>
-        </div>
+        </div>,
       );
 
       const sessionId =
@@ -125,7 +125,7 @@ export default function ProductItem(props: ProductItemProps) {
         sessionId,
         props._id,
         props.shop,
-        accessType
+        accessType,
       );
     } else {
       message.error("Thêm sản phẩm thất bại... Hãy thử lại sau!");
