@@ -124,10 +124,10 @@ interface AdvertisementProps {
 }
 
 export default function AdvertisementCarousel(
-  props: AdvertisementCarouselProps
+  props: AdvertisementCarouselProps,
 ) {
   const [advertisements, setAdvertisements] = useState<AdvertisementProps[]>(
-    []
+    [],
   );
   const [mainDisplay, setMainDisplay] = useState<JSX.Element[]>([
     <Skeleton active key="1" />,
@@ -175,7 +175,7 @@ export default function AdvertisementCarousel(
             />
           );
           return display;
-        }
+        },
       );
 
       setMainDisplay(advertisementDisplays);
@@ -184,15 +184,15 @@ export default function AdvertisementCarousel(
 
   return (
     <>
-      <Flex className="w-full py-4" vertical align="center" justify="center">
+      <Flex className="w-full " vertical align="center" justify="center">
         <Flex
-          className={`px-4 w-full h-[280px] sm:h-[600px] lg:h-[calc(100vh-80px)] items-center`}
+          className={` w-full sm:h-[600px] lg:h-[calc(100vh-80px)] items-start`}
           justify="center"
           align="center"
         >
-          <div className="block w-full">
+          <div className="block w-full h-full">
             <Carousel
-              className={`w-full overflow-clip`}
+              className={`w-full h-full overflow-clip`}
               autoplay
               autoplaySpeed={carouselAutoplaySpeed}
               arrows
