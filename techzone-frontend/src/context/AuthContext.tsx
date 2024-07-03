@@ -40,8 +40,21 @@ interface AuthContextFunctions {
   getSessionId: () => string | null;
 }
 
+function initLoading()
+{
+  const storageInfo = localStorage.getItem(authLocalStorageID)
+  if(storageInfo != null)
+  {
+    return JSON.parse(storageInfo) as SimpleUserInfoType
+  }
+  else
+  {
+    return null
+  }
+}
+
 const defaultContextValue: AuthContextProps = {
-  userInfo: null,
+  userInfo: initLoading(),
   methods: null,
 };
 
@@ -161,6 +174,7 @@ export default function AuthContextProvider({
   function logout() {
     localStorage.removeItem(authLocalStorageID);
     //remove token here
+    setUserInfo(null)
     Cookies.remove(accessTokenCookieKey);
     Cookies.remove(refreshTokenCookieKey);
   }
