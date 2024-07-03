@@ -20,9 +20,7 @@ interface AuthContextProviderInitProps {
 const authLocalStorageID = "#auth-context-user-info-record-ID";
 
 const matcher: string[] = [
-  "/",
-  "/product",
-  "/product-list"
+  "/cart",
 ];
 
 interface AuthContextProps {
@@ -34,6 +32,7 @@ interface AuthContextFunctions {
   // validateAuthRequest: (sessionInfoID: string) => boolean,
   login: (authInfo: SignInResponseData) => boolean;
   forceSignIn: () => void;
+  logoutAndBackHomepage: () => void,
   logout: () => void;
   refreshToken: () => Promise<string | null>;
   getAccessToken: () => string | null;
@@ -184,6 +183,12 @@ export default function AuthContextProvider({
     router.replace("/auth/account");
   }
 
+  function logoutAndBackHomepage()
+  {
+    logout();
+    router.replace("/")
+  }
+
   function getSessionId() {
     return Cookies.get(sessionIdKey);
   }
@@ -193,6 +198,7 @@ export default function AuthContextProvider({
     login: login,
     logout: logout,
     forceSignIn: forceSignIn,
+    logoutAndBackHomepage: logoutAndBackHomepage,
     refreshToken: refreshToken,
     getAccessToken: getAccessToken,
     getSessionId: getSessionId,
@@ -213,34 +219,39 @@ export default function AuthContextProvider({
     }
 
     async function checkAuthentication() {
-      // if (matcher.includes(currentPathname) == false) {
+        let isValid = false
         const authCase = await validateClientAuth();
         switch (authCase) {
           case 1: {
+            isValid = true
             break;
           }
           case 0: {
             //no available access token -> refresh token
             const refreshUserId = await refreshToken();
             if (refreshUserId == null) {
-              // force to login
-              logout();
-              router.replace("/auth");
+              isValid = false
             }
             else
             {
+              isValid = true
               await reloadUserInfo(refreshUserId as string);
               break;
             }
           }
           case -1: {
             // no refresh token -> re-authenticate (login again)
-            logout();
-            router.replace("/auth");
+            isValid = false
             break;
           }
         }
-      // }
+      
+      if(isValid == false && matcher.includes(currentPathname) == true)
+      {
+        // force to login
+        logout();
+        router.replace("/auth");
+      }
     }
 
     checkAuthentication();
