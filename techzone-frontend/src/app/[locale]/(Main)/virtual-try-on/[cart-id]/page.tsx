@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useContext } from "react";
 import "./local.css";
 import { ChangeEvent, useState, useEffect, useRef } from "react";
 import { BsPersonBoundingBox } from "react-icons/bs";
@@ -18,6 +18,8 @@ import axios from "axios";
 import { Divider } from "antd";
 import { AiFillCloseCircle } from "react-icons/ai";
 import ImageSwiper from "./swiper";
+import { AuthContext } from "@/context/AuthContext";
+import Replicate from "replicate";
 
 type Mode = "MODEL" | "PRODUCT" | "PREVIEW";
 type LoadStatus = "READY" | "RUNNING" | "COMPLETED" | "ERROR";
@@ -28,8 +30,11 @@ interface VtoProduct {
   originalPrice: number;
   finalPrice: number;
   size: string;
-  color: string;
-  image: string[];
+  color: {
+    label: string;
+    value: string;
+  };
+  image: string;
 }
 
 const mockVtoProductData = [
@@ -39,10 +44,12 @@ const mockVtoProductData = [
     originalPrice: 200000,
     finalPrice: 150000,
     size: "XL",
-    color: "Trắng",
-    image: [
+    color: {
+      label: "Trắng",
+      value: "fffdfd",
+    },
+    image:
       "https://res.cloudinary.com/dgsrxvev1/image/upload/v1716443927/%C3%A1o_thun_cppclk.jpg",
-    ],
   },
   {
     _id: "234",
@@ -50,10 +57,12 @@ const mockVtoProductData = [
     originalPrice: 200000,
     finalPrice: 150000,
     size: "XL",
-    color: "Trắng",
-    image: [
+    color: {
+      label: "Trắng",
+      value: "fffdfd",
+    },
+    image:
       "https://res.cloudinary.com/dgsrxvev1/image/upload/v1716443927/l%E1%BA%A3utent_qwmpog.jpg",
-    ],
   },
   {
     _id: "345",
@@ -61,10 +70,25 @@ const mockVtoProductData = [
     originalPrice: 200000,
     finalPrice: 150000,
     size: "XL",
-    color: "Trắng",
-    image: [
+    color: {
+      label: "Trắng",
+      value: "fffdfd",
+    },
+    image:
       "https://res.cloudinary.com/dgsrxvev1/image/upload/v1716443926/vn-11134207-7r98o-lp8u23rvrf4r40_hcpkjk.jpg",
-    ],
+  },
+  {
+    _id: "345",
+    name: "Áo Sơ mi Nam Lados",
+    originalPrice: 200000,
+    finalPrice: 150000,
+    size: "XL",
+    color: {
+      label: "Trắng",
+      value: "fffdfd",
+    },
+    image:
+      "https://res.cloudinary.com/dgsrxvev1/image/upload/v1716443926/vn-11134207-7r98o-lp8u23rvrf4r40_hcpkjk.jpg",
   },
 ];
 
@@ -76,10 +100,55 @@ const VirtualTryOn = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [tryOnLoading, setTryOnLoading] = useState<LoadStatus>("READY");
 
+  const authContext = useContext(AuthContext);
+
   const tryOnImageUrl = useRef<string[]>([]);
 
   const fileRef = useRef<HTMLInputElement>(null);
   const userImageUrl = useRef<string | null>(null);
+
+  console.log("Auth Context: ", authContext.userInfo?._id);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const response: any = await axios.get(
+          `https://apis.fashionstyle.io.vn/cart/user?userId=${authContext.userInfo?._id}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          },
+        );
+        if (response.status === 200) {
+          let cart: VtoProduct[] = [];
+          response.data.data.products.forEach((item: any) => {
+            let colorLabel = item.color ? item.color.label : "";
+            let colorValue = item.color ? item.color.value : "";
+            let imageLink = item.color ? item.color.link : item.images[0];
+            const product: VtoProduct = {
+              _id: item._id,
+              name: item.name,
+              originalPrice: item.originalPrice,
+              finalPrice: item.finalPrice,
+              size: item.size,
+              color: {
+                label: colorLabel,
+                value: colorValue,
+              },
+              image: imageLink,
+            };
+            cart.push(product);
+          });
+          console.log("Cart: ", cart);
+          setProductList(cart);
+        }
+      } catch (error) {
+        console.error("There was an error fetching the cart data!", error);
+      }
+    }
+    fetchData();
+  }, [authContext.userInfo?._id]);
 
   const handleCancelImg = () => {
     setImagePreview(null);
@@ -123,8 +192,8 @@ const VirtualTryOn = () => {
             },
           },
         );
+        console.log("Image uploaded successfully:", response.data);
         if (response.status == 200) {
-          console.log("Image uploaded successfully:", response.data);
           userImageUrl.current = response.data.data.path;
           setMode("PRODUCT");
         }
@@ -166,14 +235,14 @@ const VirtualTryOn = () => {
     setTryOnLoading("RUNNING");
     const postBody = {
       modelImgUrl: userImageUrl.current,
-      garmentImgUrl: chosenProduct?.image[0],
+      garmentImgUrl: chosenProduct?.image,
     };
 
-    try {
-      console.log("first: ", postBody);
+    console.log("PostBody: ", postBody);
 
+    try {
       const response = await axios.post(
-        "http://18.143.103.85/genai/virtual-try-on",
+        "http://localhost:8000/genai/virtual-try-on",
         postBody,
         {
           headers: {
@@ -181,12 +250,6 @@ const VirtualTryOn = () => {
           },
         },
       );
-
-      // const response = await axios.get("http://47.128.217.104/index", {
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      // });
 
       if (response.status == 200) {
         console.log("Response: ", response.data);
@@ -196,6 +259,28 @@ const VirtualTryOn = () => {
     } catch (error) {
       console.error("Error fetching virtual try-on:", error);
     }
+
+    const replicate = new Replicate({
+      auth: process.env.REPLICATE_API_TOKEN,
+    });
+
+    // const output= await replicate.run(
+    //   "viktorfa/oot_diffusion:9f8fa4956970dde99689af7488157a30aa152e23953526a605df1d77598343d7",
+    //   {
+    //     input: {
+    //       seed: 0,
+    //       steps: 20,
+    //       model_image: userImageUrl.current,
+    //       garment_image: chosenProduct?.image,
+    //       guidance_scale: 2,
+    //     },
+    //   },
+    // );
+    // if (output) {
+    //   console.log(output);
+    //   tryOnImageUrl.current = output.output;
+    //   setTryOnLoading("COMPLETED");
+    // }
   };
 
   const renderMainBox = (mode: Mode) => {
@@ -221,7 +306,7 @@ const VirtualTryOn = () => {
             </div>
             {imagePreview && (
               <div className="w-full h-full flex flex-col gap-4 justify-center items-center">
-                <div className="relative w-[40%] aspect-square">
+                <div className="relative w-[38%] aspect-square">
                   <Image
                     src={imagePreview}
                     alt="Preview"
@@ -251,13 +336,15 @@ const VirtualTryOn = () => {
         );
       case "PRODUCT":
         return (
-          <div className="grid grid-cols-3 gap-4 p-5">
+          <div className="flex flex-row gap-3 p-5 overflow-x-auto w-full h-[calc(100%-50px)] mt-2 scrollbar scrollbar-thin scrollbar-track-transparent scrollbar-thumb-rounded-full scrollbar-thumb-slate-400 ">
             {mockVtoProductData.map((product) => (
-              <VtoProduct
-                key={product._id}
-                product={product}
-                setChosenProduct={changeChosenProduct}
-              />
+              <div className="w-[calc(100%/3.5)]" key={product._id}>
+                <VtoProduct
+                  key={product._id}
+                  product={product}
+                  setChosenProduct={changeChosenProduct}
+                />
+              </div>
             ))}
           </div>
         );
@@ -314,10 +401,14 @@ const VirtualTryOn = () => {
   const renderChosenProductBox = (chosenProduct: VtoProduct) => {
     return (
       <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-2/3 w-[45%] h-[20%] bg-style flex flex-row rounded-2xl">
-        <AiFillCloseCircle
-          className="w-5 h-5 cursor-pointer"
-          onClick={(e) => setChosenProduct(undefined)}
-        />
+        {mode === "PRODUCT" ? (
+          <AiFillCloseCircle
+            className="w-5 h-5 cursor-pointer"
+            onClick={(e) => setChosenProduct(undefined)}
+          />
+        ) : (
+          <div className="w-5 h-5 "></div>
+        )}
         <div className="w-[75%] h-full flex flex-col gap-1 justify-center items-start py-4 pr-4">
           <div className="text-base font-semibold text-white">
             {chosenProduct.name}
@@ -331,23 +422,23 @@ const VirtualTryOn = () => {
             </div>
           </div>
           <div className="w-[75%] flex flex-row justify-between bg-white bg-opacity-50 rounded-full">
-            <div className="px-2 py-1 text-xs font-normal text-white">
+            <div className="px-2 py-0.5 text-xs font-normal text-white">
               Size{" "}
               <span className="text-sm font-bold ml-1">
                 {chosenProduct.size}
               </span>
             </div>
-            <div className="px-2 py-1 text-xs font-normal text-white">
+            <div className="px-2 py-0.5 text-xs font-normal text-white">
               Màu sắc{" "}
               <span className="text-sm font-bold ml-1">
-                {chosenProduct.color}
+                {chosenProduct.color.label}
               </span>
             </div>
           </div>
         </div>
         <div className="relative w-[25%] aspect-square">
           <Image
-            src={chosenProduct.image[0]}
+            src={chosenProduct.image}
             alt="Image of product"
             layout="fill"
             objectFit="cover"
@@ -357,6 +448,15 @@ const VirtualTryOn = () => {
         </div>
       </div>
     );
+  };
+
+  const tryAgainCLick = () => {
+    setImagePreview(null);
+    setContinueBtnState(false);
+    setMode("MODEL");
+    setChosenProduct(undefined);
+    setTryOnLoading("READY");
+    userImageUrl.current = "";
   };
 
   useEffect(() => {
@@ -379,12 +479,12 @@ const VirtualTryOn = () => {
           <div className="w-[200px] flex justify-center items-center">
             <div className="w-[60px] h-[200px] rounded-full bg-style flex flex-col gap-5 justify-center items-center text-white">
               <div
-                className={`w-[50px] h-[50px]  rounded-full flex justify-center items-center cursor-pointer ${
+                className={`w-[50px] h-[50px]  rounded-full flex justify-center items-center  ${
                   mode === "MODEL"
                     ? "bg-white bg-opacity-50 "
                     : "hover:bg-slate-50 hover:bg-opacity-20"
                 }`}
-                onClick={(e) => changeMode("MODEL")}
+                // onClick={(e) => changeMode("MODEL")}
               >
                 {mode === "MODEL" ? (
                   <IoBody className="w-[30px] h-[30px] " />
@@ -393,12 +493,12 @@ const VirtualTryOn = () => {
                 )}
               </div>
               <div
-                className={`w-[50px] h-[50px] rounded-full flex justify-center items-center cursor-pointer ${
+                className={`w-[50px] h-[50px] rounded-full flex justify-center items-center  ${
                   mode === "PRODUCT"
                     ? "bg-white bg-opacity-50"
                     : "hover:bg-white hover:bg-opacity-20"
                 }`}
-                onClick={(e) => changeMode("PRODUCT")}
+                // onClick={(e) => changeMode("PRODUCT")}
               >
                 {mode === "PRODUCT" ? (
                   <IoShirt className="w-[30px] h-[30px] " />
@@ -407,12 +507,12 @@ const VirtualTryOn = () => {
                 )}
               </div>
               <div
-                className={`w-[50px] h-[50px]  rounded-full flex justify-center items-center cursor-pointer ${
+                className={`w-[50px] h-[50px]  rounded-full flex justify-center items-center  ${
                   mode === "PREVIEW"
                     ? "bg-white bg-opacity-50"
                     : "hover:bg-slate-50 hover:bg-opacity-20"
                 }`}
-                onClick={(e) => changeMode("PREVIEW")}
+                // onClick={(e) => changeMode("PREVIEW")}
               >
                 {mode === "PREVIEW" ? (
                   <BsEyeFill className="w-[30px] h-[30px] " />
@@ -429,19 +529,24 @@ const VirtualTryOn = () => {
               </div>
               <div className="mx-3">Phòng thử đồ</div>
             </div>
-            {renderMainBox(mode)}
+            <div className="w-full h-full max-h-full">
+              {renderMainBox(mode)}
+            </div>
             {chosenProduct != undefined &&
               renderChosenProductBox(chosenProduct)}
           </div>
           <div
             className={`flex w-[200px] h-[50px] bg-style text-white text-xl justify-center items-center rounded-full cursor-pointer hover:bg-black ${
-              continueBtnState && mode === "PRODUCT" ? "" : "invisible"
+              (continueBtnState && mode === "PRODUCT") || mode === "PREVIEW"
+                ? ""
+                : "invisible"
             }`}
             onClick={(e) => {
-              setMode("PREVIEW");
+              if (mode === "PRODUCT") setMode("PREVIEW");
+              if (mode === "PREVIEW") tryAgainCLick();
             }}
           >
-            Tiếp tục
+            {mode === "PRODUCT" ? " Tiếp tục" : "Thử lại"}
           </div>
         </div>
       </div>
