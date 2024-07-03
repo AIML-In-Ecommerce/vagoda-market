@@ -299,8 +299,6 @@ export default function ProductDetail(props: ProductDetailProps) {
     const userId =
       authContext.userInfo != null ? authContext.userInfo._id : null;
 
-    if (!userId) return;
-
     let sessionId: string | null = null;
     if (authContext.methods) {
       sessionId = authContext.methods.getSessionId();

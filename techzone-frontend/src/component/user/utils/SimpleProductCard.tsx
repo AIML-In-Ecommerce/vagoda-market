@@ -85,7 +85,7 @@ export default function SimpleProductCard({
       notify(
         "Bạn đã thêm thành công!",
         <div className="flex flex-row gap-6 w-max">
-          <img className="m-2 h-20 w-20 object-fill" src={info.image} />
+          <img className="m-2 h-20 w-20 object-fill" src={info.image} alt="success"/>
           <div className="flex flex-col justify-center">
             <div className="text-sm md:text-lg truncate">{info.name}</div>
             <div className="text-[9px] md:text-sm text-red-500 font-semibold flex">

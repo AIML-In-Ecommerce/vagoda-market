@@ -1,6 +1,6 @@
 "use client";
-import { useRouter } from "next/navigation";
-import React, { useContext, useRef, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import React, { useContext, useEffect, useRef, useState } from "react";
 
 import { AuthContext } from "@/context/AuthContext";
 import AuthService, { SignInResponseData } from "@/services/auth.service";
@@ -12,6 +12,9 @@ import Link from "next/link";
 interface AuthFormProps {
   showSuccessMsg: (show: boolean) => void;
 }
+
+const signInType = "signin"
+const signUpType = "signup"
 
 const signInSuccessMessage = "Sign in successfully!";
 const signUpSuccessMessage = "Sign up successfully!";
@@ -40,6 +43,23 @@ export default function AuthForm(props: AuthFormProps) {
   const [validAuthMsg, setValidAuthMsg] = useState<string | null>(null);
   const [resultModalState, setResultModalState] =
     useState<ResultStatusType>("success");
+
+  const parameters = useSearchParams()
+
+  useEffect(() =>
+  {
+    const selectedType = parameters.get("type")
+    if(selectedType == signInType)
+    {
+      setIsSigninOpeneded(true)
+      setIsSignupOpeneded(false)
+    }
+    else if(selectedType == signUpType)
+    {
+      setIsSigninOpeneded(false)
+      setIsSignupOpeneded(true)
+    }
+  }, [])
 
   //   const context = useRecoveryContext();
   const router = useRouter();
@@ -204,11 +224,13 @@ export default function AuthForm(props: AuthFormProps) {
     setIsSignupOpeneded(false);
     setIsSigninOpeneded(true);
     setIsPasswordVisible(false);
+    router.push("/auth?type=signin")
   };
   const goToSignup = async () => {
     setValidAuthMsg(null);
     setIsSigninOpeneded(false);
     setIsSignupOpeneded(true);
+    router.push("/auth?type=signup")
   };
 
   function togglePasswordVisibility() {
