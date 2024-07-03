@@ -4,9 +4,9 @@ import { UserInfoType } from "@/model/UserInfoType"
 
 const UserService = 
 {
-    async getUserInfo(accessToken: string, useAddress: boolean)
+    async getUserInfo(userId: string, useAddress: boolean)
     {
-        const userInfo = await UserInfoAPI.getUserInfo(accessToken, useAddress) as UserInfoType
+        const userInfo = await UserInfoAPI.getUserInfo(userId, useAddress) as UserInfoType
 
         return userInfo
     }

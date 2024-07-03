@@ -19,7 +19,11 @@ interface AuthContextProviderInitProps {
 
 const authLocalStorageID = "#auth-context-user-info-record-ID";
 
-const matcher: string[] = [];
+const matcher: string[] = [
+  "/",
+  "/product",
+  "/product-list"
+];
 
 interface AuthContextProps {
   userInfo: SimpleUserInfoType | null;
@@ -31,13 +35,26 @@ interface AuthContextFunctions {
   login: (authInfo: SignInResponseData) => boolean;
   forceSignIn: () => void;
   logout: () => void;
-  refreshToken: () => Promise<boolean | null>;
+  refreshToken: () => Promise<string | null>;
   getAccessToken: () => string | null;
   getSessionId: () => string | null;
 }
 
+function initLoading()
+{
+  const storageInfo = localStorage.getItem(authLocalStorageID)
+  if(storageInfo != null)
+  {
+    return JSON.parse(storageInfo) as SimpleUserInfoType
+  }
+  else
+  {
+    return null
+  }
+}
+
 const defaultContextValue: AuthContextProps = {
-  userInfo: null,
+  userInfo: initLoading(),
   methods: null,
 };
 
@@ -110,13 +127,13 @@ export default function AuthContextProvider({
     const currentRefreshToken = Cookies.get(refreshTokenCookieKey);
     if (currentRefreshToken == null) {
       //reture false to force the user re-authenticate
-      return false;
+      return null;
     }
     const response = await AuthService.refreshToken(currentRefreshToken);
     if (response.statusCode == 500) {
-      return false;
+      return null;
     } else if (response.statusCode != 200 && response.statusCode != 201) {
-      return false;
+      return null;
     }
     const data = response.data as RefreshTokenReponseData;
 
@@ -127,10 +144,10 @@ export default function AuthContextProvider({
       expires: new Date(data.refreshTokenExpiredDate),
     });
 
-    return true;
+    return data.userId;
   }
 
-  async function reloadUserInfo() {
+  async function reloadUserInfo(userId: string) {
     //should call this function when the accessToken has existed
     try {
       if (userInfo == null) {
@@ -138,13 +155,10 @@ export default function AuthContextProvider({
         if (stringifiedInfo != null) {
           const initUserInfo = JSON.parse(stringifiedInfo) as UserInfoType;
           setUserInfo(() => initUserInfo);
-          return;
+          return true;
         }
 
-        const newUserInfo = await UserService.getUserInfo(
-          getAccessToken(),
-          false
-        );
+        const newUserInfo = await UserService.getUserInfo(userId, false);
         if (newUserInfo == null) {
           return false;
         }
@@ -160,6 +174,7 @@ export default function AuthContextProvider({
   function logout() {
     localStorage.removeItem(authLocalStorageID);
     //remove token here
+    setUserInfo(null)
     Cookies.remove(accessTokenCookieKey);
     Cookies.remove(refreshTokenCookieKey);
   }
@@ -188,10 +203,9 @@ export default function AuthContextProvider({
 
   //check authentication
   useEffect(() => {
-    console.log("current pathname: " + currentPathname);
-    console.log("authenticated");
+    console.log(currentPathname)
     const storedValue = localStorage.getItem(authLocalStorageID);
-    if (storedValue != null) {
+    if (storedValue != null && userInfo == null) {
       const currentuserInfo = JSON.parse(
         storedValue as string
       ) as SimpleUserInfoType;
@@ -199,7 +213,7 @@ export default function AuthContextProvider({
     }
 
     async function checkAuthentication() {
-      if (matcher.includes(currentPathname) == true) {
+      // if (matcher.includes(currentPathname) == false) {
         const authCase = await validateClientAuth();
         switch (authCase) {
           case 1: {
@@ -207,14 +221,17 @@ export default function AuthContextProvider({
           }
           case 0: {
             //no available access token -> refresh token
-            const isRefreshedSuccessfully = await refreshToken();
-            if (isRefreshedSuccessfully == false) {
+            const refreshUserId = await refreshToken();
+            if (refreshUserId == null) {
               // force to login
               logout();
               router.replace("/auth");
             }
-            await reloadUserInfo();
-            break;
+            else
+            {
+              await reloadUserInfo(refreshUserId as string);
+              break;
+            }
           }
           case -1: {
             // no refresh token -> re-authenticate (login again)
@@ -223,7 +240,7 @@ export default function AuthContextProvider({
             break;
           }
         }
-      }
+      // }
     }
 
     checkAuthentication();
