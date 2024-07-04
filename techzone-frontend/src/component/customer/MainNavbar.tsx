@@ -9,7 +9,8 @@ import { useContext, useEffect, useState } from "react";
 import { BsInstagram } from "react-icons/bs";
 import { FaFacebook } from "react-icons/fa";
 import { GrPinterest } from "react-icons/gr";
-import { PiShoppingCart } from "react-icons/pi";
+import { FaUser } from "react-icons/fa6";
+import { FaCartShopping } from "react-icons/fa6";
 import { RxPerson } from "react-icons/rx";
 import { TbBrandYoutubeFilled } from "react-icons/tb";
 import { TfiHeadphoneAlt } from "react-icons/tfi";
@@ -28,16 +29,13 @@ export default function MainNavbar() {
   const [countItemsCart, setCountItemsCart] = useState(0);
   const [allCategories, setAllCategories] = useState<_CategoryType[]>([]);
 
-  const authContext = useContext(AuthContext)
+  const authContext = useContext(AuthContext);
 
   const unauthItems: MenuProps["items"] = [
     {
       key: "1",
       label: (
-        <Link
-          href="/auth?type=signin"
-          prefetch={false}
-        >
+        <Link href="/auth?type=signin" prefetch={false}>
           Đăng nhập
         </Link>
       ),
@@ -45,16 +43,13 @@ export default function MainNavbar() {
     {
       key: "2",
       label: (
-        <Link
-          href="/auth?type=signup"
-          prefetch={false}
-        >
+        <Link href="/auth?type=signup" prefetch={false}>
           Đăng ký
         </Link>
       ),
-    }
-  ]
-  
+    },
+  ];
+
   const items: MenuProps["items"] = [
     {
       key: "1",
@@ -119,12 +114,10 @@ export default function MainNavbar() {
           href="#"
           prefetch={false}
           type="button"
-          onClick={(e) =>
-            {
-              e.preventDefault()
-              authContext.methods?.logoutAndBackHomepage()
-            }
-          }
+          onClick={(e) => {
+            e.preventDefault();
+            authContext.methods?.logoutAndBackHomepage();
+          }}
         >
           Đăng xuất
         </Link>
@@ -202,9 +195,9 @@ export default function MainNavbar() {
                   placement="bottomLeft"
                   className="xs:hidden"
                 >
-                  <div className="flex items-center space-x-2 text-white hover:text-sky  p-2 rounded-lg bg-[#5c6856] text-sm">
-                    <RxPerson className="" size={20} />
-                    <p className="">Account</p>
+                  <div className="flex items-center space-x-2 text-white hover:text-sky  p-1 rounded-lg bg-[#5c6856] text-sm">
+                    <FaUser className="" size={26} />
+                    <p className="">Tài khoản</p>
                   </div>
                 </Dropdown>
               </motion.div>
@@ -216,7 +209,7 @@ export default function MainNavbar() {
                     count={countItemsCart > 100 ? 109 : 5}
                     style={{ backgroundColor: "#f32c2c" }}
                   >
-                    <PiShoppingCart
+                    <FaCartShopping
                       className="text-white hover:text-[#5c6856]"
                       size={20}
                     />
@@ -282,51 +275,51 @@ export default function MainNavbar() {
                       count={countItemsCart > 100 ? 109 : 5}
                       style={{ backgroundColor: "#f32c2c" }}
                     >
-                      <PiShoppingCart
+                      <FaCartShopping
                         className="text-white hover:text-[#5c6856]"
-                        size={20}
+                        size={26}
                       />
                     </Badge>
                   </div>
                 </Link>
                 <motion.div whileTap={{ scale: 0.9 }}>
-                  {
-                    authContext.userInfo ?
+                  {authContext.userInfo ? (
                     <Dropdown
-                    menu={{ items }}
-                    placement="bottomLeft"
-                    className="xs:hidden"
+                      menu={{ items }}
+                      placement="bottomLeft"
+                      className="xs:hidden"
                     >
-                      <div className="flex space-x-2 items-center text-white hover:text-sky lg:max-w-[140px] p-[12px] rounded-lg bg-[#5c6856] text-sm">
-                      <>
-                        {authContext.userInfo?.avatar ? 
-                          <Image className="lg:h-[30px] lg:h-[30px] h-[20px] w-[20px] rounded-full" width={16} height={16} src={authContext.userInfo.avatar} alt="avatar"/>
-                          :
-                          <RxPerson className="" size={20} />
-                        }
-                        {
-                          authContext.userInfo ?
-                          <p className="truncate">{authContext.userInfo?.fullName}</p>
-                          :
-                          <p className="truncate">Account</p>
-                        }
-                      </>
+                      <div className="flex space-x-2 items-center text-white hover:text-sky lg:max-w-[100px] p-2 rounded-lg bg-[#5c6856] text-sm">
+                        <>
+                          {authContext.userInfo?.avatar ? (
+                            <FaUser className="" size={26} />
+                          ) : (
+                            <FaUser className="" size={26} />
+                          )}
+                          {authContext.userInfo ? (
+                            <p className="truncate">
+                              {authContext.userInfo?.fullName}
+                            </p>
+                          ) : (
+                            <p className="truncate">Tài khoản</p>
+                          )}
+                        </>
                       </div>
                     </Dropdown>
-                    :
+                  ) : (
                     <Dropdown
-                    menu={{items: unauthItems}}
-                    placement="bottomLeft"
-                    className="xs:hidden"
-                  >
-                    <div className="flex space-x-2 items-center text-white hover:text-sky  p-[12px] rounded-lg bg-[#5c6856] text-sm">
-                    <>
-                      <RxPerson className="" size={20} />
-                      <p className="truncate">Account</p>
-                    </>
-                    </div>
-                  </Dropdown>
-                  }
+                      menu={{ items: unauthItems }}
+                      placement="bottomLeft"
+                      className="xs:hidden"
+                    >
+                      <div className="flex space-x-2 items-center text-white hover:text-sky  p-2 rounded-lg bg-[#5c6856] text-sm">
+                        <>
+                          <FaUser className="" size={26} />
+                          <p className="truncate">Tài khoản</p>
+                        </>
+                      </div>
+                    </Dropdown>
+                  )}
                 </motion.div>
               </div>
             </div>

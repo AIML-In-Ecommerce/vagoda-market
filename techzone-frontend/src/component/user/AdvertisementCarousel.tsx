@@ -86,6 +86,11 @@ import { CarouselArrow } from "./utils/CarouselArrow";
 
 const AdvertisementData = [
   {
+    _id: "testing_05",
+    image_url:
+      "https://m.yodycdn.com/fit-in/filters:format(webp)/products/lxzy4nrasddknmal3x__K%E1%BA%BET%20N%E1%BB%90I%20GIA%20%C4%90%C3%8CNH%201920%20x864.png",
+  },
+  {
     _id: "testing_01",
     image_url:
       "https://m.yodycdn.com/fit-in/filters:format(webp)/fit-in/filters:format(webp)/products/lwynjo4x321gxw5hyq9__232-1920x864%20(1).png",
@@ -98,22 +103,17 @@ const AdvertisementData = [
   {
     _id: "testing_03",
     image_url:
-      "https://media3.coolmate.me/cdn-cgi/image/width=1920,quality=90,format=auto/uploads/June2024/Happy_Friday_-_Destop_-_co_CTA.jpg",
+      "https://m.yodycdn.com/fit-in/filters:format(webp)/fit-in/filters:format(webp)/products/ly2ofg4x44kani69so3__Hero_Web_1920x864_2x2.jpeg",
   },
   {
     _id: "testing_04",
     image_url:
-      "https://media3.coolmate.me/cdn-cgi/image/width=1920,quality=90,format=auto/uploads/June2024/PC_Banner_Homepage_-_Vui_bong_lan_san_phan_thuong_-_Destop.jpg",
+      "https://m.yodycdn.com/fit-in/filters:format(webp)/fit-in/filters:format(webp)/products/lxzue575pctrxcsake__296_HERO%20BANNER%20PC.png",
   },
   {
     _id: "testing_05",
     image_url:
-      "https://media3.coolmate.me/cdn-cgi/image/width=1920,quality=90,format=auto/uploads/June2024/FOOTBALL_BANNER_HP_(2).png",
-  },
-  {
-    _id: "testing_06",
-    image_url:
-      "https://media3.coolmate.me/cdn-cgi/image/width=1920,quality=90,format=auto/uploads/June2024/BANNER_OMO.png",
+      "https://m.yodycdn.com/fit-in/filters:format(webp)/products/lxzy2kx3xsusrkez16__VIBRANT%20SUMMER%201920%20x864.png",
   },
 ];
 interface AdvertisementCarouselProps {}
@@ -124,10 +124,10 @@ interface AdvertisementProps {
 }
 
 export default function AdvertisementCarousel(
-  props: AdvertisementCarouselProps
+  props: AdvertisementCarouselProps,
 ) {
   const [advertisements, setAdvertisements] = useState<AdvertisementProps[]>(
-    []
+    [],
   );
   const [mainDisplay, setMainDisplay] = useState<JSX.Element[]>([
     <Skeleton active key="1" />,
@@ -175,7 +175,7 @@ export default function AdvertisementCarousel(
             />
           );
           return display;
-        }
+        },
       );
 
       setMainDisplay(advertisementDisplays);
