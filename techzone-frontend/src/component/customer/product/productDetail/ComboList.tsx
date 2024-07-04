@@ -2,12 +2,11 @@
 import { Button, Carousel, Flex, List } from "antd";
 // import { useTranslations } from "next-intl";
 import ComboItem from "./ComboItem";
-import React, { useEffect, useState } from "react";
+import React, { ReactElement, useEffect, useState } from "react";
 import { CarouselArrow } from "@/component/user/utils/CarouselArrow";
 import { priceIndex } from "../ProductDetail";
 import CustomEmpty from "../../shop/mini/CustomEmpty";
 import { ProductType } from "@/model/ProductType";
-import { POST_GetProductListByShop } from "@/apis/product/ProductDetailAPI";
 
 interface ComboListProps {
   // initial price before adding the combo price
@@ -16,61 +15,12 @@ interface ComboListProps {
   updateTotalComboPrice: (price: number) => void;
   comboIdList: Array<string>;
   setComboIdList: (list: Array<string>) => void;
+  notify(message: string, content: ReactElement): void;
+  combo: ProductType[];
 }
 
 const ComboList = (comboListData: ComboListProps) => {
   //   const t = useTranslations("Review");
-  // mock data
-  const MockData = [
-    {
-      _id: "6645bab5f4c7faf064f1bcdc",
-      imageLink:
-        "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      name: "Lenovo 15i",
-      rating: 4.5,
-      soldAmount: 20,
-      price: 15000000,
-      flashSale: true,
-      originalPrice: 17000000,
-      category: "",
-    },
-    {
-      _id: "6645bbaef4c7faf064f1bce0",
-      imageLink:
-        "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      name: "Dell Vostro",
-      rating: 4.5,
-      soldAmount: 32,
-      price: 17000000,
-      flashSale: false,
-      originalPrice: 17000000,
-      category: "",
-    },
-    {
-      _id: "sp-03",
-      imageLink:
-        "https://images.unsplash.com/photo-1593642702821-c8da6771f0c6?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      name: "Dell SuperLight",
-      rating: 4.5,
-      soldAmount: 10,
-      price: 22000000,
-      flashSale: true,
-      originalPrice: 20000000,
-      category: "",
-    },
-    {
-      _id: "sp-04",
-      imageLink:
-        "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      name: "Lenovo 15i",
-      rating: 4.5,
-      soldAmount: 20,
-      price: 15000000,
-      flashSale: true,
-      originalPrice: 17000000,
-      category: "",
-    },
-  ];
 
   // pagination
   // const [page, setPage] = useState(1);
@@ -105,8 +55,6 @@ const ComboList = (comboListData: ComboListProps) => {
   // const autoPlayCarouselSpeed = 5000; //ms
 
   // var and functions
-  const [combo, setCombo] = useState<ProductType[]>(MockData);
-
   const handleCheckbox = (isChecked: boolean, id: string, price: number) => {
     let tempTotalPrice = comboListData.totalComboPrice;
     if (isChecked) {
@@ -121,25 +69,9 @@ const ComboList = (comboListData: ComboListProps) => {
     comboListData.updateTotalComboPrice(tempTotalPrice);
   };
 
-  // call api temporarily
-  const mockId = "65f1e8bbc4e39014df775166";
-
-  useEffect(() => {
-    handleGetProductList();
-  }, [mockId]);
-
-  const handleGetProductList = async () => {
-    const response = await POST_GetProductListByShop(mockId);
-    if (response.status == 200) {
-      if (response.data) {
-        setCombo(response.data);
-        // console.log("product", data);
-      }
-    }
-  };
   return (
     <div>
-      {(combo.length > 0 && (
+      {(comboListData.combo.length > 0 && (
         <div className="align-middle grid grid-cols-5 gap-5">
           <div className="sm:col-span-3 lg:col-span-4 col-span-5">
             {/* pagination */}
@@ -169,14 +101,14 @@ const ComboList = (comboListData: ComboListProps) => {
               }
               defaultCurrent={page}
               defaultPageSize={itemNumber}
-              total={combo.length}
+              total={comboListData.combo.length}
               onChange={onChange}
               showLessItems={true}
               onShowSizeChange={onShowSizeChange}
             />
           </div>
         </Flex> */}
-            {(combo.length < 4 && (
+            {(comboListData.combo.length < 4 && (
               <List
                 grid={{
                   gutter: 5,
@@ -187,7 +119,7 @@ const ComboList = (comboListData: ComboListProps) => {
                   xl: 3,
                   xxl: 3,
                 }}
-                dataSource={combo}
+                dataSource={comboListData.combo}
                 locale={{
                   emptyText: <CustomEmpty />,
                 }}
@@ -197,6 +129,7 @@ const ComboList = (comboListData: ComboListProps) => {
                       _id={item._id}
                       product={item}
                       handleCheckbox={handleCheckbox}
+                      notify={comboListData.notify}
                     />
                   </List.Item>
                 )}
@@ -241,12 +174,13 @@ const ComboList = (comboListData: ComboListProps) => {
                   },
                 ]}
               >
-                {combo.map((item, index) => (
+                {comboListData.combo.map((item, index) => (
                   <div key={index}>
                     <ComboItem
                       _id={item._id}
                       product={item}
                       handleCheckbox={handleCheckbox}
+                      notify={comboListData.notify}
                     />
                   </div>
                 ))}
@@ -285,3 +219,55 @@ const ComboList = (comboListData: ComboListProps) => {
 };
 
 export default ComboList;
+
+// mock data
+// const MockData = [
+//   {
+//     _id: "6645bab5f4c7faf064f1bcdc",
+//     imageLink:
+//       "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+//     name: "Lenovo 15i",
+//     rating: 4.5,
+//     soldAmount: 20,
+//     price: 15000000,
+//     flashSale: true,
+//     originalPrice: 17000000,
+//     category: "",
+//   },
+//   {
+//     _id: "6645bbaef4c7faf064f1bce0",
+//     imageLink:
+//       "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+//     name: "Dell Vostro",
+//     rating: 4.5,
+//     soldAmount: 32,
+//     price: 17000000,
+//     flashSale: false,
+//     originalPrice: 17000000,
+//     category: "",
+//   },
+//   {
+//     _id: "sp-03",
+//     imageLink:
+//       "https://images.unsplash.com/photo-1593642702821-c8da6771f0c6?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+//     name: "Dell SuperLight",
+//     rating: 4.5,
+//     soldAmount: 10,
+//     price: 22000000,
+//     flashSale: true,
+//     originalPrice: 20000000,
+//     category: "",
+//   },
+//   {
+//     _id: "sp-04",
+//     imageLink:
+//       "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+//     name: "Lenovo 15i",
+//     rating: 4.5,
+//     soldAmount: 20,
+//     price: 15000000,
+//     flashSale: true,
+//     originalPrice: 17000000,
+//     category: "",
+//   },
+// ];

@@ -28,24 +28,26 @@ export default function NavbarMenu(props: NavbarMenuProps) {
     {
       key: "0",
       label: (
-        <div className="flex  items-center space-x-4">
-          <div className="flex pl-6 py-2 grid grid-cols-4 gap-4">
+        <div className="flex items-center space-x-4">
+          <div className="pl-6 py-2 grid grid-cols-4 gap-4">
             {props.options.length > 0 &&
-              props.options.map((item) => (
-                <div className="justify-center mx-auto space-y-2">
+              props.options.map((item, index) => (
+                <div className="justify-center mx-auto space-y-2" key={index}>
                   <img
                     src={item.image}
                     alt="Product"
                     className="w-1/2 rounded-lg"
                   />
-                  <p className="uppercase font-bold">{item.name}</p>
+                  <p className="uppercase font-bold text-gray-600 cursor-default">
+                    {item.name}
+                  </p>
                   <div className="space-y-2">
                     {item.subCategories &&
                       item.subCategories.map((subCategory) => (
                         <Link
                           href={"/product-list?"}
                           key={subCategory._id}
-                          className="hover:text-[#5c6856] hover:font-bold block"
+                          className="hover:text-[#5c6856] hover:font-bold block text-gray-600"
                         >
                           {subCategory.name}
                         </Link>
@@ -61,11 +63,11 @@ export default function NavbarMenu(props: NavbarMenuProps) {
 
   return (
     <Dropdown
-      visible={visible}
-      onVisibleChange={handleVisibleChange}
+      open={visible}
+      onOpenChange={handleVisibleChange}
       menu={{ items: categoryItems }}
       placement="bottomLeft"
-      className=""
+      className="cursor-pointer"
       trigger={["click"]}
       overlayStyle={{
         maxHeight: 100,

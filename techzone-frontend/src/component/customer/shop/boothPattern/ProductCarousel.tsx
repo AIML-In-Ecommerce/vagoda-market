@@ -1,6 +1,6 @@
 "use client";
 import { Carousel, Flex, List, Typography } from "antd";
-import { useEffect, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import Link from "next/link";
 import { AiOutlineRight } from "react-icons/ai";
 import { CarouselArrow } from "@/component/user/utils/CarouselArrow";
@@ -14,6 +14,7 @@ import { POST_GetProductList } from "@/apis/product/ProductDetailAPI";
 
 interface ProductCarouselProps {
   widget: WidgetType;
+  notify(message: string, content: ReactElement): void;
 }
 
 interface ProductItemProps {
@@ -25,6 +26,7 @@ interface ProductItemProps {
   price: number;
   isFlashSale: boolean;
   originalPrice: number;
+  shop: string;
 }
 
 export default function ProductCarousel(props: ProductCarouselProps) {
@@ -49,6 +51,7 @@ export default function ProductCarousel(props: ProductCarouselProps) {
         price: value.price,
         isFlashSale: value.flashSale,
         originalPrice: value.originalPrice,
+        shop: value.shop,
       };
 
       return tr_item;
@@ -134,19 +137,20 @@ export default function ProductCarousel(props: ProductCarouselProps) {
                   }}
                   renderItem={(item) => (
                     <List.Item>
-                      <Link href={`/product/${item._id}`}>
-                        <div className="text-black">
-                          <ProductItem
-                            imageLink={item.imageLink}
-                            name={item.name}
-                            rating={item.rating}
-                            soldAmount={item.soldAmount}
-                            price={item.price}
-                            isFlashSale={item.isFlashSale}
-                            originalPrice={item.originalPrice}
-                          />
-                        </div>
-                      </Link>
+                      <div className="text-black">
+                        <ProductItem
+                          _id={item._id}
+                          imageLink={item.imageLink}
+                          name={item.name}
+                          rating={item.rating}
+                          soldAmount={item.soldAmount}
+                          price={item.price}
+                          isFlashSale={item.isFlashSale}
+                          originalPrice={item.originalPrice}
+                          shop={item.shop}
+                          notify={props.notify}
+                        />
+                      </div>
                     </List.Item>
                   )}
                 />
@@ -192,22 +196,23 @@ export default function ProductCarousel(props: ProductCarouselProps) {
               >
                 {products.length > 0 &&
                   products.map((value, index) => (
-                    <Link href={`/product/${value._id}`}>
-                      <div
-                        key={index}
-                        className="pl-5 text-black pt-5 h-72 flex flex-col items-center"
-                      >
-                        <ProductItem
-                          imageLink={value.imageLink}
-                          name={value.name}
-                          rating={value.rating}
-                          soldAmount={value.soldAmount}
-                          price={value.price}
-                          isFlashSale={value.isFlashSale}
-                          originalPrice={value.originalPrice}
-                        />
-                      </div>
-                    </Link>
+                    <div
+                      key={index}
+                      className="pl-5 text-black pt-5 h-72 flex flex-col items-center"
+                    >
+                      <ProductItem
+                        _id={value._id}
+                        imageLink={value.imageLink}
+                        name={value.name}
+                        rating={value.rating}
+                        soldAmount={value.soldAmount}
+                        price={value.price}
+                        isFlashSale={value.isFlashSale}
+                        originalPrice={value.originalPrice}
+                        shop={value.shop}
+                        notify={props.notify}
+                      />
+                    </div>
                   ))}
               </Carousel>
             )}

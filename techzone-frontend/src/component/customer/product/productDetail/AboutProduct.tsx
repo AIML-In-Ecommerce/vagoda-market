@@ -1,6 +1,5 @@
 "use client";
 import { ProductStatusToStringConverter } from "@/component/user/utils/ProductStatusConverter";
-import { QuantityControl } from "@/component/user/utils/QuantityControl";
 import {
   CartProductType,
   ProductDetailType,
@@ -23,12 +22,14 @@ import {
 } from "antd";
 import Link from "next/link";
 import { useContext, useEffect, useMemo, useState } from "react";
-import ReactImageMagnify from "react-image-magnify";
-import CustomEmpty from "../../shop/mini/CustomEmpty";
-import { PUT_UpdateCart } from "@/apis/cart/CartAPI";
-import StatisticsService from "@/services/statistics.service";
 import { AuthContext } from "@/context/AuthContext";
+import ReactImageMagnify from "react-image-magnify";
+import { QuantityControl } from "@/component/user/utils/QuantityControl";
+import CustomEmpty from "../../shop/mini/CustomEmpty";
 import { ProductAccessType } from "@/enum/ProductAccessType";
+
+import { POST_AddToCart } from "@/apis/cart/CartAPI";
+import StatisticsService from "@/services/statistics.service";
 
 interface AboutProductProps {
   product: ProductDetailType;
@@ -123,8 +124,6 @@ export default function AboutProduct(props: AboutProductProps) {
   const authContext = useContext(AuthContext);
 
   const handleAddToCart = async () => {
-    // let mockId = "6675a954d1a5f8cd2cf610d6"; //userid
-
     if (!authContext.userInfo || !authContext.userInfo._id) {
       props.notify("Hãy đăng nhập vào tài khoản nhé!", "");
       return;
@@ -140,7 +139,7 @@ export default function AboutProduct(props: AboutProductProps) {
       },
     ];
 
-    const response = await PUT_UpdateCart(userId, products);
+    const response = await POST_AddToCart(userId, products);
 
     // if (response.message === "Update cart successfully") {
     if (response.data) {
@@ -172,7 +171,10 @@ export default function AboutProduct(props: AboutProductProps) {
         props.product.shop,
         accessType
       );
-    } else console.log(response.message);
+    } else {
+      props.notify("Thêm sản phẩm thất bại... Hãy thử lại sau!", <></>);
+      // console.log(response.message);
+    }
   };
 
   return (
@@ -308,9 +310,12 @@ export default function AboutProduct(props: AboutProductProps) {
               {props.product.name}
             </div>
 
-            <div className="text-xs">
+            <div className="text-xs flex gap-1">
               Thương hiệu / Shop:{" "}
-              <Link href="" className="text-blue-500">
+              <Link
+                href={`/seller/${props.product.shop}`}
+                className="text-blue-500"
+              >
                 {props.product.brand}
               </Link>
             </div>

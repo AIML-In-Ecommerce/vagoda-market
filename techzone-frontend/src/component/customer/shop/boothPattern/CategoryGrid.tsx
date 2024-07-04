@@ -102,7 +102,6 @@ export default function CategoryGrid(props: CategoryGridProps) {
         }}
         renderItem={(item) => (
           <List.Item>
-            {/* TODO: revise url key to see if it redirects correctly */}
             <CategoryItem category={item} />
           </List.Item>
         )}

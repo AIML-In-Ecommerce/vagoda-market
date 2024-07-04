@@ -1,7 +1,7 @@
 "use client";
 
-import { Card, Carousel, Flex, Skeleton, Typography } from "antd";
-import { useEffect, useState } from "react";
+import { Carousel, Flex, Skeleton, Typography } from "antd";
+import { ReactElement, useEffect, useState } from "react";
 import Link from "next/link";
 import { AiOutlineRight } from "react-icons/ai";
 import { CarouselArrow } from "./utils/CarouselArrow";
@@ -9,7 +9,9 @@ import ProductItem from "../customer/ProductItem";
 
 // import SimpleProductCard from "./utils/SimpleProductCard"
 
-interface HomeSuggestedProductProps {}
+interface HomeSuggestedProductProps {
+  notify(message: string, content: ReactElement): void;
+}
 
 // interface SimpleProductInfo
 // {
@@ -30,6 +32,7 @@ interface ProductItemProps {
   price: number;
   isFlashSale: boolean;
   originalPrice: number;
+  shop: string;
 }
 
 enum WrapperType {
@@ -51,6 +54,7 @@ const paddingBlockProps: ProductItemProps = {
   price: 0,
   isFlashSale: false,
   originalPrice: 0,
+  shop: "",
 };
 
 // const MockData =
@@ -339,6 +343,7 @@ const paddingBlockProps: ProductItemProps = {
 //     }
 // ]
 
+// no shop id
 const MockData = [
   {
     _id: "sp-01",
@@ -474,7 +479,9 @@ const MockData = [
   },
 ];
 
-export default function HomeSuggestedProduct({}: HomeSuggestedProductProps) {
+export default function HomeSuggestedProduct({
+  notify,
+}: HomeSuggestedProductProps) {
   const [products, setProducts] = useState<ProductItemProps[]>([]);
   const numberOfDisplayedProductPerScreen = 5;
   // const gridColumnSpan = 5;
@@ -484,7 +491,8 @@ export default function HomeSuggestedProduct({}: HomeSuggestedProductProps) {
   useEffect(() => {
     //fetch data here
 
-    const data = MockData;
+    // const data = MockData;
+    const data = [];
     const tr_data: ProductItemProps[] = data.map((value) => {
       const tr_item: ProductItemProps = {
         _id: value._id,
@@ -495,6 +503,7 @@ export default function HomeSuggestedProduct({}: HomeSuggestedProductProps) {
         price: value.price,
         isFlashSale: value.isFlashSale,
         originalPrice: value.originalPrice,
+        shop: value.shop,
       };
 
       return tr_item;
@@ -558,19 +567,20 @@ export default function HomeSuggestedProduct({}: HomeSuggestedProductProps) {
           const value = valueWrapper.productInfo;
 
           return (
-            <Link href={`/product/${value._id}`}>
-              <div key={value._id + index.toString()} className={isInvisible}>
-                <ProductItem
-                  imageLink={value.imageLink}
-                  name={value.name}
-                  rating={value.rating}
-                  soldAmount={value.soldAmount}
-                  price={value.price}
-                  isFlashSale={value.isFlashSale}
-                  originalPrice={value.originalPrice}
-                />
-              </div>
-            </Link>
+            <div key={value._id + index.toString()} className={isInvisible}>
+              <ProductItem
+                _id={value._id}
+                imageLink={value.imageLink}
+                name={value.name}
+                rating={value.rating}
+                soldAmount={value.soldAmount}
+                price={value.price}
+                isFlashSale={value.isFlashSale}
+                originalPrice={value.originalPrice}
+                shop={value.shop}
+                notify={notify}
+              />
+            </div>
           );
         }
       );

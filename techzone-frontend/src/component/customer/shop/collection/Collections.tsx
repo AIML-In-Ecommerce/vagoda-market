@@ -1,7 +1,7 @@
 "use client";
 import { CollectionType } from "@/model/CollectionType";
 import { Menu, Skeleton } from "antd";
-import { useEffect, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import React from "react";
 import AllCollections from "./AllCollections";
 import CollectionDetail from "./CollectionDetail";
@@ -11,6 +11,7 @@ import { useParams } from "next/navigation";
 
 interface CollectionsProps {
   selectedId: string;
+  notify(message: string, content: ReactElement): void;
 }
 
 export default function Collections(props: CollectionsProps) {
@@ -83,7 +84,12 @@ export default function Collections(props: CollectionsProps) {
                   setOption([id]);
                 }}
               />
-            )) || <CollectionDetail collectionId={option[0]} />}
+            )) || (
+              <CollectionDetail
+                collectionId={option[0]}
+                notify={props.notify}
+              />
+            )}
           </div>
         </div>
       )) || <Skeleton active style={{ margin: 10 }} />}

@@ -92,3 +92,43 @@ export async function PUT_UpdateCart(id: string, products: CartProductType[]) {
     };
   }
 }
+
+export async function POST_AddToCart(id: string, products: CartProductType[]) {
+  const url = (
+    BACKEND_PREFIX?.toString() +
+    ":" +
+    CART_PORT?.toString() +
+    "/cart/user/add?userId=" +
+    id
+  ).toString();
+
+  try {
+    // console.log(url);
+    const response = await axios.post(url, { products });
+    const responseData: CartResponse = response.data;
+
+    if (responseData.status == 200) {
+      return {
+        isDenied: false,
+        message: "Update cart successfully",
+        status: responseData.status,
+        data: responseData.data,
+      };
+    } else {
+      return {
+        isDenied: true,
+        message: "Failed to update cart",
+        status: responseData.status,
+        data: responseData.data,
+      };
+    }
+  } catch (err) {
+    console.error(err);
+    return {
+      isDenied: true,
+      message: "Failed to update cart",
+      status: 500,
+      data: undefined,
+    };
+  }
+}

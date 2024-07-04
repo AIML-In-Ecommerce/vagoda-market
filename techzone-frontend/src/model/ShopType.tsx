@@ -1,6 +1,5 @@
 export type ShopInfoDesignType = {
   color: string;
-  name: string;
   avatarUrl: string;
   bannerUrl: string;
 };

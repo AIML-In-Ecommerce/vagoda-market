@@ -1,12 +1,22 @@
-import { Flex, Image } from "antd";
-import { useEffect, useState } from "react";
+"use client";
+import { Flex, Image, message } from "antd";
+import { ReactElement, useContext, useEffect, useState } from "react";
 import { PiShoppingCart } from "react-icons/pi";
 import { motion, useAnimation } from "framer-motion";
+import Link from "next/link";
+import { ProductAccessType } from "@/enum/ProductAccessType";
+import { CartProductType } from "@/model/ProductType";
+import { AuthContext } from "@/context/AuthContext";
+
+import { POST_AddToCart } from "@/apis/cart/CartAPI";
+import StatisticsService from "@/services/statistics.service";
+import { priceIndex } from "@/component/customer/product/ProductDetail";
 
 interface SimpleProductCardProps {
   info: SimpleProductInfo;
   imageHeight: string | undefined;
   imageWidth: string | undefined;
+  notify(message: string, content: ReactElement): void;
 }
 
 interface SimpleProductInfo {
@@ -16,18 +26,18 @@ interface SimpleProductInfo {
   finalPrice: number;
   status: string;
   image: string;
+  shop: string;
 }
 
 export default function SimpleProductCard({
   info,
   imageHeight,
   imageWidth,
+  notify,
 }: SimpleProductCardProps) {
   //here we can get locale from web locale language hahaha
   //ok
   const locale = "vi-VN";
-  const visibleAdditionalInfo = "transition-opacity duration-1000 opacity-100";
-  const hiddenAdditionalInfo = "transition-opacity duration-1000 opacity-0";
 
   const [isHovered, setIsHovered] = useState(false);
   const controls = useAnimation();
@@ -44,8 +54,6 @@ export default function SimpleProductCard({
     style: "currency",
     currency: "VND",
   });
-  const [visibleAdditionalInfoState, setVisibleAdditionalInfoState] =
-    useState<string>(hiddenAdditionalInfo);
 
   function calculateDiscountPercentage(
     originalPrice: number,
@@ -54,38 +62,72 @@ export default function SimpleProductCard({
     return Math.ceil(((originalPrice - finalPrice) * 100) / originalPrice);
   }
 
-  function handleAddToCartOnClick() {
-    console.log(info);
-  }
+  const authContext = useContext(AuthContext);
 
-  function handleItemOnClick() {}
+  const handleAddToCart = async () => {
+    if (!authContext.userInfo || !authContext.userInfo._id) {
+      message.error("Hãy đăng nhập vào tài khoản nhé!");
+      return;
+    }
+    const userId = authContext.userInfo._id;
 
-  function handleMouseEnter() {
-    setIsHovered(true);
-    setTimeout(() => {
-      setVisibleAdditionalInfoState(visibleAdditionalInfo);
-    }, 700);
-  }
+    let products: CartProductType[] = [
+      {
+        product: info._id,
+        quantity: 1,
+      },
+    ];
 
-  function handleMouseLeave() {
-    setIsHovered(false);
-    setTimeout(() => {
-      setVisibleAdditionalInfoState(hiddenAdditionalInfo);
-    }, 1000);
-  }
+    const response = await POST_AddToCart(userId, products);
+
+    // if (response.message === "Update cart successfully") {
+    if (response.data) {
+      notify(
+        "Bạn đã thêm thành công!",
+        <div className="flex flex-row gap-6 w-max">
+          <img className="m-2 h-20 w-20 object-fill" src={info.image} alt="success"/>
+          <div className="flex flex-col justify-center">
+            <div className="text-sm md:text-lg truncate">{info.name}</div>
+            <div className="text-[9px] md:text-sm text-red-500 font-semibold flex">
+              {priceIndex(info.finalPrice)}
+            </div>
+          </div>
+        </div>
+      );
+
+      const sessionId =
+        authContext.methods && authContext.methods.getSessionId()
+          ? authContext.methods.getSessionId()
+          : "";
+      const accessType = ProductAccessType.ADD_TO_CART;
+
+      StatisticsService.setProductAccess(
+        userId,
+        sessionId,
+        info._id,
+        info.shop,
+        accessType
+      );
+    } else {
+      message.error("Thêm sản phẩm thất bại... Hãy thử lại sau!");
+
+      // console.log(response.message);
+    }
+  };
 
   const ProductImage = (
     <Image
-      className="rounded-lg w-max"
+      className="rounded-lg w-max mt-3"
       height={imageHeight}
       width={imageWidth}
       src={info.image}
       alt=" ảnh minh họa sản phẩm"
+      preview={false}
     />
   );
 
   const ProductFinalPrice = (
-    <p className="text-xl sm:text-md font-semibold text-amber-600">
+    <p className="text-xl sm:text-md font-semibold text-red-600">
       {currencyFormater.format(info.finalPrice)}
     </p>
   );
@@ -96,12 +138,6 @@ export default function SimpleProductCard({
     </p>
   );
 
-  const ProductName = (
-    <p className="text-wrap text-base font-semibold text-amber-900">
-      {info.name}
-    </p>
-  );
-
   return (
     <>
       <motion.div
@@ -109,62 +145,58 @@ export default function SimpleProductCard({
         className="w-52 "
       >
         <Flex
-          className="h-64 w-48 rounded-lg bg-white py-2 px-1"
+          className="h-64 w-48 rounded-lg bg-white"
           vertical
           justify="center"
-          onMouseEnter={() => handleMouseEnter()}
-          onMouseLeave={() => handleMouseLeave()}
-          onClick={() => handleItemOnClick()}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
         >
-          <Flex className="relative" vertical justify="center" align="center">
-            <div className="z-0">{ProductImage}</div>
-            <Flex
-              className={`w-full z-20 absolute bottom-0 bg-white py-4 ${visibleAdditionalInfoState}`}
-              justify="center"
-              align="center"
-            >
-              <Flex className="w-2/3 px-2" justify="start" align="baseline">
-                {ProductName}
+          <Link href={`/product/${info._id}`}>
+            <Flex className="relative" vertical justify="center" align="center">
+              <div className="z-0 text-black">{ProductImage}</div>
+            </Flex>
+          </Link>
+
+          <motion.button
+            onClick={() => handleAddToCart()}
+            initial={{ opacity: 0, y: 0 }}
+            animate={controls}
+            className={`flex space-x-1 justify-center ml-8 text-xs text-white absolute z-10 transform -translate-y-1/4 p-2 bg-[#797979] shadow-sm rounded-lg`}
+          >
+            <PiShoppingCart size={16} color="white" />
+            <p>Thêm vào giỏ hàng</p>
+          </motion.button>
+
+          <Link href={`/product/${info._id}`}>
+            <div className="flex justify-between align-middle my-3 mx-3 text-black">
+              <Flex
+                className="pl-1 w-2/3"
+                vertical
+                justify="center"
+                align="start"
+              >
+                <p className="text-xs font-bold overflow-hidden line-clamp-1">
+                  {info.name}
+                </p>
+                {ProductFinalPrice}
+                {ProductOriginPrice}
               </Flex>
-              <Flex className="w-1/3" justify="end" align="center">
-                <button
-                  className="w-full"
-                  type="button"
-                  onClick={() => handleAddToCartOnClick}
-                >
-                  <Flex
-                    className="w-full bg-stone-600 hover:bg-stone-700 font-semibold text-white py-2 rounded-md"
-                    justify="center"
-                    align="center"
-                    gap={4}
-                  >
-                    <PiShoppingCart />
-                    <p>Add</p>
-                  </Flex>
-                </button>
+              <Flex
+                className="bg-red-100 h-8 rounded-2xl mt-4 py-2 px-2"
+                justify="center"
+                align="center"
+              >
+                <p className="text-red-600 text-sm font-semibold">
+                  -{" "}
+                  {calculateDiscountPercentage(
+                    info.originalPrice,
+                    info.finalPrice
+                  )}
+                  %
+                </p>
               </Flex>
-            </Flex>
-          </Flex>
-          <div className="flex justify-between align-middle mt-3 mx-3 ">
-            <Flex className="pl-1" vertical justify="center" align="start">
-              {ProductFinalPrice}
-              {ProductOriginPrice}
-            </Flex>
-            <Flex
-              className="bg-amber-700 h-8 rounded-sm my-2 py-2 px-2"
-              justify="center"
-              align="center"
-            >
-              <p className="text-white text-sm font-semibold">
-                -{" "}
-                {calculateDiscountPercentage(
-                  info.originalPrice,
-                  info.finalPrice
-                )}
-                %
-              </p>
-            </Flex>
-          </div>
+            </div>
+          </Link>
         </Flex>
       </motion.div>
     </>

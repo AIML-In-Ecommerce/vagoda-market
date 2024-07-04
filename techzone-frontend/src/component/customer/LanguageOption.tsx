@@ -46,13 +46,13 @@ export default function LanguageOption() {
     },
   ];
   return (
-    <div className="flex items-center space-x-2 hover:text-black hover:bg-slate-200 items-center text-white p-1 rounded-lg">
+    <div className="flex items-center space-x-2 hover:text-black hover:bg-slate-200 text-white p-1 rounded-lg">
       <Dropdown menu={{ items }} placement="bottomLeft">
         <div className="flex ">
           <GrLanguage className="" />
         </div>
       </Dropdown>
-      <p className="text-xs">{language}</p>
+      <p className="text-sm">{language}</p>
     </div>
   );
 }

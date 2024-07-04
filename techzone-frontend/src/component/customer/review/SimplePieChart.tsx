@@ -54,7 +54,7 @@ export default function SimplePieChart(props: SimplePieChartProps) {
         }}
       />
 
-      <div className="text-xs italic">Số lượng phản hồi</div>
+      {/* <div className="text-xs italic">Số lượng phản hồi</div> */}
 
       {/* <PieChart
         data={[

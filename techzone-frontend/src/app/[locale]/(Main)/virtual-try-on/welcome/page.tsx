@@ -1,14 +1,18 @@
 "use client";
 
-import React from "react";
+import React, { useContext } from "react";
 import { FiArrowRight } from "react-icons/fi";
 import Image from "next/image";
 import virtualTryon from "../(assets)/virtual try on welcome img.png";
 
 import { useRouter } from "next/navigation";
+import { AuthContext } from "@/context/AuthContext";
 
 const VirtualTryOnWelcomePage = () => {
   const router = useRouter();
+  const authContext = useContext(AuthContext);
+
+  console.log("Auth Context: ", authContext.userInfo?._id);
   return (
     <div className="w-[100vw] h-[100vh] bg-[#5C6856]">
       <div className="w-full h-full px-24 grid grid-cols-2 gap-8">
@@ -26,7 +30,9 @@ const VirtualTryOnWelcomePage = () => {
           </div>
           <button
             className="bg-[#FFFFFFE6] py-2 px-8 rounded-lg flex flex-row items-center justify-center text-[#323232] font-semibold text-2xl"
-            onClick={() => router.push("/virtual-try-on/123")}
+            onClick={() =>
+              router.push(`/virtual-try-on/${authContext.userInfo?._id}`)
+            }
           >
             Bắt đầu{" "}
             <span className="ml-4 ">
