@@ -98,7 +98,7 @@ export default function Searchbar(props: SearchbarProp) {
         ref={inputRef}
       />
       {showHistory && searchHistory.length > 0 && (
-        <div className="absolute z-10 w-11/12 bg-white shadow-lg rounded-lg mt-1">
+        <div className="absolute z-40 w-11/12 bg-white shadow-lg rounded-lg mt-1">
           {searchHistory.map((keyword, index) => (
             <div
               key={index}
