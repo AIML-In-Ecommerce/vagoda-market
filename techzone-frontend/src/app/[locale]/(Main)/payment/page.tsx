@@ -1,12 +1,14 @@
 "use client";
 import { GET_GetLatestOrder, Order } from "@/apis/order/OrderAPI";
 import PaymentStatusComponent from "@/component/customer/payment/PaymentStatusComponent";
+import { AuthContext } from "@/context/AuthContext";
 import { Skeleton } from "antd";
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, useContext } from "react"
 
 
 export default function PaymentPage() {
+    const context = useContext(AuthContext);
     const [loading, setLoading] = useState(true);
     const router = useRouter();
     const pathname = usePathname();
@@ -30,13 +32,14 @@ export default function PaymentPage() {
 
       useEffect(() => {
         const fetchLatestOrder = async() => {
-            await GET_GetLatestOrder(process.env.NEXT_PUBLIC_USER_ID as string).then(response => {
+            setLoading(true);
+            await GET_GetLatestOrder(context.userInfo?._id as string).then(response => {
                 setOrder(response.data as Order);
+                setLoading(false);
             })
         }
         fetchLatestOrder();
-        setLoading(false);
-      }, [])
+      }, [context.userInfo])
 
     return (
         <React.Fragment>

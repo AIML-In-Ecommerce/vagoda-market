@@ -106,10 +106,10 @@ export async function POST_addUserShippingAddress(userId: string, shippingAddres
             "idProvince": shippingAddress.idProvince,
             "idDistrict": shippingAddress.idDistrict,
             "idCommune": shippingAddress.idCommune,
-            "country": shippingAddress.country,
+            "country": shippingAddress.country ?? "Việt Nam",
             "receiverName": shippingAddress.receiverName,
             "phoneNumber": shippingAddress.phoneNumber,
-            "coordinate": shippingAddress.coordinate ?? null,
+            "coordinate": shippingAddress.coordinate ?? {},
             "label": shippingAddress.label,
             "isDefault": shippingAddress.isDefault,
         });
@@ -117,7 +117,7 @@ export async function POST_addUserShippingAddress(userId: string, shippingAddres
             return { isDenied: true, message: "Unauthenticated", status: 403, data: undefined }
         }
         if (response.status === 200) {
-            return { isDenied: false, message: response.statusText, status: response.status, data: undefined }
+            return { isDenied: false, message: response.statusText, status: response.status, data: response.data }
         }
         else {
             return { isDenied: true, message: response.statusText, status: response.status, data: undefined }
@@ -136,13 +136,10 @@ export async function PUT_updateUserShippingAddress(userId: string, shippingAddr
             "idProvince": shippingAddress.idProvince,
             "idDistrict": shippingAddress.idDistrict,
             "idCommune": shippingAddress.idCommune,
-            "country": shippingAddress.country,
+            "country": shippingAddress.country ?? "Việt Nam",
             "receiverName": shippingAddress.receiverName,
             "phoneNumber": shippingAddress.phoneNumber,
-            "coordinate": shippingAddress.coordinate ?? {
-                "lng": 105.1249021,
-                "lat": 10.2142
-            },
+            "coordinate": shippingAddress.coordinate ?? {},
             "label": shippingAddress.label,
             "isDefault": shippingAddress.isDefault,
         });

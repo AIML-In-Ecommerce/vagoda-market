@@ -1,8 +1,8 @@
 import axios from 'axios'
 
-const BACKEND_PREFIX = process.env.NEXT_PUBLIC_BACKEND_PREFIX
-const ORDER_PORT = process.env.NEXT_PUBLIC_ORDER_PORT
-// const HTTP_BACKEND_PREFIX = `${BACKEND_PREFIX}:${ORDER_PORT}`
+// const BACKEND_PREFIX = process.env.NEXT_PUBLIC_BACKEND_PREFIX
+// const ORDER_PORT = process.env.NEXT_PUBLIC_ORDER_PORT
+// // const HTTP_BACKEND_PREFIX = `${BACKEND_PREFIX}:${ORDER_PORT}`
 const GATEWAY_PREFIX = process.env.NEXT_PUBLIC_GATEWAY_PREFIX
 
 export interface Order {
@@ -10,14 +10,14 @@ export interface Order {
     user: User;
     shop: Shop;
     products: Product[];
-    promotion: null;
+    promotion: any;
     paymentMethod: PaymentMethod;
     shippingFee: number;
     totalPrice: number;
     profit: number;
     shippingAddress: ShippingAddress;
     orderStatus: OrderStatus[];
-    __v: number;
+    createAt: string;
 }
 
 export interface OrderStatus {
@@ -38,28 +38,21 @@ export interface PaymentMethod {
     paidAt: Date;
 }
 
-export interface Product {
-    brand: string;
-    isFlashSale: boolean;
-    inventoryAmount: number;
-    _id: string;
-    name: string;
-    attribute: any[];
-    description: string;
-    originalPrice: number;
-    category: Category;
-    subCategory: SubCategory;
-    shop: string;
-    platformFee: number;
-    status: string;
-    avgRating: number;
-    createAt: Date;
-    soldQuantity: number;
-    subCategoryType: SubCategoryType;
-    images: string[];
-    createdAt: Date;
-    purchasedPrice: number;
-    quantity: number;
+export interface Attribute {
+    colors: ColorAttribute[];
+    size: string[];
+    material: string;
+}
+
+export interface ColorAttribute {
+    _id?: string;
+    color: ColorItemAttribute;
+    link: string;
+}
+
+export interface ColorItemAttribute {
+    label: string;
+    value: string;
 }
 
 export interface Category {
@@ -97,6 +90,30 @@ export interface ShippingAddress {
     label: string;
     isDefault: boolean;
     _id: string;
+}
+
+export interface Product {
+    _id: string;
+    name: string;
+    shop: string;
+    description: string;
+    originalPrice: number;
+    category: Category;
+    subCategory: SubCategory;
+    subCategoryType: SubCategoryType;
+    platformFee: number;
+    status: string;
+    images: string[];
+    avgRating: number;
+    soldQuantity: number;
+    brand: string;
+    isFlashSale: boolean;
+    inventoryAmount: number;
+    attribute: Attribute;
+    purchasedPrice: number;
+    color: ColorAttribute;
+    size: string;
+    quantity: number;
 }
 
 export interface Shop {
@@ -187,7 +204,7 @@ export async function GET_GetLatestOrder(userId: string) {
     const url = `${GATEWAY_PREFIX}/order/buyer/orders?userId=${userId}`
     try {
         const response = await axios.get(url);
-        if (userId == null) {
+        if (userId === null) {
             return { isDenied: true, message: "Unauthenticated", status: 403, data: undefined }
         }
         let responseData = response.data;

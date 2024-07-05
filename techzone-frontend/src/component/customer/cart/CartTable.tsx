@@ -2,8 +2,11 @@
 import { CartItem, PUT_updateCartProduct } from '@/apis/cart/CartProductAPI';
 import { Currency } from '@/component/user/utils/CurrencyDisplay';
 import { QuantityControl } from '@/component/user/utils/QuantityControl';
+import { AuthContext } from '@/context/AuthContext';
 import { Button, Modal, Image, Select, Skeleton, Space, Table, TableColumnsType } from 'antd';
-import React, { useMemo, useState } from 'react'
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import React, { useContext, useEffect, useMemo, useState } from 'react'
 import { FaRegTrashCan } from 'react-icons/fa6';
 import styled from 'styled-components';
 
@@ -38,12 +41,19 @@ interface CartTableItem extends CartItem {
 }
 
 export default function CartTable(props: CartTableProps) {
+    const context = useContext(AuthContext);
+    const router = useRouter();
     const [selectionType, setSelectionType] = useState<'checkbox' | 'radio'>('checkbox');
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showDeleteManyModal, setShowDeleteManyModal] = useState(false);
     const selectedRowKeys = useMemo(() => {
         return props.selectedRowKeys;
     }, [props.selectedRowKeys])
+
+    //load userInfo context
+    useEffect(() => {
+        
+    }, [context.userInfo])
 
     const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
         console.log('selectedRowKeys changed: ', newSelectedRowKeys);
@@ -103,7 +113,7 @@ export default function CartTable(props: CartTableProps) {
                 }
                 return item;
             });
-            await PUT_updateCartProduct(process.env.NEXT_PUBLIC_USER_ID as string, updatedProducts);
+            await PUT_updateCartProduct(context.userInfo?._id as string, updatedProducts);
             props.setProducts(updatedProducts);
         }
     }
@@ -120,7 +130,7 @@ export default function CartTable(props: CartTableProps) {
                 }
                 return item;
             });
-            await PUT_updateCartProduct(process.env.NEXT_PUBLIC_USER_ID as string, updatedProducts);
+            await PUT_updateCartProduct(context.userInfo?._id as string, updatedProducts);
             props.setProducts(updatedProducts);
         }
     }
@@ -129,7 +139,7 @@ export default function CartTable(props: CartTableProps) {
         if (props.products) {
             const updatedProducts = props.products.filter((item: CartItem) => item.itemId !== key);
             props.setProducts(updatedProducts);
-            await PUT_updateCartProduct(process.env.NEXT_PUBLIC_USER_ID as string, updatedProducts);
+            await PUT_updateCartProduct(context.userInfo?._id as string, updatedProducts);
         }
         const updatedRowKeys = props.selectedRowKeys.filter(beforeKey => beforeKey !== key);
         props.setSelectedRowKeys(updatedRowKeys);
@@ -141,7 +151,7 @@ export default function CartTable(props: CartTableProps) {
         const updatedProducts = props.products!.filter((item: CartItem) => !props.selectedRowKeys.includes(item.itemId));
         props.setProducts(updatedProducts);
         props.selectedRowKeys.forEach(async (rowKey: React.Key) =>
-            await PUT_updateCartProduct(process.env.NEXT_PUBLIC_USER_ID as string, updatedProducts))
+            await PUT_updateCartProduct(context.userInfo?._id as string, updatedProducts))
         props.setSelectedRowKeys([]);
     };
 
@@ -156,7 +166,7 @@ export default function CartTable(props: CartTableProps) {
                 }
                 return item;
             });
-            await PUT_updateCartProduct(process.env.NEXT_PUBLIC_USER_ID as string, updatedProducts);
+            await PUT_updateCartProduct(context.userInfo?._id as string, updatedProducts);
             props.setProducts(updatedProducts);
         }
     }
@@ -170,9 +180,13 @@ export default function CartTable(props: CartTableProps) {
                 }
                 return item;
             });
-            await PUT_updateCartProduct(process.env.NEXT_PUBLIC_USER_ID as string, updatedProducts);
+            await PUT_updateCartProduct(context.userInfo?._id as string, updatedProducts);
             props.setProducts(updatedProducts);
         }
+    }
+
+    const navigateToProductDetail = (productId: string) => {
+        router.push(`/product/${productId}`)
     }
 
     const columns: TableColumnsType<CartTableItem> = [
@@ -188,28 +202,37 @@ export default function CartTable(props: CartTableProps) {
                 <Space align="start" size={12} className="flex flex-row">
                     {
                         props.loading ? <Skeleton.Image active /> :
-                            <Image.PreviewGroup
-                                items={record.images}>
-                                <Image
-                                    width={120}
-                                    src={record.images ? record.images[0] : ""}
-                                    alt={""} />
-                            </Image.PreviewGroup>
+                            <>
+                                {
+                                    record.color ? <Image
+                                        width={120}
+                                        src={record.color.link}
+                                        alt={""} /> : <Image.PreviewGroup
+                                            items={record.images}>
+                                        <Image
+                                            width={120}
+                                            src={record.images ? record.images[0] : ""}
+                                            alt={""} />
+                                    </Image.PreviewGroup>
+                                }
+                            </>
+
                     }
                     {
                         props.loading ? <Skeleton paragraph={{ rows: 2 }
                         } active /> : (
                             <div className="flex flex-row">
                                 <div className="flex flex-col gap-1">
-                                    <div className="text-sm font-bold text-ellipsis overflow-hidden">{record.name}</div>
+                                    <div className="text-sm font-bold cursor-pointer hover:text-sky-500 text-ellipsis overflow-hidden"
+                                        onClick={() => navigateToProductDetail(record._id)}>{record.name}</div>
                                     <div className="text-sm text-gray-500 mb-1">
-                                        {record.color?.color.label.toUpperCase() ?? ""} {record.color ? "/" : ""} {record.size ? record.size.toUpperCase() : ""}</div>
+                                        {record.color?.color.label.toUpperCase() ?? ""} {record.size ? "/" : ""} {record.size ? record.size.toUpperCase() : ""}</div>
                                     <SelectWrapper className="flex flex-row gap-2 mb-1">
                                         {
                                             (record.attribute.colors && record.attribute.colors.length !== 0) ? (
                                                 <Select
                                                     labelInValue
-                                                    value={record.color.color}
+                                                    value={record.color ? record.color.color : record.attribute.colors[0].color }
                                                     style={{ width: 100 }}
                                                     onChange={(e) => handleColorChange(record.itemId, e.value)}
                                                     options={record.attribute.colors.map((item) => {
@@ -221,7 +244,7 @@ export default function CartTable(props: CartTableProps) {
                                         {
                                             (record.attribute.size && record.attribute.size.length !== 0) ? (
                                                 <Select
-                                                    value={record.size}
+                                                    value={record.size ? record.size : record.attribute.size[0] }
                                                     style={{ width: 75 }}
                                                     onChange={(e) => handleSizeChange(record.itemId, e)}
                                                     options={record.attribute.size.map((item) => {

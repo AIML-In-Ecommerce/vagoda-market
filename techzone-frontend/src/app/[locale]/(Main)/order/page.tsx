@@ -1,10 +1,11 @@
 'use client';
 import { GET_GetAllOrders, Order } from '@/apis/order/OrderAPI';
 import OrderInfoComponent from '@/component/customer/order/OrderInfoComponent';
+import { AuthContext } from '@/context/AuthContext';
 import { Button, Divider, Flex, Input, List, Tabs, Typography } from 'antd';
 import Search from 'antd/es/input/Search';
 import { useRouter, useSearchParams } from 'next/navigation';
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useContext } from 'react'
 import { FaMagnifyingGlass } from 'react-icons/fa6';
 
 interface OrderOverviewProps {
@@ -83,8 +84,9 @@ const filterSearchQuery = (array: any[], query: string) => {
 }
 
 export default function OrderOverview(props: OrderOverviewProps) {
+    const context = useContext(AuthContext)
     const [initLoading, setInitLoading] = useState(true);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [orders, setOrders] = useState<Order[]>([]);
     const [displayOrders, setDisplayOrders] = useState<Order[]>([]);
     const [count, setCount] = useState<number>(INITIAL_DISPLAY);
@@ -121,7 +123,7 @@ export default function OrderOverview(props: OrderOverviewProps) {
                 <Button onClick={onLoadMore}>Xem thêm</Button>
             </div>
         ) : null;
-    
+
     const handleTabKeyOnChange = (activeKey: string) => {
         setSelectedTabKey(activeKey);
     }
@@ -133,20 +135,23 @@ export default function OrderOverview(props: OrderOverviewProps) {
 
     useEffect(() => {
         //api called
+        if (!context.userInfo) return;
         const fetchOrders = async () => {
-            await GET_GetAllOrders(process.env.NEXT_PUBLIC_USER_ID as string)
-            .then((response) => {
-                const responseData = response;
-                // console.log('orders', responseData)
-                setOrders(responseData.data.reverse());
-                setDisplayOrders(filterOrders(selectedTabKey, responseData.data).slice(0, count));
-            })
+            setLoading(true);
+            await GET_GetAllOrders(context.userInfo?._id as string)
+                .then((response) => {
+                    const responseData = response;
+                    console.log('orders', responseData)
+                    setOrders(responseData.data.reverse());
+                    setDisplayOrders(filterOrders(selectedTabKey, responseData.data.reverse()).slice(0, count));
+                })
         }
         fetchOrders();
         setInitLoading(false);
-    }, [])
+        setLoading(false);
+    }, [context.userInfo])
 
-    useEffect(() => {       
+    useEffect(() => {
         if (orders && displayOrders) {
             setDisplayOrders(filterOrders(selectedTabKey, orders).slice(0, count));
             setCount(INITIAL_DISPLAY);
@@ -193,8 +198,10 @@ export default function OrderOverview(props: OrderOverviewProps) {
                         loadMore={loadMore}
                         dataSource={displayOrders}
                         renderItem={(item) => (
-                            <List.Item key={item._id}>
-                                <OrderInfoComponent order={item} />
+                            <List.Item>
+                                <div key={item._id}>
+                                    <OrderInfoComponent order={item} />
+                                </div>
                             </List.Item>
                         )}>
                     </List>

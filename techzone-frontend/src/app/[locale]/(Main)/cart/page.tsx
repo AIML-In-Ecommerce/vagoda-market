@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Input, Button, Card, Modal, Space, Image, Tooltip, Skeleton, Radio, Divider, Spin } from 'antd';
 import type { RadioChangeEvent } from 'antd';
 import { FaRegCircleQuestion } from "react-icons/fa6";
@@ -12,7 +12,7 @@ import DeliveryInfoForm from "@/component/customer/cart/DeliveryInfoForm";
 import TransactionSection from "@/component/customer/cart/TransactionSection";
 import PromotionSection from "@/component/customer/cart/PromotionSection";
 import { GET_getUserCartProducts, CartItem } from "@/apis/cart/CartProductAPI";
-import { ShippingAddress } from "@/apis/cart/AddressAPI";
+import { POST_addUserShippingAddress, ShippingAddress } from "@/apis/cart/AddressAPI";
 import { useRouter } from "next/navigation";
 import { PaymentMethod } from "@/apis/payment/PaymentAPI";
 import { POST_createOrder } from "@/apis/order/OrderAPI";
@@ -20,6 +20,7 @@ import { GET_GetAllPromotionByShopId, Promotion } from "@/apis/cart/promotion/Pr
 import { GET_GetShop } from "@/apis/shop/ShopAPI";
 import { SearchProps } from "antd/es/input";
 import CartTable from "@/component/customer/cart/CartTable";
+import { AuthContext } from "@/context/AuthContext";
 
 const { Search } = Input;
 
@@ -74,6 +75,7 @@ type PromotionDisplay = {
 }
 
 export default function CartPage() {
+    const context = useContext(AuthContext)
     const [products, setProducts] = useState<CartItem[]>();
     const [shopInfos, setShopInfos] = useState<ShopInfo[]>();
     const [promotions, setPromotions] = useState<PromotionType[]>([]);
@@ -82,13 +84,13 @@ export default function CartPage() {
     const [queryPromotionList, setQueryPromotionList] = useState<PromotionDisplay[]>();
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
     const [selectedKey, setSelectedKey] = useState<React.Key | null>(null);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState<boolean>(true);
     const [provisional, setProvisional] = useState(0);
     const [discount, setDiscount] = useState(0);
     const [selectedPromotions, setSelectedPromotions] = useState<PromotionType[]>([]);
     const [shippingFee, setShippingFee] = useState(0);
     const [total, setTotal] = useState(0);
-    const [showPromotionModal, setShowPromotionModal] = useState(false);
+    const [showPromotionModal, setShowPromotionModal] = useState<boolean>(false);
     const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(PaymentMethod.COD);
     const [isSavingAddress, setIsSavingAddress] = useState<boolean>(false);
     const promotion_help = "Áp dụng tối đa 1 Mã giảm giá Sản Phẩm và 1 Mã Vận Chuyển"
@@ -121,20 +123,10 @@ export default function CartPage() {
         setShopInfos(shopInfosList);
     }
 
-    useEffect(() => {
-        if (products) {
-            setLoading(true);
-            fetchShopInfos(products);
-            setLoading(false);
-        }
-    }, [products]);
-
-    useEffect(() => {
-        console.log('ShopInfos', shopInfos);
-        router.refresh();
-    }, [shopInfos]);
-
     const handleShowPromotionModal = () => {
+        if (shopInfos) {
+            fetchPromotions(shopInfos);
+        }
         setShowPromotionModal(true);
     }
 
@@ -144,16 +136,28 @@ export default function CartPage() {
 
     //transaction process
     const handleTransaction = async () => {
+        if (!context.userInfo) return;
         console.log('Transaction processing...');
+
+        //if isSavingAddress checked
+        if (isSavingAddress) {
+            const response = await POST_addUserShippingAddress(context.userInfo?._id as string, currentAddress);
+            const latestAddress: ShippingAddress = response.data[response.data.length - 1];
+            setCurrentAddress(latestAddress);
+            //Ummm....
+            setTimeout(() => {
+                console.log("Successfully added shipping address", currentAddress);
+            }, 1000);
+        }
 
         //Create order, response gateway url and transaction
         const createOrderResponse = await POST_createOrder(
-            process.env.NEXT_PUBLIC_USER_ID as string, 
-            currentAddress._id, 
+            context.userInfo._id as string, 
+            currentAddress._id,
             selectedPromotions.map((item => item._id)), 
             selectedRowKeys.map(item => item.toString()), paymentMethod);
         if (createOrderResponse) {
-            console.log('Navigating to gateway...', createOrderResponse.data.order_url);
+            console.log('Navigating to gateway...', createOrderResponse.data?.order_url);
             if (paymentMethod === PaymentMethod.ZALOPAY) {
                 router.push(createOrderResponse.data.order_url)
             }
@@ -162,7 +166,7 @@ export default function CartPage() {
 
         //Direct call to transaction api
         // const transactionResponse = await POST_processTransaction(
-        //     process.env.NEXT_PUBLIC_USER_ID as string,
+        //     context.userInfo._id as string,
         //     products?.filter(item => selectedRowKeys.includes(item.itemId))!,
         //     total,
         //     paymentMethod
@@ -175,70 +179,6 @@ export default function CartPage() {
     }
 
     const fetchPromotions = async (shopInfos: ShopInfo[]) => {
-        // const data: PromotionType[] = [
-        //     {
-        //         _id: '1',
-        //         name: "Giảm 50%",
-        //         description: "Áp dụng cho thanh toán qua ví điện tử MoMo (tối đa 100k)",
-        //         discountType: DiscountType.PERCENTAGE,
-        //         discountValue: 50,
-        //         quantity: 6,
-        //         upperBound: 100000,
-        //         expiredDate: formatDate(new Date('2024-05-30T12:30:00')), // 
-        //         code: ""
-        //     },
-        //     {
-        //         _id: '2',
-        //         name: "Giảm 200k",
-        //         description: "Áp dụng cho mọi đối tượng khách hàng (cho đơn tối thiểu 400k)",
-        //         discountType: DiscountType.DIRECT_PRICE,
-        //         discountValue: 200000,
-        //         quantity: 20,
-        //         lowerBound: 400000,
-        //         expiredDate: formatDate(new Date('2024-07-27T12:30:00')),
-        //         code: ""
-        //     },
-        //     {
-        //         _id: '3',
-        //         name: "Giảm 20%",
-        //         description: "Áp dụng cho tất cả khách hàng (tối đa 50k)",
-        //         discountType: DiscountType.PERCENTAGE,
-        //         discountValue: 20,
-        //         quantity: 15,
-        //         upperBound: 50000,
-        //         expiredDate: formatDate(new Date('2024-07-22T12:30:00')),
-        //         code: ""
-        //     },
-        //     {
-        //         _id: '4',
-        //         name: "Giảm 50k",
-        //         description: "Chỉ áp dụng cho khách hàng VIP",
-        //         discountType: DiscountType.DIRECT_PRICE,
-        //         discountValue: 50000,
-        //         quantity: 10,
-        //         lowerBound: 0,
-        //         expiredDate: formatDate(new Date('2024-07-30T12:30:00')),
-        //         code: ""
-        //     },
-        //     {
-        //         _id: '5',
-        //         name: "Giảm 10%",
-        //         description: "Áp dụng cho thanh toán qua thẻ tín dụng (tối đa 50k)",
-        //         discountType: DiscountType.PERCENTAGE,
-        //         discountValue: 10,
-        //         quantity: 8,
-        //         upperBound: 50000,
-        //         expiredDate: formatDate(new Date('2024-03-25T12:30:00')),
-        //         code: ""
-        //     }
-        // ]
-        // // Generate code for each promotion
-        // const fixedData: PromotionType[] = data.map((promotion: PromotionType) => { return { ...promotion, code: generatePromotionCode(promotion.description).toUpperCase() } })
-        // setTimeout(() => {
-        //     setLoading(false);
-        // }, 1000);
-        // setPromotions(fixedData);
-
         const promotionList: PromotionDisplay[] = [];
         const promotions: PromotionType[] = [];
         shopInfos.forEach(async (item: ShopInfo) => {
@@ -275,7 +215,7 @@ export default function CartPage() {
 
     }
 
-    const handleCodeFilter: SearchProps['onSearch'] = (value, _e, info) => {
+    const handleCodeFilter = (value: string) => {
         setCurrentCode(value);
         const resultQueryList: PromotionDisplay[] = [];
         promotionDisplayList?.forEach(item => {
@@ -288,13 +228,16 @@ export default function CartPage() {
         setQueryPromotionList(resultQueryList);
     }
 
-    useEffect(() => {
-
-    }, [currentCode])
-
     const fetchProducts = async () => {
-        await GET_getUserCartProducts(process.env.NEXT_PUBLIC_USER_ID as string)
-            .then(response => setProducts(response.data?.products || undefined));
+        if (!context.userInfo) return;
+        setLoading(true);
+        console.log("current user", context.userInfo._id);
+        await GET_getUserCartProducts(context.userInfo._id as string)
+            .then(response => {
+                setProducts(response.data?.products || undefined);
+                setLoading(false);
+
+        })
     }
 
     // const handleRowClick = (record: any) => {
@@ -363,16 +306,34 @@ export default function CartPage() {
         setTotal(total);
     }
 
-    useEffect(() => {
-        setLoading(true);
-        fetchProducts();
-        setLoading(false);
-    }, [])
+    
+    // useEffect(() => {
+    //     if (shopInfos) {
+    //         fetchPromotions(shopInfos);
+    //     }
+    // }, [shopInfos])
 
     useEffect(() => {
-        if (shopInfos)
-            fetchPromotions(shopInfos);
-    }, [shopInfos])
+        fetchProducts();
+    }, [context.userInfo])
+
+    useEffect(() => {
+        if (products) {
+            setLoading(true);
+            fetchShopInfos(products);
+            setLoading(false);
+        }
+    }, [products]);
+
+    useEffect(() => {
+        console.log('ShopInfos', shopInfos);
+        router.refresh();
+    }, [shopInfos]);
+
+    useEffect(() => {
+        handleCodeFilter("");
+        console.log("Promotion fetch");
+    }, [promotions, promotionDisplayList])
 
     useEffect(() => {
         handleProvisional();
@@ -382,12 +343,10 @@ export default function CartPage() {
     }, [products, selectedRowKeys, selectedPromotions])
 
     useEffect(() => {
-        setLoading(false);
         const storedAddress = localStorage.getItem('shippingAddress');
         if (!storedAddress) return;
         const storedAddressObject = JSON.parse(storedAddress) as ShippingAddress;
         setCurrentAddress(storedAddressObject);
-        setLoading(true);
         console.log('currentAddress', storedAddressObject);
     }, []);
 
@@ -451,6 +410,7 @@ export default function CartPage() {
                             <div className="mt-5">
                                 {loading ? <Skeleton /> :
                                     <DeliveryInfoForm currentAddress={currentAddress}
+                                        setCurrentAddress={setCurrentAddress}
                                         setIsSavingAddress={setIsSavingAddress} />
                                 }
                             </div>
@@ -531,9 +491,8 @@ export default function CartPage() {
                     <div className="flex flex-col">
                         <Space direction="vertical">
                             <div className="flex gap-5 mt-5 border rounded bg-slate-100 p-5">
-                                <Search placeholder="Nhập để tìm mã"
-                                    allowClear
-                                    onSearch={handleCodeFilter}></Search>
+                                <Input placeholder="Nhập để tìm mã"
+                                    onChange={(e) => handleCodeFilter(e.target.value)}></Input>
                                 <Button className="bg-blue-500 font-semibold text-white"
                                     onClick={() => handleCodeFilter(currentCode)}>Áp dụng</Button>
                             </div>

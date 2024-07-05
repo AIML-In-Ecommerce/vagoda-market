@@ -35,7 +35,7 @@ export default function PaymentStatusComponent(props: PaymentStatusComponentProp
                         currency={"VND"}
                         minimumFractionDigits={0}></Currency></b></span> với hình thức thanh toán <b>{props.order?.paymentMethod?.kind ?? "COD"}</b>.</div>
                     {/* <div className="mb-2">Đã chọn hình thức thanh toán bằng tiền mặt. Vui lòng trả xxx.xxxđ cho người giao hàng.</div> */}
-                    <div className="text-gray-600 mb-2">Cảm ơn bạn đã mua hàng tại FashionStyle.</div>
+                    <div className="text-gray-600 mb-2">Cảm ơn bạn đã mua hàng tại VAGODA.</div>
                     <div> Mã số đơn hàng của bạn là <b>{props.order?._id ?? ""}</b></div>
                     <div> Thời gian dự kiến giao hàng đến ngày <b>dd/mm/yyyy</b></div>
                     <div className="mt-5 flex flex-row gap-5 items-center justify-center">
