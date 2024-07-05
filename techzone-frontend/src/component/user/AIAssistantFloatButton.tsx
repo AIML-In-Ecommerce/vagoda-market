@@ -41,6 +41,7 @@ import LineChart from "./utils/Chart/LineChart";
 import BarChart from "./utils/Chart/BarChar";
 import PieChart from "./utils/Chart/PieChart";
 import "../../custom_css/Loader.css";
+import InfiniteCart from "./utils/InfiniteCart";
 
 interface AIAssistantFloatButtonProps {}
 
@@ -91,7 +92,7 @@ const InfinitePromotionListSetup: InfinitePromotionListProps = {
 const testCaseNumber = 3;
 
 const fakeResponse = {
-  type: "gen_chart",
+  type: "cart_adding",
   data: [
     {
       _id: "666acc8ed40492953e97649d",
@@ -402,7 +403,7 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
         return <InfinitePromotionList setup={InfinitePromotionListSetup} />;
       case "cart_adding":
         setExtendedMessage("cart_adding");
-        return <></>;
+        return <InfiniteCart />;
       case "gen_chart":
         setExtendedMessage("gen_chart");
         switch (response.data.type) {
@@ -446,6 +447,7 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
   function handleDeleteMessages() {
     const newMessages = messages.slice(0, 1);
     setMessages(newMessages);
+    setExtraSupportDisplay(greetingReactNode);
     if (localStorage) {
       const stringifiedMessages = JSON.stringify(newMessages);
       localStorage.setItem(AIAssistantLocalStorageKeyword, stringifiedMessages);
@@ -503,7 +505,7 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
           </Flex>
           <Flex vertical gap={6} className="w-9/12">
             <Flex className="w-full" justify="start" align="center">
-              <Tag bordered={false} color={"#f5f5f4"}>
+              <Tag bordered={false} color={"#f5f5f4"} className="rounded-xl">
                 <Flex
                   className="px-1 pt-2"
                   vertical
@@ -539,12 +541,15 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
         justify="end"
         align="center"
       >
-        <Flex className="w-7/12 " justify="end" align="center">
+        <Flex className="w-7/12" justify="end" align="center">
           {/* <Tag color={"#92400e"}> */}
-          <Tag color={"#797979"}>
-            <Typography.Paragraph className="text-wrap text-sm text-white mt-1">
+          <Tag
+            color={"#797979"}
+            className="rounded-xl flex justify-center items-center"
+          >
+            <p className="text-wrap text-sm text-white my-2">
               {message.message}
-            </Typography.Paragraph>
+            </p>
           </Tag>
         </Flex>
       </Flex>
@@ -622,81 +627,81 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
     history_conservation.push(message);
 
     setMessages(history_conservation);
-    try {
-      setAiState("THINKING");
+    // try {
+    //   setAiState("THINKING");
 
-      const rawResponse = await axios.post(
-        "http://localhost:8000/chat/agent",
-        postBody,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      );
-      if (rawResponse.status == 200) {
-        console.log("AI Response: ", rawResponse.data);
+    //   const rawResponse = await axios.post(
+    //     "http://localhost:8000/chat/agent",
+    //     postBody,
+    //     {
+    //       headers: {
+    //         "Content-Type": "application/json",
+    //       },
+    //     },
+    //   );
+    //   if (rawResponse.status == 200) {
+    //     console.log("AI Response: ", rawResponse.data);
 
-        let type = "";
-        let message = "";
-        let data = "";
-        if (!isJsonString(rawResponse.data.data)) {
-          message = rawResponse.data.data;
-        } else {
-          let response = JSON.parse(rawResponse.data.data);
+    //     let type = "";
+    //     let message = "";
+    //     let data = "";
+    //     if (!isJsonString(rawResponse.data.data)) {
+    //       message = rawResponse.data.data;
+    //     } else {
+    //       let response = JSON.parse(rawResponse.data.data);
 
-          message = response.message != undefined ? response.message : "";
-          type = response.type != undefined ? response.type : "";
-          data = response.data != undefined ? response.data : "";
-          setExtraSupportDisplay(setExtendedDisplay(response));
-        }
+    //       message = response.message != undefined ? response.message : "";
+    //       type = response.type != undefined ? response.type : "";
+    //       data = response.data != undefined ? response.data : "";
+    //       setExtraSupportDisplay(setExtendedDisplay(response));
+    //     }
 
-        const assistantResponse: AssistantMessageProps = {
-          role: AssistantMessageTypes.Assistant,
-          message: message,
-          type: type,
-          data: data,
-        };
+    //     const assistantResponse: AssistantMessageProps = {
+    //       role: AssistantMessageTypes.Assistant,
+    //       message: message,
+    //       type: type,
+    //       data: data,
+    //     };
 
-        const newResponseMessages = [...history_conservation];
-        newResponseMessages.push(assistantResponse);
-        setMessages(newResponseMessages);
-        setAiState("RESPONSED");
+    //     const newResponseMessages = [...history_conservation];
+    //     newResponseMessages.push(assistantResponse);
+    //     setMessages(newResponseMessages);
+    //     setAiState("RESPONSED");
 
-        if (localStorage) {
-          const stringifiedMessages = JSON.stringify(history_conservation);
-          localStorage.setItem(
-            AIAssistantLocalStorageKeyword,
-            stringifiedMessages,
-          );
-        }
-      }
-    } catch (error) {
-      console.error("Error in conservation:", error);
-    }
-
-    // setAiState("THINKING");
-    // setTimeout(() => {
-    //   setAiState("RESPONSED");
-    //   const assistantResponse: AssistantMessageProps = {
-    //     role: AssistantMessageTypes.Assistant,
-    //     message: fakeResponse.message,
-    //     type: fakeResponse.type,
-    //     data: fakeResponse.data,
-    //   };
-
-    //   const newResponseMessages = [...history_conservation];
-    //   newResponseMessages.push(assistantResponse);
-    //   setMessages(newResponseMessages);
-    //   if (localStorage) {
-    //     const stringifiedMessages = JSON.stringify(history_conservation);
-    //     localStorage.setItem(
-    //       AIAssistantLocalStorageKeyword,
-    //       stringifiedMessages,
-    //     );
+    //     if (localStorage) {
+    //       const stringifiedMessages = JSON.stringify(history_conservation);
+    //       localStorage.setItem(
+    //         AIAssistantLocalStorageKeyword,
+    //         stringifiedMessages,
+    //       );
+    //     }
     //   }
-    //   setExtraSupportDisplay(setExtendedDisplay(fakeResponse));
-    // }, 5000);
+    // } catch (error) {
+    //   console.error("Error in conservation:", error);
+    // }
+
+    setAiState("THINKING");
+    setTimeout(() => {
+      setAiState("RESPONSED");
+      const assistantResponse: AssistantMessageProps = {
+        role: AssistantMessageTypes.Assistant,
+        message: fakeResponse.message,
+        type: fakeResponse.type,
+        data: fakeResponse.data,
+      };
+
+      const newResponseMessages = [...history_conservation];
+      newResponseMessages.push(assistantResponse);
+      setMessages(newResponseMessages);
+      if (localStorage) {
+        const stringifiedMessages = JSON.stringify(history_conservation);
+        localStorage.setItem(
+          AIAssistantLocalStorageKeyword,
+          stringifiedMessages,
+        );
+      }
+      setExtraSupportDisplay(setExtendedDisplay(fakeResponse));
+    }, 5000);
   };
 
   const ExpandOrShrinkButton =
@@ -724,7 +729,7 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
 
   const extraAiAssistantPopoverContentButton = (
     <Flex className="w-full h-full" justify="end" align="center" gap={6}>
-      <Tooltip placement="top" title="Làm mới">
+      <Tooltip placement="top" title="Đồng bộ">
         <Button
           size="small"
           className="rounded-full border-transparent"
@@ -915,7 +920,7 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
         footer={[]}
         open={bigModalOpen}
       >
-        <Flex className="w-full h-full bg-gray-200">
+        <Flex className="w-full h-full bg-gray-100">
           <Card
             className="w-2/5 "
             style={{ boxShadow: "none", borderRadius: "0 0 0 0" }}
