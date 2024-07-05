@@ -3,8 +3,9 @@ import { Avatar, Button, Divider, Flex, List, Image, Rate, Modal } from "antd";
 // import { useTranslations } from "next-intl";
 import CommentContainer from "./comment/CommentContainer";
 import { ReviewType } from "@/model/ReviewType";
-import { useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { PUT_UpdateReview } from "@/apis/review/ReviewAPI";
+import { AuthContext } from "@/context/AuthContext";
 
 interface ReviewProps {
   review: ReviewType;
@@ -13,18 +14,21 @@ interface ReviewProps {
 
 const Review = (props: ReviewProps) => {
   //   const t = useTranslations("Review");
-  const myUserId = "6675a954d1a5f8cd2cf610d6"; //mock data
+  const authContext = useContext(AuthContext);
+
+  const myUserId = authContext?.userInfo?._id ? authContext.userInfo._id : "";
 
   const [isLiked, setIsLiked] = useState<boolean>(
-    props.review.like.includes(myUserId) //TODO
+    props.review.like.includes(myUserId)
   );
 
   const handleLike = () => {
+    if (!myUserId || myUserId === "") return;
     setIsLiked(!isLiked);
   };
 
   useEffect(() => {
-    setIsLiked(props.review.like.includes(myUserId)); //TODO
+    setIsLiked(props.review.like.includes(myUserId));
   }, [props.review]);
 
   const [open, setOpen] = useState(false);
@@ -52,6 +56,7 @@ const Review = (props: ReviewProps) => {
 
   const like = useMemo(() => {
     let tempLike = [...props.review.like];
+    if (!myUserId || myUserId === "") return tempLike;
 
     if (isLiked) {
       if (!props.review.like.includes(myUserId)) {

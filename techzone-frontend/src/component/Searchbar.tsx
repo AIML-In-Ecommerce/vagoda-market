@@ -36,7 +36,7 @@ export default function Searchbar(props: SearchbarProp) {
     setSearchHistory(updatedHistory.slice(0, 5));
     localStorage.setItem(
       "searchHistory",
-      JSON.stringify(updatedHistory.slice(0, 5))
+      JSON.stringify(updatedHistory.slice(0, 5)),
     );
 
     setTimeout(() => {
@@ -64,11 +64,11 @@ export default function Searchbar(props: SearchbarProp) {
   const handleKeyDown = (e: any) => {
     if (e.key === "ArrowDown") {
       setHighlightedIndex((prevIndex) =>
-        prevIndex < searchHistory.length - 1 ? prevIndex + 1 : 0
+        prevIndex < searchHistory.length - 1 ? prevIndex + 1 : 0,
       );
     } else if (e.key === "ArrowUp") {
       setHighlightedIndex((prevIndex) =>
-        prevIndex > 0 ? prevIndex - 1 : searchHistory.length - 1
+        prevIndex > 0 ? prevIndex - 1 : searchHistory.length - 1,
       );
     } else if (e.key === "Enter") {
       if (highlightedIndex >= 0) {
@@ -85,9 +85,9 @@ export default function Searchbar(props: SearchbarProp) {
     <div className="relative">
       <Input
         size="middle"
-        placeholder="Tìm kiếm"
+        placeholder="Tìm kiếm sản phẩm"
         suffix={<GoSearch color="#5c6856" />}
-        className="rounded-full w-11/12 m-1"
+        className="rounded-full w-11/12 m-1 "
         onChange={handleChange}
         value={searchText}
         onPressEnter={() => handleSearch(searchText)}
@@ -98,7 +98,7 @@ export default function Searchbar(props: SearchbarProp) {
         ref={inputRef}
       />
       {showHistory && searchHistory.length > 0 && (
-        <div className="absolute z-10 w-11/12 bg-white shadow-lg rounded-lg mt-1">
+        <div className="absolute z-40 w-11/12 bg-white shadow-lg rounded-lg mt-1">
           {searchHistory.map((keyword, index) => (
             <div
               key={index}

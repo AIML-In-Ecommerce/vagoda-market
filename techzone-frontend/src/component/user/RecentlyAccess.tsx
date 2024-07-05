@@ -2,271 +2,18 @@
 
 import { Flex, List, Skeleton } from "antd";
 import CenterTitle from "./utils/CenterTitle";
-import { _ProductType, ProductType } from "@/model/ProductType";
-import { useEffect, useState } from "react";
+import { _ProductType, ProductDetailType } from "@/model/ProductType";
+import { ReactElement, useContext, useEffect, useState } from "react";
 import ProductItem from "@/component/customer/ProductItem";
 import { AuthContext } from "@/context/AuthContext";
-import Link from "next/link";
-import { POST_GetProductListByShop } from "@/apis/product/ProductDetailAPI";
 import CustomEmpty from "../customer/shop/mini/CustomEmpty";
+import StatisticsService from "@/services/statistics.service";
 
-interface RecentlyAccessProps {}
+interface RecentlyAccessProps {
+  notify(message: string, content: ReactElement): void;
+}
 
-// const MockData: ProductDetailType[] = [
-//   {
-//     _id: "sp-01",
-//     name: "Áo khoác Y4",
-//     description: "",
-//     originalPrice: 390000,
-//     finalPrice: 340000,
-//     category: {
-//       _id: "c-01",
-//       name: "Áo",
-//       image:
-//         "https://images.pexels.com/photos/19461512/pexels-photo-19461512/free-photo-of-model-in-an-unbuttoned-white-short-sleeved-shirt-with-a-purple-butterfly-print-lying-on-the-floor.jpeg?auto=compress&cs=tinysrgb&w=600",
-//       __v: 0,
-//     },
-//     subCategory: {
-//       _id: "sc-01",
-//       name: "Áo khoác",
-//       __v: 0,
-//     },
-//     subCategoryType: {
-//       _id: "sct-01",
-//       name: "Áo khoác mùa đông",
-//       __v: 0,
-//     },
-//     shop: "sh-01",
-//     status: "AVAILABLE",
-//     images: [
-//       {
-//         color: {
-//           label: "white",
-//           value: "FFFFFF",
-//         },
-//         link: "https://images.pexels.com/photos/19461512/pexels-photo-19461512/free-photo-of-model-in-an-unbuttoned-white-short-sleeved-shirt-with-a-purple-butterfly-print-lying-on-the-floor.jpeg?auto=compress&cs=tinysrgb&w=600",
-//         type: "",
-//       },
-//     ],
-//     avgRating: 4.8,
-//     soldQuantity: 2000,
-//     flatformFee: 4000,
-//     createdAt: new Date(),
-//   },
-//   {
-//     _id: "sp-01",
-//     name: "Áo khoác Y4",
-//     description: "",
-//     originalPrice: 390000,
-//     finalPrice: 340000,
-//     category: {
-//       _id: "c-01",
-//       name: "Áo",
-//       image:
-//         "https://images.pexels.com/photos/19461512/pexels-photo-19461512/free-photo-of-model-in-an-unbuttoned-white-short-sleeved-shirt-with-a-purple-butterfly-print-lying-on-the-floor.jpeg?auto=compress&cs=tinysrgb&w=600",
-//       __v: 0,
-//     },
-//     subCategory: {
-//       _id: "sc-01",
-//       name: "Áo khoác",
-//       __v: 0,
-//     },
-//     subCategoryType: {
-//       _id: "sct-01",
-//       name: "Áo khoác mùa đông",
-//       __v: 0,
-//     },
-//     shop: "sh-01",
-//     status: "AVAILABLE",
-//     images: [
-//       {
-//         color: {
-//           label: "white",
-//           value: "FFFFFF",
-//         },
-//         link: "https://images.pexels.com/photos/19461512/pexels-photo-19461512/free-photo-of-model-in-an-unbuttoned-white-short-sleeved-shirt-with-a-purple-butterfly-print-lying-on-the-floor.jpeg?auto=compress&cs=tinysrgb&w=600",
-//         type: "",
-//       },
-//     ],
-//     avgRating: 4.8,
-//     soldQuantity: 2000,
-//     flatformFee: 4000,
-//     createdAt: new Date(),
-//   },
-//   {
-//     _id: "sp-02",
-//     name: "Áo khoác Y5",
-//     description: "",
-//     originalPrice: 390000,
-//     finalPrice: 340000,
-//     category: {
-//       _id: "c-01",
-//       name: "Áo",
-//       image:
-//         "https://images.pexels.com/photos/19461512/pexels-photo-19461512/free-photo-of-model-in-an-unbuttoned-white-short-sleeved-shirt-with-a-purple-butterfly-print-lying-on-the-floor.jpeg?auto=compress&cs=tinysrgb&w=600",
-//       __v: 0,
-//     },
-//     subCategory: {
-//       _id: "sc-01",
-//       name: "Áo khoác",
-//       __v: 0,
-//     },
-//     subCategoryType: {
-//       _id: "sct-01",
-//       name: "Áo khoác mùa đông",
-//       __v: 0,
-//     },
-//     shop: "sh-01",
-//     status: "AVAILABLE",
-//     images: [
-//       {
-//         color: {
-//           label: "white",
-//           value: "FFFFFF",
-//         },
-//         link: "https://images.pexels.com/photos/19461512/pexels-photo-19461512/free-photo-of-model-in-an-unbuttoned-white-short-sleeved-shirt-with-a-purple-butterfly-print-lying-on-the-floor.jpeg?auto=compress&cs=tinysrgb&w=600",
-//         type: "",
-//       },
-//     ],
-//     avgRating: 4.8,
-//     soldQuantity: 2000,
-//     flatformFee: 4000,
-//     createdAt: new Date(),
-//   },
-//   {
-//     _id: "sp-03",
-//     name: "Áo khoác Y1",
-//     description: "",
-//     originalPrice: 390000,
-//     finalPrice: 340000,
-//     category: {
-//       _id: "c-01",
-//       name: "Áo",
-//       image:
-//         "https://images.pexels.com/photos/19461512/pexels-photo-19461512/free-photo-of-model-in-an-unbuttoned-white-short-sleeved-shirt-with-a-purple-butterfly-print-lying-on-the-floor.jpeg?auto=compress&cs=tinysrgb&w=600",
-//       __v: 0,
-//     },
-//     subCategory: {
-//       _id: "sc-01",
-//       name: "Áo khoác",
-//       __v: 0,
-//     },
-//     subCategoryType: {
-//       _id: "sct-01",
-//       name: "Áo khoác mùa đông",
-//       __v: 0,
-//     },
-//     shop: "sh-01",
-//     status: "AVAILABLE",
-//     images: [
-//       {
-//         color: {
-//           label: "white",
-//           value: "FFFFFF",
-//         },
-//         link: "https://images.pexels.com/photos/19461512/pexels-photo-19461512/free-photo-of-model-in-an-unbuttoned-white-short-sleeved-shirt-with-a-purple-butterfly-print-lying-on-the-floor.jpeg?auto=compress&cs=tinysrgb&w=600",
-//         type: "",
-//       },
-//     ],
-//     avgRating: 4.8,
-//     soldQuantity: 2000,
-//     flatformFee: 4000,
-//     createdAt: new Date(),
-//   },
-//   {
-//     _id: "sp-01",
-//     name: "Áo khoác Y2",
-//     description: "",
-//     originalPrice: 390000,
-//     finalPrice: 340000,
-//     category: {
-//       _id: "c-01",
-//       name: "Áo",
-//       image:
-//         "https://images.pexels.com/photos/19461512/pexels-photo-19461512/free-photo-of-model-in-an-unbuttoned-white-short-sleeved-shirt-with-a-purple-butterfly-print-lying-on-the-floor.jpeg?auto=compress&cs=tinysrgb&w=600",
-//       __v: 0,
-//     },
-//     subCategory: {
-//       _id: "sc-01",
-//       name: "Áo khoác",
-//       __v: 0,
-//     },
-//     subCategoryType: {
-//       _id: "sct-01",
-//       name: "Áo khoác mùa đông",
-//       __v: 0,
-//     },
-//     shop: "sh-01",
-//     status: "AVAILABLE",
-//     images: [
-//       {
-//         color: {
-//           label: "white",
-//           value: "FFFFFF",
-//         },
-//         link: "https://images.pexels.com/photos/19461512/pexels-photo-19461512/free-photo-of-model-in-an-unbuttoned-white-short-sleeved-shirt-with-a-purple-butterfly-print-lying-on-the-floor.jpeg?auto=compress&cs=tinysrgb&w=600",
-//         type: "",
-//       },
-//     ],
-//     avgRating: 4.8,
-//     soldQuantity: 2000,
-//     flatformFee: 4000,
-//     createdAt: new Date(),
-//   },
-//   {
-//     _id: "sp-05",
-//     name: "Áo khoác Y4",
-//     description: "",
-//     originalPrice: 390000,
-//     finalPrice: 340000,
-//     category: {
-//       _id: "c-01",
-//       name: "Áo",
-//       image:
-//         "https://images.pexels.com/photos/19461512/pexels-photo-19461512/free-photo-of-model-in-an-unbuttoned-white-short-sleeved-shirt-with-a-purple-butterfly-print-lying-on-the-floor.jpeg?auto=compress&cs=tinysrgb&w=600",
-//       __v: 0,
-//     },
-//     subCategory: {
-//       _id: "sc-01",
-//       name: "Áo khoác",
-//       __v: 0,
-//     },
-//     subCategoryType: {
-//       _id: "sct-01",
-//       name: "Áo khoác mùa đông",
-//       __v: 0,
-//     },
-//     shop: "sh-01",
-//     status: "AVAILABLE",
-//     images: [
-//       {
-//         color: {
-//           label: "white",
-//           value: "FFFFFF",
-//         },
-//         link: "https://images.pexels.com/photos/19461512/pexels-photo-19461512/free-photo-of-model-in-an-unbuttoned-white-short-sleeved-shirt-with-a-purple-butterfly-print-lying-on-the-floor.jpeg?auto=compress&cs=tinysrgb&w=600",
-//         type: "",
-//       },
-//     ],
-//     avgRating: 4.8,
-//     soldQuantity: 2000,
-//     flatformFee: 4000,
-//     createdAt: new Date(),
-//   },
-// ];
-
-// const paddingItem: _ProductType = {
-//   _id: "pd-",
-//   name: "padding",
-//   image: "",
-//   avgRating: 0,
-//   soldQuantity: 0,
-//   finalPrice: 0,
-//   originalPrice: 0,
-//   isFlashSale: false,
-// };
-
-function RecentlyAccess({}: RecentlyAccessProps) {
+function RecentlyAccess({ notify }: RecentlyAccessProps) {
   // const numberOfProductToDisplay = 6;
   const titleValue = "Truy cập gần đây";
   const subTitle = "Sản phẩm đã truy cập trong tuần";
@@ -365,31 +112,38 @@ function RecentlyAccess({}: RecentlyAccessProps) {
 
   // end comment----------------------------------------------------------------
 
-  // call api (temporarily)
-  const mockId = "65f1e8bbc4e39014df775166";
+  // call api
+  const authContext = useContext(AuthContext);
+  const userId = authContext?.userInfo?._id;
 
   useEffect(() => {
     handleGetProductList();
-  }, [mockId]);
+  }, [userId]);
 
   const handleGetProductList = async () => {
-    const response = await POST_GetProductListByShop(mockId);
-    if (response.status == 200) {
-      if (response.data) {
-        const data: _ProductType[] = response.data.map((value: ProductType) => {
-          const mapItem: _ProductType = {
-            _id: value._id,
-            name: value.name,
-            // image: value.images[0].link,
-            image: value.imageLink,
-            avgRating: value.rating,
-            soldQuantity: value.soldAmount,
-            finalPrice: value.price,
-            originalPrice: value.originalPrice,
-            isFlashSale: false,
-          };
-          return mapItem;
-        });
+    if (userId) {
+      const response = await StatisticsService.getRecentProducts(
+        userId,
+        "WATCH_DETAIL"
+      );
+      console.log("products", response);
+      if (response && response.length > 0) {
+        const data: _ProductType[] = response.map(
+          (value: ProductDetailType) => {
+            const mapItem: _ProductType = {
+              _id: value._id,
+              name: value.name,
+              image: value.images[0],
+              avgRating: value.avgRating,
+              soldQuantity: value.soldQuantity,
+              finalPrice: value.finalPrice,
+              originalPrice: value.originalPrice,
+              isFlashSale: value.isFlashSale,
+              shop: value.shop,
+            };
+            return mapItem;
+          }
+        );
 
         data.splice(6);
 
@@ -400,30 +154,32 @@ function RecentlyAccess({}: RecentlyAccessProps) {
   };
 
   return (
-    <>
-      <Flex
-        className="w-full py-4 container"
-        vertical
-        justify="center"
-        align="center"
-      >
-        <CenterTitle
-          title={titleValue}
-          subTitle={subTitle}
-          isUppercase={true}
-          background={titleBackground}
-        />
-        <div className="invisible h-10 w-full"></div>
-        {/* <Flex className="w-full" justify="center" align="center" gap={8}>
+    <div className="w-full">
+      {products.length > 0 && (
+        <Flex
+          className="w-full py-4 container"
+          vertical
+          justify="center"
+          align="center"
+        >
+          <CenterTitle
+            title={titleValue}
+            subTitle={subTitle}
+            isUppercase={true}
+            background={titleBackground}
+          />
+          <div className="invisible h-10 w-full"></div>
+          {/* <Flex className="w-full" justify="center" align="center" gap={8}>
           {mainDisplay}
         </Flex> */}
 
-        <div className="flex sm:ml-0 align-middle justify-center items-center">
+          {/* <div className="ml-5 flex align-middle"> */}
           {(products && (
             <List
-              className="ml-5"
+              className="ml-10 w-full"
               grid={{
-                gutter: { xs: 0, xl: 30 },
+                // gutter: { xs: 0, xl: 30 },
+                gutter: 20,
                 xs: 2,
                 sm: 2,
                 md: 3,
@@ -438,27 +194,29 @@ function RecentlyAccess({}: RecentlyAccessProps) {
               renderItem={(item, i) => (
                 <div key={i}>
                   <List.Item>
-                    <Link href={`/product/${item._id}`}>
-                      <div className="text-black" key={item._id}>
-                        <ProductItem
-                          imageLink={item.image}
-                          name={item.name}
-                          rating={item.avgRating}
-                          soldAmount={item.soldQuantity}
-                          price={item.finalPrice}
-                          isFlashSale={item.isFlashSale}
-                          originalPrice={item.originalPrice}
-                        />
-                      </div>
-                    </Link>
+                    <div className="text-black" key={item._id}>
+                      <ProductItem
+                        _id={item._id}
+                        imageLink={item.image}
+                        name={item.name}
+                        rating={item.avgRating}
+                        soldAmount={item.soldQuantity}
+                        price={item.finalPrice}
+                        isFlashSale={item.isFlashSale}
+                        originalPrice={item.originalPrice}
+                        shop={item.shop}
+                        notify={notify}
+                      />
+                    </div>
                   </List.Item>
                 </div>
               )}
             />
           )) || <Skeleton active />}
-        </div>
-      </Flex>
-    </>
+          {/* </div> */}
+        </Flex>
+      )}
+    </div>
   );
 }
 

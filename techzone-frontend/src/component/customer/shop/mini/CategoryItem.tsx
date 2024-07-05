@@ -9,7 +9,8 @@ export interface CategoryItemProps {
 
 export default function CategoryItem(props: CategoryItemProps) {
   return (
-    <Link href={props.category.urlKey ? props.category.urlKey : "#"}>
+    <Link href={"/product-list?category=" + props.category._id}>
+      {/* TODO: revise url to see if it redirects correctly */}
       <div className="flex flex-col gap-3 items-center pb-3">
         <Avatar
           size={220}

@@ -1,14 +1,17 @@
 import { CarouselArrow } from "@/component/user/utils/CarouselArrow";
 import { ProductType } from "@/model/ProductType";
 import { Carousel, List } from "antd";
-import { useEffect, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import CustomEmpty from "../../shop/mini/CustomEmpty";
 import ProductItem from "../../ProductItem";
 import { GET_GetRelatedProduct } from "@/apis/product/ProductDetailAPI";
-import Link from "next/link";
 import { useParams } from "next/navigation";
 
-export default function SimilarList() {
+interface ListProps {
+  notify(message: string, content: ReactElement): void;
+}
+
+export default function SimilarList(props: ListProps) {
   const autoPlayCarouselSpeed = 5000; //ms
 
   const [products, setProducts] = useState<ProductType[]>();
@@ -52,19 +55,20 @@ export default function SimilarList() {
                 }}
                 renderItem={(item) => (
                   <List.Item>
-                    <Link href={`/product/${item._id}`}>
-                      <div className="text-black">
-                        <ProductItem
-                          imageLink={item.imageLink}
-                          name={item.name}
-                          rating={item.rating}
-                          soldAmount={item.soldAmount}
-                          price={item.price}
-                          isFlashSale={item.flashSale}
-                          originalPrice={item.originalPrice}
-                        />
-                      </div>
-                    </Link>
+                    <div className="text-black">
+                      <ProductItem
+                        _id={item._id}
+                        imageLink={item.imageLink}
+                        name={item.name}
+                        rating={item.rating}
+                        soldAmount={item.soldAmount}
+                        price={item.price}
+                        isFlashSale={item.flashSale}
+                        originalPrice={item.originalPrice}
+                        shop={item.shop}
+                        notify={props.notify}
+                      />
+                    </div>
                   </List.Item>
                 )}
               />
@@ -111,22 +115,23 @@ export default function SimilarList() {
               ]}
             >
               {products.map((item, index) => (
-                <Link href={`/product/${item._id}`}>
-                  <div
-                    key={index}
-                    className="z-50 text-black pt-5 h-72 flex flex-col items-center"
-                  >
-                    <ProductItem
-                      imageLink={item.imageLink}
-                      name={item.name}
-                      rating={item.rating}
-                      soldAmount={item.soldAmount}
-                      price={item.price}
-                      isFlashSale={item.flashSale}
-                      originalPrice={item.originalPrice}
-                    />
-                  </div>
-                </Link>
+                <div
+                  key={index}
+                  className="z-50 text-black pt-5 h-72 flex flex-col items-center"
+                >
+                  <ProductItem
+                    _id={item._id}
+                    imageLink={item.imageLink}
+                    name={item.name}
+                    rating={item.rating}
+                    soldAmount={item.soldAmount}
+                    price={item.price}
+                    isFlashSale={item.flashSale}
+                    originalPrice={item.originalPrice}
+                    shop={item.shop}
+                    notify={props.notify}
+                  />
+                </div>
               ))}
             </Carousel>
           )}

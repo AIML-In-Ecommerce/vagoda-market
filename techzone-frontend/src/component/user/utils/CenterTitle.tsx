@@ -48,7 +48,7 @@ function CenterTitle({
               marginBottom: 5,
             }}
           >
-            <p className={`${uppercase} text-2xl font-semibold`}>
+            <p className={`${uppercase} text-lg lg:text-2xl font-semibold`}>
               ‧・ {title} ・‧
             </p>
           </Divider>

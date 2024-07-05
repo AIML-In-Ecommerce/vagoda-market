@@ -38,7 +38,7 @@ const ImageSwiper: React.FC<ImageSwiperProps> = ({ imgList }) => {
       className="w-full py-10"
     >
       {imgList.map((image, index) => (
-        <SwiperSlide key={index} className="w-[50%] h-[50%] bg-center bg-cover">
+        <SwiperSlide key={index} className="w-[38%] h-[38%] bg-center bg-cover">
           <img
             src={image}
             alt={`slide-${index}`}

@@ -8,6 +8,7 @@ export type ProductType = {
   originalPrice: number;
   flashSale: boolean;
   category: string;
+  shop: string;
 };
 
 export type _ProductType = {
@@ -22,6 +23,7 @@ export type _ProductType = {
   // category: { id: string; name: string };
   // subCategory: { id: string; name: string };
   // subCategoryType: { id: string; name: string };
+  shop: string;
 };
 
 export type ProductDetailType = {
@@ -31,9 +33,9 @@ export type ProductDetailType = {
   originalPrice: number;
   finalPrice: number;
 
-  category: string; // TODO
-  subCategory: string; // TODO
-  subCategoryType: any; // TODO
+  category: string;
+  subCategory: string;
+  subCategoryType: any;
   attribute: {
     colors: {
       link: string;
@@ -42,7 +44,7 @@ export type ProductDetailType = {
     size: string[];
     material: string;
     warranty: string;
-  }; // TODO
+  };
   isFlashSale: boolean;
   inventoryAmount: number;
   platformFee: number;
@@ -60,11 +62,11 @@ export type ProductDetailType = {
 
 export type CartProductType = {
   product: string;
-  color: {
+  color?: {
     link: string;
     color: { label: string; value: string };
   };
-  size: string;
+  size?: string;
   quantity: number;
 };
 

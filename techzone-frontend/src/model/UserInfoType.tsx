@@ -24,7 +24,7 @@ export type UserShippingAddressType =
 export type UserInfoType = 
 {
     _id: string,
-    fullname: string,
+    fullName: string,
     avatar: string,
     dob: string,
     phoneNumber: string,
@@ -37,7 +37,7 @@ export type UserInfoType =
 export type SimpleUserInfoType =
 {
     _id: string,
-    fullname: string,
+    fullName: string,
     avatar: string,
     dob: string,
     phoneNumber: string,

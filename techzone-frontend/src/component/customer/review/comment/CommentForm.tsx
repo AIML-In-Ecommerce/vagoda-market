@@ -1,4 +1,3 @@
-// import { useAuth } from "@/context/AuthContext";
 // import { useTranslations } from "next-intl";
 import { Avatar, Tooltip } from "antd";
 import React, { FormEvent, ReactNode, useState } from "react";
@@ -16,13 +15,7 @@ interface CommentFormProps {
 }
 
 const CommentForm = (props: CommentFormProps) => {
-  // const auth = useAuth();
   // const t = useTranslations("Comment");
-
-  const logginedUser = {
-    userId: "auth.user?._id",
-    avatar: "auth.user?.avatarUrl",
-  };
 
   const [value, setValue] = useState(props.initialText);
 

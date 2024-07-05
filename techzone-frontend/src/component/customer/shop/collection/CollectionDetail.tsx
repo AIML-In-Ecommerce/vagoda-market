@@ -1,15 +1,15 @@
 import { Typography, Divider, List, Skeleton } from "antd";
-import React, { useEffect, useState } from "react";
+import React, { ReactElement, useEffect, useState } from "react";
 import CustomEmpty from "../mini/CustomEmpty";
 import ProductItem from "../../ProductItem";
 import { ProductType } from "@/model/ProductType";
 import { POST_GetProductList } from "@/apis/product/ProductDetailAPI";
 import { CollectionType } from "@/model/CollectionType";
 import { GET_GetCollection } from "@/apis/collection/CollectionAPI";
-import Link from "next/link";
 
 interface CollectionDetailProps {
   collectionId: string;
+  notify(message: string, content: ReactElement): void;
 }
 
 export default function CollectionDetail(props: CollectionDetailProps) {
@@ -71,19 +71,20 @@ export default function CollectionDetail(props: CollectionDetailProps) {
             }}
             renderItem={(item) => (
               <List.Item>
-                <Link href={`/product/${item._id}`}>
-                  <div className="text-black">
-                    <ProductItem
-                      imageLink={item.imageLink}
-                      name={item.name}
-                      rating={item.rating}
-                      soldAmount={item.soldAmount}
-                      price={item.price}
-                      isFlashSale={item.flashSale}
-                      originalPrice={item.originalPrice}
-                    />
-                  </div>
-                </Link>
+                <div className="text-black">
+                  <ProductItem
+                    _id={item._id}
+                    imageLink={item.imageLink}
+                    name={item.name}
+                    rating={item.rating}
+                    soldAmount={item.soldAmount}
+                    price={item.price}
+                    isFlashSale={item.flashSale}
+                    originalPrice={item.originalPrice}
+                    shop={item.shop}
+                    notify={props.notify}
+                  />
+                </div>
               </List.Item>
             )}
           />

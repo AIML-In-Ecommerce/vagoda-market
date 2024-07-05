@@ -1,14 +1,31 @@
 import { ProductDetailType } from "@/model/ProductType";
-import { Popover, Flex, Rate, Progress, Collapse, Divider } from "antd";
+import {
+  Popover,
+  Flex,
+  Rate,
+  Progress,
+  Collapse,
+  Divider,
+  Skeleton,
+} from "antd";
 import Link from "next/link";
 import SimplePieChart from "./SimplePieChart";
 import { useEffect, useMemo, useState } from "react";
 import { GET_GetAllReviewsByQuery } from "@/apis/review/ReviewAPI";
 import { ReviewType } from "@/model/ReviewType";
+import axios from "axios";
 
 interface ReviewSummaryProps {
   product: ProductDetailType | undefined;
   reviews: ReviewType[];
+}
+
+interface ReviewSummary {
+  positiveCount: number;
+  negativeCount: number;
+  trashCount: number;
+  positiveSumary: string;
+  negativeSumary: string;
 }
 
 export default function ReviewSummary(props: ReviewSummaryProps) {
@@ -19,8 +36,17 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
   const [fourStarNumber, setFourStarNumber] = useState(0);
   const [fiveStarNumber, setFiveStarNumber] = useState(0);
 
+  const [summaryReview, setSummaryReview] = useState<ReviewSummary>({
+    positiveCount: 0,
+    negativeCount: 0,
+    trashCount: 0,
+    positiveSumary: "",
+    negativeSumary: "",
+  });
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
   const [menuMode, setMenuMode] = useState<"horizontal" | "vertical">(
-    "horizontal"
+    "horizontal",
   );
 
   const checkWindowSize = () => {
@@ -52,6 +78,39 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
     console.log("list", list);
     return list;
   }, [props.reviews]);
+
+  const getSummaryReview = async () => {
+    const postBody = {
+      reviews: reviewContentList,
+    };
+
+    console.log("Post reviews body: ", postBody);
+
+    try {
+      const rawResponse = await axios.post(
+        "http://localhost:8000/genai/review-synthesis",
+        postBody,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+      if (rawResponse.status == 200) {
+        console.log("Get summary review successfully:", rawResponse.data);
+        const response = JSON.parse(rawResponse.data.data);
+        console.log("Response: ", response);
+        setSummaryReview(response);
+        setIsLoading(false);
+      }
+    } catch (error) {
+      console.error("Error getting summary review :", error);
+    }
+  };
+
+  useEffect(() => {
+    getSummaryReview();
+  }, []);
 
   // api
   const handleGetNumber = async (rating: number) => {
@@ -120,7 +179,7 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
                                   <Progress
                                     percent={Math.round(
                                       (fiveStarNumber / props.reviews.length) *
-                                        100
+                                        100,
                                     )}
                                     size="small"
                                   />
@@ -136,7 +195,7 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
                                   <Progress
                                     percent={Math.round(
                                       (fourStarNumber / props.reviews.length) *
-                                        100
+                                        100,
                                     )}
                                     size="small"
                                   />
@@ -152,7 +211,7 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
                                   <Progress
                                     percent={Math.round(
                                       (threeStarNumber / props.reviews.length) *
-                                        100
+                                        100,
                                     )}
                                     size="small"
                                   />
@@ -168,7 +227,7 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
                                   <Progress
                                     percent={Math.round(
                                       (twoStarNumber / props.reviews.length) *
-                                        100
+                                        100,
                                     )}
                                     size="small"
                                   />
@@ -184,7 +243,7 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
                                   <Progress
                                     percent={Math.round(
                                       (oneStarNumber / props.reviews.length) *
-                                        100
+                                        100,
                                     )}
                                     size="small"
                                   />
@@ -224,17 +283,18 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
                         border: "0.25px solid #DCDCDC",
                       }}
                     />
-
                     <div
                       id="ai-review-summary"
                       className="md:pl-5 lg:pl-0 grid grid-cols-3 md:grid-cols-5 lg:grid-cols-3 md:min-h-[200px]"
                     >
                       <div className="col-span-1 flex items-center">
-                        <SimplePieChart
-                          positiveValue={70}
-                          negativeValue={20}
-                          trashValue={30}
-                        />
+                        <Skeleton loading={isLoading} active avatar>
+                          <SimplePieChart
+                            positiveValue={summaryReview?.positiveCount}
+                            negativeValue={summaryReview?.negativeCount}
+                            trashValue={summaryReview?.trashCount}
+                          />
+                        </Skeleton>
                       </div>
 
                       <div className="col-span-2 md:col-span-4 lg:col-span-2 pl-5">
@@ -243,14 +303,31 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
                           tổng hợp từ các đánh giá mới nhất
                         </div>
 
-                        <div
-                          className="pt-2 text-xs md:text-sm 
-                      "
-                        >
-                          {/* max-h-[350px] text-ellipsis overflow-clip */}
-                          Tổng thể, sản phẩm là một sự lựa chọn tốt cho người
-                          tiêu dùng muốn đầu tư một cách thông minh và hiệu quả.
-                        </div>
+                        <Skeleton loading={isLoading} active avatar>
+                          <div className="pt-2 text-xs md:text-sm flex flex-col">
+                            {/* max-h-[350px] text-ellipsis overflow-clip */}
+                            <div className="flex flex-row gap-1">
+                              <span className="font-bold">Tích cực: </span>{" "}
+                              <span className="text-slate-500">
+                                {" "}
+                                ({summaryReview.positiveCount} đánh giá)
+                              </span>
+                            </div>
+                            <div>{summaryReview.positiveSumary}</div>
+                          </div>
+
+                          <div className="pt-2 text-xs md:text-sm flex flex-col">
+                            {/* max-h-[350px] text-ellipsis overflow-clip */}
+                            <div className="flex flex-row gap-1">
+                              <span className="font-bold">Tiêu cực: </span>{" "}
+                              <span className="text-slate-500">
+                                {" "}
+                                ({summaryReview.negativeCount} đánh giá)
+                              </span>
+                            </div>
+                            <div>{summaryReview.negativeSumary}</div>
+                          </div>
+                        </Skeleton>
                       </div>
                     </div>
                   </div>

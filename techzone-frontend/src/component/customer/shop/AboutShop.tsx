@@ -11,11 +11,12 @@ import {
   AppstoreOutlined,
   InfoCircleOutlined,
 } from "@ant-design/icons";
-import { useState } from "react";
+import { ReactElement, useState } from "react";
 import { ShopDetailType } from "@/model/ShopType";
 
 interface AboutProps {
   shopDetail: ShopDetailType;
+  notify(message: string, content: ReactElement): void;
 }
 
 export default function AboutShop(aboutProps: AboutProps) {
@@ -42,8 +43,8 @@ export default function AboutShop(aboutProps: AboutProps) {
         // If successful, update the isCopied state value
         if (result) {
           //   toast
-          //   TODO: bannerProps.toast.success("Copy thành công!");
           setIsCopied(true);
+          aboutProps.notify("Copy thành công!", <></>);
         }
       })
       .catch((err) => {
