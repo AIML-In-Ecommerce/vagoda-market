@@ -1,28 +1,27 @@
 "use client";
-import React, { useState, useEffect, useRef } from "react";
-import { Button, Card, Modal, Space, Table, Image, Tooltip, Skeleton, Select, Radio, Divider, Spin } from 'antd';
-import type { RadioChangeEvent, TableColumnsType } from 'antd';
-import { FaRegTrashCan, FaRegCircleQuestion } from "react-icons/fa6";
-import { Currency } from "@/component/user/utils/CurrencyDisplay";
-import { QuantityControl } from "@/component/user/utils/QuantityControl";
-import { Address, AddressType } from "@/model/AddressType";
-import Search from "antd/es/transfer/search";
+import React, { useState, useEffect } from "react";
+import { Input, Button, Card, Modal, Space, Image, Tooltip, Skeleton, Radio, Divider, Spin } from 'antd';
+import type { RadioChangeEvent } from 'antd';
+import { FaRegCircleQuestion } from "react-icons/fa6";
 import { DiscountType, PromotionType } from "@/model/PromotionType";
 import PromotionCard from "@/component/customer/product/PromotionCard";
-import crypto from 'crypto';
 import styled from 'styled-components'
 import Link from "next/link";
 import { RiContactsBookLine } from "react-icons/ri";
 import DeliveryInfoForm from "@/component/customer/cart/DeliveryInfoForm";
 import TransactionSection from "@/component/customer/cart/TransactionSection";
 import PromotionSection from "@/component/customer/cart/PromotionSection";
-import { Product, GET_getUserCartProducts, PUT_updateCartProduct, ColorAttribute, CartItem } from "@/apis/cart/CartProductAPI";
+import { GET_getUserCartProducts, CartItem } from "@/apis/cart/CartProductAPI";
 import { ShippingAddress } from "@/apis/cart/AddressAPI";
 import { useRouter } from "next/navigation";
-import { POST_processTransaction, PaymentMethod } from "@/apis/payment/PaymentAPI";
+import { PaymentMethod } from "@/apis/payment/PaymentAPI";
 import { POST_createOrder } from "@/apis/order/OrderAPI";
 import { GET_GetAllPromotionByShopId, Promotion } from "@/apis/cart/promotion/PromotionAPI";
 import { GET_GetShop } from "@/apis/shop/ShopAPI";
+import { SearchProps } from "antd/es/input";
+import CartTable from "@/component/customer/cart/CartTable";
+
+const { Search } = Input;
 
 const formatDate = (date: Date) => {
     const hours = date.getHours().toString().padStart(2, '0');
@@ -43,46 +42,26 @@ const parseDateString = (dateString: string) => {
     return new Date(year, month - 1, day, hours, minutes);
 };
 
-const compareDateString = (dateString1: string, dateString2: string) => {
-    return parseDateString(dateString1) <= parseDateString(dateString2) ? 1 : -1;
-};
+// const compareDateString = (dateString1: string, dateString2: string) => {
+//     return parseDateString(dateString1) <= parseDateString(dateString2) ? 1 : -1;
+// };
 
 //Function for testing..
-function generatePromotionCode(promotionName: string): string {
-    // Create a hash object using SHA-256 algorithm
-    const hash = crypto.createHash('sha256');
+// function generatePromotionCode(promotionName: string): string {
+//     // Create a hash object using SHA-256 algorithm
+//     const hash = crypto.createHash('sha256');
 
-    // Update the hash object with the product name
-    hash.update(promotionName);
+//     // Update the hash object with the product name
+//     hash.update(promotionName);
 
-    // Get the hexadecimal digest of the hash
-    const hexDigest = hash.digest('hex');
+//     // Get the hexadecimal digest of the hash
+//     const hexDigest = hash.digest('hex');
 
-    // Take the first 8 characters of the hexadecimal digest
-    const hashedName = hexDigest.substring(0, 8);
+//     // Take the first 8 characters of the hexadecimal digest
+//     const hashedName = hexDigest.substring(0, 8);
 
-    return hashedName;
-}
-
-const SelectWrapper = styled.div`
-    .ant-select .ant-select-selector {
-        border-radius: 20px;
-        border-color: rgba(0, 0, 0);
-        border-width: 2px;
-    }
-
-    .ant-select-dropdown {
-            width: 100% !important;
-    }
-
-    .ant-select-dropdown-menu-item {
-            width: 100%;
-    }
-`
-
-interface CartTableItem extends CartItem {
-    key: React.Key
-}
+//     return hashedName;
+// }
 
 type ShopInfo = {
     _id: string,
@@ -95,21 +74,20 @@ type PromotionDisplay = {
 }
 
 export default function CartPage() {
-    const [selectionType, setSelectionType] = useState<'checkbox' | 'radio'>('checkbox');
     const [products, setProducts] = useState<CartItem[]>();
     const [shopInfos, setShopInfos] = useState<ShopInfo[]>();
     const [promotions, setPromotions] = useState<PromotionType[]>([]);
     const [promotionDisplayList, setPromotionDisplayList] = useState<PromotionDisplay[]>();
+    const [currentCode, setCurrentCode] = useState<string>("");
+    const [queryPromotionList, setQueryPromotionList] = useState<PromotionDisplay[]>();
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
-    const [selectedKey, setSelectedKey] = useState<React.Key | null>(null)
+    const [selectedKey, setSelectedKey] = useState<React.Key | null>(null);
     const [loading, setLoading] = useState(false);
     const [provisional, setProvisional] = useState(0);
     const [discount, setDiscount] = useState(0);
     const [selectedPromotions, setSelectedPromotions] = useState<PromotionType[]>([]);
     const [shippingFee, setShippingFee] = useState(0);
     const [total, setTotal] = useState(0);
-    const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [showDeleteManyModal, setShowDeleteManyModal] = useState(false);
     const [showPromotionModal, setShowPromotionModal] = useState(false);
     const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(PaymentMethod.COD);
     const [isSavingAddress, setIsSavingAddress] = useState<boolean>(false);
@@ -156,29 +134,6 @@ export default function CartPage() {
         router.refresh();
     }, [shopInfos]);
 
-    const handleShowDeleteOneModal = (key: any) => {
-        setSelectedKey(key);
-        setShowDeleteModal(true);
-    }
-    const handleDeleteOneModal = (key: any) => {
-        handleRemoveRow(key);
-        setShowDeleteModal(false);
-    }
-    const handleCancelOneModal = () => {
-        setShowDeleteModal(false);
-    }
-
-    const handleShowDeleteManyModal = () => {
-        setShowDeleteManyModal(true);
-    }
-    const handleDeleteManyModal = () => {
-        handleRemoveSelectedRows();
-        setShowDeleteManyModal(false);
-    }
-    const handleCancelManyModal = () => {
-        setShowDeleteManyModal(false);
-    }
-
     const handleShowPromotionModal = () => {
         setShowPromotionModal(true);
     }
@@ -193,7 +148,10 @@ export default function CartPage() {
 
         //Create order, response gateway url and transaction
         const createOrderResponse = await POST_createOrder(
-            process.env.NEXT_PUBLIC_USER_ID as string, currentAddress._id, [], [], paymentMethod);
+            process.env.NEXT_PUBLIC_USER_ID as string, 
+            currentAddress._id, 
+            selectedPromotions.map((item => item._id)), 
+            selectedRowKeys.map(item => item.toString()), paymentMethod);
         if (createOrderResponse) {
             console.log('Navigating to gateway...', createOrderResponse.data.order_url);
             if (paymentMethod === PaymentMethod.ZALOPAY) {
@@ -317,116 +275,26 @@ export default function CartPage() {
 
     }
 
+    const handleCodeFilter: SearchProps['onSearch'] = (value, _e, info) => {
+        setCurrentCode(value);
+        const resultQueryList: PromotionDisplay[] = [];
+        promotionDisplayList?.forEach(item => {
+            const shopCodeFilterResult = item.promotions.filter(promotion => promotion.code.toUpperCase().includes(value.toUpperCase()));
+            resultQueryList.push({
+                ...item,
+                promotions: shopCodeFilterResult
+            } as PromotionDisplay)
+        })
+        setQueryPromotionList(resultQueryList);
+    }
+
+    useEffect(() => {
+
+    }, [currentCode])
+
     const fetchProducts = async () => {
         await GET_getUserCartProducts(process.env.NEXT_PUBLIC_USER_ID as string)
             .then(response => setProducts(response.data?.products || undefined));
-    }
-
-    const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
-        console.log('selectedRowKeys changed: ', newSelectedRowKeys);
-        setSelectedRowKeys(newSelectedRowKeys);
-    };
-
-    const rowSelection = {
-        selectedRowKeys,
-        onChange: onSelectChange,
-    };
-
-    const onQuantityChange = (key: React.Key, value: number) => {
-        // Update the 'amount' field of the product with the specified key
-        if (!value) {
-            return;
-        }
-        if (products) {
-            const updatedProducts = products.map((item: CartItem) => {
-                if (item.itemId === key) {
-                    return { ...item, quantity: value };
-                }
-                return item;
-            });
-            setProducts(updatedProducts);
-        }
-    }
-
-    const onIncrement = async (key: React.Key, value: number) => {
-        if (value === 100) return;
-        if (products) {
-            const updatedProducts = products.map((item: CartItem) => {
-                if (item.itemId === key) {
-                    return { ...item, quantity: value + 1 };
-                }
-                return item;
-            });
-            await PUT_updateCartProduct(process.env.NEXT_PUBLIC_USER_ID as string, updatedProducts);
-            setProducts(updatedProducts);
-        }
-    }
-
-    const onDecrement = async (key: React.Key, value: number) => {
-        if (value === 1) {
-            return handleShowDeleteOneModal(key);
-        }
-
-        if (products) {
-            const updatedProducts = products.map((item: CartItem) => {
-                if (item.itemId === key) {
-                    return { ...item, quantity: value - 1 };
-                }
-                return item;
-            });
-            await PUT_updateCartProduct(process.env.NEXT_PUBLIC_USER_ID as string, updatedProducts);
-            setProducts(updatedProducts);
-        }
-    }
-
-    const handleRemoveRow = async (key: React.Key) => {
-        if (products) {
-            const updatedProducts = products.filter((item: CartItem) => item.itemId !== key);
-            setProducts(updatedProducts);
-            await PUT_updateCartProduct(process.env.NEXT_PUBLIC_USER_ID as string, updatedProducts);
-        }
-        const updatedRowKeys = selectedRowKeys.filter(beforeKey => beforeKey !== key);
-        setSelectedRowKeys(updatedRowKeys);
-
-    };
-
-    const handleRemoveSelectedRows = () => {
-        console.log('handleRemoveSelectedRows', selectedRowKeys)
-        const updatedProducts = products!.filter((item: CartItem) => !selectedRowKeys.includes(item.itemId));
-        setProducts(updatedProducts);
-        selectedRowKeys.forEach(async (rowKey: React.Key) =>
-            await PUT_updateCartProduct(process.env.NEXT_PUBLIC_USER_ID as string, updatedProducts))
-        setSelectedRowKeys([]);
-    };
-
-    const handleColorChange = async (key: React.Key, colorValue: string) => {
-        console.log("ATTRIBUTE_COLOR: ", colorValue);
-        if (products) {
-            const updatedProducts = products.map((item: CartItem) => {
-                if (item.itemId === key) {
-                    const colorAttribute = item.attribute.colors.find(item => item.color.value === colorValue)!;
-                    console.log("ATTRIBUTE_COLOR_STRUCTURE: ", colorAttribute);
-                    return { ...item, color: colorAttribute };
-                }
-                return item;
-            });
-            await PUT_updateCartProduct(process.env.NEXT_PUBLIC_USER_ID as string, updatedProducts);
-            setProducts(updatedProducts);
-        }
-    }
-
-    const handleSizeChange = async (key: React.Key, size: string) => {
-        console.log("ATTRIBUTE_SIZE: ", size);
-        if (products) {
-            const updatedProducts = products.map((item: CartItem) => {
-                if (item.itemId === key) {
-                    return { ...item, size: size };
-                }
-                return item;
-            });
-            await PUT_updateCartProduct(process.env.NEXT_PUBLIC_USER_ID as string, updatedProducts);
-            setProducts(updatedProducts);
-        }
     }
 
     // const handleRowClick = (record: any) => {
@@ -494,128 +362,6 @@ export default function CartPage() {
         const total = provisional !== 0 ? provisional - discount : 0;
         setTotal(total);
     }
-
-    const columns: TableColumnsType<CartTableItem> = [
-        {
-            title: <div className="flex flex-row gap-1 items-center uppercase text-gray-400">
-                <div className="text-base">Sản phẩm ({selectedRowKeys.length})</div>
-                <Button type="text" onClick={() => handleShowDeleteManyModal()}>
-                    <FaRegTrashCan />
-                </Button>
-            </div>,
-            dataIndex: 'name',
-            render: (text: string, record: CartItem) =>
-                <Space align="start" size={12} className="flex flex-row">
-                    {
-                        loading ? <Skeleton.Image active /> :
-                            <Image.PreviewGroup
-                                items={record.images}>
-                                <Image
-                                    width={120}
-                                    src={record.images ? record.images[0] : ""}
-                                    alt={""} />
-                            </Image.PreviewGroup>
-                    }
-                    {
-                        loading ? <Skeleton paragraph={{ rows: 2 }
-                        } active /> : (
-                            <div className="flex flex-row">
-                                <div className="flex flex-col gap-1">
-                                    <div className="text-sm font-bold text-ellipsis overflow-hidden">{record.name}</div>
-                                    <div className="text-sm text-gray-500 mb-1">
-                                        {record.color?.color.label.toUpperCase() ?? ""} {record.color ? "/" : ""} {record.size ? record.size.toUpperCase() : ""}</div>
-                                    <SelectWrapper className="flex flex-row gap-2 mb-1">
-                                        {
-                                            (record.attribute.colors && record.attribute.colors.length !== 0) ? (
-                                                <Select
-                                                    labelInValue
-                                                    value={record.color.color}
-                                                    style={{ width: 100 }}
-                                                    onChange={(e) => handleColorChange(record.itemId, e.value)}
-                                                    options={record.attribute.colors.map((item) => {
-                                                        return { value: item.color.value, label: item.color.label }
-                                                    })}
-                                                />
-                                            ) : <></>
-                                        }
-                                        {
-                                            (record.attribute.size && record.attribute.size.length !== 0) ? (
-                                                <Select
-                                                    value={record.size}
-                                                    style={{ width: 75 }}
-                                                    onChange={(e) => handleSizeChange(record.itemId, e)}
-                                                    options={record.attribute.size.map((item) => {
-                                                        return { value: item, label: item.toUpperCase() }
-                                                    })}
-                                                />
-                                            ) : <></>
-
-                                        }
-
-
-                                    </SelectWrapper>
-                                    <div style={{ width: 75 }} onClick={() => handleShowDeleteOneModal(record.itemId)}>
-                                        <div className="flex flex-row cursor-pointer items-center gap-1 hover:font-semibold">
-                                            <FaRegTrashCan /> Xóa
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        )
-                    }
-
-
-                </Space >,
-            width: '65%',
-            align: 'start' as const,
-        },
-        {
-            title: <span className="text-base uppercase text-gray-400">Số lượng</span>,
-            dataIndex: 'quantity',
-            render: (value: number, record: CartItem) =>
-                <div className="flex justify-center">
-                    {
-                        loading ? <Skeleton.Input active /> : (
-                            <QuantityControl
-                                keyProp={record.itemId} value={record.quantity}
-                                minValue={1} maxValue={100} defaultValue={1}
-                                inputWidth={75}
-                                onIncrement={onIncrement}
-                                onDecrement={onDecrement}
-                                onQuantityChange={onQuantityChange}
-                            />)
-                    }
-                </div>,
-            width: '10%',
-            align: 'center' as const,
-
-        },
-        {
-            title: <span className="text-base uppercase text-gray-400">Thành tiền</span>,
-            dataIndex: ['finalPrice', 'originalPrice'],
-            render: (value: number, record: CartItem) => (
-                loading ? <Skeleton.Input active /> : (
-                    <div className="flex flex-col gap-1">
-                        <span className="text-slate-500 text-base line-through">
-                            <Currency value={(record.originalPrice * (record.quantity || 1))}
-                                locales={"vi-VN"}
-                                currency={"VND"}
-                                minimumFractionDigits={0} />
-                        </span>
-                        <span className="text-red-500 font-bold text-base">
-                            <Currency value={(record.finalPrice * (record.quantity || 1))}
-                                locales={"vi-VN"}
-                                currency={"VND"}
-                                minimumFractionDigits={0} />
-                        </span>
-                    </div>
-
-                )
-            ),
-            width: '25%',
-            align: 'center' as const,
-        },
-    ];
 
     useEffect(() => {
         setLoading(true);
@@ -738,25 +484,17 @@ export default function CartPage() {
                             </Radio.Group>
                         </div>
                     </div>
-                    <div className="lg:col-span-6 lg:w-auto w-full flex flex-col border-l-2 pl-3">
+                    <div className="lg:col-span-6 lg:w-auto w-full flex flex-col lg:border-l-2 lg:pl-3">
                         <div className="w-full">
                             <div className="text-3xl font-bold normal-case p-2">Giỏ hàng</div>
-                            <Table
-                                tableLayout='auto'
-                                rowSelection={{
-                                    type: selectionType,
-                                    ...rowSelection,
-
-                                }}
-                                columns={columns}
-                                dataSource={products?.map((item: CartItem) => ({ ...item, key: item.itemId } as CartTableItem))}
-                                // onRow={(record) => ({
-                                //         onClick: () => handleRowClick(record),
-                                //       })}
-                                loading={loading}
-                                pagination={false}
-                                scroll={{ x: 'min-content' }}
-                            />
+                            <CartTable products={products} 
+                                setProducts={setProducts} 
+                                loading={loading} 
+                                selectedRowKeys={selectedRowKeys} 
+                                setSelectedRowKeys={setSelectedRowKeys} 
+                                selectedKey={selectedKey} 
+                                setSelectedKey={setSelectedKey} />
+                                
                             <Divider style={{ height: "auto", border: "0.25px solid silver" }}></Divider>
 
                             <PromotionSection
@@ -783,52 +521,25 @@ export default function CartPage() {
             </div>
 
             <Modal
-                width={400}
-                open={showDeleteModal}
-                onCancel={handleCancelOneModal}
-                title={<span className="text-xl">Xóa sản phẩm</span>}
-                footer={() => (
-                    <>
-                        <Button key="cancel" onClick={handleCancelOneModal}>Hủy</Button>,
-                        <Button key="ok" type="primary" onClick={() => handleDeleteOneModal(selectedKey)} danger>Xóa</Button>
-                    </>
-                )}
-                centered
-            >
-                Bạn có muốn xóa sản phẩm này khỏi giỏ hàng không?
-            </Modal>
-            <Modal
-                width={400}
-                open={showDeleteManyModal}
-                onCancel={handleCancelManyModal}
-                title={<span className="text-xl">Xóa sản phẩm</span>}
-                footer={() => (
-                    <>
-                        <Button key="cancel" onClick={handleCancelManyModal}>Hủy</Button>,
-                        <Button key="ok" type="primary" onClick={handleDeleteManyModal} danger>Xóa</Button>
-                    </>
-                )}
-                centered
-            >
-                Bạn có muốn xóa các sản phẩm đã chọn khỏi giỏ hàng không?
-            </Modal>
-            <Modal
                 width={550}
                 open={showPromotionModal}
                 onCancel={handleCancelPromotionModal}
-                title={<span className="text-xl">Techzone Khuyến Mãi</span>}
+                title={<span className="text-xl">Các Khuyến Mãi</span>}
                 footer={null}
                 centered>
                 {
                     <div className="flex flex-col">
                         <Space direction="vertical">
                             <div className="flex gap-5 mt-5 border rounded bg-slate-100 p-5">
-                                <Search placeholder="Nhập để tìm mã"></Search>
-                                <Button className="bg-blue-500 font-semibold text-white">Áp dụng</Button>
+                                <Search placeholder="Nhập để tìm mã"
+                                    allowClear
+                                    onSearch={handleCodeFilter}></Search>
+                                <Button className="bg-blue-500 font-semibold text-white"
+                                    onClick={() => handleCodeFilter(currentCode)}>Áp dụng</Button>
                             </div>
                             <div className="overflow-auto h-96">
                                 {
-                                    loading ? <Spin /> : promotionDisplayList?.map((item: PromotionDisplay) => {
+                                    loading ? <Spin /> : queryPromotionList?.map((item: PromotionDisplay) => {
                                         return (
                                             <Card key={item.shopInfo._id} title={<div className="font-semibold">{item.shopInfo.name}</div>}>
                                                 <div className="flex flex-col gap-5 mx-3">

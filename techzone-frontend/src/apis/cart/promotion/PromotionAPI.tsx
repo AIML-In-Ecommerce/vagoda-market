@@ -43,4 +43,3 @@ export async function GET_GetAllPromotionByShopId(shopId: string) {
         return { isDenied: true, message: "Failed to get promotions from shop", status: 500, data: undefined }
     }
 }
-

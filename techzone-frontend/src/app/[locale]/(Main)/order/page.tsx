@@ -138,7 +138,7 @@ export default function OrderOverview(props: OrderOverviewProps) {
             .then((response) => {
                 const responseData = response;
                 // console.log('orders', responseData)
-                setOrders(responseData.data);
+                setOrders(responseData.data.reverse());
                 setDisplayOrders(filterOrders(selectedTabKey, responseData.data).slice(0, count));
             })
         }

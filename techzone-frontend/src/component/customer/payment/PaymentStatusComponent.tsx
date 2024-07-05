@@ -30,14 +30,14 @@ export default function PaymentStatusComponent(props: PaymentStatusComponentProp
                     <div className="md:text-2xl text-3xl text-gray-900 font-semibold text-center">Đặt hàng thành công!</div>
                 </div>
                 <div className="text-center">
-                    <div className="mb-2">Thanh toán thành công <span><Currency value={props.order?.totalPrice ?? 0}
+                    <div className="mb-2">Thanh toán thành công <span><b><Currency value={props.order?.totalPrice ?? 0}
                         locales={"vi-VN"}
                         currency={"VND"}
-                        minimumFractionDigits={0}></Currency></span> với hình thức thanh toán {props.order?.paymentMethod?.kind ?? "COD"}.</div>
+                        minimumFractionDigits={0}></Currency></b></span> với hình thức thanh toán <b>{props.order?.paymentMethod?.kind ?? "COD"}</b>.</div>
                     {/* <div className="mb-2">Đã chọn hình thức thanh toán bằng tiền mặt. Vui lòng trả xxx.xxxđ cho người giao hàng.</div> */}
                     <div className="text-gray-600 mb-2">Cảm ơn bạn đã mua hàng tại FashionStyle.</div>
-                    <div> Mã số đơn hàng của bạn là {props.order?._id ?? ""}</div>
-                    <div> Thời gian dự kiến giao hàng đến ngày dd/mm/yyyy</div>
+                    <div> Mã số đơn hàng của bạn là <b>{props.order?._id ?? ""}</b></div>
+                    <div> Thời gian dự kiến giao hàng đến ngày <b>dd/mm/yyyy</b></div>
                     <div className="mt-5 flex flex-row gap-5 items-center justify-center">
                         <Button type="text" size="large"
                             onClick={() => navigateToHomePage(router)}
