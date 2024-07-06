@@ -60,6 +60,7 @@ export default function SearchDrawer(props: SearchDrawerProp) {
       if (!props.isOpen) {
         return;
       }
+      setSearchText("");
       let subCategoryList: string[] = [];
       if (authContext.userInfo) {
         console.log("HERE");
