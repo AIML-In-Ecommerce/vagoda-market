@@ -1,9 +1,9 @@
-.loader {
+.progress {
   position: relative;
   display: flex;
 }
-.loader:before,
-.loader:after {
+.progress:before,
+.progress:after {
   content: "";
   width: 8px;
   height: 8px;
@@ -16,7 +16,7 @@
   box-shadow: 20px 0;
   animation: left 1s infinite ease-in-out;
 }
-.loader:after {
+.progress:after {
   color: #ff3d00;
   animation: right 1s infinite ease-in-out;
 }

@@ -107,7 +107,7 @@ export default function AboutProduct(props: AboutProductProps) {
     return Math.round(
       ((props.product.originalPrice - props.product.finalPrice) /
         props.product.originalPrice) *
-        100
+        100,
     );
   }, [props.product]);
 
@@ -155,7 +155,7 @@ export default function AboutProduct(props: AboutProductProps) {
               {priceIndex(props.product.finalPrice)}
             </div>
           </div>
-        </div>
+        </div>,
       );
 
       const sessionId =
@@ -169,7 +169,7 @@ export default function AboutProduct(props: AboutProductProps) {
         sessionId,
         props.product._id,
         props.product.shop,
-        accessType
+        accessType,
       );
     } else {
       props.notify("Thêm sản phẩm thất bại... Hãy thử lại sau!", <></>);
