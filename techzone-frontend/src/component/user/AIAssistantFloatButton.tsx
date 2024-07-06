@@ -69,7 +69,7 @@ interface AssistantMessageProps {
 const GreetingMessage: AssistantMessageProps = {
   role: AssistantMessageTypes.Assistant,
   message:
-    "Xin chào! Mình là trợ lý AI của TechZone.\nMình sẵn sàng giúp đỡ bạn những câu hỏi về tư vấn, tìm kiếm sản phẩm.\n Hôm nay bạn cần mình hỗ trợ gì hông? ^^",
+    "Xin chào! Mình là trợ lý AI của Vagoda.\nMình sẵn sàng giúp đỡ bạn những câu hỏi về tư vấn, tìm kiếm sản phẩm.\n Hôm nay bạn cần mình hỗ trợ gì hông? ^^",
   type: "text",
   data: "",
 };
@@ -627,47 +627,73 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
     history_conservation.push(message);
 
     setMessages(history_conservation);
-    // try {
+    try {
+      setAiState("THINKING");
+
+      const rawResponse = await axios.post(
+        "http://localhost:8000/chat/agent",
+        // "http://54.255.29.11/chat/agent",
+        postBody,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+      if (rawResponse.status == 200) {
+        console.log("AI Response: ", rawResponse.data);
+
+        let type = "";
+        let message = "";
+        let data = "";
+        if (!isJsonString(rawResponse.data.data)) {
+          message = rawResponse.data.data;
+        } else {
+          let response = JSON.parse(rawResponse.data.data);
+
+          message = response.message != undefined ? response.message : "";
+          type = response.type != undefined ? response.type : "";
+          data = response.data != undefined ? response.data : "";
+          setExtraSupportDisplay(setExtendedDisplay(response));
+        }
+
+        const assistantResponse: AssistantMessageProps = {
+          role: AssistantMessageTypes.Assistant,
+          message: message,
+          type: type,
+          data: data,
+        };
+
+        const newResponseMessages = [...history_conservation];
+        newResponseMessages.push(assistantResponse);
+        setMessages(newResponseMessages);
+        setAiState("RESPONSED");
+
+        if (localStorage) {
+          const stringifiedMessages = JSON.stringify(history_conservation);
+          localStorage.setItem(
+            AIAssistantLocalStorageKeyword,
+            stringifiedMessages,
+          );
+        }
+      }
+    } catch (error) {
+      console.error("Error in conservation:", error);
+    }
+
     //   setAiState("THINKING");
-
-    //   const rawResponse = await axios.post(
-    //     "http://localhost:8000/chat/agent",
-    //     postBody,
-    //     {
-    //       headers: {
-    //         "Content-Type": "application/json",
-    //       },
-    //     },
-    //   );
-    //   if (rawResponse.status == 200) {
-    //     console.log("AI Response: ", rawResponse.data);
-
-    //     let type = "";
-    //     let message = "";
-    //     let data = "";
-    //     if (!isJsonString(rawResponse.data.data)) {
-    //       message = rawResponse.data.data;
-    //     } else {
-    //       let response = JSON.parse(rawResponse.data.data);
-
-    //       message = response.message != undefined ? response.message : "";
-    //       type = response.type != undefined ? response.type : "";
-    //       data = response.data != undefined ? response.data : "";
-    //       setExtraSupportDisplay(setExtendedDisplay(response));
-    //     }
-
+    //   setTimeout(() => {
+    //     setAiState("RESPONSED");
     //     const assistantResponse: AssistantMessageProps = {
     //       role: AssistantMessageTypes.Assistant,
-    //       message: message,
-    //       type: type,
-    //       data: data,
+    //       message: fakeResponse.message,
+    //       type: fakeResponse.type,
+    //       data: fakeResponse.data,
     //     };
 
     //     const newResponseMessages = [...history_conservation];
     //     newResponseMessages.push(assistantResponse);
     //     setMessages(newResponseMessages);
-    //     setAiState("RESPONSED");
-
     //     if (localStorage) {
     //       const stringifiedMessages = JSON.stringify(history_conservation);
     //       localStorage.setItem(
@@ -675,33 +701,8 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
     //         stringifiedMessages,
     //       );
     //     }
-    //   }
-    // } catch (error) {
-    //   console.error("Error in conservation:", error);
-    // }
-
-    setAiState("THINKING");
-    setTimeout(() => {
-      setAiState("RESPONSED");
-      const assistantResponse: AssistantMessageProps = {
-        role: AssistantMessageTypes.Assistant,
-        message: fakeResponse.message,
-        type: fakeResponse.type,
-        data: fakeResponse.data,
-      };
-
-      const newResponseMessages = [...history_conservation];
-      newResponseMessages.push(assistantResponse);
-      setMessages(newResponseMessages);
-      if (localStorage) {
-        const stringifiedMessages = JSON.stringify(history_conservation);
-        localStorage.setItem(
-          AIAssistantLocalStorageKeyword,
-          stringifiedMessages,
-        );
-      }
-      setExtraSupportDisplay(setExtendedDisplay(fakeResponse));
-    }, 5000);
+    //     setExtraSupportDisplay(setExtendedDisplay(fakeResponse));
+    //   }, 5000);
   };
 
   const ExpandOrShrinkButton =
