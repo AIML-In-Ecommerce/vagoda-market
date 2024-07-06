@@ -34,7 +34,7 @@ export default function SearchDrawer(props: SearchDrawerProp) {
   const [allCategoryNames, setAllCategoryNames] = useState<string[]>([]);
   const [suggestedKeywords, setSuggestedKeywords] = useState<string[]>([]);
   const [suggestedProducts, setSuggestedProducts] = useState<_ProductType[]>(
-    []
+    [],
   );
 
   const extractCategoryNames = (categories: _CategoryType[]): string[] => {
@@ -66,13 +66,13 @@ export default function SearchDrawer(props: SearchDrawerProp) {
         console.log("HERE");
         const recentProduct: _ProductType[] =
           await StatisticsService.getRecentProducts(
-            authContext.userInfo._id ?? ""
+            authContext.userInfo._id ?? "",
           );
 
         console.log("RECENT PRODUCTS", recentProduct);
 
         subCategoryList = recentProduct.map(
-          (product) => product.subCategory._id
+          (product) => product.subCategory._id,
         );
       }
 
@@ -107,7 +107,7 @@ export default function SearchDrawer(props: SearchDrawerProp) {
   useEffect(() => {
     const updateSuggestedKeywords = () => {
       const updatedData = allCategoryNames.filter((category) =>
-        category.toLowerCase().includes(searchText.toLowerCase())
+        category.toLowerCase().includes(searchText.toLowerCase()),
       );
       const uniqueUpdatedData = Array.from(new Set(updatedData));
       setSuggestedKeywords(uniqueUpdatedData);
@@ -137,7 +137,7 @@ export default function SearchDrawer(props: SearchDrawerProp) {
       <div className="flex my-4">
         <div className="flex mx-auto justify-center">
           {allCategories.map((category, index) => (
-            <div className="flex items-center mx-auto">
+            <div className="flex items-center mx-auto" key={index}>
               {/* {index != 0 && <hr className="font-light  ">|</hr>} */}
               <Link
                 onClick={() => props.setIsOpen(false)}
@@ -240,7 +240,7 @@ export default function SearchDrawer(props: SearchDrawerProp) {
                 suggestedProducts.map((product, index) => (
                   <div
                     key={product._id}
-                    className="space-y-4"
+                    className="space-y-4 cursor-pointer"
                     onClick={() => {
                       props.setIsOpen(false);
                       router.push(`/product/${product._id}`);
