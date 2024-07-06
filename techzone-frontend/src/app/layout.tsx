@@ -1,10 +1,9 @@
-import "./globals.css";
 import type { Metadata } from "next";
+import "./globals.css";
 
 // import SocketProvider from "@/socket/SocketProvider";
 import { ReactNode } from "react";
 import AuthContextProvider from "../context/AuthContext";
-import React from "react";
 
 interface RootLayoutProps {
   children: ReactNode;

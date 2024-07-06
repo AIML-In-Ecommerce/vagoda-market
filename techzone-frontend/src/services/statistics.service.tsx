@@ -1,4 +1,5 @@
 import StatisticsAPIs from "@/apis/statistics/statistics.api";
+import { _ProductType } from "@/model/ProductType";
 
 const StatisticsService = {
   async setProductAccess(
@@ -42,8 +43,8 @@ const StatisticsService = {
     return null;
   },
 
-  async getRecentProducts(userId: string | null, accessType: string) {
-    let result = null;
+  async getRecentProducts(userId: string | null, accessType?: string) {
+    let result: _ProductType[] = [];
 
     const startTime = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
     const endTime = new Date();
@@ -57,7 +58,7 @@ const StatisticsService = {
       );
       if (response != null && response.status == 200) {
         const data = response.data;
-        result = data.data;
+        result = data.data as _ProductType[];
       }
     }
 
