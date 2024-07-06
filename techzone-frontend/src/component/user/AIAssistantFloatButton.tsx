@@ -867,7 +867,7 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
                       <Typography.Text className="text-amber-900 text-sm font-semibold mb-1">
                         Trợ lý AI
                       </Typography.Text>
-                      <span className="loader p-3 mr-[12px] mb-2"></span>
+                      <span className="progress p-3 mr-[12px] mb-2"></span>
                     </Flex>
                   </Tag>
                 </Flex>
