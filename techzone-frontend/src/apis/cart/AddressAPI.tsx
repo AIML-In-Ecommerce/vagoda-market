@@ -4,6 +4,7 @@ import { Address } from '@/model/AddressType';
 
 const BACKEND_PREFIX = process.env.NEXT_PUBLIC_BACKEND_PREFIX
 const USER_PORT = process.env.NEXT_PUBLIC_USER_PORT
+const GATEWAY_PREFIX = process.env.NEXT_PUBLIC_GATEWAY_PREFIX
 
 export interface ShippingAddress {
     street: string;
@@ -77,7 +78,7 @@ export function getFullAddress(address: Address): string {
 }
 
 export async function GET_getUserShippingAddress(userId: string) {
-    const url = `${BACKEND_PREFIX}:${USER_PORT}/user_info/shipping_address?userId=${userId}`
+    const url = `${GATEWAY_PREFIX}/user_info/shipping_address?userId=${userId}`
     try {
         const response = await axios.get(url);
         if (userId == null) {
@@ -98,17 +99,17 @@ export async function GET_getUserShippingAddress(userId: string) {
 }
 
 export async function POST_addUserShippingAddress(userId: string, shippingAddress: ShippingAddress) {
-    const url = `${BACKEND_PREFIX}:${USER_PORT}/user_info/shipping_address?userId=${userId}`
+    const url = `${GATEWAY_PREFIX}/user_info/shipping_address?userId=${userId}`
     try {
         const response = await axios.post(url, {
             "street": shippingAddress.street,
             "idProvince": shippingAddress.idProvince,
             "idDistrict": shippingAddress.idDistrict,
             "idCommune": shippingAddress.idCommune,
-            "country": shippingAddress.country,
+            "country": shippingAddress.country ?? "Việt Nam",
             "receiverName": shippingAddress.receiverName,
             "phoneNumber": shippingAddress.phoneNumber,
-            "coordinate": shippingAddress.coordinate ?? null,
+            "coordinate": shippingAddress.coordinate ?? {},
             "label": shippingAddress.label,
             "isDefault": shippingAddress.isDefault,
         });
@@ -116,7 +117,7 @@ export async function POST_addUserShippingAddress(userId: string, shippingAddres
             return { isDenied: true, message: "Unauthenticated", status: 403, data: undefined }
         }
         if (response.status === 200) {
-            return { isDenied: false, message: response.statusText, status: response.status, data: undefined }
+            return { isDenied: false, message: response.statusText, status: response.status, data: response.data }
         }
         else {
             return { isDenied: true, message: response.statusText, status: response.status, data: undefined }
@@ -128,17 +129,17 @@ export async function POST_addUserShippingAddress(userId: string, shippingAddres
 }
 
 export async function PUT_updateUserShippingAddress(userId: string, shippingAddress: ShippingAddress) {
-    const url = `${BACKEND_PREFIX}:${USER_PORT}/user_info/shipping_address?userId=${userId}&targetId=${shippingAddress._id}`;
+    const url = `${GATEWAY_PREFIX}/user_info/shipping_address?userId=${userId}&targetId=${shippingAddress._id}`;
     try {
         const response = await axios.put(url, {
             "street": shippingAddress.street,
             "idProvince": shippingAddress.idProvince,
             "idDistrict": shippingAddress.idDistrict,
             "idCommune": shippingAddress.idCommune,
-            "country": shippingAddress.country,
+            "country": shippingAddress.country ?? "Việt Nam",
             "receiverName": shippingAddress.receiverName,
             "phoneNumber": shippingAddress.phoneNumber,
-            "coordinate": shippingAddress.coordinate ?? null,
+            "coordinate": shippingAddress.coordinate ?? {},
             "label": shippingAddress.label,
             "isDefault": shippingAddress.isDefault,
         });
@@ -158,7 +159,7 @@ export async function PUT_updateUserShippingAddress(userId: string, shippingAddr
 }
 
 export async function DELETE_removeUserShippingAddress(userId: string, _id: string) {
-    const url = `${BACKEND_PREFIX}:${USER_PORT}/user_info/shipping_address?userId=${userId}&targetId=${_id}`;
+    const url = `${GATEWAY_PREFIX}/user/shipping_address?userId=${userId}&targetId=${_id}`;
     try {
         const response = await axios.delete(url);
         if (userId === null) {

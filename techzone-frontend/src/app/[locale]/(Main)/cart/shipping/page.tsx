@@ -1,12 +1,13 @@
 "use client";
-import { Button, Card, Skeleton, Space } from "antd";
-import React, { useEffect, useRef, useState } from "react";
+import { Button, Card, Empty, Skeleton, Space } from "antd";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { FaPlus } from "react-icons/fa6"
 import { useRouter } from "next/navigation"
 import { AddressForm } from "@/component/customer/shipping/AddressForm";
 // import { Address, ShippingAddress } from "@/model/ShippingAddress";
-import { DELETE_removeUserShippingAddress, GET_getUserShippingAddress, POST_addUserShippingAddress, PUT_updateUserShippingAddress, ShippingAddress, getFullAddress } from "@/app/apis/cart/AddressAPI";
+import { DELETE_removeUserShippingAddress, GET_getUserShippingAddress, POST_addUserShippingAddress, PUT_updateUserShippingAddress, ShippingAddress, getFullAddress } from "@/apis/cart/AddressAPI";
 import { Address } from "@/model/AddressType";
+import { AuthContext } from "@/context/AuthContext";
 
 //utils for testing process
 //source: https://stackoverflow.com/questions/6860853/generate-random-string-for-div-id
@@ -22,6 +23,7 @@ const initialAddress = {
 } as ShippingAddress
 
 export default function ShippingAddressPage() {
+    const context = useContext(AuthContext)
     const [formVisibility, setFormVisibility] = useState<boolean>(false);
     const [address, setAddress] = useState<ShippingAddress[]>([]);
     const [isEditMode, setIsEditMode] = useState<boolean>(false);
@@ -97,18 +99,19 @@ export default function ShippingAddressPage() {
         //     },
         // ]
         setLoading(true);
-        const data = (await GET_getUserShippingAddress(process.env.NEXT_PUBLIC_USER_ID as string)).data!;
+        
+        const data = (await GET_getUserShippingAddress(context.userInfo?._id as string)).data!;
         setAddress(data);
         setLoading(false);
     }
 
     const handleSetDefaultShippingAddress = (_address: ShippingAddress | undefined) => {
-        if (!_address) return;
+        if (!_address || !address) return;
 
         address.forEach(async (item) => {
             if (item._id !== _address._id) {
                 await PUT_updateUserShippingAddress(
-                    process.env.NEXT_PUBLIC_USER_ID as string,
+                    context.userInfo?._id as string,
                     { ...item, isDefault: false } as ShippingAddress);
             }
         });
@@ -118,7 +121,7 @@ export default function ShippingAddressPage() {
     const handleCreateShippingAddress = async (_address: ShippingAddress | undefined) => {
         if (!_address) return;
 
-        await POST_addUserShippingAddress(process.env.NEXT_PUBLIC_USER_ID as string, _address);
+        await POST_addUserShippingAddress(context.userInfo?._id as string, _address);
         if (_address.isDefault) {
             handleSetDefaultShippingAddress(_address)
         }
@@ -129,12 +132,12 @@ export default function ShippingAddressPage() {
     const handleUpdateShippingAddress = async (_address: ShippingAddress | undefined) => {
         if (!_address) return;
 
-        await PUT_updateUserShippingAddress(process.env.NEXT_PUBLIC_USER_ID as string, _address);
+        await PUT_updateUserShippingAddress(context.userInfo?._id as string, _address);
         await fetchAddress();
     }
 
     const handleRemoveShippingAddress = async (_id: string) => {
-        await DELETE_removeUserShippingAddress(process.env.NEXT_PUBLIC_USER_ID as string, _id);
+        await DELETE_removeUserShippingAddress(context.userInfo?._id as string, _id);
         await fetchAddress();
     }
 
@@ -144,17 +147,19 @@ export default function ShippingAddressPage() {
     }
 
     useEffect(() => {
-        fetchAddress();
-    }, []);
+        if (context.userInfo) {
+            fetchAddress();
+        }
+    }, [context.userInfo]);
 
     return (
         <React.Fragment>
             <div className="container mx-auto p-5 flex flex-col mt-5 w-5/6">
                 <div className="text-2xl font-bold mb-10">Địa chỉ giao hàng</div>
                 <div className="text-base mb-10">Chọn địa chỉ giao hàng có sẵn bên dưới:</div>
-                <Space direction="vertical" size="middle" className="grid lg:grid-cols-2 grid-cols-1">
+                <Space direction="vertical" align="center" size="middle" className="grid lg:grid-cols-2 grid-cols-1">
                     {
-                        loading ? <Skeleton active={loading} /> : address.map((item: ShippingAddress, index: number) => {
+                        loading ? <Skeleton active={loading} /> : address ? address.map((item: ShippingAddress, index: number) => {
                             const addressItem = {
                                 street: item.street,
                                 idProvince: item.idProvince,
@@ -202,7 +207,7 @@ export default function ShippingAddressPage() {
                                     </Card>
                                 </div>
                             )
-                        })
+                        }) : <Empty description={"Không có địa chỉ nào đã lưu"} />
                     }
                 </Space>
                 <div className="mt-5 flex flex-col text-lg space-x-2 space-y-2 self-center">

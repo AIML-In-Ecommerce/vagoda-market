@@ -1,11 +1,11 @@
+import { AuthContext } from "@/context/AuthContext";
+import { ProductAccessType } from "@/enum/ProductAccessType";
+import { CartProductType } from "@/model/ProductType";
 import { message, Rate } from "antd";
 import { motion, useAnimation } from "framer-motion";
 import Link from "next/link";
 import { ReactElement, useContext, useEffect, useState } from "react";
 import { PiShoppingCart } from "react-icons/pi";
-import { ProductAccessType } from "@/enum/ProductAccessType";
-import { CartProductType } from "@/model/ProductType";
-import { AuthContext } from "@/context/AuthContext";
 
 import { POST_AddToCart } from "@/apis/cart/CartAPI";
 import StatisticsService from "@/services/statistics.service";
@@ -111,7 +111,7 @@ export default function ProductItem(props: ProductItemProps) {
               {price}
             </div>
           </div>
-        </div>,
+        </div>
       );
 
       const sessionId =
@@ -125,7 +125,7 @@ export default function ProductItem(props: ProductItemProps) {
         sessionId,
         props._id,
         props.shop,
-        accessType,
+        accessType
       );
     } else {
       message.error("Thêm sản phẩm thất bại... Hãy thử lại sau!");
@@ -177,13 +177,13 @@ export default function ProductItem(props: ProductItemProps) {
         </motion.button>
 
         <Link href={`/product/${props._id}`}>
-          <div className="transform w-full bg-white rounded-bl-lg rounded-br-lg shadow-sm text-black">
+          <div className="transform w-full bg-white rounded-bl-lg rounded-br-lg shadow-sm text-black ">
             <div className="p-3 text-xs">
-              <p className="font-bold overflow-hidden line-clamp-2">
+              <p className="font-bold overflow-hidden line-clamp-2 h-8">
                 {props.name}
               </p>
               <div className="flex mt-1 justify-between items-center text-[10px]">
-                <div>{soldAmount} sold</div>
+                <div>Đã bán {soldAmount}</div>
                 <Rate
                   disabled
                   defaultValue={props.rating}

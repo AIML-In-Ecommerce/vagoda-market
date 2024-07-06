@@ -1,26 +1,28 @@
 "use client";
-import React, { useState, useEffect, useRef } from "react";
-import { Button, Card, Modal, Space, Table, Image, Tooltip, Skeleton, Select, Radio, Divider } from 'antd';
-import type { RadioChangeEvent, TableColumnsType } from 'antd';
-import { FaRegTrashCan, FaRegCircleQuestion } from "react-icons/fa6";
-import { Currency } from "@/component/user/utils/CurrencyDisplay";
-import { QuantityControl } from "@/component/user/utils/QuantityControl";
-import { Address, AddressType } from "@/model/AddressType";
-import Search from "antd/es/transfer/search";
+import React, { useState, useEffect, useContext } from "react";
+import { Input, Button, Card, Modal, Space, Image, Tooltip, Skeleton, Radio, Divider, Spin } from 'antd';
+import type { RadioChangeEvent } from 'antd';
+import { FaRegCircleQuestion } from "react-icons/fa6";
 import { DiscountType, PromotionType } from "@/model/PromotionType";
 import PromotionCard from "@/component/customer/product/PromotionCard";
-import crypto from 'crypto';
 import styled from 'styled-components'
 import Link from "next/link";
 import { RiContactsBookLine } from "react-icons/ri";
 import DeliveryInfoForm from "@/component/customer/cart/DeliveryInfoForm";
 import TransactionSection from "@/component/customer/cart/TransactionSection";
 import PromotionSection from "@/component/customer/cart/PromotionSection";
-import { Product, GET_getUserCartProducts, PUT_updateCartProduct } from "@/app/apis/cart/CartProductAPI";
-import { ShippingAddress } from "@/app/apis/cart/AddressAPI";
+import { GET_getUserCartProducts, CartItem } from "@/apis/cart/CartProductAPI";
+import { POST_addUserShippingAddress, ShippingAddress } from "@/apis/cart/AddressAPI";
 import { useRouter } from "next/navigation";
-import { POST_processTransaction, PaymentMethod } from "@/app/apis/payment/PaymentAPI";
-import { POST_createOrder } from "@/app/apis/order/OrderAPI";
+import { PaymentMethod } from "@/apis/payment/PaymentAPI";
+import { POST_createOrder } from "@/apis/order/OrderAPI";
+import { GET_GetAllPromotionByShopId, Promotion } from "@/apis/cart/promotion/PromotionAPI";
+import { GET_GetShop } from "@/apis/shop/ShopAPI";
+import { SearchProps } from "antd/es/input";
+import CartTable from "@/component/customer/cart/CartTable";
+import { AuthContext } from "@/context/AuthContext";
+
+const { Search } = Input;
 
 const formatDate = (date: Date) => {
     const hours = date.getHours().toString().padStart(2, '0');
@@ -41,90 +43,90 @@ const parseDateString = (dateString: string) => {
     return new Date(year, month - 1, day, hours, minutes);
 };
 
-const compareDateString = (dateString1: string, dateString2: string) => {
-    return parseDateString(dateString1) <= parseDateString(dateString2) ? 1 : -1;
-};
+// const compareDateString = (dateString1: string, dateString2: string) => {
+//     return parseDateString(dateString1) <= parseDateString(dateString2) ? 1 : -1;
+// };
 
 //Function for testing..
-function generatePromotionCode(promotionName: string): string {
-    // Create a hash object using SHA-256 algorithm
-    const hash = crypto.createHash('sha256');
+// function generatePromotionCode(promotionName: string): string {
+//     // Create a hash object using SHA-256 algorithm
+//     const hash = crypto.createHash('sha256');
 
-    // Update the hash object with the product name
-    hash.update(promotionName);
+//     // Update the hash object with the product name
+//     hash.update(promotionName);
 
-    // Get the hexadecimal digest of the hash
-    const hexDigest = hash.digest('hex');
+//     // Get the hexadecimal digest of the hash
+//     const hexDigest = hash.digest('hex');
 
-    // Take the first 8 characters of the hexadecimal digest
-    const hashedName = hexDigest.substring(0, 8);
+//     // Take the first 8 characters of the hexadecimal digest
+//     const hashedName = hexDigest.substring(0, 8);
 
-    return hashedName;
+//     return hashedName;
+// }
+
+type ShopInfo = {
+    _id: string,
+    name: string,
 }
 
-const SelectWrapper = styled.div`
-    .ant-select .ant-select-selector {
-        border-radius: 20px;
-        border-color: rgba(0, 0, 0);
-        border-width: 2px;
-    }
-`
-
-interface ProductTableItem extends Product {
-    key: React.Key
+type PromotionDisplay = {
+    shopInfo: ShopInfo,
+    promotions: Promotion[]
 }
 
 export default function CartPage() {
-    const [selectionType, setSelectionType] = useState<'checkbox' | 'radio'>('checkbox');
-    const [products, setProducts] = useState<Product[]>();
+    const context = useContext(AuthContext)
+    const [products, setProducts] = useState<CartItem[]>();
+    const [shopInfos, setShopInfos] = useState<ShopInfo[]>();
     const [promotions, setPromotions] = useState<PromotionType[]>([]);
+    const [promotionDisplayList, setPromotionDisplayList] = useState<PromotionDisplay[]>();
+    const [currentCode, setCurrentCode] = useState<string>("");
+    const [queryPromotionList, setQueryPromotionList] = useState<PromotionDisplay[]>();
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
-    const [selectedKey, setSelectedKey] = useState<React.Key | null>(null)
-    const [loading, setLoading] = useState(false);
+    const [selectedKey, setSelectedKey] = useState<React.Key | null>(null);
+    const [loading, setLoading] = useState<boolean>(true);
     const [provisional, setProvisional] = useState(0);
     const [discount, setDiscount] = useState(0);
+    const [selectedPromotions, setSelectedPromotions] = useState<PromotionType[]>([]);
     const [shippingFee, setShippingFee] = useState(0);
-    const [discounts, setDiscounts] = useState<PromotionType[]>([]);
     const [total, setTotal] = useState(0);
-    const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [showDeleteManyModal, setShowDeleteManyModal] = useState(false);
-    const [showPromotionModal, setShowPromotionModal] = useState(false);
+    const [showPromotionModal, setShowPromotionModal] = useState<boolean>(false);
     const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(PaymentMethod.COD);
     const [isSavingAddress, setIsSavingAddress] = useState<boolean>(false);
     const promotion_help = "Áp dụng tối đa 1 Mã giảm giá Sản Phẩm và 1 Mã Vận Chuyển"
     const router = useRouter();
 
-    const initialAddress = {
-        _id: "datn1",
+    const [currentAddress, setCurrentAddress] = useState<ShippingAddress>({
+        _id: 'datn'
+    } as ShippingAddress);
 
-    } as ShippingAddress;
-
-    const [currentAddress, setCurrentAddress] = useState<ShippingAddress>(initialAddress);
-
-    const handleShowDeleteOneModal = (key: any) => {
-        setSelectedKey(key);
-        setShowDeleteModal(true);
-    }
-    const handleDeleteOneModal = (key: any) => {
-        handleRemoveRow(key);
-        setShowDeleteModal(false);
-    }
-    const handleCancelOneModal = () => {
-        setShowDeleteModal(false);
+    const filterShopName = (shopId: string) => {
+        const shopName = shopInfos!.find(shopInfo => shopInfo._id === shopId)!.name;
+        return shopName;
     }
 
-    const handleShowDeleteManyModal = () => {
-        setShowDeleteManyModal(true);
-    }
-    const handleDeleteManyModal = () => {
-        handleRemoveSelectedRows();
-        setShowDeleteManyModal(false);
-    }
-    const handleCancelManyModal = () => {
-        setShowDeleteManyModal(false);
+    const fetchShopInfos = (products: CartItem[]) => {
+        const shopInfosList: ShopInfo[] = [];
+        const shopIdList: string[] = [];
+        products.forEach(async (product: CartItem) => {
+            if (!shopIdList.includes(product.shop)) {
+                shopIdList.push(product.shop);
+            }
+        })
+        shopIdList.forEach(async (item: string) => {
+            await GET_GetShop(item)
+                .then((response) => shopInfosList.push({
+                    _id: item,
+                    name: response.data?.name,
+                } as ShopInfo));
+        })
+        setShopInfos(shopInfosList);
     }
 
     const handleShowPromotionModal = () => {
+        if (shopInfos) {
+            fetchPromotions(shopInfos);
+        }
         setShowPromotionModal(true);
     }
 
@@ -134,176 +136,109 @@ export default function CartPage() {
 
     //transaction process
     const handleTransaction = async () => {
+        if (!context.userInfo) return;
         console.log('Transaction processing...');
 
-        //Create order
+        //if isSavingAddress checked
+        if (isSavingAddress) {
+            const response = await POST_addUserShippingAddress(context.userInfo?._id as string, currentAddress);
+            const latestAddress: ShippingAddress = response.data[response.data.length - 1];
+            setCurrentAddress(latestAddress);
+            //Ummm....
+            setTimeout(() => {
+                console.log("Successfully added shipping address", currentAddress);
+            }, 1000);
+        }
+
+        //Create order, response gateway url and transaction
         const createOrderResponse = await POST_createOrder(
-            process.env.NEXT_PUBLIC_USER_ID as string, currentAddress._id, "", paymentMethod);
+            context.userInfo._id as string, 
+            currentAddress._id,
+            selectedPromotions.map((item => item._id)), 
+            selectedRowKeys.map(item => item.toString()), paymentMethod);
+        if (createOrderResponse) {
+            console.log('Navigating to gateway...', createOrderResponse.data?.order_url);
+            if (paymentMethod === PaymentMethod.ZALOPAY) {
+                router.push(createOrderResponse.data.order_url)
+            }
+            else { router.push('/payment') }
+        }
 
         //Direct call to transaction api
-        const transactionResponse = await POST_processTransaction(
-            process.env.NEXT_PUBLIC_USER_ID as string, 
-            products?.filter(product => selectedRowKeys.includes(product._id))!,
-            total,
-            paymentMethod
-        );
-        if (transactionResponse) {
-            console.log('Navigating to gateway...', transactionResponse.data);
-            transactionResponse.data ? router.push(transactionResponse.data) : router.push('/payment');
-        }
+        // const transactionResponse = await POST_processTransaction(
+        //     context.userInfo._id as string,
+        //     products?.filter(item => selectedRowKeys.includes(item.itemId))!,
+        //     total,
+        //     paymentMethod
+        // );
+        // if (transactionResponse) {
+        //     console.log('Navigating to gateway...', transactionResponse.data);
+        //     transactionResponse.data ? router.push(transactionResponse.data) : router.push('/payment');
+        // }
+        // 
     }
 
-    const fetchPromotions = async () => {
-        const data: PromotionType[] = [
-            {
-                _id: '1',
-                name: "Giảm 50%",
-                description: "Áp dụng cho thanh toán qua ví điện tử MoMo (tối đa 100k)",
-                discountType: DiscountType.PERCENTAGE,
-                discountValue: 50,
-                quantity: 6,
-                upperBound: 100000,
-                expiredDate: formatDate(new Date('2024-05-30T12:30:00')), // 
-                code: ""
-            },
-            {
-                _id: '2',
-                name: "Giảm 200k",
-                description: "Áp dụng cho mọi đối tượng khách hàng (cho đơn tối thiểu 400k)",
-                discountType: DiscountType.DIRECT_PRICE,
-                discountValue: 200000,
-                quantity: 20,
-                lowerBound: 400000,
-                expiredDate: formatDate(new Date('2024-06-27T12:30:00')),
-                code: ""
-            },
-            {
-                _id: '3',
-                name: "Giảm 20%",
-                description: "Áp dụng cho tất cả khách hàng (tối đa 50k)",
-                discountType: DiscountType.PERCENTAGE,
-                discountValue: 20,
-                quantity: 15,
-                upperBound: 50000,
-                expiredDate: formatDate(new Date('2024-03-22T12:30:00')),
-                code: ""
-            },
-            {
-                _id: '4',
-                name: "Giảm 50k",
-                description: "Chỉ áp dụng cho khách hàng VIP",
-                discountType: DiscountType.DIRECT_PRICE,
-                discountValue: 50000,
-                quantity: 10,
-                lowerBound: 0,
-                expiredDate: formatDate(new Date('2024-04-30T12:30:00')),
-                code: ""
-            },
-            {
-                _id: '5',
-                name: "Giảm 10%",
-                description: "Áp dụng cho thanh toán qua thẻ tín dụng (tối đa 50k)",
-                discountType: DiscountType.PERCENTAGE,
-                discountValue: 10,
-                quantity: 8,
-                upperBound: 50000,
-                expiredDate: formatDate(new Date('2024-03-25T12:30:00')),
-                code: ""
-            }
-        ]
-        // Generate code for each promotion
-        const fixedData: PromotionType[] = data.map((promotion: PromotionType) => { return { ...promotion, code: generatePromotionCode(promotion.description).toUpperCase() } })
-        setTimeout(() => {
-            setLoading(false);
-        }, 1000);
-        setPromotions(fixedData);
+    const fetchPromotions = async (shopInfos: ShopInfo[]) => {
+        const promotionList: PromotionDisplay[] = [];
+        const promotions: PromotionType[] = [];
+        shopInfos.forEach(async (item: ShopInfo) => {
+            const response = await GET_GetAllPromotionByShopId(item._id);
+            if (response) promotionList.push(
+                {
+                    shopInfo: item,
+                    promotions: response.data
+                } as PromotionDisplay
+            )
+        })
+        setPromotionDisplayList(promotionList);
+        promotionList.forEach((item: PromotionDisplay) => {
+            item.promotions.forEach((promotion: Promotion) => {
+                const convertedPromotion = {
+                    _id: promotion._id,
+                    name: promotion.name,
+                    description: promotion.description,
+                    discountType: promotion.discountTypeInfo.type as unknown as DiscountType,
+                    discountValue: promotion.discountTypeInfo.value,
+                    upperBound: promotion.discountTypeInfo?.limitAmountToReduce,
+                    lowerBound: promotion.discountTypeInfo.lowerBoundaryForOrder,
+                    quantity: promotion.quantity,
+                    activeDate: formatDate(new Date(promotion.activeDate)),
+                    expiredDate: formatDate(new Date(promotion.expiredDate)),
+                    createdAt: formatDate(new Date(promotion.createAt)),
+                    code: promotion.code,
+                } as PromotionType
+                promotions.push(convertedPromotion);
+            })
+        })
+        setPromotions(promotions);
+        console.log('promotions', promotionList);
+
+    }
+
+    const handleCodeFilter = (value: string) => {
+        setCurrentCode(value);
+        const resultQueryList: PromotionDisplay[] = [];
+        promotionDisplayList?.forEach(item => {
+            const shopCodeFilterResult = item.promotions.filter(promotion => promotion.code.toUpperCase().includes(value.toUpperCase()));
+            resultQueryList.push({
+                ...item,
+                promotions: shopCodeFilterResult
+            } as PromotionDisplay)
+        })
+        setQueryPromotionList(resultQueryList);
     }
 
     const fetchProducts = async () => {
-        await GET_getUserCartProducts(process.env.NEXT_PUBLIC_USER_ID as string)
-            .then(response => setProducts(response.data?.products || undefined));
-        setTimeout(() => {
-            setLoading(false);
-        }, 1000);
-        ;
+        if (!context.userInfo) return;
+        setLoading(true);
+        console.log("current user", context.userInfo._id);
+        await GET_getUserCartProducts(context.userInfo._id as string)
+            .then(response => {
+                setProducts(response.data?.products || undefined);
+                setLoading(false);
+
+        })
     }
-
-    const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
-        console.log('selectedRowKeys changed: ', newSelectedRowKeys);
-        setSelectedRowKeys(newSelectedRowKeys);
-    };
-
-    const rowSelection = {
-        selectedRowKeys,
-        onChange: onSelectChange,
-    };
-
-    const onQuantityChange = (key: React.Key, value: number) => {
-        // Update the 'amount' field of the product with the specified key
-        if (!value) {
-            return;
-        }
-        if (products) {
-            const updatedProducts = products.map((product: Product) => {
-                if (product._id === key) {
-                    return { ...product, quantity: value };
-                }
-                return product;
-            });
-            setProducts(updatedProducts);
-        }
-    }
-
-    const onIncrement = async (key: React.Key, value: number) => {
-        if (value === 100) return;
-        if (products) {
-            const updatedProducts = products.map((product: Product) => {
-                if (product._id === key) {
-                    return { ...product, quantity: value + 1 };
-                }
-                return product;
-            });
-            await PUT_updateCartProduct(process.env.NEXT_PUBLIC_USER_ID as string, key.toString(), value + 1);
-            setProducts(updatedProducts);
-        }
-    }
-
-    const onDecrement = async (key: React.Key, value: number) => {
-        if (value === 1) {   
-            return handleShowDeleteOneModal(key);
-        }
-
-        if (products) {
-            const updatedProducts = products.map((product: Product) => {
-                if (product._id === key) {
-                    return { ...product, quantity: value - 1 };
-                }
-                return product;
-            });
-            await PUT_updateCartProduct(process.env.NEXT_PUBLIC_USER_ID as string, key.toString(), value - 1);
-            setProducts(updatedProducts);
-        }
-    }
-
-    const handleRemoveRow = async (key: React.Key) => {
-        if (products) {
-            const updatedProducts = products.filter((product: Product) => product._id !== key);
-            setProducts(updatedProducts);
-            await PUT_updateCartProduct(process.env.NEXT_PUBLIC_USER_ID as string, key.toString(), 0);
-        }
-        const updatedRowKeys = selectedRowKeys.filter(beforeKey => beforeKey !== key);
-        setSelectedRowKeys(updatedRowKeys);
-
-    };
-
-    const handleRemoveSelectedRows = () => {
-        console.log('handleRemoveSelectedRows', selectedRowKeys)
-        const updatedProducts = products!.filter((product: Product) => !selectedRowKeys.includes(product._id));
-        setProducts(updatedProducts);
-        selectedRowKeys.forEach(async (rowKey: React.Key) => 
-            await PUT_updateCartProduct(process.env.NEXT_PUBLIC_USER_ID as string, rowKey.toString(), 0))
-        setSelectedRowKeys([]);
-    };
 
     // const handleRowClick = (record: any) => {
     //     // Toggle selection for clicked row
@@ -315,26 +250,29 @@ export default function CartPage() {
     // };
 
     const applyDiscount = (promotion: PromotionType) => {
-        if (discounts.length === 1) {
-            alert("Giới hạn Áp dụng Mã Sản Phẩm!")
+        if (selectedPromotions.length === 2) {
+            // alert("Giới hạn Áp dụng Mã Sản Phẩm!")
             return;
         }
-        let updatedDiscounts = discounts.slice();
+        let updatedDiscounts = selectedPromotions.slice();
         updatedDiscounts.push(promotion);
-        setDiscounts(updatedDiscounts);
+        setSelectedPromotions(updatedDiscounts);
     }
 
     const removeDiscount = (promotion: PromotionType) => {
-        let updatedDiscounts = discounts.filter(discount => discount._id !== promotion._id)
-        setDiscounts(updatedDiscounts);
+        let updatedDiscounts = selectedPromotions.filter(discount => discount._id !== promotion._id)
+        setSelectedPromotions(updatedDiscounts);
     }
 
     const handleProvisional = () => {
-        const selectedProducts = products ? products.filter((product: Product) => selectedRowKeys.includes(product._id)) : [];
-        const provisional = selectedProducts ? selectedProducts.reduce((total: number, product: Product) => {
-            return total + (product.finalPrice * (product.quantity || 1));
+        const selectedProducts = products ? products.filter((item: CartItem) => selectedRowKeys.includes(item.itemId)) : [];
+        const provisional = selectedProducts ? selectedProducts.reduce((total: number, item: CartItem) => {
+            return total + (item.finalPrice * (item.quantity || 1));
         }, 0) : 0;
+        console.log('handleProvisional called', provisional, selectedProducts);
         setProvisional(provisional);
+        const total = provisional !== 0 ? provisional - discount : 0;
+        setTotal(total);
     }
 
     const calculateDirectPricePromotion = (value: number, lowerBound: number, upperBound: number) => {
@@ -349,7 +287,7 @@ export default function CartPage() {
 
     const handleDiscount = () => {
         let totalDiscount = 0;
-        discounts.forEach((item: PromotionType) => {
+        selectedPromotions.forEach((item: PromotionType) => {
             if (item.discountType === DiscountType.DIRECT_PRICE) {
                 if (item.discountValue)
                     totalDiscount += calculateDirectPricePromotion(item.discountValue, item.lowerBound!, item.upperBound!) ?? 0;
@@ -363,134 +301,46 @@ export default function CartPage() {
     }
 
     const handleTotalPrice = () => {
+        // console.log('handleTotalPrice called', provisional);
         const total = provisional !== 0 ? provisional - discount : 0;
         setTotal(total);
     }
 
-    const columns: TableColumnsType<Product> = [
-        {
-            title: <div className="flex flex-row gap-1 items-center uppercase text-gray-400">
-                <div className="text-base">Sản phẩm ({selectedRowKeys.length})</div>
-                <Button type="text" onClick={() => handleShowDeleteManyModal()}>
-                    <FaRegTrashCan />
-                </Button>
-            </div>,
-            dataIndex: 'name',
-            render: (text: string, record: Product) =>
-                <Space align="start" size={12} className="flex flex-row">
-                    {
-                        loading ? <Skeleton.Image active /> :
-                            <Image
-                                width={120}
-                                src={record.image}
-                                alt={""} />
-                    }
-                    {
-                        loading ? <Skeleton paragraph={{ rows: 2 }
-                        } active /> : (
-                            <div className="flex flex-row">
-                                <div className="flex flex-col gap-1">
-                                    <div className="text-sm font-bold text-ellipsis overflow-hidden">{record.name}</div>
-                                    <div className="text-sm text-gray-500 mb-1">Vàng / XS</div>
-                                    <SelectWrapper className="flex flex-row gap-2 mb-1">
-                                        <Select
-                                            defaultValue="yellow"
-                                            style={{ width: 75 }}
-                                            // onChange={handleChange}
-                                            options={[
-                                                { value: 'red', label: 'Đỏ' },
-                                                { value: 'green', label: 'Xanh' },
-                                                { value: 'yellow', label: 'Vàng' },
-                                            ]}
-                                        />
-                                        <Select
-                                            defaultValue="xs"
-                                            style={{ width: 75 }}
-                                            // onChange={handleChange}
-                                            options={[
-                                                { value: 'xs', label: 'XS' },
-                                                { value: 's', label: 'S' },
-                                                { value: 'm', label: 'M' },
-                                                { value: 'l', label: 'L' },
-                                                { value: 'xl', label: 'XL' },
-                                                { value: '2xl', label: '2XL' },
-                                            ]}
-                                        />
-                                    </SelectWrapper>
-                                    <div style={{ width: 75 }} onClick={() => handleShowDeleteOneModal(record._id)}>
-                                        <div className="flex flex-row cursor-pointer items-center gap-1 hover:font-semibold">
-                                            <FaRegTrashCan /> Xóa
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        )
-                    }
-
-
-                </Space >,
-            width: '65%',
-            align: 'start' as const,
-        },
-        {
-            title: <span className="text-base uppercase text-gray-400">Số lượng</span>,
-            dataIndex: 'quantity',
-            render: (value: number, record: Product) =>
-                <div className="flex justify-center">
-                    {
-                        loading ? <Skeleton.Input active /> : (
-                            <QuantityControl
-                                keyProp={record._id} value={record.quantity}
-                                minValue={1} maxValue={100} defaultValue={1}
-                                inputWidth={75}
-                                onIncrement={onIncrement}
-                                onDecrement={onDecrement}
-                                onQuantityChange={onQuantityChange}
-                            />)
-                    }
-                </div>,
-            width: '10%',
-            align: 'center' as const,
-
-        },
-        {
-            title: <span className="text-base uppercase text-gray-400">Thành tiền</span>,
-            dataIndex: ['finalPrice', 'originalPrice'],
-            render: (value: number, record: Product) => (
-                loading ? <Skeleton.Input active /> : (
-                    <div className="flex flex-col gap-1">
-                        <span className="text-slate-500 text-base line-through">
-                            <Currency value={(record.originalPrice * (record.quantity || 1))}
-                                locales={"vi-VN"}
-                                currency={"VND"}
-                                minimumFractionDigits={0} />
-                        </span>
-                        <span className="text-red-500 font-bold text-base">
-                            <Currency value={(record.finalPrice * (record.quantity || 1))}
-                                locales={"vi-VN"}
-                                currency={"VND"}
-                                minimumFractionDigits={0} />
-                        </span>
-                    </div>
-
-                )
-            ),
-            width: '25%',
-            align: 'center' as const,
-        },
-    ];
+    
+    // useEffect(() => {
+    //     if (shopInfos) {
+    //         fetchPromotions(shopInfos);
+    //     }
+    // }, [shopInfos])
 
     useEffect(() => {
-        setLoading(true);
         fetchProducts();
-        fetchPromotions();
-    }, [])
+    }, [context.userInfo])
+
+    useEffect(() => {
+        if (products) {
+            setLoading(true);
+            fetchShopInfos(products);
+            setLoading(false);
+        }
+    }, [products]);
+
+    useEffect(() => {
+        console.log('ShopInfos', shopInfos);
+        router.refresh();
+    }, [shopInfos]);
+
+    useEffect(() => {
+        handleCodeFilter("");
+        console.log("Promotion fetch");
+    }, [promotions, promotionDisplayList])
 
     useEffect(() => {
         handleProvisional();
         handleDiscount();
-        handleTotalPrice();
-    }, [products, provisional, discount, total, selectedRowKeys, discounts])
+        // handleTotalPrice();
+        console.log('UPDATE_CART', products);
+    }, [products, selectedRowKeys, selectedPromotions])
 
     useEffect(() => {
         const storedAddress = localStorage.getItem('shippingAddress');
@@ -560,6 +410,7 @@ export default function CartPage() {
                             <div className="mt-5">
                                 {loading ? <Skeleton /> :
                                     <DeliveryInfoForm currentAddress={currentAddress}
+                                        setCurrentAddress={setCurrentAddress}
                                         setIsSavingAddress={setIsSavingAddress} />
                                 }
                             </div>
@@ -593,31 +444,23 @@ export default function CartPage() {
                             </Radio.Group>
                         </div>
                     </div>
-                    <div className="lg:col-span-6 lg:w-auto w-full flex flex-col border-l-2 pl-3">
+                    <div className="lg:col-span-6 lg:w-auto w-full flex flex-col lg:border-l-2 lg:pl-3">
                         <div className="w-full">
                             <div className="text-3xl font-bold normal-case p-2">Giỏ hàng</div>
-                            <Table
-                                tableLayout='auto'
-                                rowSelection={{
-                                    type: selectionType,
-                                    ...rowSelection,
-
-                                }}
-                                columns={columns}
-                                dataSource={products?.map(product => ({...product, key: product._id} as ProductTableItem))}
-                                // onRow={(record) => ({
-                                //         onClick: () => handleRowClick(record),
-                                //       })}
-                                loading={loading}
-                                pagination={false}
-                                scroll={{ x: 'min-content' }}
-                            />
+                            <CartTable products={products} 
+                                setProducts={setProducts} 
+                                loading={loading} 
+                                selectedRowKeys={selectedRowKeys} 
+                                setSelectedRowKeys={setSelectedRowKeys} 
+                                selectedKey={selectedKey} 
+                                setSelectedKey={setSelectedKey} />
+                                
                             <Divider style={{ height: "auto", border: "0.25px solid silver" }}></Divider>
 
                             <PromotionSection
                                 loading={loading}
                                 showPromotionModal={handleShowPromotionModal}
-                                selectedDiscounts={discounts}
+                                selectedDiscounts={selectedPromotions}
                                 allPromotions={promotions}
                                 applyDiscount={applyDiscount}
                                 removeDiscount={removeDiscount} />
@@ -627,63 +470,77 @@ export default function CartPage() {
                             <TransactionSection
                                 selectedRowKeys={selectedRowKeys}
                                 loading={loading}
-                                provisional={provisional} 
-                                discount={discount} 
+                                provisional={provisional}
+                                discount={discount}
                                 shippingFee={shippingFee}
-                                total={total} 
-                                handleTransaction={handleTransaction}/>
+                                total={total}
+                                handleTransaction={handleTransaction} />
                         </div>
                     </div>
                 </div>
             </div>
 
             <Modal
-                width={400}
-                open={showDeleteModal}
-                onCancel={handleCancelOneModal}
-                title={<span className="text-xl">Xóa sản phẩm</span>}
-                footer={() => (
-                    <>
-                        <Button key="cancel" onClick={handleCancelOneModal}>Hủy</Button>,
-                        <Button key="ok" type="primary" onClick={() => handleDeleteOneModal(selectedKey)} danger>Xóa</Button>
-                    </>
-                )}
-                centered
-            >
-                Bạn có muốn xóa sản phẩm này khỏi giỏ hàng không?
-            </Modal>
-            <Modal
-                width={400}
-                open={showDeleteManyModal}
-                onCancel={handleCancelManyModal}
-                title={<span className="text-xl">Xóa sản phẩm</span>}
-                footer={() => (
-                    <>
-                        <Button key="cancel" onClick={handleCancelManyModal}>Hủy</Button>,
-                        <Button key="ok" type="primary" onClick={handleDeleteManyModal} danger>Xóa</Button>
-                    </>
-                )}
-                centered
-            >
-                Bạn có muốn xóa các sản phẩm đã chọn khỏi giỏ hàng không?
-            </Modal>
-            <Modal
                 width={550}
                 open={showPromotionModal}
                 onCancel={handleCancelPromotionModal}
-                title={<span className="text-xl">Techzone Khuyến Mãi</span>}
+                title={<span className="text-xl">Các Khuyến Mãi</span>}
                 footer={null}
                 centered>
                 {
                     <div className="flex flex-col">
                         <Space direction="vertical">
                             <div className="flex gap-5 mt-5 border rounded bg-slate-100 p-5">
-                                <Search placeholder="Nhập để tìm mã"></Search>
-                                <Button className="bg-blue-500 font-semibold text-white">Áp dụng</Button>
+                                <Input placeholder="Nhập để tìm mã"
+                                    onChange={(e) => handleCodeFilter(e.target.value)}></Input>
+                                <Button className="bg-blue-500 font-semibold text-white"
+                                    onClick={() => handleCodeFilter(currentCode)}>Áp dụng</Button>
                             </div>
-                            <Card className="overflow-auto h-96">
+                            <div className="overflow-auto h-96">
                                 {
-                                    promotions.sort(
+                                    loading ? <Spin /> : queryPromotionList?.map((item: PromotionDisplay) => {
+                                        return (
+                                            <Card key={item.shopInfo._id} title={<div className="font-semibold">{item.shopInfo.name}</div>}>
+                                                <div className="flex flex-col gap-5 mx-3">
+                                                    {
+                                                        item.promotions.sort(
+                                                            (a, b) => (a.expiredDate! >= b.expiredDate! ? -1 : 1)
+                                                        ).map(item => {
+                                                            const convertedPromotion = {
+                                                                _id: item._id,
+                                                                name: item.name,
+                                                                description: item.description,
+                                                                discountType: item.discountTypeInfo.type as unknown as DiscountType,
+                                                                discountValue: item.discountTypeInfo.value,
+                                                                upperBound: item.discountTypeInfo?.limitAmountToReduce,
+                                                                lowerBound: item.discountTypeInfo.lowerBoundaryForOrder,
+                                                                quantity: item.quantity,
+                                                                activeDate: formatDate(new Date(item.activeDate)),
+                                                                expiredDate: formatDate(new Date(item.expiredDate)),
+                                                                createdAt: formatDate(new Date(item.createAt)),
+                                                                code: item.code,
+                                                            } as PromotionType
+
+                                                            const isExpiredPromotion = (item: PromotionType) => {
+                                                                return parseDateString(item.expiredDate!) <= new Date();
+                                                            }
+                                                            if (isExpiredPromotion(convertedPromotion)) return;
+                                                            return (
+                                                                <PromotionCard
+                                                                    key={convertedPromotion._id}
+                                                                    item={convertedPromotion}
+                                                                    isSelected={selectedPromotions.includes(convertedPromotion)}
+                                                                    applyDiscount={applyDiscount}
+                                                                    removeDiscount={removeDiscount} />
+                                                            )
+                                                        })
+                                                    }
+                                                </div>
+                                            </Card>
+                                        )
+                                    })
+                                /* {
+                                    promotion.sort(
                                         (a, b) => compareDateString(a.expiredDate!, b.expiredDate!)
                                     ).map(item => {
                                         const isExpiredPromotion = (item: PromotionType) => {
@@ -694,17 +551,17 @@ export default function CartPage() {
                                             <PromotionCard
                                                 key={item._id}
                                                 item={item}
-                                                isSelected={discounts.includes(item)}
+                                                isSelected={selectedPromotions.includes(item)}
                                                 applyDiscount={applyDiscount}
                                                 removeDiscount={removeDiscount} />
                                         )
                                     })
-                                }
-                            </Card>
+                                } */}
+                            </div>
                             <div className="my-5 flex flex-row justify-center items-center">
                                 <div>Bạn đã chọn &nbsp;</div>
-                                <div className={`${discounts.length > 0 ? "text-red-500" : ""} font-bold text-2xl`}>
-                                    {discounts.length}
+                                <div className={`${selectedPromotions.length > 0 ? "text-red-500" : ""} font-bold text-2xl`}>
+                                    {selectedPromotions.length}
                                 </div>
                                 <div>&nbsp; mã giảm giá Sản Phẩm &nbsp;</div>
                                 <Tooltip title={promotion_help}>

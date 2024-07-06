@@ -1,10 +1,11 @@
 import axios from 'axios'
-import { Product } from '../cart/CartProductAPI';
+import { CartItem, Product } from '../cart/CartProductAPI';
 
-const BACKEND_PREFIX = process.env.NEXT_PUBLIC_BACKEND_PREFIX
-//local testing...
-const BACKEND_PREFIX_FOR_PAYMENT = 'http://localhost'
-const PAYMENT_PORT = process.env.NEXT_PUBLIC_PAYMENT_PORT
+// const BACKEND_PREFIX = process.env.NEXT_PUBLIC_BACKEND_PREFIX
+// //local testing...
+// const BACKEND_PREFIX_FOR_PAYMENT = 'http://localhost'
+// const PAYMENT_PORT = process.env.NEXT_PUBLIC_PAYMENT_PORT
+const GATEWAY_PREFIX = process.env.NEXT_PUBLIC_GATEWAY_PREFIX;
 
 export enum PaymentMethod {
     COD = 'COD',
@@ -24,20 +25,18 @@ export interface ZalopayResponseData {
 }
 
 //return gateway url (if available)
-export async function POST_processTransaction(userId: string, products: Product[], totalPrice: number, paymentMethod: PaymentMethod) {
+export async function POST_processTransaction(userId: string, items: CartItem[], totalPrice: number, paymentMethod: PaymentMethod) {
     const method = paymentMethod.toLowerCase();
     
-    // local testing...
-    const url = `${BACKEND_PREFIX_FOR_PAYMENT}:${PAYMENT_PORT}/${method}/payment`
-    // const url = `${BACKEND_PREFIX}:${PAYMENT_PORT}/${method}/payment`
+    const url = `${GATEWAY_PREFIX}/${method}/payment`
     
     try {
         const response = await axios.post(url, {
-            products: products,
+            products: items,
             amount: totalPrice,
             userId: userId,
         });
-        if (userId == null) {
+        if (userId === null) {
             return {
                 isDenied: true,
                 message: "Unauthenticated",

@@ -9,15 +9,12 @@ import { useContext, useEffect, useState } from "react";
 import { BsInstagram } from "react-icons/bs";
 import { FaFacebook } from "react-icons/fa";
 import { GrPinterest } from "react-icons/gr";
-import { PiShoppingCart } from "react-icons/pi";
-import { RxPerson } from "react-icons/rx";
+import { FaUser } from "react-icons/fa6";
+import { FaCartShopping } from "react-icons/fa6";
 import { TbBrandYoutubeFilled } from "react-icons/tb";
-import { TfiHeadphoneAlt } from "react-icons/tfi";
-import logo from "../../../public/asset/vagoda.png";
-import logo2 from "../../../public/asset/v.jpg";
+import logo from "../../../public/asset/vagoda_1.png";
 import Searchbar from "../Searchbar";
 import LanguageOption from "./LanguageOption";
-import NavbarCategory from "./NavbarCategory";
 import NavbarMenu from "./NavbarMenu";
 import Link from "next/link";
 import { AuthContext } from "@/context/AuthContext";
@@ -186,6 +183,12 @@ export default function MainNavbar() {
               alt="Logo"
               onClick={() => router.push("/")}
             />
+            {/* <img
+              src={logo}
+              alt="Logo"
+              onClick={() => router.push("/")}
+              className="w-200 h-100"
+            /> */}
 
             <div className="flex space-x-2 items-center">
               <motion.div whileTap={{ scale: 0.9 }}>
@@ -194,9 +197,9 @@ export default function MainNavbar() {
                   placement="bottomLeft"
                   className="xs:hidden"
                 >
-                  <div className="flex items-center space-x-2 text-white hover:text-sky  p-2 rounded-lg bg-[#5c6856] text-sm">
-                    <RxPerson className="" size={20} />
-                    <p className="">Account</p>
+                  <div className="flex items-center space-x-2 text-white hover:text-sky  p-1 rounded-lg bg-[#5c6856] text-sm">
+                    <FaUser className="" size={26} />
+                    <p className="">Tài khoản</p>
                   </div>
                 </Dropdown>
               </motion.div>
@@ -208,7 +211,7 @@ export default function MainNavbar() {
                     count={countItemsCart > 100 ? 109 : 5}
                     style={{ backgroundColor: "#f32c2c" }}
                   >
-                    <PiShoppingCart
+                    <FaCartShopping
                       className="text-white hover:text-[#5c6856]"
                       size={20}
                     />
@@ -246,7 +249,7 @@ export default function MainNavbar() {
                   <Image
                     src={logo}
                     alt="Logo"
-                    className="w-auto h-[45px] "
+                    className="w-auto h-[60px] "
                     onClick={() => router.push("/")}
                   />
                 </div>
@@ -274,9 +277,9 @@ export default function MainNavbar() {
                       count={countItemsCart > 100 ? 109 : 5}
                       style={{ backgroundColor: "#f32c2c" }}
                     >
-                      <PiShoppingCart
+                      <FaCartShopping
                         className="text-white hover:text-[#5c6856]"
-                        size={20}
+                        size={26}
                       />
                     </Badge>
                   </div>
@@ -299,7 +302,8 @@ export default function MainNavbar() {
                               alt="avatar"
                             />
                           ) : (
-                            <RxPerson className="" size={20} />
+                            // <RxPerson className="" size={20} />
+                            <FaUser className="" size={26} />
                           )}
                           {authContext.userInfo ? (
                             <p className="truncate">
@@ -317,10 +321,10 @@ export default function MainNavbar() {
                       placement="bottomLeft"
                       className="xs:hidden"
                     >
-                      <div className="flex space-x-2 items-center text-white hover:text-sky  p-[12px] rounded-lg bg-[#5c6856] text-sm">
+                      <div className="flex space-x-2 items-center text-white hover:text-sky  p-2 rounded-lg bg-[#5c6856] text-sm">
                         <>
-                          <RxPerson className="" size={20} />
-                          <p className="truncate">Account</p>
+                          <FaUser className="" size={26} />
+                          <p className="truncate">Tài khoản</p>
                         </>
                       </div>
                     </Dropdown>

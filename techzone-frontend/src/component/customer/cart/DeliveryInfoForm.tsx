@@ -2,27 +2,24 @@
 import { Address, AddressType } from '@/model/AddressType'
 import { Checkbox, CheckboxProps, Input, Select } from 'antd'
 import React, { useEffect, useMemo, useState } from 'react'
-import { getProvince, getDistrict, getCommune, Province, Commune, District, ShippingAddress } from '@/app/apis/cart/AddressAPI';
+import { getProvince, getDistrict, getCommune, Province, Commune, District, ShippingAddress } from '@/apis/cart/AddressAPI';
 
 interface DeliveryInfoFormProps {
     currentAddress: ShippingAddress | undefined;
+    setCurrentAddress: (address: ShippingAddress) => void;
     setIsSavingAddress: (isSavingAddress: boolean) => void;
 }
 
 export default function DeliveryInfoForm(props: DeliveryInfoFormProps) {
-    const addressInfo = useMemo(() => {
-        const address = props.currentAddress;
-        return address;
-    }, [props.currentAddress]);
-
-    const [name, setName] = useState<string>(addressInfo!.receiverName || '');
-    const [phoneNumber, setPhoneNumber] = useState<string>(addressInfo!.phoneNumber || '');
+    const [name, setName] = useState<string>(props.currentAddress?.receiverName || '');
+    const [phoneNumber, setPhoneNumber] = useState<string>(props.currentAddress?.phoneNumber || '');
+    const [streetAddress, setStreetAddress] = useState<string>(props.currentAddress?.street || '');
     const [address, setAddress] = useState<Address | undefined>({
-        street: addressInfo?.street,
-        idProvince: addressInfo?.idProvince,
-        idDistrict: addressInfo?.idDistrict,
-        idCommune: addressInfo?.idCommune,
-        country: addressInfo?.country,
+        street: props.currentAddress?.street,
+        idProvince: props.currentAddress?.idProvince,
+        idDistrict: props.currentAddress?.idDistrict,
+        idCommune: props.currentAddress?.idCommune,
+        country: props.currentAddress?.country,
     } as Address);
     const [provinceList, setProvinceList] = React.useState<Province[]>([]);
     const [districtList, setDistrictList] = React.useState<District[]>([]);
@@ -43,6 +40,19 @@ export default function DeliveryInfoForm(props: DeliveryInfoFormProps) {
 
     const onSavingAddress: CheckboxProps['onChange'] = (e) => {
         props.setIsSavingAddress(e.target.checked);
+        const savingAddress = {
+            street: streetAddress,
+            idProvince: provinceValue,
+            idDistrict: districtValue,
+            idCommune: communeValue,
+            country: address?.country ?? "Việt Nam",
+            receiverName: name,
+            phoneNumber: phoneNumber,
+            coordinate: {},
+            label: "HOME",
+            isDefault: false
+        } as ShippingAddress;
+        props.setCurrentAddress(savingAddress);
         setIsChecked(e.target.checked);
     }
 
@@ -152,7 +162,8 @@ export default function DeliveryInfoForm(props: DeliveryInfoFormProps) {
                     onChange={(e) => setPhoneNumber(e.target.value)}></Input>
             </div>
             <Input className="border-1 border-gray-400 rounded-xl" size="large" placeholder='Địa chỉ'
-                value={address!.street}></Input>
+                value={streetAddress}
+                onChange={(e) => setStreetAddress(e.target.value)}></Input>
             <div className="grid grid-cols-3 gap-5">
                 <Select size="large" placeholder=" Chọn Thành Phố/Tỉnh"
                     defaultValue={provinceValue}

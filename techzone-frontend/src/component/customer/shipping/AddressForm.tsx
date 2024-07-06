@@ -1,5 +1,5 @@
 "use client";
-import { getProvince, getDistrict, getCommune, Commune, District, Province, ShippingAddress } from '@/app/apis/cart/AddressAPI';
+import { getProvince, getDistrict, getCommune, Commune, District, Province, ShippingAddress } from '@/apis/cart/AddressAPI';
 import { Address, AddressType } from '@/model/AddressType';
 import { Select, Radio, Checkbox, Button, Input, CheckboxProps, RadioChangeEvent, Form } from 'antd';
 import TextArea from 'antd/es/input/TextArea';

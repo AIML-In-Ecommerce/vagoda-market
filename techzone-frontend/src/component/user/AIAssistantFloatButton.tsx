@@ -41,6 +41,7 @@ import LineChart from "./utils/Chart/LineChart";
 import BarChart from "./utils/Chart/BarChar";
 import PieChart from "./utils/Chart/PieChart";
 import "../../custom_css/Loader.css";
+import InfiniteCart from "./utils/InfiniteCart";
 
 interface AIAssistantFloatButtonProps {}
 
@@ -68,7 +69,7 @@ interface AssistantMessageProps {
 const GreetingMessage: AssistantMessageProps = {
   role: AssistantMessageTypes.Assistant,
   message:
-    "Xin chào! Mình là trợ lý AI của TechZone.\nMình sẵn sàng giúp đỡ bạn những câu hỏi về tư vấn, tìm kiếm sản phẩm.\n Hôm nay bạn cần mình hỗ trợ gì hông? ^^",
+    "Xin chào! Mình là trợ lý AI của Vagoda.\nMình sẵn sàng giúp đỡ bạn những câu hỏi về tư vấn, tìm kiếm sản phẩm.\n Hôm nay bạn cần mình hỗ trợ gì hông? ^^",
   type: "text",
   data: "",
 };
@@ -91,7 +92,7 @@ const InfinitePromotionListSetup: InfinitePromotionListProps = {
 const testCaseNumber = 3;
 
 const fakeResponse = {
-  type: "gen_chart",
+  type: "cart_adding",
   data: [
     {
       _id: "666acc8ed40492953e97649d",
@@ -402,7 +403,7 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
         return <InfinitePromotionList setup={InfinitePromotionListSetup} />;
       case "cart_adding":
         setExtendedMessage("cart_adding");
-        return <></>;
+        return <InfiniteCart />;
       case "gen_chart":
         setExtendedMessage("gen_chart");
         switch (response.data.type) {
@@ -446,6 +447,7 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
   function handleDeleteMessages() {
     const newMessages = messages.slice(0, 1);
     setMessages(newMessages);
+    setExtraSupportDisplay(greetingReactNode);
     if (localStorage) {
       const stringifiedMessages = JSON.stringify(newMessages);
       localStorage.setItem(AIAssistantLocalStorageKeyword, stringifiedMessages);
@@ -503,7 +505,7 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
           </Flex>
           <Flex vertical gap={6} className="w-9/12">
             <Flex className="w-full" justify="start" align="center">
-              <Tag bordered={false} color={"#f5f5f4"}>
+              <Tag bordered={false} color={"#f5f5f4"} className="rounded-xl">
                 <Flex
                   className="px-1 pt-2"
                   vertical
@@ -539,12 +541,15 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
         justify="end"
         align="center"
       >
-        <Flex className="w-7/12 " justify="end" align="center">
+        <Flex className="w-7/12" justify="end" align="center">
           {/* <Tag color={"#92400e"}> */}
-          <Tag color={"#797979"}>
-            <Typography.Paragraph className="text-wrap text-sm text-white mt-1">
+          <Tag
+            color={"#797979"}
+            className="rounded-xl flex justify-center items-center"
+          >
+            <p className="text-wrap text-sm text-white my-2">
               {message.message}
-            </Typography.Paragraph>
+            </p>
           </Tag>
         </Flex>
       </Flex>
@@ -627,6 +632,7 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
 
       const rawResponse = await axios.post(
         "http://localhost:8000/chat/agent",
+        // "http://54.255.29.11/chat/agent",
         postBody,
         {
           headers: {
@@ -675,28 +681,28 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
       console.error("Error in conservation:", error);
     }
 
-    // setAiState("THINKING");
-    // setTimeout(() => {
-    //   setAiState("RESPONSED");
-    //   const assistantResponse: AssistantMessageProps = {
-    //     role: AssistantMessageTypes.Assistant,
-    //     message: fakeResponse.message,
-    //     type: fakeResponse.type,
-    //     data: fakeResponse.data,
-    //   };
+    //   setAiState("THINKING");
+    //   setTimeout(() => {
+    //     setAiState("RESPONSED");
+    //     const assistantResponse: AssistantMessageProps = {
+    //       role: AssistantMessageTypes.Assistant,
+    //       message: fakeResponse.message,
+    //       type: fakeResponse.type,
+    //       data: fakeResponse.data,
+    //     };
 
-    //   const newResponseMessages = [...history_conservation];
-    //   newResponseMessages.push(assistantResponse);
-    //   setMessages(newResponseMessages);
-    //   if (localStorage) {
-    //     const stringifiedMessages = JSON.stringify(history_conservation);
-    //     localStorage.setItem(
-    //       AIAssistantLocalStorageKeyword,
-    //       stringifiedMessages,
-    //     );
-    //   }
-    //   setExtraSupportDisplay(setExtendedDisplay(fakeResponse));
-    // }, 5000);
+    //     const newResponseMessages = [...history_conservation];
+    //     newResponseMessages.push(assistantResponse);
+    //     setMessages(newResponseMessages);
+    //     if (localStorage) {
+    //       const stringifiedMessages = JSON.stringify(history_conservation);
+    //       localStorage.setItem(
+    //         AIAssistantLocalStorageKeyword,
+    //         stringifiedMessages,
+    //       );
+    //     }
+    //     setExtraSupportDisplay(setExtendedDisplay(fakeResponse));
+    //   }, 5000);
   };
 
   const ExpandOrShrinkButton =
@@ -724,7 +730,7 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
 
   const extraAiAssistantPopoverContentButton = (
     <Flex className="w-full h-full" justify="end" align="center" gap={6}>
-      <Tooltip placement="top" title="Làm mới">
+      <Tooltip placement="top" title="Đồng bộ">
         <Button
           size="small"
           className="rounded-full border-transparent"
@@ -862,7 +868,7 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
                       <Typography.Text className="text-amber-900 text-sm font-semibold mb-1">
                         Trợ lý AI
                       </Typography.Text>
-                      <span className="loader p-3 mr-[12px] mb-2"></span>
+                      <span className="progress p-3 mr-[12px] mb-2"></span>
                     </Flex>
                   </Tag>
                 </Flex>
@@ -915,7 +921,7 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
         footer={[]}
         open={bigModalOpen}
       >
-        <Flex className="w-full h-full bg-gray-200">
+        <Flex className="w-full h-full bg-gray-100">
           <Card
             className="w-2/5 "
             style={{ boxShadow: "none", borderRadius: "0 0 0 0" }}

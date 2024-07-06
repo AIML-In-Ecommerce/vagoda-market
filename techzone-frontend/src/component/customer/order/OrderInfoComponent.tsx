@@ -1,5 +1,5 @@
-import { Order, Product } from '@/app/apis/order/OrderAPI';
-import { GET_getShopInfoById } from '@/app/apis/shop/ShopAPI';
+import { Order, Product } from '@/apis/order/OrderAPI';
+import { GET_GetShop } from '@/apis/shop/ShopAPI';
 import { Currency } from '@/component/user/utils/CurrencyDisplay';
 import { Button, Card, Image, Skeleton, Tooltip } from 'antd'
 import { useRouter } from 'next/navigation';
@@ -100,10 +100,10 @@ export default function OrderInfoComponent(props: OrderInfoComponentProps) {
             }
         })
         shopIdList.forEach(async (item: string) => {
-            await GET_getShopInfoById(item)
+            await GET_GetShop(item)
                 .then((response) => shopInfosList.push({
-                    _id: item,
-                    name: response.data.data.name,
+                    _id: item,  
+                    name: response.data?.name,
                 } as ShopInfo));
         })
         setShopInfos(shopInfosList);
