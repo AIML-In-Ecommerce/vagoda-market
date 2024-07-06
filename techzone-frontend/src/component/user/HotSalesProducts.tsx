@@ -247,12 +247,7 @@ export default function HotSalesProducts({
   return (
     <>
       <div className="w-full flex flex-col justify-center items-center py-4">
-        <Flex
-          vertical
-          className="container w-full"
-          justify="center"
-          align="center"
-        >
+        <Flex vertical className="w-full" justify="center" align="center">
           <CenterTitle
             title={titleValue}
             subTitle={subTitleValue}
@@ -272,9 +267,9 @@ export default function HotSalesProducts({
           <div className="invisible h-10 w-full"></div> */}
 
           {(products && (
-            <div className="w-full">
+            <div className="w-full flex flex-col items-center">
               <List
-                className="ml-10 w-full"
+                className="w-full"
                 // pagination={{
                 //   align: "center",
                 //   responsive: true,
@@ -298,7 +293,7 @@ export default function HotSalesProducts({
                   sm: 2,
                   md: 3,
                   lg: 4,
-                  xl: 6,
+                  xl: 5,
                   xxl: 6,
                 }}
                 // dataSource={products}

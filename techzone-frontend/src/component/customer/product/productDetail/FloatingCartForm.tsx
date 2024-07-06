@@ -4,8 +4,16 @@ import { Button, Image } from "antd";
 import { priceIndex } from "../ProductDetail";
 import { QuantityControl } from "@/component/user/utils/QuantityControl";
 import { BsQuestionCircle } from "react-icons/bs";
+import { AuthContext } from "@/context/AuthContext";
+import { POST_AddToCart } from "@/apis/cart/CartAPI";
+import StatisticsService from "@/services/statistics.service";
+import { useContext } from "react";
+import { CartProductType } from "@/model/ProductType";
+import { ProductAccessType } from "@/enum/ProductAccessType";
 
 interface FormProps {
+  _id: string;
+  shop: string;
   name: string;
   price: number;
   mainImage: string;
@@ -13,6 +21,7 @@ interface FormProps {
   updateItemNumber: (value: number) => void;
   totalPrice: number;
   handleCartDetail: (isOpen: boolean) => void;
+  notify(message: string, content: any): void;
 }
 
 const FloatingCartForm = (formData: FormProps) => {
@@ -24,6 +33,8 @@ const FloatingCartForm = (formData: FormProps) => {
   //     formData.totalComboPrice
   //   );
   // }, [formData.totalComboPrice, formData.numberOfItem]);
+
+  const authContext = useContext(AuthContext);
 
   const onIncrement = (value: number) => {
     if (value === 100) return;
@@ -39,6 +50,58 @@ const FloatingCartForm = (formData: FormProps) => {
     // Update the 'amount' field of the product with the specified key
     if (value) {
       formData.updateItemNumber(value);
+    }
+  };
+
+  const handleAddToCart = async () => {
+    if (!authContext.userInfo || !authContext.userInfo._id) {
+      formData.notify("Hãy đăng nhập vào tài khoản nhé!", "");
+      return;
+    }
+    const userId = authContext.userInfo._id;
+
+    let products: CartProductType[] = [
+      {
+        product: formData._id,
+        quantity: formData.numberOfItem,
+      },
+    ];
+
+    const response = await POST_AddToCart(userId, products);
+
+    // if (response.message === "Update cart successfully") {
+    if (response.data) {
+      formData.notify(
+        "Bạn đã thêm thành công!",
+        <div className="flex flex-row gap-6 w-max">
+          <img className="m-2 h-20 w-20 object-fill" src={formData.mainImage} />
+          <div className="flex flex-col justify-center">
+            <div className="text-sm md:text-lg truncate">
+              {formData.name.substring(0, 15) + "..."}
+            </div>
+            <div className="text-[9px] md:text-sm text-red-500 font-semibold flex">
+              {priceIndex(formData.price)}
+            </div>
+          </div>
+        </div>
+      );
+
+      const sessionId =
+        authContext.methods && authContext.methods.getSessionId()
+          ? authContext.methods.getSessionId()
+          : "";
+      const accessType = ProductAccessType.ADD_TO_CART;
+
+      StatisticsService.setProductAccess(
+        userId,
+        sessionId,
+        formData._id,
+        formData.shop,
+        accessType
+      );
+    } else {
+      formData.notify("Thêm sản phẩm thất bại... Hãy thử lại sau!", <></>);
+      // console.log(response.message);
     }
   };
 
@@ -80,16 +143,18 @@ const FloatingCartForm = (formData: FormProps) => {
           />
         </div>
 
-        <div className="col-start-9 col-span-4 sm:col-start-10 sm:col-span-3 md:col-start-11 md:col-span-2 m-3">
+        <div className="col-start-9 col-span-5 sm:col-start-10 sm:col-span-3 md:col-start-11 md:col-span-2 m-3">
           <Button
             type="primary"
-            href="/cart"
+            // href="/cart"
+            onClick={handleAddToCart}
             danger
             block
-            size="large"
+            size="middle"
             style={{ background: "#5c6856" }}
+            className="rounded-full mt-1"
           >
-            Mua ngay
+            Thêm vào giỏ hàng
           </Button>
         </div>
       </div>

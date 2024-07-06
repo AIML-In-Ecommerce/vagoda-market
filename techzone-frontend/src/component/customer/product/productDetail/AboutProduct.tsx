@@ -80,9 +80,10 @@ export default function AboutProduct(props: AboutProductProps) {
 
   // image col
   const imageCol = useMemo(() => {
+    if (props.selectedColorOption) return 1;
     if (!props.product || !props.product.images) return 1;
     return props.product.images.length > 5 ? 2 : 1;
-  }, [props.product]);
+  }, [props.product, props.selectedColorOption]);
 
   // functions
   const onIncrement = (key: React.Key, value: number) => {
@@ -149,7 +150,7 @@ export default function AboutProduct(props: AboutProductProps) {
           <img className="m-2 h-20 w-20 object-fill" src={props.mainImage} />
           <div className="flex flex-col justify-center">
             <div className="text-sm md:text-lg truncate">
-              {props.product.name}
+              {props.product.name.substring(0, 15) + "..."}
             </div>
             <div className="text-[9px] md:text-sm text-red-500 font-semibold flex">
               {priceIndex(props.product.finalPrice)}

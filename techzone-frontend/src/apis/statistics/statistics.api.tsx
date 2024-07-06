@@ -99,6 +99,7 @@ const StatisticsAPIs = {
       amount: 6,
       startTime: startTime,
       endTime: endTime,
+      useCompensation: true,
     };
 
     try {
@@ -122,6 +123,7 @@ const StatisticsAPIs = {
       startTime: startTime,
       endTime: endTime,
       useProductInfo: true,
+      useCompensation: true,
     };
 
     try {
@@ -145,6 +147,7 @@ const StatisticsAPIs = {
       amount: 14,
       startTime: startTime,
       endTime: endTime,
+      useCompensation: true,
     };
 
     try {

@@ -25,7 +25,7 @@ export default function Home() {
   };
 
   return (
-    <div>
+    <div className="w-full">
       {contextHolder}
       <Flex
         vertical

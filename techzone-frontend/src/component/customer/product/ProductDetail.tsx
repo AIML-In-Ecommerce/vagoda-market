@@ -393,6 +393,9 @@ export default function ProductDetail(props: ProductDetailProps) {
                 name={product.name}
                 price={product.finalPrice}
                 mainImage={mainImage}
+                shop={product.shop}
+                _id={product._id}
+                notify={props.notify}
               />
             </Affix>
 

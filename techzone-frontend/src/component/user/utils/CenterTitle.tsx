@@ -25,8 +25,8 @@ function CenterTitle({
   }, []);
 
   return (
-    <>
-      <Flex className="w-full" vertical justify="center" align="center">
+    <div className="w-full">
+      <Flex className="w-screen" vertical justify="center" align="center">
         {/* <Flex className="container w-full py-2" justify="center" align="center">
           <Flex className="w-full" vertical justify="center" align="center">
             <div className="w-1/2 h-1 bg-[#683A25] relative rounded-full"></div>
@@ -66,7 +66,7 @@ function CenterTitle({
           <></>
         )}
       </Flex>
-    </>
+    </div>
   );
 }
 

@@ -184,9 +184,9 @@ export default function AdvertisementCarousel(
 
   return (
     <>
-      <Flex className="w-full " vertical align="center" justify="center">
+      <Flex className="w-full" vertical align="center" justify="center">
         <Flex
-          className={` w-full max-h-[600px] xl:max-h-screen xl:h-[calc(100vh-80px)] items-start`}
+          className={`w-full max-h-[600px] xl:max-h-screen xl:h-[calc(100vh-80px)] items-start`}
           justify="center"
           align="center"
         >

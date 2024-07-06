@@ -218,47 +218,44 @@ export default function HomeFlashSales({ notify }: HomeFlashSalesProps) {
   }, []);
 
   const handleGetProductList = async () => {
-    const response = await StatisticsService.getSaleProducts() as ProductDetailType[];
+    const response =
+      (await StatisticsService.getSaleProducts()) as ProductDetailType[];
     console.log("products response", response);
     if (response && response.length > 0) {
-
       //cast from ProductInfo to SimpleProductInfo
-      const castedProducts = response.map((item: ProductDetailType) =>
-      {
-        const imageDisplayed = item.images.length > 0 ? item.images[0] : ""
-        const castedItem: SimpleProductInfo = 
-        {
+      const castedProducts = response.map((item: ProductDetailType) => {
+        const imageDisplayed = item.images.length > 0 ? item.images[0] : "";
+        const castedItem: SimpleProductInfo = {
           _id: item._id,
           name: item.name,
           originalPrice: item.originalPrice,
           finalPrice: item.finalPrice,
           status: item.status,
           image: imageDisplayed,
-          shop: item.shop
-        }
+          shop: item.shop,
+        };
 
-        return castedItem
-      })
+        return castedItem;
+      });
       setProducts(castedProducts);
     }
   };
 
   return (
-    <>
-      <div className="w-full flex justify-center">
-        <div className="container">
-          <div className="invisible h-10 w-full"></div>
-          <CenterTitle
-            title={titleValue}
-            subTitle={subTitleValue}
-            isUppercase
-            background={titleBackground}
-          />
-          <div className="invisible h-5 w-full"></div>
-          <div className="h-full">
-            <div className="block">
-              {/* double level carousel */}
-              {/* <Carousel
+    <div className="w-full flex flex-col items-center">
+      <div className="invisible h-10 w-full"></div>
+      <CenterTitle
+        title={titleValue}
+        subTitle={subTitleValue}
+        isUppercase
+        background={titleBackground}
+      />
+      <div className="invisible h-5 w-full"></div>
+      <div className="container w-full">
+        <div className="h-full">
+          <div className="block">
+            {/* double level carousel */}
+            {/* <Carousel
                 style={{ maxHeight: undefined }}
                 className="h-full ml-10"
                 autoplay={true}
@@ -269,97 +266,96 @@ export default function HomeFlashSales({ notify }: HomeFlashSalesProps) {
                 {productDisplay()}
               </Carousel> */}
 
-              {/* single level carousel */}
-              {products.length < 7 ? (
-                <div className="px-10">
-                  <List
-                    grid={{
-                      gutter: 5,
-                      xs: 2,
-                      sm: 2,
-                      md: 4,
-                      lg: 5,
-                      xl: 6,
-                      xxl: 6,
-                    }}
-                    dataSource={products}
-                    locale={{
-                      emptyText: <CustomEmpty />,
-                    }}
-                    renderItem={(item: SimpleProductInfo) => (
-                      <List.Item>
-                        <SimpleProductCard
-                          info={item}
-                          imageWidth={cardImageWidth}
-                          imageHeight={cardImageHeight}
-                          notify={notify}
-                        />
-                      </List.Item>
-                    )}
-                  />
-                </div>
-              ) : (
-                <Carousel
-                  // autoplay
-                  // autoplaySpeed={5000}
-                  arrows
-                  prevArrow={<CarouselArrow direction="left" />}
-                  nextArrow={<CarouselArrow direction="right" />}
-                  slidesToShow={6}
-                  slidesToScroll={1}
-                  initialSlide={0}
-                  responsive={[
-                    {
-                      breakpoint: 1280,
-                      settings: {
-                        slidesToShow: 4,
-                        slidesToScroll: 1,
-                        infinite: true,
-                        dots: true,
-                      },
+            {/* single level carousel */}
+            {products.length < 7 ? (
+              <div className="px-10">
+                <List
+                  grid={{
+                    gutter: 5,
+                    xs: 2,
+                    sm: 2,
+                    md: 4,
+                    lg: 5,
+                    xl: 6,
+                    xxl: 6,
+                  }}
+                  dataSource={products}
+                  locale={{
+                    emptyText: <CustomEmpty />,
+                  }}
+                  renderItem={(item: SimpleProductInfo) => (
+                    <List.Item>
+                      <SimpleProductCard
+                        info={item}
+                        imageWidth={cardImageWidth}
+                        imageHeight={cardImageHeight}
+                        notify={notify}
+                      />
+                    </List.Item>
+                  )}
+                />
+              </div>
+            ) : (
+              <Carousel
+                // autoplay
+                // autoplaySpeed={5000}
+                arrows
+                prevArrow={<CarouselArrow direction="left" />}
+                nextArrow={<CarouselArrow direction="right" />}
+                slidesToShow={6}
+                slidesToScroll={1}
+                initialSlide={0}
+                responsive={[
+                  {
+                    breakpoint: 1280,
+                    settings: {
+                      slidesToShow: 4,
+                      slidesToScroll: 1,
+                      infinite: true,
+                      dots: true,
                     },
-                    {
-                      breakpoint: 1024,
-                      settings: {
-                        slidesToShow: 3,
-                        slidesToScroll: 1,
-                        infinite: true,
-                        dots: true,
-                      },
+                  },
+                  {
+                    breakpoint: 1024,
+                    settings: {
+                      slidesToShow: 3,
+                      slidesToScroll: 1,
+                      infinite: true,
+                      dots: true,
                     },
-                    {
-                      breakpoint: 768,
-                      settings: {
-                        slidesToShow: 2,
-                        slidesToScroll: 1,
-                        initialSlide: 1,
-                      },
+                  },
+                  {
+                    breakpoint: 768,
+                    settings: {
+                      slidesToShow: 2,
+                      slidesToScroll: 1,
+                      initialSlide: 1,
                     },
-                  ]}
-                >
-                  {products.length > 0 &&
-                    products.map((value, index) => (
-                      <div
-                        key={index}
-                        className="pl-5 text-black pt-5 h-72 flex flex-col items-center"
-                      >
-                        <SimpleProductCard
-                          info={value}
-                          imageWidth={cardImageWidth}
-                          imageHeight={cardImageHeight}
-                          notify={notify}
-                        />
-                      </div>
-                    ))}
-                </Carousel>
-              )}
+                  },
+                ]}
+              >
+                {products.length > 0 &&
+                  products.map((value, index) => (
+                    <div
+                      key={index}
+                      className="pl-5 text-black pt-5 h-72 flex flex-col items-center"
+                    >
+                      <SimpleProductCard
+                        info={value}
+                        imageWidth={cardImageWidth}
+                        imageHeight={cardImageHeight}
+                        notify={notify}
+                      />
+                    </div>
+                  ))}
+              </Carousel>
+            )}
 
-              {/* end */}
-            </div>
+            {/* end */}
           </div>
-          <div className="invisible h-20 w-full"></div>
         </div>
+        <div className="invisible h-20 w-full"></div>
       </div>
-    </>
+    </div>
   );
 }

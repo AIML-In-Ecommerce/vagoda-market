@@ -36,11 +36,11 @@ export default function HotCategory({}: HotCategoryProps) {
       let newList: SubCategoryType[] = [];
 
       // let data = [...response, ...response, ...response]; //for testing purposes
-      response.forEach((category: { subCategory: SubCategoryType }) => {
-        newList.push(category.subCategory);
+      response.forEach((category: SubCategoryType) => {
+        newList.push(category);
       });
 
-      // console.log("new category", newList);
+      console.log("new category", newList);
       setCategory(newList);
 
       setCurrentSlide(0);
@@ -254,7 +254,7 @@ export default function HotCategory({}: HotCategoryProps) {
 
   return (
     <div
-      className="mx-5"
+      className="mx-5 flex flex-col items-center"
       onMouseEnter={() => {
         onHoldingCallback();
       }}

@@ -154,14 +154,9 @@ function RecentlyAccess({ notify }: RecentlyAccessProps) {
   };
 
   return (
-    <div className="w-full">
+    <div className="w-full flex align-middle items-center">
       {products.length > 0 && (
-        <Flex
-          className="w-full py-4 container"
-          vertical
-          justify="center"
-          align="center"
-        >
+        <Flex className="w-full py-4" vertical justify="center" align="center">
           <CenterTitle
             title={titleValue}
             subTitle={subTitle}
@@ -173,47 +168,47 @@ function RecentlyAccess({ notify }: RecentlyAccessProps) {
           {mainDisplay}
         </Flex> */}
 
-          {/* <div className="ml-5 flex align-middle"> */}
-          {(products && (
-            <List
-              className="ml-10 w-full"
-              grid={{
-                // gutter: { xs: 0, xl: 30 },
-                gutter: 20,
-                xs: 2,
-                sm: 2,
-                md: 3,
-                lg: 4,
-                xl: 6,
-                xxl: 6,
-              }}
-              dataSource={products}
-              locale={{
-                emptyText: <CustomEmpty />,
-              }}
-              renderItem={(item, i) => (
-                <div key={i}>
-                  <List.Item>
-                    <div className="text-black" key={item._id}>
-                      <ProductItem
-                        _id={item._id}
-                        imageLink={item.image}
-                        name={item.name}
-                        rating={item.avgRating}
-                        soldAmount={item.soldQuantity}
-                        price={item.finalPrice}
-                        isFlashSale={item.isFlashSale}
-                        originalPrice={item.originalPrice}
-                        shop={item.shop}
-                        notify={notify}
-                      />
-                    </div>
-                  </List.Item>
-                </div>
-              )}
-            />
-          )) || <Skeleton active />}
-          {/* </div> */}
+          <div className="w-full">
+            {(products && (
+              <List
+                className="ml-10 w-full"
+                grid={{
+                  gutter: { xs: 0, xl: 10 },
+                  // gutter: 20,
+                  xs: 2,
+                  sm: 2,
+                  md: 3,
+                  lg: 4,
+                  xl: 6,
+                  xxl: 6,
+                }}
+                dataSource={products}
+                locale={{
+                  emptyText: <CustomEmpty />,
+                }}
+                renderItem={(item, i) => (
+                  <div key={i}>
+                    <List.Item>
+                      <div className="text-black" key={item._id}>
+                        <ProductItem
+                          _id={item._id}
+                          imageLink={item.image}
+                          name={item.name}
+                          rating={item.avgRating}
+                          soldAmount={item.soldQuantity}
+                          price={item.finalPrice}
+                          isFlashSale={item.isFlashSale}
+                          originalPrice={item.originalPrice}
+                          shop={item.shop}
+                          notify={notify}
+                        />
+                      </div>
+                    </List.Item>
+                  </div>
+                )}
+              />
+            )) || <Skeleton active />}
+          </div>
         </Flex>
       )}
     </div>

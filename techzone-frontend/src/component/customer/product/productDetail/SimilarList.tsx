@@ -34,10 +34,10 @@ export default function SimilarList(props: ListProps) {
   };
 
   return (
-    <div>
+    <div className="w-full">
       {(products && products.length > 0 && (
         <div>
-          {products.length < 4 ? (
+          {products.length < 6 ? (
             <div className="p-10">
               <List
                 grid={{
@@ -117,7 +117,7 @@ export default function SimilarList(props: ListProps) {
               {products.map((item, index) => (
                 <div
                   key={index}
-                  className="z-50 text-black pt-5 h-72 flex flex-col items-center"
+                  className="z-50 text-black pt-5 h-fit flex flex-col items-center"
                 >
                   <ProductItem
                     _id={item._id}
