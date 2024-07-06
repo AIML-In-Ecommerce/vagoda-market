@@ -36,4 +36,22 @@ export const ProductService = {
       };
     }
   },
+  get4SuggestedProducts: async (input: {
+    subCategories: string[];
+  }): Promise<_ProductType[]> => {
+    try {
+      const response: any = await ProductAPI.get4SuggestedProducts(input);
+
+      if (response.data && Array.isArray(response.data)) {
+        const formatedData: _ProductType[] = response.data;
+        return formatedData;
+      }
+
+      return [];
+    } catch (error) {
+      console.log("@SERVICE_get4SuggestedProducts: ", error);
+
+      return [];
+    }
+  },
 };
