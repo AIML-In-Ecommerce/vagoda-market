@@ -14,7 +14,7 @@ import { FaCartShopping } from "react-icons/fa6";
 import { RxPerson } from "react-icons/rx";
 import { TbBrandYoutubeFilled } from "react-icons/tb";
 import { TfiHeadphoneAlt } from "react-icons/tfi";
-import logo from "../../../public/asset/vagoda.png";
+import logo from "../../../public/asset/vagoda_1.png";
 import logo2 from "../../../public/asset/v.jpg";
 import Searchbar from "../Searchbar";
 import LanguageOption from "./LanguageOption";
@@ -187,6 +187,12 @@ export default function MainNavbar() {
               alt="Logo"
               onClick={() => router.push("/")}
             />
+            {/* <img
+              src={logo}
+              alt="Logo"
+              onClick={() => router.push("/")}
+              className="w-200 h-100"
+            /> */}
 
             <div className="flex space-x-2 items-center">
               <motion.div whileTap={{ scale: 0.9 }}>
@@ -247,7 +253,7 @@ export default function MainNavbar() {
                   <Image
                     src={logo}
                     alt="Logo"
-                    className="w-auto h-[45px] "
+                    className="w-auto h-[60px] "
                     onClick={() => router.push("/")}
                   />
                 </div>

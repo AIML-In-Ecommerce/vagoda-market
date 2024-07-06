@@ -11,8 +11,8 @@ interface RootLayoutProps {
 }
 
 export const metadata: Metadata = {
-  title: "Techzone seller",
-  description: "Seller center",
+  title: "Vagoda - Đẳng cấp thời trang, bứt phá giới hạn",
+  description: "Thời trang là phong cách, phong cách là bạn!",
 };
 
 export default function RootLayout({ children }: RootLayoutProps) {
