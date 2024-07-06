@@ -14,15 +14,15 @@ export type ProductType = {
 export type _ProductType = {
   _id: string;
   name: string;
-  image: string;
+  images: string[];
   avgRating: number;
   soldQuantity: number;
   finalPrice: number;
   originalPrice: number;
   isFlashSale: boolean;
-  // category: { id: string; name: string };
-  // subCategory: { id: string; name: string };
-  // subCategoryType: { id: string; name: string };
+  category: { _id: string; name: string };
+  subCategory: { _id: string; name: string };
+  subCategoryType: { _id: string; name: string };
   shop: string;
 };
 

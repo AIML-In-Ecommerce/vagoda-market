@@ -1,4 +1,3 @@
-import { FilterCriteria } from "./shop/ShopProductList";
 import { _ProductType } from "@/model/ProductType";
 import {
   Button,
@@ -10,6 +9,7 @@ import {
   Skeleton,
   Space,
 } from "antd";
+import { FilterCriteria } from "./shop/ShopProductList";
 
 import { useSearchParams } from "next/navigation";
 import { ReactElement, useEffect, useState } from "react";
@@ -297,7 +297,7 @@ export default function ProductItemList(props: ProductListProps) {
                   soldAmount={product.soldQuantity}
                   price={product.finalPrice}
                   isFlashSale={true}
-                  imageLink={product.image}
+                  imageLink={product.images[0]}
                   originalPrice={product.originalPrice}
                   shop={product.shop}
                   notify={props.notify}

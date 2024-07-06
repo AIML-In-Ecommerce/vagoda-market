@@ -63,9 +63,9 @@ const StatisticsAPIs = {
 
   async getRecentProductsByAuthUser(
     userId: string,
-    startTime: Date | number | undefined,
-    endTime: Date | number | undefined,
-    accessType: string
+    startTime?: Date | number | undefined,
+    endTime?: Date | number | undefined,
+    accessType?: string
   ) {
     const publicAPIURL = process.env.NEXT_PUBLIC_GATEWAY_PREFIX;
     const url = `${publicAPIURL}/statistics/access/buyer/product`;
