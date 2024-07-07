@@ -1,5 +1,5 @@
 "use client";
-import { Button, Card, Empty, Skeleton, Space } from "antd";
+import { Button, Card, Empty, Modal, Skeleton, Space } from "antd";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { FaPlus } from "react-icons/fa6"
 import { useRouter } from "next/navigation"
@@ -29,6 +29,24 @@ export default function ShippingAddressPage() {
     const [isEditMode, setIsEditMode] = useState<boolean>(false);
     const [currentAddress, setCurrentAddress] = useState<ShippingAddress>(initialAddress);
     const [loading, setLoading] = useState<boolean>(false);
+    const [openDeleteModal, setOpenDeleteModal] = useState<boolean>(false);
+
+    const handleOpenDeleteModal = (addressId: string) => {
+        const current = address.find(item => item._id === addressId);
+        if (current) {
+            setCurrentAddress(current);
+            setOpenDeleteModal(true);
+        }
+    }
+
+    const handleCancelDeleteModal = () => {
+        setOpenDeleteModal(false);
+    }
+    
+    const handleOKDeleteModal = async (addressId: string) => {
+        await handleRemoveShippingAddress(addressId);
+        setOpenDeleteModal(false);
+    }
 
     const componentRef = useRef<HTMLDivElement | null>(null);
     const router = useRouter();
@@ -54,54 +72,11 @@ export default function ShippingAddressPage() {
     }, [formVisibility])
 
     const fetchAddress = async () => {
-        // const userAddresses: ShippingAddress[] = [
-        //     {
-        //         _id: '1',
-        //         receiverName: 'Nguyễn Minh Quang',
-        //         address: {
-        //             street: "135B Trần Hưng Đạo",
-        //             idProvince: "79",
-        //             idDistrict: "760",
-        //             idCommune: "26752",
-        //             country: "Việt Nam"
-        //         },
-        //         phoneNumber: "0839994856",
-        //         ShippingAddress: "HOME",
-        //         selectedAsDefault: true
-        //     },
-        //     {
-        //         _id: '2',
-        //         receiverName: 'Nguyễn Minh Quang',
-        //         address: {
-        //             street: "227 Nguyễn Văn Cừ",
-        //             idProvince: "79",
-        //             idDistrict: "774",
-        //             idCommune: "27301",
-        //             country: "Việt Nam"
-        //         },
-        //         phoneNumber: "0839994856",
-        //         ShippingAddress: "OFFICE",
-        //         selectedAsDefault: false
-        //     },
-        //     {
-        //         _id: '3',
-        //         receiverName: 'Lê Hoàng Khanh Nguyên',
-        //         address: {
-        //             street: "106, Phạm Viết Chánh",
-        //             idProvince: "79",
-        //             idDistrict: "760",
-        //             idCommune: "26758",
-        //             country: "Việt Nam"
-        //         },
-        //         phoneNumber: "0773969851",
-        //         ShippingAddress: "OFFICE",
-        //         selectedAsDefault: false
-        //     },
-        // ]
         setLoading(true);
-        
         const data = (await GET_getUserShippingAddress(context.userInfo?._id as string)).data!;
-        setAddress(data);
+        //sort by isDefault address
+        const sortData = data.sort((a, b) => Number(b.isDefault) - Number(a.isDefault));
+        setAddress(sortData);
         setLoading(false);
     }
 
@@ -115,7 +90,6 @@ export default function ShippingAddressPage() {
                     { ...item, isDefault: false } as ShippingAddress);
             }
         });
-
     }
 
     const handleCreateShippingAddress = async (_address: ShippingAddress | undefined) => {
@@ -133,6 +107,9 @@ export default function ShippingAddressPage() {
         if (!_address) return;
 
         await PUT_updateUserShippingAddress(context.userInfo?._id as string, _address);
+        if (_address.isDefault) {
+            handleSetDefaultShippingAddress(_address);
+        }
         await fetchAddress();
     }
 
@@ -200,7 +177,7 @@ export default function ShippingAddressPage() {
                                                 {
                                                     item.isDefault ? null :
                                                         <Button className="bg-red-400 text-white border font-medium"
-                                                            onClick={() => handleRemoveShippingAddress(item._id)}>Xóa</Button>
+                                                            onClick={() => handleOpenDeleteModal(item._id)}>Xóa</Button>
                                                 }
                                             </div>
                                         </div>
@@ -237,6 +214,21 @@ export default function ShippingAddressPage() {
                     }
                 </div>
             </div>
+            <Modal
+                width={400}
+                open={openDeleteModal}
+                onCancel={handleCancelDeleteModal}
+                title={<span className="text-xl">Xóa địa chỉ</span>}
+                footer={() => (
+                    <>
+                        <Button key="cancel" onClick={handleCancelDeleteModal}>Hủy</Button>,
+                        <Button key="ok" type="primary" onClick={() => handleOKDeleteModal(currentAddress?._id)} danger>Xóa</Button>
+                    </>
+                )}
+                centered
+            >
+                Bạn có muốn xóa địa chỉ này khỏi danh sách không?
+            </Modal>
         </React.Fragment>
     )
 }

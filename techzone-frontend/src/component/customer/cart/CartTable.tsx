@@ -7,6 +7,7 @@ import { Button, Modal, Image, Select, Skeleton, Space, Table, TableColumnsType 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { useContext, useEffect, useMemo, useState } from 'react'
+import { BsShop } from 'react-icons/bs';
 import { FaRegTrashCan } from 'react-icons/fa6';
 import styled from 'styled-components';
 
@@ -225,8 +226,13 @@ export default function CartTable(props: CartTableProps) {
                                 <div className="flex flex-col gap-1">
                                     <div className="text-sm font-bold cursor-pointer hover:text-sky-500 text-ellipsis overflow-hidden"
                                         onClick={() => navigateToProductDetail(record._id)}>{record.name}</div>
+                                    {/* <div className="flex flex-row items-center gap-2 text-sm text-gray-500 mb-1">
+                                        <BsShop />
+                                        <div>{record.shop}</div>
+                                    </div> */}
                                     <div className="text-sm text-gray-500 mb-1">
-                                        {record.color?.color.label.toUpperCase() ?? ""} {record.size ? "/" : ""} {record.size ? record.size.toUpperCase() : ""}</div>
+                                        {record.color?.color.label.toUpperCase() ?? ""} {record.size ? "/" : ""} {record.size ? record.size.toUpperCase() : ""}
+                                    </div>
                                     <SelectWrapper className="flex flex-row gap-2 mb-1">
                                         {
                                             (record.attribute.colors && record.attribute.colors.length !== 0) ? (
