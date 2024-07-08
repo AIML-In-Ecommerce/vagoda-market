@@ -303,6 +303,18 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
   const [extendedMessage, setExtendedMessage] = useState<ToolType>();
   const [aiState, setAiState] = useState<AIState>("RESPONSED");
   const [inputType, setInputType] = useState<InputType>("KEYBOARD");
+  const buttonRef = useRef<HTMLDivElement>(null);
+  const userInputRef = useRef<string>("");
+
+  const sendClick = () => {
+    if (buttonRef.current) {
+      buttonRef.current.click();
+    }
+  };
+
+  const setUserInputRef = (transcript: string) => {
+    userInputRef.current = transcript;
+  };
 
   const ref = useRef(null);
   useEffect(() => {
@@ -622,11 +634,12 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
   }
 
   const handleSendButtonOnClick = async () => {
-    if (userInput == undefined) {
-      return;
-    }
+    // if (userInput == undefined) {
+    //   return;
+    // }
 
     console.log("User Input: ", userInput);
+    console.log("User Input Ref: ", userInputRef.current);
 
     const message: AssistantMessageProps = {
       role: AssistantMessageTypes.User,
@@ -634,6 +647,12 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
       type: "text",
       data: [],
     };
+
+    if (userInputRef.current != "") {
+      message.message = userInputRef.current as string;
+    } else {
+      message.message = userInput as string;
+    }
 
     const history_conservation = [...messages];
 
@@ -825,6 +844,7 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
               />
               <div
                 className="p-2 rounded-xl hover:bg-slate-200 cursor-pointer"
+                ref={buttonRef}
                 onClick={() => setInputType("VOICE")}
               >
                 <FiMic />
@@ -847,6 +867,7 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
           setInputType={setInputType}
           setUserInput={setUserInput}
           handleSendButtonOnClick={handleSendButtonOnClick}
+          setUserInputRef={setUserInputRef}
         />
       )}
     </>

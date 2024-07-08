@@ -7,6 +7,7 @@ interface VocieChatProps {
   setInputType(type: InputType): void;
   setUserInput(transcript: string): void;
   handleSendButtonOnClick(): void;
+  setUserInputRef(transcript: string): void;
 }
 
 const VoiceChat: React.FC<VocieChatProps> = (props) => {
@@ -75,11 +76,12 @@ const VoiceChat: React.FC<VocieChatProps> = (props) => {
     if (isListening) {
       recognitionRef.current?.stop();
       props.setUserInput(transcript);
+      props.setUserInputRef(transcript);
       setTimeout(() => {
         props.setInputType("KEYBOARD");
-        setTranscript("");
         props.handleSendButtonOnClick();
         onClose();
+        setTranscript("");
       }, 1000);
     } else {
       setTranscript("");
