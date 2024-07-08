@@ -42,6 +42,8 @@ import BarChart from "./utils/Chart/BarChar";
 import PieChart from "./utils/Chart/PieChart";
 import "../../custom_css/Loader.css";
 import InfiniteCart from "./utils/InfiniteCart";
+import { SimpleUserInfoType } from "@/model/UserInfoType";
+const authLocalStorageID = "#auth-context-user-info-record-ID";
 
 interface AIAssistantFloatButtonProps {}
 
@@ -306,6 +308,17 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
   //ref: https://stackoverflow.com/questions/37620694/how-to-scroll-to-bottom-in-react
   const messageEndRef = useRef<null | HTMLDivElement>(null);
   const extendMessagesEndRef = useRef<null | HTMLDivElement>(null);
+
+  function initLoading() {
+    const storageInfo = localStorage.getItem(authLocalStorageID);
+    if (storageInfo != null) {
+      return JSON.parse(storageInfo) as SimpleUserInfoType;
+    } else {
+      return null;
+    }
+  }
+
+  const userInfo = initLoading();
 
   const greetingLottie = (
     <lottie-player
@@ -616,11 +629,15 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
 
     const history_conservation = [...messages];
 
+    console.log("History: ", history_conservation);
+
     setUserInput(undefined);
+
+    let prompt = "USER_ID " + " " + userInfo?._id + ": " + message.message;
 
     const postBody = {
       history_conservation: history_conservation,
-      prompt: message.message,
+      prompt: prompt,
     };
     console.log("PostBody: ", postBody);
 
@@ -650,6 +667,7 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
           message = rawResponse.data.data;
         } else {
           let response = JSON.parse(rawResponse.data.data);
+          console.log("Valid Response Data");
 
           message = response.message != undefined ? response.message : "";
           type = response.type != undefined ? response.type : "";
@@ -670,7 +688,7 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
         setAiState("RESPONSED");
 
         if (localStorage) {
-          const stringifiedMessages = JSON.stringify(history_conservation);
+          const stringifiedMessages = JSON.stringify(newResponseMessages);
           localStorage.setItem(
             AIAssistantLocalStorageKeyword,
             stringifiedMessages,
