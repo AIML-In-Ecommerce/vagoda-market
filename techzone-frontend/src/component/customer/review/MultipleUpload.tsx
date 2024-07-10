@@ -58,19 +58,30 @@ export default function MultipleUpload(props: MultipleUploadProps) {
     props.setAsset(newUrls);
   }, [props.fileList]);
 
+  // const dummyRequest = async (options: any) => {
+  //   setTimeout(() => {
+  //     options.onSuccess("ok");
+  //   }, 0);
+  // };
+
   return (
     <div className="max-w-[800px]">
       <Upload
+        // action="https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload"
+        // customRequest={dummyRequest}
+        accept="image/png, image/jpeg"
         name="avatar"
         listType="picture-card"
         showUploadList={true}
-        beforeUpload={beforeUpload}
+        // beforeUpload={beforeUpload}
+        beforeUpload={() => false}
         onChange={handleChange}
         onRemove={(file) =>
           props.setFileList(props.fileList.filter((f) => f !== file))
         }
         fileList={props.fileList}
         onPreview={handlePreview}
+        // maxCount={10}
       >
         {props.fileList.length >= 10 ? null : uploadButton}
       </Upload>
@@ -108,5 +119,6 @@ export const beforeUpload = (file: FileType) => {
   if (!isLt2M) {
     message.error("Image must smaller than 2MB!");
   }
+  message.success(isJpgOrPng && isLt2M);
   return isJpgOrPng && isLt2M;
 };

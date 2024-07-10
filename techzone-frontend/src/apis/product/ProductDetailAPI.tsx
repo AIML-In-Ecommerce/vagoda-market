@@ -213,7 +213,7 @@ export async function POST_GetProductListByShop(shopId: string) {
     // console.log(url);
     const response = await axios.post(
       url,
-      { shop: shopId }
+      { shopId: shopId }
       // {
       //   headers: {
       //     Authorization: `Bearer ${auth.user?.access_token}`,

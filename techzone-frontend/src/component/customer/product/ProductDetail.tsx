@@ -360,7 +360,7 @@ export default function ProductDetail(props: ProductDetailProps) {
   };
 
   return (
-    <div className="bg-white px-2 lg:px-24 ">
+    <div className="bg-slate-50 px-2 lg:px-24 ">
       {(product && (
         <div className="justify-between pb-10 gap-5 h-fit overflow-hidden relative">
           <div className="">

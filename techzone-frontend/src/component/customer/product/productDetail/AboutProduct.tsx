@@ -108,7 +108,7 @@ export default function AboutProduct(props: AboutProductProps) {
     return Math.round(
       ((props.product.originalPrice - props.product.finalPrice) /
         props.product.originalPrice) *
-        100,
+        100
     );
   }, [props.product]);
 
@@ -156,7 +156,7 @@ export default function AboutProduct(props: AboutProductProps) {
               {priceIndex(props.product.finalPrice)}
             </div>
           </div>
-        </div>,
+        </div>
       );
 
       const sessionId =
@@ -170,7 +170,7 @@ export default function AboutProduct(props: AboutProductProps) {
         sessionId,
         props.product._id,
         props.product.shop,
-        accessType,
+        accessType
       );
     } else {
       props.notify("Thêm sản phẩm thất bại... Hãy thử lại sau!", <></>);
@@ -179,7 +179,7 @@ export default function AboutProduct(props: AboutProductProps) {
   };
 
   return (
-    <div className="bg-white flex lg:flex-row flex-col my-5 lg:max-h-[450px] xl:max-h-[550px] overflow-y-clip">
+    <div className="bg-slate-50 flex lg:flex-row flex-col my-5 lg:max-h-[450px] xl:max-h-[550px] overflow-y-clip">
       {/* about product */}
       <Flex>
         <div
@@ -246,7 +246,7 @@ export default function AboutProduct(props: AboutProductProps) {
           )}
         </div>
 
-        <div className="bg-white h-fit z-50">
+        <div className="bg-slate-50 h-fit z-50">
           <AntdImage
             width={20}
             src="https://cdn.icon-icons.com/icons2/1372/PNG/512/resize-3_91066.png"
@@ -394,7 +394,7 @@ export default function AboutProduct(props: AboutProductProps) {
           {/* attributes block */}
           {colorOptions && colorOptions.length > 0 && (
             <div id="color block">
-              <div className="flex text-xs gap-1">
+              <div className="flex text-xs gap-1 overflow-x-auto">
                 <div>Màu sắc: </div>
                 {props.selectedColorOption &&
                   props.selectedColorOption.color && (
@@ -404,7 +404,7 @@ export default function AboutProduct(props: AboutProductProps) {
                   )}
               </div>
 
-              <Flex gap="4px">
+              <Flex gap="4px" className="overflow-x-auto">
                 {colorOptions.map((color, index) => (
                   <div
                     key={index}

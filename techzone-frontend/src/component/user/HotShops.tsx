@@ -286,24 +286,26 @@ function HotShops({}: HotShopsProps) {
 
   return (
     <>
-      <Flex
-        className="constain w-full"
-        vertical
-        justify="center"
-        align="center"
-      >
-        <CenterTitle
-          title={titleValue}
-          isUppercase={true}
-          subTitle={subTitleValue}
-          background="bg-[#F2F2F2]"
-        />
-        <div className="invisible h-4 w-full"></div>
-        <Flex className="container w-full py-4" vertical>
-          {mainDisplay}
+      {shops.length > 0 && (
+        <Flex
+          className="constain w-full"
+          vertical
+          justify="center"
+          align="center"
+        >
+          <CenterTitle
+            title={titleValue}
+            isUppercase={true}
+            subTitle={subTitleValue}
+            background="bg-[#F2F2F2]"
+          />
+          <div className="invisible h-4 w-full"></div>
+          <Flex className="container w-full py-4" vertical>
+            {mainDisplay}
+          </Flex>
+          <div className="invisible h-10 w-full"></div>
         </Flex>
-        <div className="invisible h-10 w-full"></div>
-      </Flex>
+      )}
     </>
   );
 }

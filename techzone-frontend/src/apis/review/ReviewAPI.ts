@@ -121,53 +121,53 @@ export async function POST_CreateReview(props: RawReviewType) {
 
       // return await timeoutCreateReview(url, pathResponse, props);
 
-      await setTimeout(async () => {
-        if (
-          pathResponse.status == 200 &&
-          pathResponse.data &&
-          pathResponse.data.length === props.asset.length
-        ) {
-          // console.log(url);
-          const requestBody = {
-            product: props.product,
-            user: props.user, //user id
-            rating: props.rating,
-            content: props.content, //desc
-            // asset: props.asset, //image urls
-            asset: pathResponse.data, //image urls
-            createdAt: props.createdAt,
-            conversation: props.conversation,
-            like: props.like,
+      // await setTimeout(async () => {
+      if (
+        pathResponse.status == 200 &&
+        pathResponse.data &&
+        pathResponse.data.length === props.asset.length
+      ) {
+        // console.log(url);
+        const requestBody = {
+          product: props.product,
+          user: props.user, //user id
+          rating: props.rating,
+          content: props.content, //desc
+          // asset: props.asset, //image urls
+          asset: pathResponse.data, //image urls
+          createdAt: props.createdAt,
+          conversation: props.conversation,
+          like: props.like,
+        };
+
+        const response = await axios.post(url, requestBody);
+        const responseData: ReviewResponse = response.data;
+
+        if (responseData.status == 200) {
+          await PUT_UpdateProductRating(props.product);
+
+          return {
+            isDenied: false,
+            message: "Create review successfully",
+            status: responseData.status,
+            data: responseData.data,
           };
-
-          const response = await axios.post(url, requestBody);
-          const responseData: ReviewResponse = response.data;
-
-          if (responseData.status == 200) {
-            await PUT_UpdateProductRating(props.product);
-
-            return {
-              isDenied: false,
-              message: "Create review successfully",
-              status: responseData.status,
-              data: responseData.data,
-            };
-          } else {
-            return {
-              isDenied: true,
-              message: "Failed to create review",
-              status: responseData.status,
-              data: responseData.data,
-            };
-          }
-        } else
+        } else {
           return {
             isDenied: true,
             message: "Failed to create review",
-            status: 500,
-            data: undefined,
+            status: responseData.status,
+            data: responseData.data,
           };
-      }, 2000);
+        }
+      } else
+        return {
+          isDenied: true,
+          message: "Failed to create review",
+          status: 500,
+          data: undefined,
+        };
+      // }, 6000);
     } else {
       const requestBody = {
         product: props.product,
