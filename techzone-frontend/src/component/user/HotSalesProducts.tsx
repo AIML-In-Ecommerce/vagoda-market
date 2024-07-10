@@ -245,8 +245,8 @@ export default function HotSalesProducts({
   };
 
   return (
-    <>
-      <div className="w-full flex flex-col justify-center items-center py-4">
+    <div className="w-full flex items-center align-middle justify-center py-4">
+      {products.length > 0 && (
         <Flex vertical className="w-full" justify="center" align="center">
           <CenterTitle
             title={titleValue}
@@ -267,7 +267,7 @@ export default function HotSalesProducts({
           <div className="invisible h-10 w-full"></div> */}
 
           {(products && (
-            <div className="w-full flex flex-col items-center">
+            <div className="w-full flex flex-col align-middle">
               <List
                 className="w-full"
                 // pagination={{
@@ -288,7 +288,8 @@ export default function HotSalesProducts({
                 //     `${range[0]} - ${range[1]} trên tổng ${total} đánh giá`,
                 // }}
                 grid={{
-                  gutter: { sm: 0, lg: 100, xl: 10 },
+                  // gutter: { sm: 0, lg: 100, xl: 10 },
+                  gutter: { xs: 0, xl: 10 },
                   xs: 2,
                   sm: 2,
                   md: 3,
@@ -304,7 +305,7 @@ export default function HotSalesProducts({
                 renderItem={(value, i) => (
                   <div key={i}>
                     <List.Item>
-                      <div className="text-black my-3" key={value._id}>
+                      <div className="text-black my-3 mx-10" key={value._id}>
                         <ProductItem
                           _id={value._id}
                           imageLink={value.imageLink}
@@ -331,7 +332,7 @@ export default function HotSalesProducts({
 
           <div className="invisible h-16 w-full"></div>
         </Flex>
-      </div>
-    </>
+      )}
+    </div>
   );
 }

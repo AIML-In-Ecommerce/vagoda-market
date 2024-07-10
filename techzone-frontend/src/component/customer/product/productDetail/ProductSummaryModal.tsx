@@ -139,7 +139,9 @@ const ProductSummaryModal = (modalData: ModalProps) => {
 
         <div className="bg-white border-2 rounded-xl max-w-1/4 h-fit p-4 grid grid-cols-4">
           <div className="col-span-1 col-start-1">
-            {mainProduct?.name.substring(0, 20)}
+            {mainProduct && mainProduct.name.length > 10
+              ? mainProduct?.name.substring(0, 10) + "..."
+              : mainProduct?.name}
           </div>
           <div className="col-span-1 col-start-2">
             {priceIndex(modalData.mainProductPrice)}

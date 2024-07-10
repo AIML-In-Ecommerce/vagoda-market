@@ -117,7 +117,9 @@ export async function POST_addUserShippingAddress(userId: string, shippingAddres
             return { isDenied: true, message: "Unauthenticated", status: 403, data: undefined }
         }
         if (response.status === 200) {
-            return { isDenied: false, message: response.statusText, status: response.status, data: response.data }
+            const ResponseData = response.data;
+            const addressList: ShippingAddress[] = ResponseData.data;
+            return { isDenied: false, message: response.statusText, status: response.status, data: addressList }
         }
         else {
             return { isDenied: true, message: response.statusText, status: response.status, data: undefined }
@@ -159,7 +161,7 @@ export async function PUT_updateUserShippingAddress(userId: string, shippingAddr
 }
 
 export async function DELETE_removeUserShippingAddress(userId: string, _id: string) {
-    const url = `${GATEWAY_PREFIX}/user/shipping_address?userId=${userId}&targetId=${_id}`;
+    const url = `${GATEWAY_PREFIX}/user_info/shipping_address?userId=${userId}&targetId=${_id}`;
     try {
         const response = await axios.delete(url);
         if (userId === null) {

@@ -40,3 +40,12 @@
     transform: translateY(-6px);
   }
 }
+
+.markdown a {
+  color: rgb(55, 48, 48) !important;
+  font-weight: 600;
+}
+
+.markdown a:hover {
+  text-decoration: underline;
+}

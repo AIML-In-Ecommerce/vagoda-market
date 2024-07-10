@@ -128,22 +128,7 @@ function RecentlyAccess({ notify }: RecentlyAccessProps) {
       );
       console.log("products", response);
       if (response && response.length > 0) {
-        const data: _ProductType[] = response.map(
-          (value: ProductDetailType) => {
-            const mapItem: _ProductType = {
-              _id: value._id,
-              name: value.name,
-              image: value.images[0],
-              avgRating: value.avgRating,
-              soldQuantity: value.soldQuantity,
-              finalPrice: value.finalPrice,
-              originalPrice: value.originalPrice,
-              isFlashSale: value.isFlashSale,
-              shop: value.shop,
-            };
-            return mapItem;
-          }
-        );
+        const data: _ProductType[] = response;
 
         data.splice(6);
 
@@ -179,7 +164,7 @@ function RecentlyAccess({ notify }: RecentlyAccessProps) {
                   sm: 2,
                   md: 3,
                   lg: 4,
-                  xl: 6,
+                  xl: 5,
                   xxl: 6,
                 }}
                 dataSource={products}
@@ -192,7 +177,7 @@ function RecentlyAccess({ notify }: RecentlyAccessProps) {
                       <div className="text-black" key={item._id}>
                         <ProductItem
                           _id={item._id}
-                          imageLink={item.image}
+                          imageLink={item.images[0]}
                           name={item.name}
                           rating={item.avgRating}
                           soldAmount={item.soldQuantity}

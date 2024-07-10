@@ -42,6 +42,9 @@ import BarChart from "./utils/Chart/BarChar";
 import PieChart from "./utils/Chart/PieChart";
 import "../../custom_css/Loader.css";
 import InfiniteCart from "./utils/InfiniteCart";
+import { SimpleUserInfoType } from "@/model/UserInfoType";
+import VoiceChat from "./utils/VoiceChat";
+const authLocalStorageID = "#auth-context-user-info-record-ID";
 
 interface AIAssistantFloatButtonProps {}
 
@@ -49,6 +52,8 @@ enum AssistantMessageTypes {
   User = "User",
   Assistant = "Assistant",
 }
+
+type InputType = "VOICE" | "KEYBOARD";
 
 type ToolType =
   | "product_getter"
@@ -297,6 +302,19 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
   const [userInput, setUserInput] = useState<string | undefined>(undefined);
   const [extendedMessage, setExtendedMessage] = useState<ToolType>();
   const [aiState, setAiState] = useState<AIState>("RESPONSED");
+  const [inputType, setInputType] = useState<InputType>("KEYBOARD");
+  const buttonRef = useRef<HTMLDivElement>(null);
+  const userInputRef = useRef<string>("");
+
+  const sendClick = () => {
+    if (buttonRef.current) {
+      buttonRef.current.click();
+    }
+  };
+
+  const setUserInputRef = (transcript: string) => {
+    userInputRef.current = transcript;
+  };
 
   const ref = useRef(null);
   useEffect(() => {
@@ -306,6 +324,17 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
   //ref: https://stackoverflow.com/questions/37620694/how-to-scroll-to-bottom-in-react
   const messageEndRef = useRef<null | HTMLDivElement>(null);
   const extendMessagesEndRef = useRef<null | HTMLDivElement>(null);
+
+  function initLoading() {
+    const storageInfo = localStorage.getItem(authLocalStorageID);
+    if (storageInfo != null) {
+      return JSON.parse(storageInfo) as SimpleUserInfoType;
+    } else {
+      return null;
+    }
+  }
+
+  const userInfo = initLoading();
 
   const greetingLottie = (
     <lottie-player
@@ -515,9 +544,11 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
                   <Typography.Text className="text-amber-900 text-sm font-semibold mb-1">
                     Trợ lý AI
                   </Typography.Text>
-                  <ReactMarkdown className="text-wrap text-sm text-black pb-2">
-                    {message.message}
-                  </ReactMarkdown>
+                  <div className="markdown">
+                    <ReactMarkdown className="text-wrap text-sm text-black pb-2">
+                      {message.message}
+                    </ReactMarkdown>
+                  </div>
                 </Flex>
               </Tag>
             </Flex>
@@ -603,9 +634,12 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
   }
 
   const handleSendButtonOnClick = async () => {
-    if (userInput == undefined) {
-      return;
-    }
+    // if (userInput == undefined) {
+    //   return;
+    // }
+
+    console.log("User Input: ", userInput);
+    console.log("User Input Ref: ", userInputRef.current);
 
     const message: AssistantMessageProps = {
       role: AssistantMessageTypes.User,
@@ -614,13 +648,23 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
       data: [],
     };
 
+    if (userInputRef.current != "") {
+      message.message = userInputRef.current as string;
+    } else {
+      message.message = userInput as string;
+    }
+
     const history_conservation = [...messages];
+
+    console.log("History: ", history_conservation);
 
     setUserInput(undefined);
 
+    let prompt = "USER_ID " + " " + userInfo?._id + ": " + message.message;
+
     const postBody = {
       history_conservation: history_conservation,
-      prompt: message.message,
+      prompt: prompt,
     };
     console.log("PostBody: ", postBody);
 
@@ -650,6 +694,7 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
           message = rawResponse.data.data;
         } else {
           let response = JSON.parse(rawResponse.data.data);
+          console.log("Valid Response Data");
 
           message = response.message != undefined ? response.message : "";
           type = response.type != undefined ? response.type : "";
@@ -670,7 +715,7 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
         setAiState("RESPONSED");
 
         if (localStorage) {
-          const stringifiedMessages = JSON.stringify(history_conservation);
+          const stringifiedMessages = JSON.stringify(newResponseMessages);
           localStorage.setItem(
             AIAssistantLocalStorageKeyword,
             stringifiedMessages,
@@ -777,40 +822,54 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
 
   const CardActions = (
     <>
-      <div className="w-full h-full">
-        {/* <div className="relative h-10 w-full"></div> */}
-        <Flex
-          className="w-full absolute bottom-0 left-0 px-5"
-          justify="center"
-          align="end"
-          gap={4}
-        >
-          <div className="w-full flex flex-row justify-center items-center border rounded-xl ">
-            <TextArea
-              className="w-full max-h-96 overflow-y-auto border-none rounded-xl"
-              autoSize={true}
-              value={userInput}
-              placeholder="Nhập nội dung cần hỗ trợ"
-              onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
-                setUserInput(e.target.value)
-              }
-              onKeyPress={handleKeyPress}
-            />
-            <div className="p-2 rounded-xl hover:bg-slate-200 cursor-pointer">
-              <FiMic />
-            </div>
-          </div>
-          {/* <Input className="w-full" multiple={true} value={userInput} onChange={(e: ChangeEvent<HTMLInputElement>) => setUserInput(e.target.value)}/> */}
-          <Button
-            disabled={isSendButtonDisabled}
-            className={SendButtonStyle}
-            onClick={(e) => handleSendButtonOnClick()}
-            type="default"
+      {inputType == "KEYBOARD" ? (
+        <div className="w-full h-full">
+          {/* <div className="relative h-10 w-full"></div> */}
+          <Flex
+            className="w-full absolute bottom-0 left-0 px-5"
+            justify="center"
+            align="end"
+            gap={4}
           >
-            <LuSendHorizonal className="font-light" />
-          </Button>
-        </Flex>
-      </div>
+            <div className="w-full flex flex-row justify-center items-center border rounded-xl ">
+              <TextArea
+                className="w-full max-h-96 overflow-y-auto border-none rounded-xl"
+                autoSize={true}
+                value={userInput}
+                placeholder="Nhập nội dung cần hỗ trợ"
+                onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
+                  setUserInput(e.target.value)
+                }
+                onKeyPress={handleKeyPress}
+              />
+              <div
+                className="p-2 rounded-xl hover:bg-slate-200 cursor-pointer"
+                ref={buttonRef}
+                onClick={() => setInputType("VOICE")}
+              >
+                <FiMic />
+              </div>
+            </div>
+
+            {/* <Input className="w-full" multiple={true} value={userInput} onChange={(e: ChangeEvent<HTMLInputElement>) => setUserInput(e.target.value)}/> */}
+            <Button
+              disabled={isSendButtonDisabled}
+              className={SendButtonStyle}
+              onClick={(e) => handleSendButtonOnClick()}
+              type="default"
+            >
+              <LuSendHorizonal className="font-light" />
+            </Button>
+          </Flex>
+        </div>
+      ) : (
+        <VoiceChat
+          setInputType={setInputType}
+          setUserInput={setUserInput}
+          handleSendButtonOnClick={handleSendButtonOnClick}
+          setUserInputRef={setUserInputRef}
+        />
+      )}
     </>
   );
 
@@ -972,7 +1031,7 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
                             <Typography.Text className="text-amber-900 text-sm font-semibold mb-1">
                               Trợ lý AI
                             </Typography.Text>
-                            <span className="loader p-3 mr-[12px] mb-2"></span>
+                            <span className="progress p-3 mr-[12px] mb-2"></span>
                           </Flex>
                         </Tag>
                       </Flex>
