@@ -73,6 +73,7 @@ const displayOrderStatusLabel = (status: OrderStatusType) => {
 }
 
 export default function OrderInfoComponent(props: OrderInfoComponentProps) {
+    
     const router = useRouter();
     const [shopInfos, setShopInfos] = useState<ShopInfo[]>();
     const [loading, setLoading] = useState<boolean>(true);
@@ -145,7 +146,7 @@ export default function OrderInfoComponent(props: OrderInfoComponentProps) {
                             <Meta avatar=
                                 {
                                     <div className="relative border-1 border-slate-100">
-                                        <Image preview={false} width={60} height={60} src={product.images[0]} />
+                                        <Image preview={false} width={60} height={60} src={product.images ? product.images[0] : ""} />
                                         <div className="absolute right-0 top-2/3 bg-slate-200 p-2 rounded-l-xl font-semibold">x{product.quantity}</div>
                                     </div>
 

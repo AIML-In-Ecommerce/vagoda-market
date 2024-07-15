@@ -70,7 +70,7 @@ type ShopInfo = {
 
 type PromotionDisplay = {
     shopInfo: ShopInfo,
-    promotions: Promotion[]
+    promotions: PromotionType[]
 }
 
 export default function CartPage() {
@@ -106,8 +106,8 @@ export default function CartPage() {
     }
 
     const fetchShopInfos = (products: CartItem[]) => {
-        const shopInfosList: ShopInfo[] = [];
-        const shopIdList: string[] = [];
+        const shopInfosList: ShopInfo[] = [] as ShopInfo[];
+        const shopIdList: string[] = [] as string[];
         products.forEach(async (product: CartItem) => {
             if (!shopIdList.includes(product.shop)) {
                 shopIdList.push(product.shop);
@@ -124,12 +124,12 @@ export default function CartPage() {
     }
 
     const handleShowPromotionModal = async () => {
-        if (shopInfos) {
-            await fetchPromotions(shopInfos);
-        }
         setShowPromotionModal(true);
     }
 
+    const handleOKPromotionModal = () => {
+        setShowPromotionModal(false);
+    }
     const handleCancelPromotionModal = () => {
         setShowPromotionModal(false);
     }
@@ -172,11 +172,10 @@ export default function CartPage() {
         }
     }
 
-    const fetchPromotions = async (shopInfos: ShopInfo[]) => {
-        setLoadingPromotion(true);
+    const fetchPromotions = async () => {
         const promotionList: PromotionDisplay[] = [];
         const promotions: PromotionType[] = [];
-        shopInfos.forEach(async (item: ShopInfo, key: React.Key) => {
+        shopInfos?.forEach(async (item: ShopInfo, key: React.Key) => {
             const response = await GET_GetPromotionWithSelection(
                 [item._id],
                 provisional,
@@ -190,34 +189,18 @@ export default function CartPage() {
             )
         })
         promotionList.forEach((item: PromotionDisplay) => {
-            item.promotions.forEach((promotion: Promotion) => {
-                const convertedPromotion = {
-                    _id: promotion._id,
-                    name: promotion.name,
-                    description: promotion.description,
-                    discountType: promotion.discountTypeInfo.type as unknown as DiscountType,
-                    discountValue: promotion.discountTypeInfo.value,
-                    upperBound: promotion.discountTypeInfo?.limitAmountToReduce,
-                    lowerBound: promotion.discountTypeInfo.lowerBoundaryForOrder,
-                    quantity: promotion.quantity,
-                    activeDate: formatDate(new Date(promotion.activeDate)),
-                    expiredDate: formatDate(new Date(promotion.expiredDate)),
-                    createdAt: formatDate(new Date(promotion.createAt)),
-                    code: promotion.code,
-                } as PromotionType
-                promotions.push(convertedPromotion);
+            item.promotions.forEach((promotion: PromotionType) => {
+                promotions.push(promotion);
             })
         })
         setPromotions(promotions);
         setPromotionDisplayList(promotionList);
         handleCodeFilter("");
-        setLoadingPromotion(false);
-
     }
 
     const handleCodeFilter = (value: string) => {
         setCurrentCode(value);
-        const resultQueryList: PromotionDisplay[] = [];
+        const resultQueryList: PromotionDisplay[] = [] as PromotionDisplay[];
         promotionDisplayList?.forEach(item => {
             const shopCodeFilterResult = (item.promotions && item.promotions.length > 0) ? item.promotions.filter(promotion => {
                 return promotion.code.toUpperCase().includes(value.toUpperCase())
@@ -275,41 +258,46 @@ export default function CartPage() {
         return (!!upperBound && (discountValue <= upperBound)) ? discountValue : upperBound;
     }
 
-    const handleProvisional = async () => {
-        const selectedProducts = products ? products.filter((item: CartItem) => selectedRowKeys.includes(item.itemId)) : [];
-        const provisional = selectedProducts ? selectedProducts.reduce((total: number, item: CartItem) => {
-            return total + (item.finalPrice * (item.quantity || 1));
-        }, 0) : 0;
-        console.log('handleProvisional called', provisional, selectedProducts);
-        setProvisional(provisional);
-    }
+    // const handleProvisional = async () => {
+    //     const selectedProducts = products ? products.filter((item: CartItem) => selectedRowKeys.includes(item.itemId)) : [];
+    //     const provisional = selectedProducts ? selectedProducts.reduce((total: number, item: CartItem) => {
+    //         return total + (item.finalPrice * (item.quantity || 1));
+    //     }, 0) : 0;
+    //     console.log('handleProvisional called', provisional, selectedProducts);
+    //     setProvisional(provisional);
+    // }
 
-    const handleDiscount = async () => {
-        let totalDiscount = 0;
-        selectedPromotions.forEach((item: PromotionType, key: React.Key) => {
-            console.log("DISCOUNT_TYPE ", key, item.discountType)
-            if (item.discountType === (DiscountType.DIRECT_PRICE as string)) {
+    // const handleDiscount = async () => {
+    //     let totalDiscount = 0;
+    //     selectedPromotions.forEach((item: PromotionType, key: React.Key) => {
+    //         console.log("DISCOUNT_TYPE ", key, item.discountTypeInfo.type)
+    //         if (item.discountTypeInfo.type === (DiscountType.DIRECT_PRICE as string)) {
 
-                if (item.discountValue) {
-                    totalDiscount += calculateDirectPricePromotion(item.discountValue, item.lowerBound!, item.upperBound!) ?? 0;
+    //             if (item.discountTypeInfo.value) {
+    //                 totalDiscount += calculateDirectPricePromotion(
+    //                     item.discountTypeInfo.value,
+    //                     item.discountTypeInfo.lowerBoundaryForOrder,
+    //                     item.discountTypeInfo.limitAmountToReduce) ?? 0;
 
-                }
-            }
-            else if (item.discountType === (DiscountType.PERCENTAGE as string)) {
-                if (item.discountValue)
-                    totalDiscount += calculatePercentagePromotion(item.discountValue, item.upperBound!);
-            }
-        })
-        setDiscount(totalDiscount);
-        console.log('handleDiscount selectedPromotions', selectedPromotions);
-        console.log('handleDiscount called', discount);
-    }
+    //             }
+    //         }
+    //         else if (item.discountTypeInfo.type === (DiscountType.PERCENTAGE as string)) {
+    //             if (item.discountTypeInfo.value)
+    //                 totalDiscount += calculatePercentagePromotion(
+    //                     item.discountTypeInfo.value,
+    //                     item.discountTypeInfo.limitAmountToReduce);
+    //         }
+    //     })
+    //     setDiscount(totalDiscount);
+    //     console.log('handleDiscount selectedPromotions', selectedPromotions);
+    //     console.log('handleDiscount called', discount);
+    // }
 
-    const handleTotalPrice = async () => {
-        const totalValue = provisional !== 0 ? provisional - discount : 0;
-        console.log('handleTotalPrice called', totalValue);
-        setTotal(totalValue);
-    }
+    // const handleTotalPrice = async () => {
+    //     const totalValue = provisional !== 0 ? provisional - discount : 0;
+    //     console.log('handleTotalPrice called', totalValue);
+    //     setTotal(totalValue);
+    // }
 
     const calculateCartPrices = () => {
         //calc provisional prices
@@ -323,17 +311,22 @@ export default function CartPage() {
         //calc discount factor
         let totalDiscount = 0;
         selectedPromotions.forEach((item: PromotionType, key: React.Key) => {
-            console.log("DISCOUNT_TYPE ", key, item.discountType)
-            if (item.discountType === (DiscountType.DIRECT_PRICE as string)) {
+            console.log("DISCOUNT_TYPE ", key, item.discountTypeInfo.type)
+            if (item.discountTypeInfo.type === (DiscountType.DIRECT_PRICE as string)) {
 
-                if (item.discountValue) {
-                    totalDiscount += calculateDirectPricePromotion(item.discountValue, item.lowerBound!, item.upperBound!) ?? 0;
+                if (item.discountTypeInfo.value) {
+                    totalDiscount += calculateDirectPricePromotion(
+                        item.discountTypeInfo.value,
+                        item.discountTypeInfo.lowerBoundaryForOrder,
+                        item.discountTypeInfo.limitAmountToReduce) ?? 0;
 
                 }
             }
-            else if (item.discountType === (DiscountType.PERCENTAGE as string)) {
-                if (item.discountValue)
-                    totalDiscount += calculatePercentagePromotion(item.discountValue, item.upperBound!);
+            else if (item.discountTypeInfo.type === (DiscountType.PERCENTAGE as string)) {
+                if (item.discountTypeInfo.value)
+                    totalDiscount += calculatePercentagePromotion(
+                        item.discountTypeInfo.value,
+                        item.discountTypeInfo.limitAmountToReduce);
             }
         })
         setDiscount(totalDiscount);
@@ -346,15 +339,18 @@ export default function CartPage() {
 
     }
 
-
-    // useEffect(() => {
-    //     if (shopInfos) {
-    //         fetchPromotions(shopInfos);
-    //     }
-    // }, [shopInfos])
+    useEffect(() => {
+        if (shopInfos && context.userInfo && showPromotionModal) {
+            setLoadingPromotion(true);
+            fetchPromotions();
+            setLoadingPromotion(false);
+        }
+    }, [shopInfos, context.userInfo, showPromotionModal])
 
     useEffect(() => {
-        fetchProducts();
+        if (context.userInfo) {
+            fetchProducts();
+        }
     }, [context.userInfo])
 
     useEffect(() => {
@@ -365,15 +361,10 @@ export default function CartPage() {
         }
     }, [products]);
 
-    useEffect(() => {
-        console.log('ShopInfos', shopInfos);
-        router.refresh();
-    }, [shopInfos]);
-
     // useEffect(() => {
-    //     handleCodeFilter("");
-    //     console.log("Promotion fetch");
-    // }, [promotions, promotionDisplayList])
+    //     console.log('ShopInfos', shopInfos);
+    //     router.refresh();
+    // }, [shopInfos]);
 
     useEffect(() => {
         if (selectedRowKeys.length > 0) {
@@ -394,6 +385,10 @@ export default function CartPage() {
         console.log('currentAddress', storedAddressObject);
     }, []);
 
+    useEffect(() => {
+        console.log("Promotion fetch");
+    }, [showPromotionModal, promotions, promotionDisplayList, queryPromotionList])
+
     const goToShippingAddressPage = () => {
         localStorage.setItem('shippingAddress', JSON.stringify(currentAddress));
     }
@@ -411,12 +406,12 @@ export default function CartPage() {
             value: PaymentMethod.ZALOPAY,
             icon: "https://web.venusagency.vn/uploads/public/2021/06/03/1622682588188_zalopay.png"
         },
-        {
-            label: 'Thanh toán qua Paypal',
-            description: "Thẻ tín dụng (Credit card) / Thẻ ghi nợ (Debit card)",
-            value: PaymentMethod.PAYPAL,
-            icon: "https://cdn.iconscout.com/icon/free/png-256/free-paypal-58-711793.png"
-        },
+        // {
+        //     label: 'Thanh toán qua Paypal',
+        //     description: "Thẻ tín dụng (Credit card) / Thẻ ghi nợ (Debit card)",
+        //     value: PaymentMethod.PAYPAL,
+        //     icon: "https://cdn.iconscout.com/icon/free/png-256/free-paypal-58-711793.png"
+        // },
     ];
 
     const onPaymentMethodChange = (e: RadioChangeEvent) => {
@@ -527,7 +522,8 @@ export default function CartPage() {
             <Modal
                 width={550}
                 open={showPromotionModal}
-                onCancel={handleCancelPromotionModal}
+                onOk={() => handleOKPromotionModal()}
+                onCancel={() => handleCancelPromotionModal()}
                 title={<span className="text-xl">Các Khuyến Mãi</span>}
                 footer={null}
                 centered>
@@ -536,6 +532,7 @@ export default function CartPage() {
                         <Space direction="vertical">
                             <div className="flex gap-5 mt-5 border rounded bg-slate-100 p-5">
                                 <Input placeholder="Nhập để tìm mã"
+                                    defaultValue={""}
                                     value={currentCode}
                                     onChange={(e) => handleCodeFilter(e.target.value)}></Input>
                                 <Button className="bg-blue-500 font-semibold text-white"
@@ -543,7 +540,7 @@ export default function CartPage() {
                             </div>
                             <div className="overflow-auto h-96">
                                 {
-                                    loadingPromotion ? <Spin /> : (queryPromotionList) ? queryPromotionList.map((item: PromotionDisplay) => {
+                                    loadingPromotion ? <Skeleton active /> : (queryPromotionList) ? queryPromotionList.map((item: PromotionDisplay) => {
                                         return (
                                             <Card key={item.shopInfo._id} title={<div className="font-semibold">{item.shopInfo.name}</div>}>
                                                 <div className="flex flex-col gap-5 mx-3">
@@ -551,34 +548,19 @@ export default function CartPage() {
                                                         item.promotions.length > 0 ? item.promotions.sort(
                                                             (a, b) => (a.expiredDate! >= b.expiredDate! ? -1 : 1)
                                                         ).map(item => {
-                                                            const convertedPromotion = {
-                                                                _id: item._id,
-                                                                name: item.name,
-                                                                shop: item.shop,
-                                                                description: item.description,
-                                                                discountType: item.discountTypeInfo.type as unknown as DiscountType,
-                                                                discountValue: item.discountTypeInfo.value,
-                                                                upperBound: item.discountTypeInfo?.limitAmountToReduce,
-                                                                lowerBound: item.discountTypeInfo.lowerBoundaryForOrder,
-                                                                quantity: item.quantity,
-                                                                activeDate: formatDate(new Date(item.activeDate)),
-                                                                expiredDate: formatDate(new Date(item.expiredDate)),
-                                                                createdAt: formatDate(new Date(item.createAt)),
-                                                                code: item.code,
-                                                            } as PromotionType
 
                                                             const isExpiredPromotion = (item: PromotionType) => {
-                                                                return parseDateString(item.expiredDate!) <= new Date();
+                                                                return item.expiredDate <= new Date();
                                                             }
-                                                            if (isExpiredPromotion(convertedPromotion)) return;
+                                                            if (isExpiredPromotion(item)) return;
 
                                                             const isSelected =
-                                                                selectedPromotions.find(item => item._id === convertedPromotion._id) ? true : false;
+                                                                selectedPromotions.find(selected => selected._id === item._id) ? true : false;
 
                                                             return (
                                                                 <PromotionCard
-                                                                    key={convertedPromotion._id}
-                                                                    item={convertedPromotion}
+                                                                    key={item._id}
+                                                                    item={item}
                                                                     isSelected={isSelected}
                                                                     applyDiscount={applyDiscount}
                                                                     removeDiscount={removeDiscount} />

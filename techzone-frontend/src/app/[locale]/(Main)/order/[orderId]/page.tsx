@@ -133,6 +133,10 @@ export default function OrderDetailPage() {
         router.push('/order')
     }
 
+    const handleNavigateToReviewPage = (itemId: string) => {
+        router.push(`/review?orderId=${orderId}&itemId=${itemId}`)
+    }
+
     // const filterShopName = (shopId: string) => {
     //     const shopName = shopInfos!.find(shopInfo => shopInfo._id === shopId)!.name;
     //     return shopName;
@@ -212,8 +216,8 @@ export default function OrderDetailPage() {
                                         {record.color?.color.label.toUpperCase() ?? ""} {record.size ? "/" : ""} {record.size ? record.size.toUpperCase() : ""}</div>
                                     <div className="text-sm text-gray-500 mb-1 flex flex-row gap-1">Cung cấp bởi <Link href={''}>{order?.shop.name}</Link></div>
                                     <div className="flex flex-row gap-2">
-                                        <Button onClick={() => { }}>Viết nhận xét</Button>
-                                        <Button onClick={() => { }}>Mua lại</Button>
+                                        <Button onClick={() => { handleNavigateToReviewPage(record._id)}}>Viết nhận xét</Button>
+                                        {/* <Button onClick={() => { }}>Mua lại</Button> */}
                                     </div>
                                 </div>
                             </div>

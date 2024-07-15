@@ -1,9 +1,15 @@
 import axios from 'axios';
 
+export interface ShopSmallInfo {
+    _id: string;
+    name: string;
+    avatarUrl: string;
+}
+
 export interface Promotion {
     _id: string;
     name: string;
-    shop: string;
+    shop: ShopSmallInfo;
     description: string;
     discountTypeInfo: DiscountTypeInfo;
     activeDate: Date;
@@ -14,11 +20,15 @@ export interface Promotion {
     status: string;
     code: string;
     createAt: Date;
-    __v: number;
 }
 
+export enum DiscountType {
+    PERCENTAGE = "PERCENTAGE",
+    DIRECT_PRICE = "DIRECT_PRICE",
+  }
+
 export interface DiscountTypeInfo {
-    type: string;
+    type: DiscountType;
     value: number;
     lowerBoundaryForOrder: number;
     limitAmountToReduce: number;
