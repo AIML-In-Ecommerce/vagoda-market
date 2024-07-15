@@ -242,18 +242,18 @@ export default function OrderDetailPage() {
             dataIndex: 'quantity',
 
         },
-        {
-            title: <span className="lg:text-base text-sm truncate text-gray-400">Giảm giá</span>,
-            // dataIndex: 'quantity',
-            render: () => <span className="text-base">
-                - <Currency value={0}
-                    locales={"vi-VN"}
-                    currency={"VND"}
-                    minimumFractionDigits={0} />
-            </span>
+        // {
+        //     title: <span className="lg:text-base text-sm truncate text-gray-400">Giảm giá</span>,
+        //     // dataIndex: 'quantity',
+        //     render: () => <span className="text-base">
+        //         - <Currency value={0}
+        //             locales={"vi-VN"}
+        //             currency={"VND"}
+        //             minimumFractionDigits={0} />
+        //     </span>
 
 
-        },
+        // },
         {
             title: <span className="lg:text-base text-sm truncate text-gray-400">Tạm tính</span>,
             dataIndex: 'purchasedPrice',

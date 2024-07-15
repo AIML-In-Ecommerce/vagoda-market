@@ -33,11 +33,11 @@ export default function PromotionCard(props: PromotionCardProps) {
         setIsSelected(props.isSelected);
     }, [props.isSelected]);
 
-    useEffect(() => {
-        if (isSelected) {
-            props.applyDiscount(props.item);
-        } else props.removeDiscount(props.item);
-    }, [isSelected]);
+    // useEffect(() => {
+    //     if (isSelected) {
+    //         props.applyDiscount(props.item);
+    //     } else props.removeDiscount(props.item);
+    // }, [isSelected]);
 
     return (
         <div className="h-auto select-none grid"
