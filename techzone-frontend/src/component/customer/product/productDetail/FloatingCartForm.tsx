@@ -113,7 +113,13 @@ const FloatingCartForm = (formData: FormProps) => {
           src={formData.mainImage}
           alt=""
         /> */}
-        <Image src={formData.mainImage} preview={false} width={12} alt="" />
+        <Image
+          src={formData.mainImage}
+          preview={false}
+          width={50}
+          alt=""
+          className="m-2"
+        />
 
         <div className="col-start-3 md:col-start-2 col-span-4 flex flex-col justify-center">
           <div className="text-sm md:text-lg truncate">{formData.name}</div>
