@@ -4,12 +4,11 @@ import { InfoCircleOutlined } from "@ant-design/icons";
 import { priceIndex } from "./product/ProductDetail";
 import { PromotionType } from "@/model/PromotionType";
 import { useState } from "react";
-import moment from 'moment';
-
+import moment from "moment";
 
 // Function to format dates
 const formatDate = (date: Date) => {
-  return moment(date).format('DD/MM/YYYY HH:mm');
+  return moment(date).format("DD/MM/YYYY HH:mm");
 };
 
 export interface PromotionProps {
@@ -58,7 +57,9 @@ export default function MiniPromotionTicket(props: PromotionProps) {
                   <div className="mb-2">Mã</div>
                   <div className="mb-2">{props.item.code}</div>
                   <div className="mb-2">Hạn sử dụng</div>
-                  <div className="mb-2">{formatDate(props.item.expiredDate)}</div>
+                  <div className="mb-2">
+                    {formatDate(props.item.expiredDate)}
+                  </div>
                   <div className="col-span-2">
                     <div>Điều kiện: </div>
                     <div>- {props.item.description}</div>
@@ -66,12 +67,17 @@ export default function MiniPromotionTicket(props: PromotionProps) {
                     {props.item.discountTypeInfo.limitAmountToReduce && (
                       <div>
                         - Số tiền có thể giảm tối đa:{" "}
-                        {priceIndex(props.item.discountTypeInfo.limitAmountToReduce)}
+                        {priceIndex(
+                          props.item.discountTypeInfo.limitAmountToReduce
+                        )}
                       </div>
                     )}
                     {props.item.discountTypeInfo.lowerBoundaryForOrder && (
                       <div>
-                        - Đơn tối thiểu: {priceIndex(props.item.discountTypeInfo.lowerBoundaryForOrder)}
+                        - Đơn tối thiểu:{" "}
+                        {priceIndex(
+                          props.item.discountTypeInfo.lowerBoundaryForOrder
+                        )}
                       </div>
                     )}
 
@@ -93,13 +99,13 @@ export default function MiniPromotionTicket(props: PromotionProps) {
                 đã lưu
               </div>
             )) || (
-                <div
-                  className="uppercase font-semibold text-blue-400 cursor-pointer m-2"
-                  onClick={() => setIsSaved(true)}
-                >
-                  lưu
-                </div>
-              )}
+              <div
+                className="uppercase font-semibold text-blue-400 cursor-pointer m-2"
+                onClick={() => setIsSaved(true)}
+              >
+                lưu
+              </div>
+            )}
           </div>
         </Card>
       </ConfigProvider>
