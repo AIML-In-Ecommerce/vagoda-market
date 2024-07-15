@@ -18,6 +18,7 @@ import LanguageOption from "./LanguageOption";
 import NavbarMenu from "./NavbarMenu";
 import Link from "next/link";
 import { AuthContext } from "@/context/AuthContext";
+import { GET_getUserCartProducts } from "@/apis/cart/CartProductAPI";
 
 export default function MainNavbar() {
   const router = useRouter();
@@ -140,9 +141,25 @@ export default function MainNavbar() {
       const data: _CategoryType[] = await CategoryService.getAllCategories();
       setAllCategories(data);
     };
+    // Load cart size on badge
+    const loadCartSize = async () => {
+      const data = await GET_getUserCartProducts(authContext.userInfo?._id as string);
+      if (data.data) {
+        console.log('Loading Cart Size', data);
+        setCountItemsCart(data.data.products.length);
+      }
+    }
+    if (authContext.userInfo) {
+      loadCartSize()
+      loadAllCategories();
 
-    loadAllCategories();
-  }, []);
+      const intervalId = setInterval(() => {
+        loadCartSize();
+        loadAllCategories();
+      }, 1000 * 5) // in milliseconds
+      return () => clearInterval(intervalId)
+    }
+  }, [authContext.userInfo]);
 
   return (
     <div>
@@ -274,7 +291,7 @@ export default function MainNavbar() {
                     <Badge
                       size="small"
                       className="site-badge-count-109"
-                      count={countItemsCart > 100 ? 109 : 5}
+                      count={countItemsCart ?? 0}
                       style={{ backgroundColor: "#f32c2c" }}
                     >
                       <FaCartShopping

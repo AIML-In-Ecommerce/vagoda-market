@@ -4,12 +4,13 @@ import ProductItemList from "@/component/customer/ProductItemList";
 import PriceFilter from "@/component/customer/filter/PriceFilter";
 import RatingFilter from "@/component/customer/filter/RatingFilter";
 import CategoryFilter from "@/component/customer/product/CategoryFilter";
+import { AuthContext } from "@/context/AuthContext";
 import { _ProductType } from "@/model/ProductType";
 import { CategoryService } from "@/services/Category";
 import { ProductService } from "@/services/Product";
 import { Button, Divider, TreeDataNode } from "antd";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useContext, useEffect, useState } from "react";
 import { HiOutlineAdjustmentsHorizontal } from "react-icons/hi2";
 import "../../../app/[locale]/globals.css";
 
@@ -33,6 +34,7 @@ interface ListProps {
 }
 
 export default function ShopProductList(props: ListProps) {
+  const authContext = useContext(AuthContext);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [totalProduct, setTotalProduct] = useState(0);
   const [totalPages, setTotalPages] = useState(0);

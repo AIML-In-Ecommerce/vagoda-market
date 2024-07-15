@@ -1,5 +1,5 @@
 import PromotionCard from "@/component/customer/product/PromotionCard"
-import { DiscountType, PromotionType } from "@/model/PromotionType"
+import { DiscountType, DiscountTypeInfo, PromotionStatus, PromotionType } from "@/model/PromotionType"
 import { Button, Flex, Skeleton } from "antd"
 import React, { useEffect, useRef, useState } from "react"
 
@@ -20,70 +20,90 @@ const MockData: PromotionType[] =
         _id: "pro-01",
         name: "Brand Opening Sales 15%",
         description: "Applied for all of our products bought online",
-        discountType: DiscountType.PERCENTAGE,
-        discountValue: 15,
-        upperBound: 1000000,
-        lowerBound: 0,
+        discountTypeInfo: {
+            type: DiscountType.PERCENTAGE,
+            value: 15,
+            lowerBoundaryForOrder: 0,
+            limitAmountToReduce: 1000000
+        } as DiscountTypeInfo,
         quantity: 1000,
-        activeDate: new Date().toUTCString(),
-        expiredDate: new Date(new Date().setDate(new Date().getDate() + 10)).toUTCString(),
-        createdAt: new Date().toUTCString(),
-        code: "p001"
+        activeDate: new Date(),
+        expiredDate: new Date(new Date().setDate(new Date().getDate() + 10)),
+        createAt: new Date(),
+        code: "p001",
+        targetProducts: [],
+        status: PromotionStatus.UPCOMMING
     },
     {
         _id: "pro-02",
         name: "Sales 06-01",
         description: "Sale 20% up to 100k. Applied when customer buy an item worth at least 20,000k",
-        discountType: DiscountType.DIRECT_PRICE,
-        discountValue: 20,
-        upperBound: 100000,
-        lowerBound: 20000,
+        discountTypeInfo: {
+            type: DiscountType.PERCENTAGE,
+            value: 20,
+            lowerBoundaryForOrder: 20000,
+            limitAmountToReduce: 100000
+        } as DiscountTypeInfo,
         quantity: 1000,
-        activeDate: new Date().toUTCString(),
-        expiredDate: new Date(new Date().setDate(new Date().getDate() + 10)).toUTCString(),
-        createdAt: new Date().toUTCString(),
-        code: "p001"
+        activeDate: new Date(),
+        expiredDate: new Date(new Date().setDate(new Date().getDate() + 10)),
+        createAt: new Date(),
+        targetProducts: [],
+        status: PromotionStatus.UPCOMMING,
+        code: "p002"
     },
     {
         _id: "pro-03",
         name: "Big Sale Dell Laptops 1000k for students",
         description: "Applied when a student buys a Dell laptop",
-        discountType: DiscountType.DIRECT_PRICE,
-        discountValue: 1000000,
-        upperBound: 1000000,
-        lowerBound: 8000000,
+        discountTypeInfo: {
+            type: DiscountType.DIRECT_PRICE,
+            value: 1000000,
+            lowerBoundaryForOrder: 8000000,
+            limitAmountToReduce: 1000000
+        } as DiscountTypeInfo,
         quantity: 1000,
-        activeDate: new Date().toUTCString(),
-        expiredDate: new Date(new Date().setDate(new Date().getDate() + 10)).toUTCString(),
-        createdAt: new Date().toUTCString(),
-        code: "p001"
+        activeDate: new Date(),
+        expiredDate: new Date(new Date().setDate(new Date().getDate() + 10)),
+        createAt: new Date(),
+        targetProducts: [],
+        status: PromotionStatus.UPCOMMING,
+        code: "p003"
     },
     {
         _id: "pro-04",
         name: "Big Sale Lenovo Laptops 1000k for students",
         description: "Applied when a student buys a Lenovo laptop",
-        discountType: DiscountType.DIRECT_PRICE,
-        discountValue: 1000000,
-        upperBound: 1000000,
-        lowerBound: 8000000,
+        discountTypeInfo: {
+            type: DiscountType.DIRECT_PRICE,
+            value: 1000000,
+            lowerBoundaryForOrder: 8000000,
+            limitAmountToReduce: 1000000
+        } as DiscountTypeInfo,
         quantity: 1000,
-        activeDate: new Date().toUTCString(),
-        expiredDate: new Date(new Date().setDate(new Date().getDate() + 10)).toUTCString(),
-        createdAt: new Date().toUTCString(),
-        code: "p001"
+        activeDate: new Date(),
+        expiredDate: new Date(new Date().setDate(new Date().getDate() + 10)),
+        createAt: new Date(),
+        targetProducts: [],
+        status: PromotionStatus.UPCOMMING,
+        code: "p004"
     },
     {
         _id: "pro-05",
         name: "Big Sale HP Laptops upto 1000k for students",
         description: "Applied when a student buys a HP laptop",
-        discountType: DiscountType.DIRECT_PRICE,
-        discountValue: 1000000,
-        upperBound: 1000000,
-        lowerBound: 8000000,
+        discountTypeInfo: {
+            type: DiscountType.DIRECT_PRICE,
+            value: 1000000,
+            lowerBoundaryForOrder: 8000000,
+            limitAmountToReduce: 1000000
+        } as DiscountTypeInfo,
         quantity: 1000,
-        activeDate: new Date().toUTCString(),
-        expiredDate: new Date(new Date().setDate(new Date().getDate() + 10)).toUTCString(),
-        createdAt: new Date().toUTCString(),
+        activeDate: new Date(),
+        expiredDate: new Date(new Date().setDate(new Date().getDate() + 10)),
+        createAt: new Date(),
+        targetProducts: [],
+        status: PromotionStatus.UPCOMMING,
         code: "p001"
     }
 ]
