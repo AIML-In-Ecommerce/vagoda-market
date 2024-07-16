@@ -36,8 +36,8 @@ export default function HotCategory({}: HotCategoryProps) {
       let newList: SubCategoryType[] = [];
 
       // let data = [...response, ...response, ...response]; //for testing purposes
-      response.forEach((category: SubCategoryType) => {
-        newList.push(category);
+      response.forEach((category: { subCategory: SubCategoryType }) => {
+        newList.push(category.subCategory);
       });
 
       console.log("new category", newList);

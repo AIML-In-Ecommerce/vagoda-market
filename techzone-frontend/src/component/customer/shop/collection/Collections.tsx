@@ -76,7 +76,7 @@ export default function Collections(props: CollectionsProps) {
               ))}
             </Menu>
           </div>
-          <div className="p-5">
+          <div className="p-5 w-full">
             {(option[0] === "0" && (
               <AllCollections
                 collections={collections}

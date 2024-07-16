@@ -62,7 +62,7 @@ export default function CollectionDetail(props: CollectionDetailProps) {
               sm: 1,
               md: 2,
               lg: 3,
-              xl: 4,
+              xl: 3,
               xxl: 4,
             }}
             dataSource={products}

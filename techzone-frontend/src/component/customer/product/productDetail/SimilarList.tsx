@@ -117,7 +117,7 @@ export default function SimilarList(props: ListProps) {
               {products.map((item, index) => (
                 <div
                   key={index}
-                  className="z-50 text-black pt-5 h-fit flex flex-col items-center"
+                  className="z-50 text-black pt-5 h-fit mb-5 flex flex-col items-center"
                 >
                   <ProductItem
                     _id={item._id}

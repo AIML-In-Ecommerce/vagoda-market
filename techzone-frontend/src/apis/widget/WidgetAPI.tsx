@@ -402,16 +402,44 @@ export async function POST_GetPath(image: string) {
   }
 }
 
-export async function GetPathList(images: string[]) {
-  let pathList: string[] = [];
+// export async function GetPathList(images: string[]) {
+//   let pathList: string[] = [];
 
+//   try {
+//     await images.forEach(async (image) => {
+//       const response = await POST_GetPath(image);
+//       if (response.status === 200 && response.data) {
+//         pathList.push(response.data);
+//       } else return response;
+//     });
+
+//     return {
+//       isDenied: false,
+//       message: "Create link successfully",
+//       status: 200,
+//       data: pathList,
+//     };
+//   } catch (err) {
+//     console.error(err);
+//     return {
+//       isDenied: true,
+//       message: "Failed to create link",
+//       status: 500,
+//       data: undefined,
+//     };
+//   }
+// }
+
+export async function GetPathList(images: string[]) {
   try {
-    await images.forEach(async (image) => {
-      const response = await POST_GetPath(image);
-      if (response.status === 200 && response.data) {
-        pathList.push(response.data);
-      } else return response;
-    });
+    let pathList = await Promise.all(
+      images.map(async (image) => {
+        const response = await POST_GetPath(image);
+        if (response.status === 200 && response.data) {
+          return response.data;
+        } else throw new Error("Failed to create link");
+      })
+    );
 
     return {
       isDenied: false,

@@ -61,7 +61,7 @@ export default function AboutShop(aboutProps: AboutProps) {
             <Card bordered={false}>
               <Statistic
                 title={
-                  <div className="text-sm">
+                  <div className="text-xs">
                     Tỉ lệ hủy
                     <Tooltip
                       title={<div className="m-5 w-fit">Trong 4 tuần qua</div>}
@@ -89,7 +89,7 @@ export default function AboutShop(aboutProps: AboutProps) {
             <Card bordered={false}>
               <Statistic
                 title={
-                  <div className="text-sm">
+                  <div className="text-xs">
                     Tỉ lệ đổi trả
                     <Tooltip
                       title={<div className="my-5 w-fit">Trong 4 tuần qua</div>}
