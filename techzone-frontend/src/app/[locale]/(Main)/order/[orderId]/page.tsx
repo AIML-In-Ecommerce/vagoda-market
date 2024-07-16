@@ -67,6 +67,10 @@ const displayOrderStatusLabel = (status: string) => {
     }
 }
 
+const calculateDiscountValue = (totalPrice: number, provisional: number, shippingFee: number) => {
+    return Math.abs(totalPrice - provisional - shippingFee);
+}
+
 const OrderTransaction =
     (
         loading: boolean,
@@ -98,7 +102,7 @@ const OrderTransaction =
                                 </div>
                                 <div className="flex justify-between">
                                     <div>Giảm giá</div>
-                                    <div>- <Currency value={discount}
+                                    <div>- <Currency value={calculateDiscountValue(total, provisional, shippingFee)}
                                         locales={"vi-VN"}
                                         currency={"VND"}
                                         minimumFractionDigits={0} /></div>

@@ -293,7 +293,7 @@ export async function GET_GetLatestOrder(userId: string) {
 }
 
 export async function GET_GetOrderProduct(orderId: string, itemId: string) {
-  const url = `${HTTP_BACKEND_PREFIX}/order/get_item`;
+  const url = `${GATEWAY_PREFIX}/order/get_item`;
   try {
     const response = await axios.get(url, {
       params: {
