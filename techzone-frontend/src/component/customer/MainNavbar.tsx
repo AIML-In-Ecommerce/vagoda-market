@@ -145,7 +145,7 @@ export default function MainNavbar() {
     const loadCartSize = async () => {
       const data = await GET_getUserCartProducts(authContext.userInfo?._id as string);
       if (data.data) {
-        console.log('Loading Cart Size', data);
+        // console.log('Loading Cart Size', data);
         setCountItemsCart(data.data.products.length);
       }
     }

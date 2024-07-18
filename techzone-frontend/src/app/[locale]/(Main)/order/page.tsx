@@ -130,7 +130,9 @@ export default function OrderOverview(props: OrderOverviewProps) {
 
     const filterOrders = (filter: string, orders: Order[]) => {
         if (filter === 'ALL_ORDER') return orders;
-        return orders.filter((order: Order) => order.orderStatus[order.orderStatus.length - 1].status === filter)
+        return orders.filter(
+                (order: Order) => 
+                    order.orderStatus[order.orderStatus.length - 1].status === filter)
     }
 
     useEffect(() => {
@@ -142,8 +144,14 @@ export default function OrderOverview(props: OrderOverviewProps) {
                 .then((response) => {
                     const responseData = response;
                     console.log('orders', responseData)
-                    setOrders(responseData.data.reverse());
-                    setDisplayOrders(filterOrders(selectedTabKey, responseData.data.reverse()).slice(0, count));
+                    const ordersData = responseData.data;
+                    const latedTimeOrderStatus = (order: Order) => {
+                        const lastIndex = order.orderStatus.length - 1;
+                        return order.orderStatus[lastIndex].time;
+                    }
+                    ordersData.sort((a: Order, b: Order) => latedTimeOrderStatus(a) < latedTimeOrderStatus(b) ? 1 : -1);
+                    setOrders(responseData.data);
+                    setDisplayOrders(filterOrders(selectedTabKey, responseData.data).slice(0, count));
                 })
         }
         fetchOrders();

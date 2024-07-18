@@ -163,7 +163,8 @@ export default function OrderInfoComponent(props: OrderInfoComponentProps) {
             </div>
             <div className="text-xl text-end mt-5">
                 <span className="text-gray-500">Tông tiền:</span> <span className="text-red-500 font-semibold">
-                    <Currency value={calculateOrderTotalPrice(props.order.products)} />
+                    {/* <Currency value={calculateOrderTotalPrice(props.order.products)} /> */}
+                    <Currency value={props.order.totalPrice} />
                 </span>
             </div>
             <div className="flex flex-row gap-2 justify-end mt-2">
