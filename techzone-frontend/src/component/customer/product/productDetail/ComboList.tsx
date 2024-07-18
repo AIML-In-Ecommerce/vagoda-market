@@ -2,11 +2,20 @@
 import { Button, Carousel, Flex, List } from "antd";
 // import { useTranslations } from "next-intl";
 import ComboItem from "./ComboItem";
-import React, { ReactElement, useEffect, useState } from "react";
+import React, { ReactElement, useContext } from "react";
 import { CarouselArrow } from "@/component/user/utils/CarouselArrow";
 import { priceIndex } from "../ProductDetail";
 import CustomEmpty from "../../shop/mini/CustomEmpty";
-import { ProductType } from "@/model/ProductType";
+import {
+  CartProductType,
+  ProductDetailType,
+  ProductType,
+} from "@/model/ProductType";
+import { AuthContext } from "@/context/AuthContext";
+import { POST_AddToCart } from "@/apis/cart/CartAPI";
+import { ProductAccessType } from "@/enum/ProductAccessType";
+import StatisticsService from "@/services/statistics.service";
+import { BsQuestionCircle } from "react-icons/bs";
 
 interface ComboListProps {
   // initial price before adding the combo price
@@ -17,6 +26,9 @@ interface ComboListProps {
   setComboIdList: (list: Array<string>) => void;
   notify(message: string, content: ReactElement): void;
   combo: ProductType[];
+  product: ProductDetailType;
+  numberOfItem: number;
+  handleCartDetail: (isOpen: boolean) => void;
 }
 
 const ComboList = (comboListData: ComboListProps) => {
@@ -67,6 +79,102 @@ const ComboList = (comboListData: ComboListProps) => {
       );
     }
     comboListData.updateTotalComboPrice(tempTotalPrice);
+  };
+
+  const authContext = useContext(AuthContext);
+
+  const handleAddToCart = async () => {
+    if (!authContext.userInfo || !authContext.userInfo._id) {
+      comboListData.notify("Hãy đăng nhập vào tài khoản nhé!", <></>);
+      return;
+    }
+    const userId = authContext.userInfo._id;
+
+    let products: CartProductType[] = [
+      {
+        product: comboListData.product._id,
+        quantity: comboListData.numberOfItem,
+      },
+    ];
+
+    if (comboListData.combo.length > 0) {
+      comboListData.combo.forEach((combo) => {
+        products.push({
+          product: combo._id,
+          quantity: 1,
+        });
+      });
+    }
+
+    const response = await POST_AddToCart(userId, products);
+
+    // if (response.message === "Update cart successfully") {
+    if (response.data) {
+      comboListData.notify(
+        "Bạn đã thêm thành công!",
+        <div className="flex flex-row gap-6 w-max">
+          <img
+            className="m-2 h-20 w-20 object-fill"
+            src={comboListData.product.images[0]}
+          />
+          <div className="flex flex-col justify-center">
+            <div className="text-sm md:text-lg truncate">
+              {comboListData.product.name.substring(0, 15) + "..."}
+            </div>
+            <div className="text-[9px] md:text-sm text-red-500 font-semibold flex">
+              {priceIndex(comboListData.product.finalPrice)}
+            </div>
+          </div>
+        </div>
+      );
+
+      const sessionId =
+        authContext.methods && authContext.methods.getSessionId()
+          ? authContext.methods.getSessionId()
+          : "";
+      const accessType = ProductAccessType.ADD_TO_CART;
+
+      StatisticsService.setProductAccess(
+        userId,
+        sessionId,
+        comboListData.product._id,
+        comboListData.product.shop,
+        accessType
+      );
+
+      if (comboListData.combo.length > 0) {
+        comboListData.combo.forEach((combo) => {
+          comboListData.notify(
+            "Bạn đã thêm thành công!",
+            <div className="flex flex-row gap-6 w-max">
+              <img
+                className="m-2 h-20 w-20 object-fill"
+                src={combo.imageLink}
+              />
+              <div className="flex flex-col justify-center">
+                <div className="text-sm md:text-lg truncate">
+                  {combo.name.substring(0, 15) + "..."}
+                </div>
+                <div className="text-[9px] md:text-sm text-red-500 font-semibold flex">
+                  {priceIndex(combo.price)}
+                </div>
+              </div>
+            </div>
+          );
+
+          StatisticsService.setProductAccess(
+            userId,
+            sessionId,
+            combo._id,
+            combo.shop,
+            accessType
+          );
+        });
+      }
+    } else {
+      comboListData.notify("Thêm sản phẩm thất bại... Hãy thử lại sau!", <></>);
+      // console.log(response.message);
+    }
   };
 
   return (
@@ -192,18 +300,29 @@ const ComboList = (comboListData: ComboListProps) => {
             <div className="mx-5 mb-16 min-w-32">
               <Flex vertical gap="small">
                 <div className="font-semibold">Tổng cộng:</div>
-                <div className="text-xl">
-                  {priceIndex(comboListData.totalPrice)}
+                <div className="flex gap-2">
+                  <div className="text-xl">
+                    {priceIndex(comboListData.totalPrice)}
+                  </div>
+                  <div
+                    className="mt-1 ml-2 cursor-pointer text-xs"
+                    onClick={() => comboListData.handleCartDetail(true)}
+                  >
+                    <BsQuestionCircle />
+                  </div>
                 </div>
                 <Button
                   type="primary"
                   danger
                   block
                   size="large"
-                  href="/cart"
+                  // href="/cart"
+                  onClick={handleAddToCart}
                   style={{ background: "#5c6856" }}
+                  className="rounded-full text-xs md:text-sm"
                 >
-                  Mua ngay
+                  {/* Thêm vào giỏ hàng */}
+                  Thêm cùng combo
                 </Button>
               </Flex>
             </div>

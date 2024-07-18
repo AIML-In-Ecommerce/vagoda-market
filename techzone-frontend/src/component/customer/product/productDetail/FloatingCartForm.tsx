@@ -3,7 +3,6 @@ import { Button, Image } from "antd";
 // import { useTranslations } from "next-intl";
 import { priceIndex } from "../ProductDetail";
 import { QuantityControl } from "@/component/user/utils/QuantityControl";
-import { BsQuestionCircle } from "react-icons/bs";
 import { AuthContext } from "@/context/AuthContext";
 import { POST_AddToCart } from "@/apis/cart/CartAPI";
 import StatisticsService from "@/services/statistics.service";
@@ -19,8 +18,8 @@ interface FormProps {
   mainImage: string;
   numberOfItem: number;
   updateItemNumber: (value: number) => void;
-  totalPrice: number;
-  handleCartDetail: (isOpen: boolean) => void;
+  // totalPrice: number;
+  // handleCartDetail: (isOpen: boolean) => void;
   notify(message: string, content: any): void;
 }
 
@@ -36,21 +35,21 @@ const FloatingCartForm = (formData: FormProps) => {
 
   const authContext = useContext(AuthContext);
 
-  const onIncrement = (value: number) => {
+  const onIncrement = (key: React.Key, value: number) => {
     if (value === 100) return;
     formData.updateItemNumber(value + 1);
   };
 
-  const onDecrement = (value: number) => {
+  const onDecrement = (key: React.Key, value: number) => {
     if (value === 1) return;
     formData.updateItemNumber(value - 1);
   };
 
   const onQuantityChange = (key: React.Key, value: number) => {
     // Update the 'amount' field of the product with the specified key
-    if (value) {
-      formData.updateItemNumber(value);
-    }
+    // if (value) {
+    //   formData.updateItemNumber(value);
+    // }
   };
 
   const handleAddToCart = async () => {
@@ -124,14 +123,14 @@ const FloatingCartForm = (formData: FormProps) => {
         <div className="col-start-3 md:col-start-2 col-span-4 flex flex-col justify-center">
           <div className="text-sm md:text-lg truncate">{formData.name}</div>
           <div className="text-[9px] md:text-sm text-red-500 font-semibold flex">
-            {/* {priceIndex(formData.product.price)} */}
-            {priceIndex(formData.totalPrice)}
-            <div
+            {priceIndex(formData.price)}
+            {/* {priceIndex(formData.totalPrice)} */}
+            {/* <div
               className="mt-1 ml-2 cursor-pointer"
               onClick={() => formData.handleCartDetail(true)}
             >
               <BsQuestionCircle />
-            </div>
+            </div> */}
           </div>
         </div>
         <div className="col-start-9 col-span-2 hidden md:block m-4">
@@ -158,7 +157,7 @@ const FloatingCartForm = (formData: FormProps) => {
             block
             size="middle"
             style={{ background: "#5c6856" }}
-            className="rounded-full mt-1"
+            className="rounded-full mt-1 text-xs md:text-sm"
           >
             Thêm vào giỏ hàng
           </Button>

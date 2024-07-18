@@ -29,14 +29,14 @@ export default function NavbarMenu(props: NavbarMenuProps) {
       key: "0",
       label: (
         <div className="flex items-center space-x-4">
-          <div className="pl-6 py-2 grid grid-cols-4 gap-4">
+          <div className="p-6 py-2 grid grid-cols-3 gap-2 0 w-fit">
             {props.options.length > 0 &&
               props.options.map((item, index) => (
                 <div className="justify-center mx-auto space-y-2" key={index}>
                   <img
                     src={item.image}
                     alt="Product"
-                    className="w-1/2 rounded-lg"
+                    className="w-44 rounded-lg"
                   />
                   <p className="uppercase font-bold text-gray-600 cursor-default">
                     {item.name}
@@ -73,7 +73,8 @@ export default function NavbarMenu(props: NavbarMenuProps) {
         maxHeight: 100,
         overflowY: "auto",
         width: "60%",
-        minWidth: "500px",
+        minWidth: "200px",
+        maxWidth: "700px",
       }}
     >
       <div className="font-bold">

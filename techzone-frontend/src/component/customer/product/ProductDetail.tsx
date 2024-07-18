@@ -386,10 +386,10 @@ export default function ProductDetail(props: ProductDetailProps) {
               className={`${cartVisibility ? "" : "hidden"} `}
             >
               <FloatingCartForm
-                handleCartDetail={setOpen}
+                // handleCartDetail={setOpen}
+                // totalPrice={totalPrice}
                 numberOfItem={numberOfItem}
                 updateItemNumber={setNumberOfItem}
-                totalPrice={totalPrice}
                 name={product.name}
                 price={product.finalPrice}
                 mainImage={mainImage}
@@ -433,6 +433,9 @@ export default function ProductDetail(props: ProductDetailProps) {
                   comboIdList={comboIdList}
                   setComboIdList={setComboIdList}
                   notify={props.notify}
+                  product={product}
+                  numberOfItem={numberOfItem}
+                  handleCartDetail={setOpen}
                 />
               </div>
             )}
