@@ -121,7 +121,7 @@ export default function CartTable(props: CartTableProps) {
 
     const onDecrement = async (key: React.Key, value: number) => {
         if (value === 1) {
-            return handleShowDeleteOneModal(key);
+            handleShowDeleteOneModal(key);
         }
 
         if (props.products) {
@@ -138,21 +138,32 @@ export default function CartTable(props: CartTableProps) {
 
     const handleRemoveRow = async (key: React.Key) => {
         if (props.products) {
+            const payloadUpdateProducts = props.products.map((item: CartItem) => {
+                if (item.itemId === key) {
+                    return {...item, quantity: 0};
+                }
+                else return item;
+            })
             const updatedProducts = props.products.filter((item: CartItem) => item.itemId !== key);
             props.setProducts(updatedProducts);
-            await PUT_updateCartProduct(context.userInfo?._id as string, updatedProducts);
+            await PUT_updateCartProduct(context.userInfo?._id as string, payloadUpdateProducts);
         }
         const updatedRowKeys = props.selectedRowKeys.filter(beforeKey => beforeKey !== key);
         props.setSelectedRowKeys(updatedRowKeys);
 
     };
 
-    const handleRemoveSelectedRows = () => {
+    const handleRemoveSelectedRows = async () => {
         console.log('handleRemoveSelectedRows', props.selectedRowKeys)
+        const payloadUpdateProducts = props.products.map((item: CartItem) => {
+            if (props.selectedRowKeys.includes(item.itemId)) {
+                return {...item, quantity: 0};
+            }
+            else return item;
+        })
         const updatedProducts = props.products!.filter((item: CartItem) => !props.selectedRowKeys.includes(item.itemId));
         props.setProducts(updatedProducts);
-        props.selectedRowKeys.forEach(async (rowKey: React.Key) =>
-            await PUT_updateCartProduct(context.userInfo?._id as string, updatedProducts))
+        await PUT_updateCartProduct(context.userInfo?._id as string, payloadUpdateProducts)
         props.setSelectedRowKeys([]);
     };
 

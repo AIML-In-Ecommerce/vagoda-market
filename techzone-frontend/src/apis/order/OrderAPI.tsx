@@ -10,7 +10,7 @@ export interface Order {
   _id: string;
   user: User;
   shop: Shop;
-  products: Product[];
+  products: ProductInOrder[];
   promotion: any;
   paymentMethod: PaymentMethod;
   shippingFee: number;
@@ -19,6 +19,10 @@ export interface Order {
   shippingAddress: ShippingAddress;
   orderStatus: OrderStatus[];
   createAt: string;
+}
+
+export interface ProductInOrder extends Product {
+  itemId: string
 }
 
 export interface OrderStatus {

@@ -87,7 +87,7 @@ export async function GET_GetAllPromotionByShopId(shopId: string) {
 }
 
 export async function GET_GetPromotionWithSelection(
-    shopIds: string[],
+    shopId: string,
     lowerBoundaryForOrder?: number,
     targetProducts?: string[],
     inActive?: boolean
@@ -95,7 +95,7 @@ export async function GET_GetPromotionWithSelection(
     const url = `${GATEWAY_PREFIX}/promotion/shop/selection`
     try {
         const response = await axios.post(url, {
-            "shopIds": shopIds,
+            "shopId": shopId,
             "lowerBoundaryForOrder": lowerBoundaryForOrder ?? null,
             "targetProducts": targetProducts ?? [],
             "inActive": inActive ?? null

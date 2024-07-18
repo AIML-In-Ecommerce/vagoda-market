@@ -228,14 +228,14 @@ export default function CartPage() {
             selectedProducts.forEach(item => selectedProductIds.add(item._id)) 
             console.log("selectedProductIds", Array.from(selectedProductIds));
             const response = await GET_GetPromotionWithSelection(
-                [item._id],
+                item._id,
                 provisional,
                 Array.from(selectedProductIds),
                 true);
             if (response) promotionList.push(
                 {
                     shopInfo: item,
-                    promotions: response.data[0]?.promotions ?? []
+                    promotions: response.data ?? []
                 } as PromotionDisplay
             )
         }

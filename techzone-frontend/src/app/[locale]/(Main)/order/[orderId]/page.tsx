@@ -5,9 +5,8 @@ import { PaymentMethod } from '@/apis/payment/PaymentAPI';
 import { Currency } from '@/component/user/utils/CurrencyDisplay';
 import { TableColumnsType, Button, Space, Skeleton, Table, Image } from 'antd';
 import Link from 'next/link';
-import { GET_GetShop } from '@/apis/shop/ShopAPI';
 import { FaAngleDoubleLeft } from 'react-icons/fa';
-import { GET_GetOrderById, Order, Product } from '@/apis/order/OrderAPI';
+import { GET_GetOrderById, Order, ProductInOrder } from '@/apis/order/OrderAPI';
 import { getFullAddress } from '@/apis/cart/AddressAPI';
 import { Address } from '@/model/AddressType';
 import { AuthContext } from '@/context/AuthContext';
@@ -16,8 +15,8 @@ interface OrderDetailPageProps {
 
 }
 
-interface ProductTableItem extends Product {
-    key: React.Key
+interface ProductTableItem extends ProductInOrder {
+    key: React.Key,
 }
 enum OrderStatusType {
     WAITING_ONLINE_PAYMENT = "WAITING_ONLINE_PAYMENT",
@@ -138,6 +137,7 @@ export default function OrderDetailPage() {
     }
 
     const handleNavigateToReviewPage = (itemId: string) => {
+        console.log('itemId', itemId);
         router.push(`/review?orderId=${orderId}&itemId=${itemId}`)
     }
 
@@ -146,10 +146,10 @@ export default function OrderDetailPage() {
     //     return shopName;
     // }
 
-    // const fetchShopInfos = (products: Product[]) => {
+    // const fetchShopInfos = (products: ProductInOrder[]) => {
     //     const shopInfosList: ShopInfo[] = [];
     //     const shopIdList: string[] = [];
-    //     products.forEach(async (product: Product) => {
+    //     products.forEach(async (product: ProductInOrder) => {
     //         if (!shopIdList.includes(product.shop._id)) {
     //             shopIdList.push(product.shop._id);
     //         }
@@ -184,98 +184,101 @@ export default function OrderDetailPage() {
     //     router.refresh();
     // }, [shopInfos]);
 
-
-    const columns: TableColumnsType<Product> = [
-        {
-            title: <div className="flex flex-row gap-1 items-center text-gray-400">
-                <div className="lg:text-base text-sm">Sản phẩm</div>
-            </div>,
-            dataIndex: 'name',
-            render: (text: string, record: Product) =>
-                <Space align="start" size={12} className="flex flex-row">
-                    {
-                        loading ? <Skeleton.Image active /> :
-                            <>
-                                {
-                                    record.color ? <Image
-                                        width={120}
-                                        src={record.color.link}
-                                        alt={""} /> : <Image.PreviewGroup
-                                            items={record.images}>
-                                        <Image
+    const columns = useMemo<TableColumnsType<ProductInOrder>>(() => {
+        const result: TableColumnsType<ProductInOrder> = [
+            {
+                title: <div className="flex flex-row gap-1 items-center text-gray-400">
+                    <div className="lg:text-base text-sm">Sản phẩm</div>
+                </div>,
+                dataIndex: 'name',
+                render: (text: string, record: ProductInOrder) =>
+                    <Space align="start" size={12} className="flex flex-row">
+                        {
+                            loading ? <Skeleton.Image active /> :
+                                <>
+                                    {
+                                        record.color ? <Image
                                             width={120}
-                                            src={record.images ? record.images[0] : ""}
-                                            alt={""} />
-                                    </Image.PreviewGroup>
-                                }
-                            </>
-                    }
-                    {
-                        loading ? <Skeleton paragraph={{ rows: 2 }
-                        } active /> : (
-                            <div className="flex flex-row">
-                                <div className="flex flex-col gap-1">
-                                    <div className="text-sm font-bold text-ellipsis overflow-hidden">{record.name}</div>
-                                    <div className="text-sm text-gray-500 mb-1">
-                                        {record.color?.color.label.toUpperCase() ?? ""} {record.size ? "/" : ""} {record.size ? record.size.toUpperCase() : ""}</div>
-                                    <div className="text-sm text-gray-500 mb-1 flex flex-row gap-1">Cung cấp bởi <Link href={''}>{order?.shop.name}</Link></div>
-                                    <div className="flex flex-row gap-2">
-                                        <Button onClick={() => { handleNavigateToReviewPage(record._id)}}>Viết nhận xét</Button>
-                                        {/* <Button onClick={() => { }}>Mua lại</Button> */}
+                                            src={record.color.link}
+                                            alt={""} /> : <Image.PreviewGroup
+                                                items={record.images}>
+                                            <Image
+                                                width={120}
+                                                src={record.images ? record.images[0] : ""}
+                                                alt={""} />
+                                        </Image.PreviewGroup>
+                                    }
+                                </>
+                        }
+                        {
+                            loading ? <Skeleton paragraph={{ rows: 2 }
+                            } active /> : (
+                                <div className="flex flex-row">
+                                    <div className="flex flex-col gap-1">
+                                        <div className="text-sm font-bold text-ellipsis overflow-hidden">{record.name}</div>
+                                        <div className="text-sm text-gray-500 mb-1">
+                                            {record.color?.color.label.toUpperCase() ?? ""} {record.size ? "/" : ""} {record.size ? record.size.toUpperCase() : ""}</div>
+                                        <div className="text-sm text-gray-500 mb-1 flex flex-row gap-1">Cung cấp bởi <Link href={''}>{order?.shop.name}</Link></div>
+                                        <div className="flex flex-row gap-2">
+                                            <Button onClick={() => { handleNavigateToReviewPage(record.itemId)}}>Viết nhận xét</Button>
+                                            {/* <Button onClick={() => { }}>Mua lại</Button> */}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        )
-                    }
-                </Space >
-        },
-        {
-            title: <span className="lg:text-base text-sm text-gray-400">Giá</span>,
-            dataIndex: 'purchasedPrice',
-            render: (value: number, record: Product) => (
-                <span className="text-base">
-                    <Currency value={record.purchasedPrice}
-                        locales={"vi-VN"}
-                        currency={"VND"}
-                        minimumFractionDigits={0} />
-                </span>
-            )
-        },
-        {
-            title: <span className="lg:text-base text-sm text-gray-400">Số lượng</span>,
-            dataIndex: 'quantity',
-
-        },
-        // {
-        //     title: <span className="lg:text-base text-sm truncate text-gray-400">Giảm giá</span>,
-        //     // dataIndex: 'quantity',
-        //     render: () => <span className="text-base">
-        //         - <Currency value={0}
-        //             locales={"vi-VN"}
-        //             currency={"VND"}
-        //             minimumFractionDigits={0} />
-        //     </span>
-
-
-        // },
-        {
-            title: <span className="lg:text-base text-sm truncate text-gray-400">Tạm tính</span>,
-            dataIndex: 'purchasedPrice',
-            render: (value: number, record: Product) => (
-                loading ? <Skeleton.Input active /> : (
-                    <div className="flex flex-col gap-1">
-                        <span className="text-base">
-                            <Currency value={(record.purchasedPrice * (record.quantity || 1))}
-                                locales={"vi-VN"}
-                                currency={"VND"}
-                                minimumFractionDigits={0} />
-                        </span>
-                    </div>
-
+                            )
+                        }
+                    </Space >
+            },
+            {
+                title: <span className="lg:text-base text-sm text-gray-400">Giá</span>,
+                dataIndex: 'purchasedPrice',
+                render: (value: number, record: ProductInOrder) => (
+                    <span className="text-base">
+                        <Currency value={record.purchasedPrice}
+                            locales={"vi-VN"}
+                            currency={"VND"}
+                            minimumFractionDigits={0} />
+                    </span>
                 )
-            ),
-        },
-    ];
+            },
+            {
+                title: <span className="lg:text-base text-sm text-gray-400">Số lượng</span>,
+                dataIndex: 'quantity',
+    
+            },
+            // {
+            //     title: <span className="lg:text-base text-sm truncate text-gray-400">Giảm giá</span>,
+            //     // dataIndex: 'quantity',
+            //     render: () => <span className="text-base">
+            //         - <Currency value={0}
+            //             locales={"vi-VN"}
+            //             currency={"VND"}
+            //             minimumFractionDigits={0} />
+            //     </span>
+    
+    
+            // },
+            {
+                title: <span className="lg:text-base text-sm truncate text-gray-400">Tạm tính</span>,
+                dataIndex: 'purchasedPrice',
+                render: (value: number, record: ProductInOrder) => (
+                    loading ? <Skeleton.Input active /> : (
+                        <div className="flex flex-col gap-1">
+                            <span className="text-base">
+                                <Currency value={(record.purchasedPrice * (record.quantity || 1))}
+                                    locales={"vi-VN"}
+                                    currency={"VND"}
+                                    minimumFractionDigits={0} />
+                            </span>
+                        </div>
+    
+                    )
+                ),
+            },
+        ];
+        return result;
+    }, [order])
+
     return (
         <React.Fragment>
             <div className="container flex flex-col lg:px-24 px-10 mx-auto lg:grid lg:grid-cols-3 items-center gap-5 mb-10">
@@ -319,7 +322,7 @@ export default function OrderDetailPage() {
                     <Table
                         tableLayout='auto'
                         columns={columns}
-                        dataSource={order?.products.map((product: Product) => ({ ...product, key: product._id } as ProductTableItem)) || []}
+                        dataSource={order?.products.map((product: ProductInOrder) => ({ ...product, key: product.itemId } as ProductTableItem)) || []}
                         // onRow={(record) => ({
                         //         onClick: () => handleRowClick(record),
                         //       })}
