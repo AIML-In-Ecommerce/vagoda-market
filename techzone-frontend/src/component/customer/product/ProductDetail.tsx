@@ -356,7 +356,7 @@ export default function ProductDetail(props: ProductDetailProps) {
 
       console.log("combo data", data);
       setCombo(data);
-    } else console.log(response.message);
+    } else console.log("no combo data");
   };
 
   return (

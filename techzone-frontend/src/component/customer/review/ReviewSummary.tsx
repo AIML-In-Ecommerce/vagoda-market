@@ -46,7 +46,7 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const [menuMode, setMenuMode] = useState<"horizontal" | "vertical">(
-    "horizontal",
+    "horizontal"
   );
 
   const checkWindowSize = () => {
@@ -94,7 +94,7 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
           headers: {
             "Content-Type": "application/json",
           },
-        },
+        }
       );
       if (rawResponse.status == 200) {
         console.log("Get summary review successfully:", rawResponse.data);
@@ -179,7 +179,7 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
                                   <Progress
                                     percent={Math.round(
                                       (fiveStarNumber / props.reviews.length) *
-                                        100,
+                                        100
                                     )}
                                     size="small"
                                   />
@@ -195,7 +195,7 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
                                   <Progress
                                     percent={Math.round(
                                       (fourStarNumber / props.reviews.length) *
-                                        100,
+                                        100
                                     )}
                                     size="small"
                                   />
@@ -211,7 +211,7 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
                                   <Progress
                                     percent={Math.round(
                                       (threeStarNumber / props.reviews.length) *
-                                        100,
+                                        100
                                     )}
                                     size="small"
                                   />
@@ -227,7 +227,7 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
                                   <Progress
                                     percent={Math.round(
                                       (twoStarNumber / props.reviews.length) *
-                                        100,
+                                        100
                                     )}
                                     size="small"
                                   />
@@ -243,7 +243,7 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
                                   <Progress
                                     percent={Math.round(
                                       (oneStarNumber / props.reviews.length) *
-                                        100,
+                                        100
                                     )}
                                     size="small"
                                   />
@@ -298,7 +298,7 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
                       </div>
 
                       <div className="col-span-2 md:col-span-4 lg:col-span-2 pl-5">
-                        <div className="font-semibold text-xs md:text-sm">
+                        <div className="font-semibold text-xs md:text-sm w-full">
                           🤖 <Link href="#">Trợ lý AI </Link>
                           tổng hợp từ các đánh giá mới nhất
                         </div>

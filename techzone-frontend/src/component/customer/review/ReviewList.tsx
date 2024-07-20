@@ -19,10 +19,22 @@ const ReviewList = (reviewListProps: ReviewListProps) => {
   const [page, setPage] = useState(1);
   const [itemNumber, setItemNumber] = useState(3);
 
+  const handleCompareDateString = (date1: string, date2: string) => {
+    let check: number = 0;
+
+    let newDate1 = new Date(date1);
+    let newDate2 = new Date(date2);
+
+    check = newDate2.getTime() - newDate1.getTime();
+    return check;
+  };
+
   const filterData = useMemo(() => {
-    return reviewListProps.reviews.filter((item, index) => {
-      return index >= (page - 1) * itemNumber && index < page * itemNumber;
-    });
+    return reviewListProps.reviews
+      .sort((a, b) => handleCompareDateString(a.createdAt, b.createdAt))
+      .filter((item, index) => {
+        return index >= (page - 1) * itemNumber && index < page * itemNumber;
+      });
   }, [page, reviewListProps.reviews]);
 
   const onShowSizeChange: PaginationProps["onShowSizeChange"] = (
@@ -47,12 +59,14 @@ const ReviewList = (reviewListProps: ReviewListProps) => {
       )) || (
         <div>
           {filterData.map((item, index) => (
-            <Review
-              review={item}
-              updateReviews={() => {
-                reviewListProps.setReviews(reviewListProps.reviews);
-              }}
-            />
+            <div key={index}>
+              <Review
+                review={item}
+                updateReviews={() => {
+                  reviewListProps.setReviews(reviewListProps.reviews);
+                }}
+              />
+            </div>
           ))}
 
           <div className="m-3">

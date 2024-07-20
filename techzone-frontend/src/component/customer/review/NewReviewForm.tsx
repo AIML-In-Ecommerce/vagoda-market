@@ -81,13 +81,37 @@ export default function NewReviewForm(props: NewReviewFormProps) {
 
     const userId = authContext.userInfo._id;
 
+    let updatedContent = "";
+
+    if (product.color || product.size) {
+      updatedContent += "[";
+    }
+
+    if (product.color) {
+      updatedContent += "Màu " + product.color.color.label;
+    }
+
+    if (product.color && product.size) {
+      updatedContent += " - ";
+    }
+
+    if (product.size) {
+      updatedContent += "Kích cỡ " + product.size;
+    }
+
+    if (product.color || product.size) {
+      updatedContent += "] ";
+    }
+
+    updatedContent += content;
+
     let newReview: RawReviewType = {
       _id: "",
       // product: productId.toString(),
       product: product._id,
       user: userId,
       rating: rating,
-      content: content,
+      content: updatedContent,
       asset: asset,
       createdAt: new Date().toISOString(),
       conversation: [],
@@ -114,15 +138,11 @@ export default function NewReviewForm(props: NewReviewFormProps) {
         </div>
       );
 
-      setTimeout(() => {
-        // if (response.status == 200) {
-        setRating(3);
-        setContent("");
-        setAsset([]);
-        setFileList([]);
-        // } else console.log(response.message);
-      }, 10000);
-    } else console.log("No response...");
+      setRating(3);
+      setContent("");
+      setAsset([]);
+      setFileList([]);
+    }
   };
 
   useEffect(() => {
