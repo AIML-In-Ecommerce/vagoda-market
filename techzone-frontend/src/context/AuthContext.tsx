@@ -8,7 +8,6 @@ import AuthService, {
   RefreshTokenReponseData,
   SignInResponseData,
 } from "@/services/auth.service";
-import { stringifyError } from "next/dist/shared/lib/utils";
 import UserService from "@/services/user.service";
 
 const sessionIdKey = "ssid";
@@ -39,21 +38,9 @@ interface AuthContextFunctions {
   getSessionId: () => string | null;
 }
 
-function initLoading()
-{
-  const storageInfo = localStorage.getItem(authLocalStorageID)
-  if(storageInfo != null)
-  {
-    return JSON.parse(storageInfo) as SimpleUserInfoType
-  }
-  else
-  {
-    return null
-  }
-}
 
 const defaultContextValue: AuthContextProps = {
-  userInfo: initLoading(),
+  userInfo: null,
   methods: null,
 };
 
@@ -65,7 +52,27 @@ export default function AuthContextProvider({
   const accessTokenCookieKey = "#client_access_token_@";
   const refreshTokenCookieKey = "#client_refresh_token@";
 
-  const [userInfo, setUserInfo] = useState<SimpleUserInfoType | null>(null);
+  function initLoading()
+  {
+    if(localStorage)
+    {
+      const storageInfo = localStorage.getItem(authLocalStorageID)
+      if(storageInfo != null)
+      {
+        return JSON.parse(storageInfo) as SimpleUserInfoType
+      }
+      else
+      {
+        return null
+      }
+    }
+    else
+    {
+      return null
+    }
+  }
+
+  const [userInfo, setUserInfo] = useState<SimpleUserInfoType | null>(initLoading());
 
   const router = useRouter();
   const currentPathname = usePathname();
