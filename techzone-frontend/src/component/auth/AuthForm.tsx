@@ -142,13 +142,13 @@ export default function AuthForm(props: AuthFormProps) {
       return
     }
 
-    isWaitingForResponse.current = true
-
     const targetEmail = new String(email).toString();
     const targetPassword = new String(password).toString();
     if (isValidAuth(email, password) == false) {
       return;
     }
+    
+    isWaitingForResponse.current = true
 
     const response = await AuthService.signIn(targetEmail, targetPassword);
 
@@ -195,8 +195,6 @@ export default function AuthForm(props: AuthFormProps) {
       return
     }
 
-    isWaitingForResponse.current = true
-
     let check = true;
     let message = null;
     if (username.length == 0) {
@@ -215,6 +213,8 @@ export default function AuthForm(props: AuthFormProps) {
       return;
     }
     console.log("here");
+
+    isWaitingForResponse.current = true
 
     const response = await AuthService.register(email, password, username);
 
