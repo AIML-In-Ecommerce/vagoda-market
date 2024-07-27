@@ -332,3 +332,38 @@ export async function GET_GetOrderProduct(orderId: string, itemId: string) {
     };
   }
 }
+export async function POST_RepurchaseOrder(orderId: string, itemIds: string[]) {
+  const url = `${GATEWAY_PREFIX}/order/buyer/repurchase_item`;
+  try {
+    const response = await axios.post(url, {
+        orderId: orderId,
+        itemIds: itemIds,
+    });
+    let responseData = response.data;
+    if (response.status === 200) {
+      let item = responseData.data;
+      return {
+        isDenied: false,
+        message: "Repurchase the item successfully",
+        status: response.status,
+        data: item,
+      };
+    } else {
+      return {
+        isDenied: true,
+        message: "Failed to Repurchase the item",
+        status: 500,
+        data: undefined,
+      };
+    }
+  } catch (error) {
+    console.error("Failed to Repurchase the item: ", error);
+    return {
+      isDenied: true,
+      message: "Failed to Repurchase the item",
+      status: 500,
+      data: undefined,
+    };
+  }
+}
+

@@ -5,7 +5,7 @@ import { AuthContext } from '@/context/AuthContext';
 import { Button, Divider, Flex, Input, List, Tabs, Typography } from 'antd';
 import Search from 'antd/es/input/Search';
 import { useRouter, useSearchParams } from 'next/navigation';
-import React, { useEffect, useState, useContext } from 'react'
+import React, { useEffect, useState, useContext, useMemo } from 'react'
 import { FaMagnifyingGlass } from 'react-icons/fa6';
 
 interface OrderOverviewProps {
@@ -97,6 +97,13 @@ export default function OrderOverview(props: OrderOverviewProps) {
     const router = useRouter();
     const [selectedTabKey, setSelectedTabKey] = useState<string>(activeTabFromUrl)
 
+    const filterOrders = (filter: string, orders: Order[]) => {
+        if (filter === 'ALL_ORDER') return orders;
+        return orders.filter(
+                (order: Order) => 
+                    order.orderStatus[order.orderStatus.length - 1].status === filter)
+    }
+    
     const handleSearchQuery = (query: string) => {
         setDisplayOrders(filterSearchQuery(orders, query));
     }
@@ -105,12 +112,12 @@ export default function OrderOverview(props: OrderOverviewProps) {
         const newDisplayItem = count + LOAD_DISPLAY < orders.length ? count + LOAD_DISPLAY : orders.length;
         setCount(newDisplayItem);
         const newDisplayOrders = filterOrders(selectedTabKey, orders).slice(0, newDisplayItem);
-        // console.log('Total display: ', newDisplayItem, newDisplayOrders);
         setDisplayOrders(newDisplayOrders);
     };
 
-    const loadMore =
-        !initLoading && !loading && (displayOrders.length < orders.length) ? (
+    const loadMore = useMemo(() => {
+        let maxDisplayItems = filterOrders(selectedTabKey, orders).length;
+        return (!initLoading && !loading && (displayOrders.length < maxDisplayItems) ? (
             <div
                 style={{
                     textAlign: 'center',
@@ -122,17 +129,11 @@ export default function OrderOverview(props: OrderOverviewProps) {
             >
                 <Button onClick={onLoadMore}>Xem thêm</Button>
             </div>
-        ) : null;
+        ) : null);
+    },[initLoading, loading, displayOrders, orders]);
 
     const handleTabKeyOnChange = (activeKey: string) => {
         setSelectedTabKey(activeKey);
-    }
-
-    const filterOrders = (filter: string, orders: Order[]) => {
-        if (filter === 'ALL_ORDER') return orders;
-        return orders.filter(
-                (order: Order) => 
-                    order.orderStatus[order.orderStatus.length - 1].status === filter)
     }
 
     useEffect(() => {

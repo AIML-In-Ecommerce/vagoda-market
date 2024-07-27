@@ -1,11 +1,10 @@
-import { Order, Product } from '@/apis/order/OrderAPI';
+import { Order, POST_RepurchaseOrder, Product } from '@/apis/order/OrderAPI';
 import { GET_GetShop } from '@/apis/shop/ShopAPI';
 import { Currency } from '@/component/user/utils/CurrencyDisplay';
-import { Button, Card, Image, Skeleton, Tooltip } from 'antd'
+import { Button, Card, Image, message, Skeleton, Tooltip } from 'antd'
 import { useRouter } from 'next/navigation';
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { BiDetail } from 'react-icons/bi';
-import { BsTruckFront } from 'react-icons/bs'
 import { CiShop } from 'react-icons/ci';
 import { FaCartArrowDown, FaPen, FaShippingFast } from 'react-icons/fa';
 import { LiaTruckLoadingSolid } from 'react-icons/lia';
@@ -32,6 +31,17 @@ enum OrderStatusType {
     SHIPPING = "SHIPPING",
     COMPLETED = "COMPLETED",
     CANCELLED = "CANCELLED",
+}
+
+
+let availableRepurchaseStatuses = [
+    OrderStatusType.COMPLETED,
+    OrderStatusType.CANCELLED
+]
+
+const getLatestOrderStatus = (order: Order) => {
+    let orderStatusList = order.orderStatus;
+    return orderStatusList.at(-1)?.status;
 }
 
 const displayOrderStatusIcon = (status: OrderStatusType) => {
@@ -73,14 +83,27 @@ const displayOrderStatusLabel = (status: OrderStatusType) => {
 }
 
 export default function OrderInfoComponent(props: OrderInfoComponentProps) {
-    
+
     const router = useRouter();
     const [shopInfos, setShopInfos] = useState<ShopInfo[]>();
     const [loading, setLoading] = useState<boolean>(true);
+    const latestOrderStatus = useMemo(() => {
+        return getLatestOrderStatus(props.order);
+    }, [props.order]);
 
 
     const handleOrderDetail = (orderId: string) => {
         router.push(`/order/${orderId}`);
+    }
+
+    const handleRepurchaseOrder = async (orderId: string) => {
+        const response = await POST_RepurchaseOrder(orderId as string, []);
+        if (response.status === 200) {
+            message.success(`Đã thêm sản phẩm vào giỏ hàng`)
+        }
+        else {
+            message.error("Lỗi khi thêm sản phẩm");
+        }
     }
 
     const calculateOrderTotalPrice = (products: Product[]) => {
@@ -103,7 +126,7 @@ export default function OrderInfoComponent(props: OrderInfoComponentProps) {
         shopIdList.forEach(async (item: string) => {
             await GET_GetShop(item)
                 .then((response) => shopInfosList.push({
-                    _id: item,  
+                    _id: item,
                     name: response.data?.name,
                 } as ShopInfo));
         })
@@ -129,7 +152,7 @@ export default function OrderInfoComponent(props: OrderInfoComponentProps) {
                 {loading ? (
                     <>
                         <Skeleton.Avatar active={loading} size={24} shape="circle" />
-                        <Skeleton.Input active={loading}/>
+                        <Skeleton.Input active={loading} />
                     </>
                 ) : <>
                     {displayOrderStatusIcon(props.order.orderStatus[props.order.orderStatus.length - 1].status as OrderStatusType)}
@@ -168,12 +191,16 @@ export default function OrderInfoComponent(props: OrderInfoComponentProps) {
                 </span>
             </div>
             <div className="flex flex-row gap-2 justify-end mt-2">
-                <Button className="flex items-center justify-center text-white bg-[#5c6856] border-2 group">
-                    <span className="group-hover:mr-2"><FaCartArrowDown /></span>
-                    <span className="cursor-pointer text-white hidden group-hover:block">
-                        Mua lại
-                    </span>
-                </Button>
+                {
+                    latestOrderStatus ? availableRepurchaseStatuses.includes(latestOrderStatus as OrderStatusType) ?
+                        (<Button className="flex items-center justify-center text-white bg-[#5c6856] border-2 group"
+                            onClick={async () => await handleRepurchaseOrder(props.order._id)}>
+                            <span className="group-hover:mr-2"><FaCartArrowDown /></span>
+                            <span className="cursor-pointer text-white hidden group-hover:block">
+                                Mua lại
+                            </span>
+                        </Button>) : <></> : <></>
+                }
                 <Button className="flex items-center justify-center text-white bg-blue-400 border-2 group"
                     onClick={() => handleOrderDetail(props.order._id)}>
                     <span className="group-hover:mr-2"><BiDetail /></span>

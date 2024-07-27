@@ -3,10 +3,10 @@ import React, { useContext, useEffect, useMemo, useState } from 'react'
 import { useParams, useRouter } from "next/navigation";
 import { PaymentMethod } from '@/apis/payment/PaymentAPI';
 import { Currency } from '@/component/user/utils/CurrencyDisplay';
-import { TableColumnsType, Button, Space, Skeleton, Table, Image } from 'antd';
+import { TableColumnsType, Button, Space, Skeleton, Table, Image, message } from 'antd';
 import Link from 'next/link';
 import { FaAngleDoubleLeft } from 'react-icons/fa';
-import { GET_GetOrderById, Order, ProductInOrder } from '@/apis/order/OrderAPI';
+import { GET_GetOrderById, Order, POST_RepurchaseOrder, ProductInOrder } from '@/apis/order/OrderAPI';
 import { getFullAddress } from '@/apis/cart/AddressAPI';
 import { Address } from '@/model/AddressType';
 import { AuthContext } from '@/context/AuthContext';
@@ -26,6 +26,15 @@ enum OrderStatusType {
     COMPLETED = "COMPLETED",
     CANCELLED = "CANCELLED",
 }
+
+let availableReviewStatuses = [
+    OrderStatusType.COMPLETED
+]
+
+let availableRepurchaseStatuses = [
+    OrderStatusType.COMPLETED,
+    OrderStatusType.CANCELLED
+]
 
 // type ShopInfo = {
 //     _id: string,
@@ -132,6 +141,11 @@ export default function OrderDetailPage() {
     // const [shopInfos, setShopInfos] = useState<ShopInfo[]>();
     const router = useRouter();
 
+    const getLatestOrderStatus = (order: Order) => {
+        let orderStatusList = order.orderStatus;
+        return orderStatusList.at(-1)?.status;
+    }
+
     const handleOrderDetails = () => {
         router.push('/order')
     }
@@ -139,6 +153,17 @@ export default function OrderDetailPage() {
     const handleNavigateToReviewPage = (itemId: string) => {
         console.log('itemId', itemId);
         router.push(`/review?orderId=${orderId}&itemId=${itemId}`)
+    }
+
+    const handleRepurchaseOrder = async (item: ProductInOrder) => {
+        let itemId = item.itemId;
+        const response = await POST_RepurchaseOrder(orderId as string, [itemId]);
+        if (response.status === 200) {
+            message.success(`Đã thêm sản phẩm "${item.name}" vào giỏ hàng`)
+        }
+        else {
+            message.error("Lỗi khi thêm sản phẩm");
+        }
     }
 
     // const filterShopName = (shopId: string) => {
@@ -220,8 +245,19 @@ export default function OrderDetailPage() {
                                             {record.color?.color.label.toUpperCase() ?? ""} {record.size ? "/" : ""} {record.size ? record.size.toUpperCase() : ""}</div>
                                         <div className="text-sm text-gray-500 mb-1 flex flex-row gap-1">Cung cấp bởi <Link href={''}>{order?.shop.name}</Link></div>
                                         <div className="flex flex-row gap-2">
-                                            <Button onClick={() => { handleNavigateToReviewPage(record.itemId)}}>Viết nhận xét</Button>
-                                            {/* <Button onClick={() => { }}>Mua lại</Button> */}
+                                            {
+                                                latestOrderStatus ? (
+                                                    availableReviewStatuses.includes(latestOrderStatus as OrderStatusType) ? (
+                                                        <Button onClick={() => { handleNavigateToReviewPage(record.itemId)}}>Viết nhận xét</Button>
+                                                    ) : <></>) : <></>
+                                            }
+                                            {
+                                                latestOrderStatus ? (
+                                                    availableRepurchaseStatuses.includes(latestOrderStatus as OrderStatusType) ? (
+                                                        <Button onClick={() => { handleRepurchaseOrder(record)}}>Mua lại</Button>
+                                                    ) : <></>) : <></>
+                                            }
+                                            
                                         </div>
                                     </div>
                                 </div>
@@ -277,7 +313,13 @@ export default function OrderDetailPage() {
             },
         ];
         return result;
-    }, [order])
+    }, [order]);
+
+    const latestOrderStatus = useMemo(() => {
+        if (!order) return null;
+        const status = getLatestOrderStatus(order);
+        return status;
+    },[order]);
 
     return (
         <React.Fragment>
