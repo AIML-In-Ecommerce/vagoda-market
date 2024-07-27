@@ -12,6 +12,7 @@ import GoogleImage from "../../../public/asset/google.256x256.png"
 import FacebookImage from "../../../public/asset/facebook.256x256.png"
 import VagodaIcon from "../VagodaIcon";
 import VagodaText from "../VagodaText";
+import { clearTimeout, setTimeout } from "timers";
 
 interface AuthFormProps {
   showSuccessMsg: (show: boolean) => void;
@@ -46,6 +47,9 @@ export default function AuthForm(props: AuthFormProps) {
   const [validAuthMsg, setValidAuthMsg] = useState<string | null>(null);
   const [resultModalState, setResultModalState] = useState<ResultStatusType>("success");
 
+  const isWaitingForResponse = useRef(false)
+
+
   const parameters = useSearchParams()
 
   useEffect(() =>
@@ -62,6 +66,26 @@ export default function AuthForm(props: AuthFormProps) {
       setIsSignupOpeneded(true)
     }
   }, [])
+
+  useEffect(() =>
+  {
+    console.log(isWaitingForResponse.current)
+  }, [isWaitingForResponse.current])
+
+  useEffect(() =>
+  {
+    let timeout = undefined
+
+    if(validAuthMsg != null)
+    {
+      timeout = setTimeout(() =>
+      {
+        setValidAuthMsg(null)
+      }, 4000)  
+    }
+
+    return () => clearTimeout(timeout)
+  }, [validAuthMsg])
 
   //   const context = useRecoveryContext();
   const router = useRouter();
@@ -100,12 +124,12 @@ export default function AuthForm(props: AuthFormProps) {
   const isValidAuth = (email: string, password: string) => {
     setValidAuthMsg(null);
     if (!isEmail(email)) {
-      setValidAuthMsg(t("email_error_msg"));
+      setValidAuthMsg("Email không hợp lệ!");
       console.error("Error email");
       return false;
     }
     if (!isPassword(password)) {
-      setValidAuthMsg(t("password_error_msg"));
+      setValidAuthMsg("Mật khẩu không hợp lệ");
       console.error("Error password");
       return false;
     }
@@ -113,6 +137,13 @@ export default function AuthForm(props: AuthFormProps) {
   };
 
   const handleLogin = async () => {
+    if(isWaitingForResponse.current == true)
+    {
+      return
+    }
+
+    isWaitingForResponse.current = true
+
     const targetEmail = new String(email).toString();
     const targetPassword = new String(password).toString();
     if (isValidAuth(email, password) == false) {
@@ -152,18 +183,29 @@ export default function AuthForm(props: AuthFormProps) {
     } else {
       setValidAuthMsg(response.message);
     }
+
+    isWaitingForResponse.current = false
   };
 
   const handleSignup = async () => {
+
+    console.log(isWaitingForResponse.current)
+    if(isWaitingForResponse.current == true)
+    {
+      return
+    }
+
+    isWaitingForResponse.current = true
+
     let check = true;
     let message = null;
     if (username.length == 0) {
       check = false;
-      message = t("empty_username");
+      message = "Hãy cung cấp email của bạn!";
       setValidAuthMsg(message);
     } else if (password != confirmPassword) {
       check = false;
-      message = t("different_password_confirm_password");
+      message = "Xác nhận mật khẩu không chính xác";
       setValidAuthMsg(message);
     } else if (isValidAuth(email, password) == false) {
       check = false;
@@ -188,8 +230,10 @@ export default function AuthForm(props: AuthFormProps) {
         setOpenModalAuthSucess(false);
       }, 2000);
     } else if (response.statusCode == 409) {
-      setValidAuthMsg("Email has already existed");
+      setValidAuthMsg("Email đã tồn tại. Hãy sử dụng email khác!");
     }
+
+    isWaitingForResponse.current = false
   };
 
   const handleVerification = async () => {
@@ -248,21 +292,21 @@ export default function AuthForm(props: AuthFormProps) {
   }
 
   const handleGoogleLogin = async () => {
-    try {
-      router.push(`${process.env.NEXT_PUBLIC_BACKEND_PREFIX}auth/google`);
-      // router.push(`http://localhost:4000/auth/google`);
-    } catch (error) {
-      console.error("Error initiating Google login:", error);
-    }
+    // try {
+    //   router.push(`${process.env.NEXT_PUBLIC_BACKEND_PREFIX}auth/google`);
+    //   // router.push(`http://localhost:4000/auth/google`);
+    // } catch (error) {
+    //   console.error("Error initiating Google login:", error);
+    // }
   };
 
   const handleFacebookLogin = async () => {
-    try {
-      // router.push(`${process.env.NEXT_PUBLIC_BACKEND_PREFIX}auth/facebook`);
-      //   router.push(`http://localhost:4000/auth/facebook`);
-    } catch (error) {
-      console.error("Error initiating Facebook login:", error);
-    }
+    // try {
+    //   // router.push(`${process.env.NEXT_PUBLIC_BACKEND_PREFIX}auth/facebook`);
+    //   //   router.push(`http://localhost:4000/auth/facebook`);
+    // } catch (error) {
+    //   console.error("Error initiating Facebook login:", error);
+    // }
   };
 
   return (
@@ -346,7 +390,6 @@ export default function AuthForm(props: AuthFormProps) {
                 placeholder={"Tên người dùng"}
                 className="input input-bordered w-full m-2 mx-auto px-1 py-2 bg-gray-100"
                 value={username}
-                maxLength={15}
                 onChange={(e) => setUsername(e.target.value)}
               />
             </div>
