@@ -76,6 +76,7 @@ export default function ShopPage() {
             <WidgetList
               widgets={widgets}
               setCollectionId={setSelectedCollectionId}
+              setTab1={() => setTab("1")}
               notify={openNotification}
             />
           )) || <Skeleton active style={{ margin: 10 }} />}
