@@ -726,28 +726,28 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
       console.error("Error in conservation:", error);
     }
 
-    //   setAiState("THINKING");
-    //   setTimeout(() => {
-    //     setAiState("RESPONSED");
-    //     const assistantResponse: AssistantMessageProps = {
-    //       role: AssistantMessageTypes.Assistant,
-    //       message: fakeResponse.message,
-    //       type: fakeResponse.type,
-    //       data: fakeResponse.data,
-    //     };
+    // setAiState("THINKING");
+    // setTimeout(() => {
+    //   setAiState("RESPONSED");
+    //   const assistantResponse: AssistantMessageProps = {
+    //     role: AssistantMessageTypes.Assistant,
+    //     message: fakeResponse.message,
+    //     type: fakeResponse.type,
+    //     data: fakeResponse.data,
+    //   };
 
-    //     const newResponseMessages = [...history_conservation];
-    //     newResponseMessages.push(assistantResponse);
-    //     setMessages(newResponseMessages);
-    //     if (localStorage) {
-    //       const stringifiedMessages = JSON.stringify(history_conservation);
-    //       localStorage.setItem(
-    //         AIAssistantLocalStorageKeyword,
-    //         stringifiedMessages,
-    //       );
-    //     }
-    //     setExtraSupportDisplay(setExtendedDisplay(fakeResponse));
-    //   }, 5000);
+    //   const newResponseMessages = [...history_conservation];
+    //   newResponseMessages.push(assistantResponse);
+    //   setMessages(newResponseMessages);
+    //   if (localStorage) {
+    //     const stringifiedMessages = JSON.stringify(history_conservation);
+    //     localStorage.setItem(
+    //       AIAssistantLocalStorageKeyword,
+    //       stringifiedMessages,
+    //     );
+    //   }
+    //   setExtraSupportDisplay(setExtendedDisplay(fakeResponse));
+    // }, 5000);
   };
 
   const ExpandOrShrinkButton =
@@ -1042,7 +1042,7 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
             </Flex>
             {CardActions}
           </Card>
-          <div className="w-3/5">{extraSupportDisplay}</div>
+          <div className="w-3/5 ">{extraSupportDisplay}</div>
         </Flex>
       </Modal>
       {/* <FloatButton className="w-full h-full" shape="square" icon={<BiSupport />} type="primary"/> */}
