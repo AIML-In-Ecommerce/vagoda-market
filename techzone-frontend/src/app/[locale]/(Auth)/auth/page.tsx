@@ -40,7 +40,7 @@ export default function Auth() {
       index: 4,
       url: "https://img.freepik.com/free-photo/stylish-models-showing-paper-bags_23-2147689035.jpg?t=st=1721905873~exp=1721909473~hmac=28210d161254cb7b99a6a592634e7cf14544772e2d166185fb926c7c7e6ea14d&w=360",
       title: "Năng động hay Thanh lịch",
-      subTitle: "mọi thữ đều có trên Vagoda!!"
+      subTitle: "mọi thứ đều có trên Vagoda!!"
     }
 
   ]

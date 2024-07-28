@@ -9,37 +9,10 @@ import CategoryItem from "../mini/CategoryItem";
 
 interface CategoryGridProps {
   widget: WidgetType;
+  setTab1: () => void;
 }
 
 export default function CategoryGrid(props: CategoryGridProps) {
-  // mock data
-  // const categoryData: CategoryType[] = [
-  //   {
-  //     _id: "id1",
-  //     key: "1",
-  //     urlKey: "string",
-  //     name: "Laptop",
-  //     image: "string",
-  //     subCategoryType: [],
-  //   },
-  //   {
-  //     _id: "id2",
-  //     key: "2",
-  //     urlKey: "string",
-  //     name: "Màn hình máy tính",
-  //     image: "string",
-  //     subCategoryType: [],
-  //   },
-  //   {
-  //     _id: "id3",
-  //     key: "3",
-  //     urlKey: "string",
-  //     name: "Ổ cứng",
-  //     image: "string",
-  //     subCategoryType: [],
-  //   },
-  // ];
-
   // var
   const [categories, setCategories] = useState<CategoryType[]>();
   const element = props.widget.element as CategoryElement;
@@ -57,6 +30,15 @@ export default function CategoryGrid(props: CategoryGridProps) {
         // console.log("category", response.data);
       }
     }
+  };
+
+  const handleSelectCategory = (id: string) => {
+    window.history.pushState(
+      {},
+      "",
+      `${window.location.pathname}?category=${id}`
+    );
+    props.setTab1();
   };
 
   return (
@@ -101,7 +83,7 @@ export default function CategoryGrid(props: CategoryGridProps) {
           emptyText: <CustomEmpty />,
         }}
         renderItem={(item) => (
-          <List.Item>
+          <List.Item onClick={() => handleSelectCategory(item._id)}>
             <CategoryItem category={item} />
           </List.Item>
         )}
@@ -109,3 +91,31 @@ export default function CategoryGrid(props: CategoryGridProps) {
     </div>
   );
 }
+
+// mock data
+// const categoryData: CategoryType[] = [
+//   {
+//     _id: "id1",
+//     key: "1",
+//     urlKey: "string",
+//     name: "Laptop",
+//     image: "string",
+//     subCategoryType: [],
+//   },
+//   {
+//     _id: "id2",
+//     key: "2",
+//     urlKey: "string",
+//     name: "Màn hình máy tính",
+//     image: "string",
+//     subCategoryType: [],
+//   },
+//   {
+//     _id: "id3",
+//     key: "3",
+//     urlKey: "string",
+//     name: "Ổ cứng",
+//     image: "string",
+//     subCategoryType: [],
+//   },
+// ];

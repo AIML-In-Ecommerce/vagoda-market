@@ -23,7 +23,7 @@ export async function POST_GetPromotionList(ids: string[]) {
   try {
     // console.log(url);
     const requestBody = {
-      ids: ids,
+      promotionIds: ids,
     };
 
     const response = await axios.post(url, requestBody);

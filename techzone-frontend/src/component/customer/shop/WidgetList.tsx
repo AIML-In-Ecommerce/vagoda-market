@@ -24,6 +24,7 @@ import { ReactElement } from "react";
 interface WidgetListProps {
   widgets: WidgetType[];
   setCollectionId: (id: string) => void;
+  setTab1: () => void;
   notify(message: string, content: ReactElement): void;
 }
 
@@ -38,6 +39,7 @@ export default function WidgetList(props: WidgetListProps) {
               <Widget
                 widget={item}
                 setCollectionId={props.setCollectionId}
+                setTab1={props.setTab1}
                 notify={props.notify}
               />
             )}
@@ -50,6 +52,7 @@ export default function WidgetList(props: WidgetListProps) {
 interface BaseWidgetProps {
   widget: WidgetType;
   setCollectionId: (id: string) => void;
+  setTab1: () => void;
   notify(message: string, content: ReactElement): void;
 }
 
@@ -66,7 +69,7 @@ function Widget(props: BaseWidgetProps) {
       )}
 
       {props.widget.type === WidgetCategoryType.CATEGORY && (
-        <CategoryWidget widget={props.widget} notify={props.notify} />
+        <CategoryWidget widget={props.widget} setTab1={props.setTab1} />
       )}
 
       {props.widget.type === WidgetCategoryType.PROMOTION && (
@@ -115,13 +118,18 @@ function BannerWidget(props: WidgetProps) {
   );
 }
 
-function CategoryWidget(props: WidgetProps) {
+interface CategoryWidgetProps {
+  widget: WidgetType;
+  setTab1: () => void;
+}
+
+function CategoryWidget(props: CategoryWidgetProps) {
   const element = props.widget.element as CategoryElement;
 
   return (
     <div>
       {element && element.pattern === CategoryPatternType.GRID && (
-        <CategoryGrid widget={props.widget} />
+        <CategoryGrid widget={props.widget} setTab1={props.setTab1} />
       )}
     </div>
   );
