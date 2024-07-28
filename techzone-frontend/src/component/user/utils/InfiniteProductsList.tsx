@@ -4,6 +4,7 @@ import ProductItem from "@/component/customer/ProductItem";
 import { ProductType } from "@/model/ProductType";
 import { Button, Flex, message, Skeleton } from "antd";
 import React, { ReactElement, useEffect, useRef, useState } from "react";
+const authLocalStorageID = "#auth-context-user-info-record-ID";
 
 export interface InfiniteScrollProductsProps {
   productsPerRow: number;
@@ -74,9 +75,10 @@ const InfiniteProductsList: React.FC<{
 
   const LoadMoreButton =
     isLoadingItems == false ? (
-      <Button className="border-none" onClick={() => {}}>
-        Xem thêm
-      </Button>
+      // <Button className="border-none" onClick={() => {}}>
+      //   Xem thêm
+      // </Button>
+      <div> </div>
     ) : (
       <div>{lottie}</div>
     );
@@ -84,7 +86,7 @@ const InfiniteProductsList: React.FC<{
   return (
     <>
       <Flex
-        className="w-full h-full bg-white"
+        className="w-full h-full bg-gray-100 p-4"
         vertical
         justify="center"
         align="center"
@@ -99,9 +101,11 @@ const InfiniteProductsList: React.FC<{
               className="lg:col-span-1 md:col-span-1 sm:col-span-1 "
             >
               <ProductItem
+                _id={value._id}
                 imageLink={value.images[0]}
                 name={value.name}
                 rating={value.avgRating}
+                shop={value.shop}
                 soldAmount={value.soldQuantity}
                 price={value.finalPrice}
                 isFlashSale={true}

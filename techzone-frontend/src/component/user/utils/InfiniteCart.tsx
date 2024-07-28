@@ -2,6 +2,8 @@ import { CartItem, GET_getUserCartProducts } from "@/apis/cart/CartProductAPI";
 import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "@/context/AuthContext";
 import CartTable from "@/component/customer/cart/CartTable";
+import { SimpleUserInfoType } from "@/model/UserInfoType";
+const authLocalStorageID = "#auth-context-user-info-record-ID";
 
 const InfiniteCart = () => {
   const [products, setProducts] = useState<CartItem[]>();
@@ -9,14 +11,19 @@ const InfiniteCart = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [selectedKey, setSelectedKey] = useState<React.Key | null>(null);
 
-  const authContext = useContext(AuthContext);
+  function initLoading() {
+    const storageInfo = localStorage.getItem(authLocalStorageID);
+    if (storageInfo != null) {
+      return JSON.parse(storageInfo) as SimpleUserInfoType;
+    } else {
+      return null;
+    }
+  }
 
-  console.log("User Id: ", authContext.userInfo?._id);
+  const userInfo = initLoading();
 
   const fetchProducts = async () => {
-    await GET_getUserCartProducts(
-      process.env.NEXT_PUBLIC_USER_ID as string,
-    ).then((response) => {
+    await GET_getUserCartProducts(userInfo?._id as string).then((response) => {
       console.log("Cart: ", response.data?.products);
       setProducts(response.data?.products || undefined);
     });
