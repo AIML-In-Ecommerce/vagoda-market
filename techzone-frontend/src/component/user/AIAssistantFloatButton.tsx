@@ -686,6 +686,7 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
       );
       if (rawResponse.status == 200) {
         console.log("AI Response: ", rawResponse.data);
+        setExtendedDisplay(<></>);
 
         let type = "";
         let message = "";
