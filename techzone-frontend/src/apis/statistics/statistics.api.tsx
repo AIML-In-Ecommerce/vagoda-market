@@ -1,5 +1,7 @@
 import axios from "axios";
 
+const GATEWAY_PREFIX = process.env.NEXT_PUBLIC_GATEWAY_PREFIX;
+
 const StatisticsAPIs = {
   async setAccessProductByAuthUser(
     userId: string,
