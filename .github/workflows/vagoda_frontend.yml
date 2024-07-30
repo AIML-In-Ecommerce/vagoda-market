@@ -8,7 +8,11 @@ jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2         
+      - uses: actions/checkout@v2
+      #  your build commands
+      - run: |
+        npm ci
+        npm build --prod         
       - uses: amondnet/vercel-action@v25.2.0
         with:
           vercel-token: ${{ secrets.VERCEL_SECRET_TOKEN }}
