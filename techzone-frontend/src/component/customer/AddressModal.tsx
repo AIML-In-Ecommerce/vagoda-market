@@ -53,7 +53,7 @@ export default function AddressModal(props: AddressModalProps) {
         <Radio.Group onChange={onChange} value={value}>
           <Space direction="vertical">
             {addressList.map((address, index) => (
-              <Radio value={index}>
+              <Radio key={index} value={index}>
                 <AddressInfoItem
                   receiver={address.receiver}
                   phoneNumber={address.phoneNumber}

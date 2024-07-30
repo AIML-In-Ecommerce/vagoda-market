@@ -74,7 +74,7 @@ export default function AuthForm(props: AuthFormProps) {
 
   useEffect(() =>
   {
-    let timeout = undefined
+    let timeout: NodeJS.Timeout | undefined = undefined
 
     if(validAuthMsg != null)
     {
