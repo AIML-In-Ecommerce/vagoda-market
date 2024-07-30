@@ -305,6 +305,7 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
   const [inputType, setInputType] = useState<InputType>("KEYBOARD");
   const buttonRef = useRef<HTMLDivElement>(null);
   const userInputRef = useRef<string>("");
+  const AI_DOMAIN = process.env.NEXT_PUBLIC_AI_DOMAIN;
 
   const sendClick = () => {
     if (buttonRef.current) {
@@ -675,8 +676,7 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
       setAiState("THINKING");
 
       const rawResponse = await axios.post(
-        "http://localhost:8000/chat/agent",
-        // "http://54.255.29.11/chat/agent",
+        `${AI_DOMAIN}/chat/agent`,
         postBody,
         {
           headers: {

@@ -20,7 +20,9 @@ import { AiFillCloseCircle } from "react-icons/ai";
 import ImageSwiper from "./swiper";
 import { AuthContext } from "@/context/AuthContext";
 import Replicate from "replicate";
+import { SimpleUserInfoType } from "@/model/UserInfoType";
 
+const authLocalStorageID = "#auth-context-user-info-record-ID";
 type Mode = "MODEL" | "PRODUCT" | "PREVIEW";
 type LoadStatus = "READY" | "RUNNING" | "COMPLETED" | "ERROR";
 
@@ -99,21 +101,27 @@ const VirtualTryOn = () => {
   const [chosenProduct, setChosenProduct] = useState<VtoProduct>();
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [tryOnLoading, setTryOnLoading] = useState<LoadStatus>("READY");
-
-  const authContext = useContext(AuthContext);
-
   const tryOnImageUrl = useRef<string[]>([]);
-
   const fileRef = useRef<HTMLInputElement>(null);
   const userImageUrl = useRef<string | null>(null);
+  const AI_DOMAIN = process.env.NEXT_PUBLIC_AI_DOMAIN;
 
-  console.log("Auth Context: ", authContext.userInfo?._id);
+  function initLoading() {
+    const storageInfo = localStorage.getItem(authLocalStorageID);
+    if (storageInfo != null) {
+      return JSON.parse(storageInfo) as SimpleUserInfoType;
+    } else {
+      return null;
+    }
+  }
+
+  const userInfo = initLoading();
 
   useEffect(() => {
     async function fetchData() {
       try {
         const response: any = await axios.get(
-          `https://apis.fashionstyle.io.vn/cart/user?userId=${authContext.userInfo?._id}`,
+          `https://apis.fashionstyle.io.vn/cart/user?userId=${userInfo?._id}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -148,7 +156,7 @@ const VirtualTryOn = () => {
       }
     }
     fetchData();
-  }, [authContext.userInfo?._id]);
+  }, [userInfo?._id]);
 
   const handleCancelImg = () => {
     setImagePreview(null);
@@ -184,7 +192,7 @@ const VirtualTryOn = () => {
 
       try {
         const response = await axios.post(
-          "http://14.225.218.109:3010/upload",
+          "https://apis.fashionstyle.io.vn/upload/",
           formData,
           {
             headers: {
@@ -242,8 +250,7 @@ const VirtualTryOn = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8000/genai/virtual-try-on",
-        // "http://54.255.29.11/genai/virtual-try-on",
+        `${AI_DOMAIN}/genai/virtual-try-on`,
         postBody,
         {
           headers: {
@@ -401,7 +408,7 @@ const VirtualTryOn = () => {
 
   const renderChosenProductBox = (chosenProduct: VtoProduct) => {
     return (
-      <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-2/3 w-[45%] h-[20%] bg-style flex flex-row rounded-2xl">
+      <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-3/4 w-[45%]  bg-style flex flex-row rounded-2xl">
         {mode === "PRODUCT" ? (
           <AiFillCloseCircle
             className="w-5 h-5 cursor-pointer"
@@ -411,7 +418,7 @@ const VirtualTryOn = () => {
           <div className="w-5 h-5 "></div>
         )}
         <div className="w-[75%] h-full flex flex-col gap-1 justify-center items-start py-4 pr-4">
-          <div className="text-base font-semibold text-white">
+          <div className="w-full text-base font-semibold text-white truncate overflow-hidden overflow-ellipsis whitespace-nowrap">
             {chosenProduct.name}
           </div>
           <div className="w-full flex flex-row gap-2 items-center">
