@@ -10,17 +10,17 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       #  your build commands
-      - name: build 
-        run: |
-          cd ./techzone-frontend
-          npm ci --force
-          npm run build
+      # - name: build 
+      #   run: |
+      #     cd ./techzone-frontend
+      #     npm ci --force
+      #     npm run build
       - uses: amondnet/vercel-action@v25.2.0
         with:
           vercel-token: ${{ secrets.VERCEL_SECRET_TOKEN }}
           # github-token: ${{ secrets.GITHUB_TOKEN }}
           vercel-org-id: ${{ secrets.ORG_ID}}
           vercel-project-id: ${{ secrets.PROJECT_ID}}
-          working-directory: techzone-frontend/
           vercel-args: '--prod'
+          working-directory: techzone-frontend/
 
