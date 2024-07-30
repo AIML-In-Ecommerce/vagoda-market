@@ -12,6 +12,7 @@ jobs:
       #  your build commands
       - name: build 
         run: |
+          cd ./techzone-frontend
           npm ci
           npm build --prod
       - uses: amondnet/vercel-action@v25.2.0
