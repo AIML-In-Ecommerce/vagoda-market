@@ -11,8 +11,6 @@ jobs:
       - uses: actions/checkout@v2
       #  your build commands
       - run: |
-        cd ./techzone-frontend
-        npm ci
         npm build --prod         
       - uses: amondnet/vercel-action@v25.2.0
         with:
