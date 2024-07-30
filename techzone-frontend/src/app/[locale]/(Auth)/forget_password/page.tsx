@@ -84,3 +84,12 @@
 //     </React.Fragment>
 //   )
 // }
+
+function ForgetPasswordPage()
+{
+    return(
+        <></>
+    )
+}
+
+export default ForgetPasswordPage
