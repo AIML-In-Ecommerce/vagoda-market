@@ -14,7 +14,7 @@ jobs:
         run: |
           cd ./techzone-frontend
           npm ci --force
-          npm build --prod
+          npm run build
       - uses: amondnet/vercel-action@v25.2.0
         with:
           vercel-token: ${{ secrets.VERCEL_SECRET_TOKEN }}
