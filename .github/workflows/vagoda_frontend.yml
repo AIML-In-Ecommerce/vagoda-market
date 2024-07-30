@@ -11,7 +11,7 @@ jobs:
       - uses: actions/checkout@v2
       #  your build commands
       - run: |
-        npm build --prod         
+        npm run build      
       - uses: amondnet/vercel-action@v25.2.0
         with:
           vercel-token: ${{ secrets.VERCEL_SECRET_TOKEN }}
