@@ -1,8 +1,11 @@
 import axios from 'axios'
 
-// const BACKEND_PREFIX = process.env.NEXT_PUBLIC_BACKEND_PREFIX
-// const CART_PORT = process.env.NEXT_PUBLIC_CART_PORT
+const BACKEND_PREFIX = process.env.NEXT_PUBLIC_BACKEND_PREFIX
+const CART_PORT = process.env.NEXT_PUBLIC_CART_PORT
 const GATEWAY_PREFIX = process.env.NEXT_PUBLIC_GATEWAY_PREFIX
+
+// const publicAPIURL = `${BACKEND_PREFIX}:${CART_PORT}`
+const publicAPIURL = `${GATEWAY_PREFIX}`
 
 export interface Cart {
     _id: string;
@@ -80,7 +83,7 @@ export interface CardProductUpdateInfo {
 
 
 export async function GET_getUserCartProducts(userId: string) {
-    const url = `${GATEWAY_PREFIX}/cart/user?userId=${userId}`
+    const url = `${publicAPIURL}/cart/user?userId=${userId}`
     try {
         const response = await axios.get(url);
         if (userId == null) {
@@ -102,7 +105,7 @@ export async function GET_getUserCartProducts(userId: string) {
 
 //quantity: 0 -> delete product; quantity: > 0 -> if product is not in cart, then add to the cart else update quantity
 export async function PUT_updateCartProduct(userId: string, updateProducts: CartItem[]) {
-    const url = `${GATEWAY_PREFIX}/cart/user/update?userId=${userId}`
+    const url = `${publicAPIURL}/cart/user/update?userId=${userId}`
     const castUpdateInfo = updateProducts.map(item => {
         return {
             itemId: item.itemId,

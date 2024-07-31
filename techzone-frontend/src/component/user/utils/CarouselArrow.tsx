@@ -1,4 +1,5 @@
 import { CSSProperties } from 'react'
+
 // import Stylesheet from 'our custom code'
 
 const arrowSize = 30
@@ -42,12 +43,18 @@ const StyleSheet = {
 // we don't add currentSlide and slideCount to the pops, we get console errors.
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const CarouselArrow = ({ currentSlide, direction, slideCount, ...carouselProps }: ArrowProps & AntdArrowProps) =>
-  direction === 'left' ? (
-    <div>
-        <LeftOutlined {...carouselProps} style={StyleSheet.leftArrow} />
-    </div>
-    ) : (
-        <div>
-            <RightOutlined {...carouselProps} style={StyleSheet.rightArrow} />
-        </div>
+{
+  console.log(currentSlide)
+  console.log(slideCount)
+  return (
+    direction === 'left' ? (
+      <div>
+          <LeftOutlined {...carouselProps} style={StyleSheet.leftArrow} />
+      </div>
+      ) : (
+          <div>
+              <RightOutlined {...carouselProps} style={StyleSheet.rightArrow} />
+          </div>
+    )
   )
+}

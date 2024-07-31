@@ -6,8 +6,12 @@ import { GetPathList } from "../widget/WidgetAPI";
 import { CommentType } from "@/model/CommentType";
 import { PUT_UpdateProductRating } from "../product/ProductDetailAPI";
 
+const GATEWAY_PREFIX = process.env.NEXT_PUBLIC_GATEWAY_PREFIX;
 const BACKEND_PREFIX = process.env.NEXT_PUBLIC_BACKEND_PREFIX;
 const REVIEW_PORT = process.env.NEXT_PUBLIC_REVIEW_PORT;
+
+const publicAPIURL = `${GATEWAY_PREFIX}`
+// const publicAPIURL = `${BACKEND_PREFIX}:${REVIEW_PORT}`
 
 interface ReviewResponse {
   status: number;
@@ -16,10 +20,7 @@ interface ReviewResponse {
 }
 
 export async function GET_GetReview(id: string) {
-  const url = (
-    BACKEND_PREFIX?.toString() +
-    ":" +
-    REVIEW_PORT?.toString() +
+  const url = (publicAPIURL +
     "/review/" +
     id
   ).toString();
@@ -108,10 +109,7 @@ export async function GET_GetReview(id: string) {
 // }
 
 export async function POST_CreateReview(props: RawReviewType) {
-  const url = (
-    BACKEND_PREFIX?.toString() +
-    ":" +
-    REVIEW_PORT?.toString() +
+  const url = (publicAPIURL +
     "/review"
   ).toString();
 
@@ -211,10 +209,7 @@ export async function POST_CreateReview(props: RawReviewType) {
 }
 
 export async function DELETE_DeleteReview(id: string) {
-  const url = (
-    BACKEND_PREFIX?.toString() +
-    ":" +
-    REVIEW_PORT?.toString() +
+  const url = (publicAPIURL +
     "/review/" +
     id
   ).toString();
@@ -251,10 +246,7 @@ export async function DELETE_DeleteReview(id: string) {
 }
 
 export async function PUT_UpdateReview(props: RawReviewType) {
-  const url = (
-    BACKEND_PREFIX?.toString() +
-    ":" +
-    REVIEW_PORT?.toString() +
+  const url = (publicAPIURL +
     "/review/" +
     props._id
   ).toString();
@@ -308,10 +300,7 @@ interface ReviewListResponse {
 }
 
 export async function GET_GetReviewListByProduct(productId: string) {
-  const url = (
-    BACKEND_PREFIX?.toString() +
-    ":" +
-    REVIEW_PORT?.toString() +
+  const url = (publicAPIURL +
     "/productReviews/" +
     productId
   ).toString();
@@ -394,10 +383,7 @@ export async function GET_GetAllReviewsByQuery(
   product: string,
   rating: number
 ) {
-  const url = (
-    BACKEND_PREFIX?.toString() +
-    ":" +
-    REVIEW_PORT?.toString() +
+  const url = (publicAPIURL +
     "/reviews?product=" +
     product +
     "&&rating=" +
@@ -443,10 +429,7 @@ interface CommentResponse {
 }
 
 export async function POST_CreateComment(props: any) {
-  const url = (
-    BACKEND_PREFIX?.toString() +
-    ":" +
-    REVIEW_PORT?.toString() +
+  const url = (publicAPIURL +
     "/comment"
   ).toString();
 
@@ -481,10 +464,7 @@ export async function POST_CreateComment(props: any) {
 }
 
 export async function GET_GetProductRating(id: string) {
-  const url = (
-    BACKEND_PREFIX?.toString() +
-    ":" +
-    REVIEW_PORT?.toString() +
+  const url = (publicAPIURL +
     "/avgRating/" +
     id
   ).toString();

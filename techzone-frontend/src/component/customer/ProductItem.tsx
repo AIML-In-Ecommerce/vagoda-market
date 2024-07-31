@@ -102,7 +102,7 @@ export default function ProductItem(props: ProductItemProps) {
       props.notify(
         `Bạn đã thêm thành công!`,
         <div className="flex flex-row gap-6 w-max">
-          <img className="m-2 h-20 w-20 object-fill" src={props.imageLink} />
+          <img className="m-2 h-20 w-20 object-fill" src={props.imageLink} alt="" />
           <div className="flex flex-col justify-center">
             <div className="text-sm md:text-lg truncate">
               {props.name.substring(0, 15) + "..."}
@@ -153,6 +153,7 @@ export default function ProductItem(props: ProductItemProps) {
             {props.isFlashSale && (
               <div className="absolute top-2 left-2 z-20 p-1 text-white font-bold text-[8px]">
                 <img
+                  alt=""
                   src="https://cdn-icons-png.flaticon.com/128/1374/1374072.png"
                   width={30}
                 />

@@ -242,8 +242,8 @@ const VirtualTryOn = () => {
 
     try {
       const response = await axios.post(
-        // "http://localhost:8000/genai/virtual-try-on",
-        "http://54.255.29.11/genai/virtual-try-on",
+        "http://localhost:8000/genai/virtual-try-on",
+        // "http://54.255.29.11/genai/virtual-try-on",
         postBody,
         {
           headers: {

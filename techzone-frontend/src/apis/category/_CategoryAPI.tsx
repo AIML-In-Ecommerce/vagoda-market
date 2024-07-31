@@ -3,8 +3,12 @@
 import { CategoryType, SubCategoryType } from "@/model/CategoryType";
 import axios from "axios";
 
+const GATEWAY_PREFIX = process.env.NEXT_PUBLIC_GATEWAY_PREFIX;
 const BACKEND_PREFIX = process.env.NEXT_PUBLIC_BACKEND_PREFIX;
 const CATEGORY_PORT = process.env.NEXT_PUBLIC_CATEGORY_PORT;
+
+// const publicAPIURL = `${BACKEND_PREFIX}:${CATEGORY_PORT}`
+const publicAPIURL = `${GATEWAY_PREFIX}`
 
 interface CategoryResponse {
   status: number;
@@ -13,10 +17,7 @@ interface CategoryResponse {
 }
 
 export async function GET_GetCategory(id: string) {
-  const url = (
-    BACKEND_PREFIX?.toString() +
-    ":" +
-    CATEGORY_PORT?.toString() +
+  const url = (publicAPIURL +
     "/category/" +
     id
   ).toString();
@@ -59,10 +60,7 @@ interface CategoryListResponse {
 }
 
 export async function GET_GetAllCategories() {
-  const url = (
-    BACKEND_PREFIX?.toString() +
-    ":" +
-    CATEGORY_PORT?.toString() +
+  const url = (publicAPIURL +
     "/categories"
   ).toString();
 
@@ -100,10 +98,7 @@ export async function GET_GetAllCategories() {
 }
 
 export async function POST_GetCategoryList(ids: string[]) {
-  const url = (
-    BACKEND_PREFIX?.toString() +
-    ":" +
-    CATEGORY_PORT?.toString() +
+  const url = (publicAPIURL +
     "/categories/list"
   ).toString();
 
@@ -149,10 +144,7 @@ interface SubCategoryListResponse {
 }
 
 export async function GET_GetAllSubCategories() {
-  const url = (
-    BACKEND_PREFIX?.toString() +
-    ":" +
-    CATEGORY_PORT?.toString() +
+  const url = (publicAPIURL +
     "/subCategories"
   ).toString();
 

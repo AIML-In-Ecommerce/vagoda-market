@@ -2,8 +2,12 @@
 import { ShopType } from "@/model/ShopType";
 import axios from "axios";
 
+const GATEWAY_PREFIX = process.env.NEXT_PUBLIC_GATEWAY_PREFIX;
 const BACKEND_PREFIX = process.env.NEXT_PUBLIC_BACKEND_PREFIX;
 const SHOP_PORT = process.env.NEXT_PUBLIC_SHOP_PORT;
+
+const publicAPIURL = `${GATEWAY_PREFIX}`
+// const publicAPIURL = `${BACKEND_PREFIX}:${SHOP_PORT}`
 
 interface ShopResponse {
   status: number;
@@ -12,10 +16,7 @@ interface ShopResponse {
 }
 
 export async function GET_GetShop(id: string) {
-  const url = (
-    BACKEND_PREFIX?.toString() +
-    ":" +
-    SHOP_PORT?.toString() +
+  const url = (publicAPIURL +
     "/shop/" +
     id
   ).toString();
@@ -58,10 +59,7 @@ interface ShopListResponse {
 }
 
 export async function GET_GetShopList() {
-  const url = (
-    BACKEND_PREFIX?.toString() +
-    ":" +
-    SHOP_PORT?.toString() +
+  const url = (publicAPIURL +
     "/shops"
   ).toString();
 

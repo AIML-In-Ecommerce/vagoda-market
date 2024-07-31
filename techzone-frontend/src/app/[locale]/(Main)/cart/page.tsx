@@ -497,7 +497,7 @@ export default function CartPage() {
                                     {
                                         payment_options.map(item => {
                                             return (
-                                                <div className={`border-2 rounded-xl cursor-pointer ${paymentMethod === item.value ? "border-[#9bb0e8]" : "border-gray-200"} mt-1 p-2`}>
+                                                <div key={item.value} className={`border-2 rounded-xl cursor-pointer ${paymentMethod === item.value ? "border-[#9bb0e8]" : "border-gray-200"} mt-1 p-2`}>
                                                     <GreyoutWrapper>
                                                         <Radio value={item.value} className="w-full text-gray-400 hover:text-black">
                                                             <div className="flex flex-row items-center">
