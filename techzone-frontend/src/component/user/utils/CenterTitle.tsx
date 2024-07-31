@@ -37,6 +37,14 @@ function CenterTitle({
         </Flex> */}
 
         <div className="w-1/2">
+          {/* <ConfigProvider
+            theme={{
+              token: {
+                colorSplit: "black",
+                colorText: "black",
+              },
+            }}
+          > */}
           <Divider
             style={{
               border: "2px solid silver",
@@ -49,9 +57,10 @@ function CenterTitle({
             }}
           >
             <p className={`${uppercase} text-lg lg:text-2xl font-semibold`}>
-              ‧・ {title} ・‧
+              ‧・ ❀ {title} ❀ ・‧
             </p>
           </Divider>
+          {/* </ConfigProvider> */}
         </div>
 
         {subTitle ? (
@@ -60,7 +69,7 @@ function CenterTitle({
             justify="center"
             align="center"
           >
-            <p className="text-[#797979] text-sm">{subTitle}</p>
+            <p className="text-[#797979] text-sm">✦ {subTitle} ✦</p>
           </Flex>
         ) : (
           <></>

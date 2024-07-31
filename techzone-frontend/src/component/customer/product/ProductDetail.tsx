@@ -404,6 +404,13 @@ export default function ProductDetail(props: ProductDetailProps) {
               <div className="w-full">
                 <div className="w-full flex flex-col align-middle justify-center items-center">
                   <div className="w-1/2">
+                    {/* <ConfigProvider
+                      theme={{
+                        token: {
+                          colorSplit: "black",
+                        },
+                      }}
+                    > */}
                     <Divider
                       className="mt-8"
                       style={{
@@ -417,9 +424,10 @@ export default function ProductDetail(props: ProductDetailProps) {
                       }}
                     >
                       <div className="px-5 text-lg uppercase">
-                        Sản phẩm có thể kết hợp
+                        ✦ Sản phẩm có thể kết hợp ✦
                       </div>
                     </Divider>
+                    {/* </ConfigProvider> */}
                   </div>
                 </div>
 
@@ -489,7 +497,7 @@ export default function ProductDetail(props: ProductDetailProps) {
                     }}
                   >
                     <div className="px-5 text-lg uppercase">
-                      Sản phẩm tương tự
+                      ✦ Sản phẩm tương tự ✦
                     </div>
                   </Divider>
                 </div>
