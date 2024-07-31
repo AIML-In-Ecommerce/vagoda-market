@@ -3,9 +3,12 @@ import { CartItem, Product } from '../cart/CartProductAPI';
 
 // const BACKEND_PREFIX = process.env.NEXT_PUBLIC_BACKEND_PREFIX
 // //local testing...
-// const BACKEND_PREFIX_FOR_PAYMENT = 'http://localhost'
-// const PAYMENT_PORT = process.env.NEXT_PUBLIC_PAYMENT_PORT
+const BACKEND_PREFIX_FOR_PAYMENT = 'http://localhost'
+const PAYMENT_PORT = process.env.NEXT_PUBLIC_PAYMENT_PORT
 const GATEWAY_PREFIX = process.env.NEXT_PUBLIC_GATEWAY_PREFIX;
+
+// const publicAPIURL = `${BACKEND_PREFIX_FOR_PAYMENT}:${PAYMENT_PORT}`
+const publicAPIURL = `${GATEWAY_PREFIX}`
 
 export enum PaymentMethod {
     COD = 'COD',
@@ -28,7 +31,7 @@ export interface ZalopayResponseData {
 export async function POST_processTransaction(userId: string, items: CartItem[], totalPrice: number, paymentMethod: PaymentMethod) {
     const method = paymentMethod.toLowerCase();
     
-    const url = `${GATEWAY_PREFIX}/${method}/payment`
+    const url = `${publicAPIURL}/${method}/payment`
     
     try {
         const response = await axios.post(url, {

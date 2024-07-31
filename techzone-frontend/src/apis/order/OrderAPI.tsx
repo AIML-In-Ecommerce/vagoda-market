@@ -2,9 +2,12 @@ import axios from "axios";
 
 const BACKEND_PREFIX = process.env.NEXT_PUBLIC_BACKEND_PREFIX;
 const ORDER_PORT = process.env.NEXT_PUBLIC_ORDER_PORT;
-const HTTP_BACKEND_PREFIX = `${BACKEND_PREFIX}:${ORDER_PORT}`;
+// const publicAPIURL = `${BACKEND_PREFIX}:${ORDER_PORT}`;
 
 const GATEWAY_PREFIX = process.env.NEXT_PUBLIC_GATEWAY_PREFIX;
+
+const publicAPIURL = `${GATEWAY_PREFIX}`
+
 
 export interface Order {
   _id: string;
@@ -133,7 +136,7 @@ export interface User {
 }
 
 export async function GET_GetAllOrders(userId: string) {
-  const url = `${GATEWAY_PREFIX}/order/buyer/orders?userId=${userId}`;
+  const url = `${publicAPIURL}/order/buyer/orders?userId=${userId}`;
   try {
     const response = await axios.get(url);
     if (userId == null) {
@@ -173,7 +176,7 @@ export async function GET_GetAllOrders(userId: string) {
 }
 
 export async function GET_GetOrderById(orderId: string, userId: string) {
-  const url = `${GATEWAY_PREFIX}/order/buyer/order?orderId=${orderId}&userId=${userId}`;
+  const url = `${publicAPIURL}/order/buyer/order?orderId=${orderId}&userId=${userId}`;
   try {
     const response = await axios.get(url);
     let responseData = response.data;
@@ -211,7 +214,7 @@ export async function POST_createOrder(
   itemIds: string[],
   paymentMethodId: string
 ) {
-  const url = `${GATEWAY_PREFIX}/order/buyer/create?userId=${userId}`;
+  const url = `${publicAPIURL}/order/buyer/create?userId=${userId}`;
   try {
     const response = await axios.post(url, {
       shippingAddressId: shippingAddressId,
@@ -256,7 +259,7 @@ export async function POST_createOrder(
   }
 }
 export async function GET_GetLatestOrder(userId: string) {
-  const url = `${GATEWAY_PREFIX}/order/buyer/orders?userId=${userId}`;
+  const url = `${publicAPIURL}/order/buyer/orders?userId=${userId}`;
   try {
     const response = await axios.get(url);
     if (userId === null) {
@@ -297,7 +300,7 @@ export async function GET_GetLatestOrder(userId: string) {
 }
 
 export async function GET_GetOrderProduct(orderId: string, itemId: string) {
-  const url = `${GATEWAY_PREFIX}/order/get_item`;
+  const url = `${publicAPIURL}/order/get_item`;
   try {
     const response = await axios.get(url, {
       params: {
@@ -333,7 +336,7 @@ export async function GET_GetOrderProduct(orderId: string, itemId: string) {
   }
 }
 export async function POST_RepurchaseOrder(orderId: string, itemIds: string[]) {
-  const url = `${GATEWAY_PREFIX}/order/buyer/repurchase_item`;
+  const url = `${publicAPIURL}/order/buyer/repurchase_item`;
   try {
     const response = await axios.post(url, {
         orderId: orderId,

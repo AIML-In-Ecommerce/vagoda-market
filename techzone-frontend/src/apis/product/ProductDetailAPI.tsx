@@ -7,8 +7,12 @@ import {
 import axios from "axios";
 import { GET_GetProductRating } from "../review/ReviewAPI";
 
+const GATEWAY_PREFIX = process.env.NEXT_PUBLIC_GATEWAY_PREFIX;
 const BACKEND_PREFIX = process.env.NEXT_PUBLIC_BACKEND_PREFIX;
 const PRODUCT_PORT = process.env.NEXT_PUBLIC_PRODUCT_PORT;
+
+const publicAPIURL = `${GATEWAY_PREFIX}`
+// const publicAPIURL = `${BACKEND_PREFIX}:${PRODUCT_PORT}`
 
 interface ProductDetailResponse {
   status: number;
@@ -17,10 +21,7 @@ interface ProductDetailResponse {
 }
 
 export async function GET_GetProductDetail(id: string) {
-  const url = (
-    BACKEND_PREFIX?.toString() +
-    ":" +
-    PRODUCT_PORT?.toString() +
+  const url = (publicAPIURL +
     "/product/" +
     id
   ).toString();
@@ -86,10 +87,7 @@ export async function GET_GetProductDetail(id: string) {
 }
 
 export async function PUT_UpdateProductRating(id: string) {
-  const url = (
-    BACKEND_PREFIX?.toString() +
-    ":" +
-    PRODUCT_PORT?.toString() +
+  const url = (publicAPIURL +
     "/product/" +
     id
   ).toString();
@@ -136,10 +134,7 @@ interface ProductListResponse {
 }
 
 export async function POST_GetProductList(idList: string[]) {
-  const url = (
-    BACKEND_PREFIX?.toString() +
-    ":" +
-    PRODUCT_PORT?.toString() +
+  const url = (publicAPIURL +
     "/products/list"
   ).toString();
 
@@ -202,10 +197,7 @@ export async function POST_GetProductList(idList: string[]) {
 }
 
 export async function POST_GetProductListByShop(shopId: string) {
-  const url = (
-    BACKEND_PREFIX?.toString() +
-    ":" +
-    PRODUCT_PORT?.toString() +
+  const url = (publicAPIURL +
     "/products/filter"
   ).toString();
 
@@ -271,10 +263,7 @@ export async function POST_GetProductListByShop(shopId: string) {
 }
 
 export async function GET_GetRelatedProduct(id: string) {
-  const url = (
-    BACKEND_PREFIX?.toString() +
-    ":" +
-    PRODUCT_PORT?.toString() +
+  const url = (publicAPIURL +
     "/related/" +
     id
   ).toString();
