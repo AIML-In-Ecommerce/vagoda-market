@@ -10,7 +10,7 @@ const GATEWAY_PREFIX = process.env.NEXT_PUBLIC_GATEWAY_PREFIX;
 const BACKEND_PREFIX = process.env.NEXT_PUBLIC_BACKEND_PREFIX;
 const REVIEW_PORT = process.env.NEXT_PUBLIC_REVIEW_PORT;
 
-const publicAPIURL = `${GATEWAY_PREFIX}`
+const publicAPIURL = `${GATEWAY_PREFIX}`;
 // const publicAPIURL = `${BACKEND_PREFIX}:${REVIEW_PORT}`
 
 interface ReviewResponse {
@@ -20,10 +20,7 @@ interface ReviewResponse {
 }
 
 export async function GET_GetReview(id: string) {
-  const url = (publicAPIURL +
-    "/review/" +
-    id
-  ).toString();
+  const url = (publicAPIURL + "/review/" + id).toString();
 
   try {
     // console.log(url);
@@ -109,9 +106,7 @@ export async function GET_GetReview(id: string) {
 // }
 
 export async function POST_CreateReview(props: RawReviewType) {
-  const url = (publicAPIURL +
-    "/review"
-  ).toString();
+  const url = (publicAPIURL + "/review").toString();
 
   try {
     if (props.asset.length > 0) {
@@ -178,7 +173,13 @@ export async function POST_CreateReview(props: RawReviewType) {
         like: props.like,
       };
 
-      const response = await axios.post(url, requestBody);
+      const response = await axios.post(
+        url,
+        requestBody
+        //   {headers: {
+        //   "Content-Type": "application/json",
+        // },}
+      );
       const responseData: ReviewResponse = response.data;
 
       if (responseData.status == 200) {
@@ -209,10 +210,7 @@ export async function POST_CreateReview(props: RawReviewType) {
 }
 
 export async function DELETE_DeleteReview(id: string) {
-  const url = (publicAPIURL +
-    "/review/" +
-    id
-  ).toString();
+  const url = (publicAPIURL + "/review/" + id).toString();
 
   try {
     // console.log(url);
@@ -246,10 +244,7 @@ export async function DELETE_DeleteReview(id: string) {
 }
 
 export async function PUT_UpdateReview(props: RawReviewType) {
-  const url = (publicAPIURL +
-    "/review/" +
-    props._id
-  ).toString();
+  const url = (publicAPIURL + "/review/" + props._id).toString();
 
   try {
     // console.log(url);
@@ -300,10 +295,7 @@ interface ReviewListResponse {
 }
 
 export async function GET_GetReviewListByProduct(productId: string) {
-  const url = (publicAPIURL +
-    "/productReviews/" +
-    productId
-  ).toString();
+  const url = (publicAPIURL + "/productReviews/" + productId).toString();
 
   try {
     // console.log(url);
@@ -383,7 +375,8 @@ export async function GET_GetAllReviewsByQuery(
   product: string,
   rating: number
 ) {
-  const url = (publicAPIURL +
+  const url = (
+    publicAPIURL +
     "/reviews?product=" +
     product +
     "&&rating=" +
@@ -429,9 +422,7 @@ interface CommentResponse {
 }
 
 export async function POST_CreateComment(props: any) {
-  const url = (publicAPIURL +
-    "/comment"
-  ).toString();
+  const url = (publicAPIURL + "/comment").toString();
 
   try {
     const response = await axios.post(url, props);
@@ -464,10 +455,7 @@ export async function POST_CreateComment(props: any) {
 }
 
 export async function GET_GetProductRating(id: string) {
-  const url = (publicAPIURL +
-    "/avgRating/" +
-    id
-  ).toString();
+  const url = (publicAPIURL + "/avgRating/" + id).toString();
 
   try {
     // console.log(url);
