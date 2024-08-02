@@ -2,8 +2,9 @@
 
 import ProductItem from "@/component/customer/ProductItem";
 import { ProductType } from "@/model/ProductType";
-import { Button, Flex, message, Skeleton } from "antd";
+import { Flex } from "antd";
 import React, { ReactElement, useEffect, useRef, useState } from "react";
+import { notification } from "antd";
 const authLocalStorageID = "#auth-context-user-info-record-ID";
 
 export interface InfiniteScrollProductsProps {
@@ -56,6 +57,16 @@ const InfiniteProductsList: React.FC<{
   const [products, setProducts] = useState<ProductItemProps[]>(additionalData);
   const [isLoadingItems, setIsLoadingItems] = useState<boolean>(false);
 
+  const [api, contextHolder] = notification.useNotification()
+
+  const openNotification = (title: string, content: ReactElement) => {
+    api.info({
+      message: `${title}`,
+      description: content,
+      placement: "topLeft",
+    });
+  };
+
   const ref = useRef(null);
   React.useEffect(() => {
     require("@lottiefiles/lottie-player");
@@ -85,6 +96,7 @@ const InfiniteProductsList: React.FC<{
 
   return (
     <>
+      {contextHolder}
       <Flex
         className="w-full h-full bg-gray-100 p-4"
         vertical
@@ -101,6 +113,7 @@ const InfiniteProductsList: React.FC<{
               className="lg:col-span-1 md:col-span-1 sm:col-span-1 "
             >
               <ProductItem
+                notify={openNotification}
                 _id={value._id}
                 imageLink={value.images[0]}
                 name={value.name}

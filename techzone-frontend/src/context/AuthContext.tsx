@@ -72,7 +72,7 @@ export default function AuthContextProvider({
     }
   }
 
-  const [userInfo, setUserInfo] = useState<SimpleUserInfoType | null>(initLoading());
+  const [userInfo, setUserInfo] = useState<SimpleUserInfoType | null>(null);
 
   const router = useRouter();
   const currentPathname = usePathname();
@@ -126,7 +126,12 @@ export default function AuthContextProvider({
   }
 
   function getAccessToken() {
-    return Cookies.get(accessTokenCookieKey);
+    const storageToken = Cookies.get(accessTokenCookieKey);
+    if(storageToken == undefined)
+    {
+      return null
+    }
+    return storageToken
   }
 
   async function refreshToken() {
@@ -197,7 +202,13 @@ export default function AuthContextProvider({
   }
 
   function getSessionId() {
-    return Cookies.get(sessionIdKey);
+    const storageSSID = Cookies.get(sessionIdKey);
+    if(storageSSID == undefined)
+    {
+      return null
+    }
+    
+    return storageSSID
   }
 
   const supportMethodValue: AuthContextFunctions = {

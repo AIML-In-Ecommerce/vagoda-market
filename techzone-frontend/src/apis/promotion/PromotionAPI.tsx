@@ -3,8 +3,12 @@
 import { PromotionType } from "@/model/PromotionType";
 import axios from "axios";
 
+const GATEWAY_PREFIX = process.env.NEXT_PUBLIC_GATEWAY_PREFIX;
 const BACKEND_PREFIX = process.env.NEXT_PUBLIC_BACKEND_PREFIX;
 const PROMOTION_PORT = process.env.NEXT_PUBLIC_PROMOTION_PORT;
+
+const publicAPIURL = `${GATEWAY_PREFIX}`
+// const publicAPIURL = `${BACKEND_PREFIX}:${PROMOTION_PORT}`
 
 interface PromotionListResponse {
   status: number;
@@ -13,10 +17,7 @@ interface PromotionListResponse {
 }
 
 export async function POST_GetPromotionList(ids: string[]) {
-  const url = (
-    BACKEND_PREFIX?.toString() +
-    ":" +
-    PROMOTION_PORT?.toString() +
+  const url = (publicAPIURL +
     "/promotions/list"
   ).toString();
 
@@ -56,10 +57,7 @@ export async function POST_GetPromotionList(ids: string[]) {
 }
 
 export async function GET_GetPromotionListByShop(shopId: string) {
-  const url = (
-    BACKEND_PREFIX?.toString() +
-    ":" +
-    PROMOTION_PORT?.toString() +
+  const url = (publicAPIURL +
     "/promotions/shop/" +
     shopId
   ).toString();

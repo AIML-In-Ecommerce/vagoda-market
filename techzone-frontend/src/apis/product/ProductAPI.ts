@@ -14,11 +14,12 @@ export interface ProductFilterInput {
   amount?: number;
 }
 
-const BACKEND_SERVER_PREFIX = `${process.env.NEXT_PUBLIC_BACKEND_PREFIX}:${process.env.NEXT_PUBLIC_PRODUCT_PORT}`;
+const publicAPIURL = `${process.env.NEXT_PUBLIC_GATEWAY_PREFIX}`;
+// const publicAPIURL = `${process.env.NEXT_PUBLIC_BACKEND_PREFIX}:${process.env.NEXT_PUBLIC_PRODUCT_PORT}`;
 
 export const ProductAPI = {
   getProductByFilter: async (input: ProductFilterInput) => {
-    const URL = `${BACKEND_SERVER_PREFIX}/products/filter`;
+    const URL = `${publicAPIURL}/products/filter`;
     try {
       const response = await axios.post(URL, input);
       return response.data;
@@ -27,7 +28,7 @@ export const ProductAPI = {
     }
   },
   get4SuggestedProducts: async (input: { subCategories: string[] }) => {
-    const URL = `${BACKEND_SERVER_PREFIX}/revelantCategoryProducts`;
+    const URL = `${publicAPIURL}/revelantCategoryProducts`;
     try {
       const response = await axios.post(URL, input);
       return response.data;

@@ -67,9 +67,14 @@ export interface ShopInfoDesign {
 
 
 const GATEWAY_PREFIX = process.env.NEXT_PUBLIC_GATEWAY_PREFIX
+const BACKEND_PREFIX = process.env.NEXT_PUBLIC_BACKEND_PREFIX;
+const CART_PORT = process.env.NEXT_PUBLIC_CART_PORT;
+
+// const publicAPIURL = `${BACKEND_PREFIX}:${CART_PORT}`
+const publicAPIURL = `${GATEWAY_PREFIX}`
 
 export async function GET_GetAllPromotionByShopId(shopId: string) {
-    const url = `${GATEWAY_PREFIX}/promotion/shop/all?shopId=${shopId}`
+    const url = `${publicAPIURL}/promotion/shop/all?shopId=${shopId}`
     try {
         const response = await axios.get(url);
         let responseData = response.data;
@@ -92,7 +97,7 @@ export async function GET_GetPromotionWithSelection(
     targetProducts?: string[],
     inActive?: boolean
 ) {
-    const url = `${GATEWAY_PREFIX}/promotion/shop/selection`
+    const url = `${publicAPIURL}/promotion/shop/selection`
     try {
         const response = await axios.post(url, {
             "shopId": shopId,

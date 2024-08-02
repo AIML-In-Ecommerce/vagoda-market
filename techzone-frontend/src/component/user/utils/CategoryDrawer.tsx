@@ -404,7 +404,7 @@ export default function CategoryDrawer({}: CategoryDrawerProps)
                                 if(type === undefined || type == null)
                                 {
                                     return (
-                                        <Typography.Text className="text-gray-700 text-lg">
+                                        <Typography.Text key={typeId} className="text-gray-700 text-lg">
                                             No service
                                         </Typography.Text>
                                     )

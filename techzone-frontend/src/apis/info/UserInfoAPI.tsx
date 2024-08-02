@@ -2,7 +2,8 @@ import axios from "axios"
 
 
 // const publicURL = `${process.env.NEXT_PUBLIC_BACKEND_PREFIX}:${process.env.NEXT_PUBLIC_USER_PORT}`
-const publicURL = `${process.env.NEXT_PUBLIC_BACKEND_PREFIX}`
+// const publicURL = `${process.env.NEXT_PUBLIC_BACKEND_PREFIX}`
+const publicAPIURL = `${process.env.NEXT_PUBLIC_GATEWAY_PREFIX}`
 
 const UserInfoAPI = 
 {
@@ -43,7 +44,7 @@ const UserInfoAPI =
 
     async getUserInfo(userId: string, useAddress: boolean)
     {
-        const url = `${publicURL}/user_info`
+        const url = `${publicAPIURL}/user_info`
         try
         {
             const response = await axios.get(url, {

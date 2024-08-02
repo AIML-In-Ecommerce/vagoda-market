@@ -141,21 +141,25 @@ export default function MainNavbar() {
       const data: _CategoryType[] = await CategoryService.getAllCategories();
       setAllCategories(data);
     };
-    // Load cart size on badge
-    const loadCartSize = async () => {
-      const data = await GET_getUserCartProducts(authContext.userInfo?._id as string);
-      if (data.data) {
-        // console.log('Loading Cart Size', data);
-        setCountItemsCart(data.data.products.length);
-      }
-    }
-    if (authContext.userInfo) {
-      loadCartSize()
-      loadAllCategories();
 
+    if (authContext.userInfo) {
+      loadAllCategories();
+    }
+  }, [authContext.userInfo]);
+
+  //separate categories calling
+  useEffect(() => {
+    if (authContext.userInfo) {
+      // Load cart size on badge
+      const loadCartSize = async () => {
+        const data = await GET_getUserCartProducts(authContext.userInfo?._id as string);
+        if (data.data) {
+          // console.log('Loading Cart Size', data);
+          setCountItemsCart(data.data.products.length);
+        }
+      }
       const intervalId = setInterval(() => {
         loadCartSize();
-        loadAllCategories();
       }, 1000 * 5) // in milliseconds
       return () => clearInterval(intervalId)
     }
@@ -164,9 +168,8 @@ export default function MainNavbar() {
   return (
     <div>
       <div
-        className={`flex text-xs  justify-end bg-[#5c6856]  items-center ${
-          menuMode == "mobileMode" ? "px-2" : "px-24"
-        }  `}
+        className={`flex text-xs  justify-end bg-[#5c6856]  items-center ${menuMode == "mobileMode" ? "px-2" : "px-24"
+          }  `}
       >
         {/* <div className="flex  items-center text-white space-x-2">
           <TfiHeadphoneAlt />

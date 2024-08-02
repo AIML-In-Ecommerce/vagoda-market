@@ -3,8 +3,12 @@ import { CartProductType } from "@/model/ProductType";
 // import { CartType } from "@/model/CartType";
 import axios from "axios";
 
+const GATEWAY_PREFIX = process.env.NEXT_PUBLIC_GATEWAY_PREFIX
 const BACKEND_PREFIX = process.env.NEXT_PUBLIC_BACKEND_PREFIX;
 const CART_PORT = process.env.NEXT_PUBLIC_CART_PORT;
+
+// const publicAPIURL = `${BACKEND_PREFIX}:${CART_PORT}`
+const publicAPIURL = `${GATEWAY_PREFIX}`
 
 interface CartResponse {
   status: number;
@@ -14,10 +18,7 @@ interface CartResponse {
 }
 
 export async function GET_GetCart(id: string) {
-  const url = (
-    BACKEND_PREFIX?.toString() +
-    ":" +
-    CART_PORT?.toString() +
+  const url = (publicAPIURL +
     "/cart/" +
     id
   ).toString();
@@ -54,10 +55,7 @@ export async function GET_GetCart(id: string) {
 }
 
 export async function PUT_UpdateCart(id: string, products: CartProductType[]) {
-  const url = (
-    BACKEND_PREFIX?.toString() +
-    ":" +
-    CART_PORT?.toString() +
+  const url = (publicAPIURL +
     "/cart/user?userId=" +
     id
   ).toString();
@@ -94,10 +92,7 @@ export async function PUT_UpdateCart(id: string, products: CartProductType[]) {
 }
 
 export async function POST_AddToCart(id: string, products: CartProductType[]) {
-  const url = (
-    BACKEND_PREFIX?.toString() +
-    ":" +
-    CART_PORT?.toString() +
+  const url = (publicAPIURL +
     "/cart/user/add?userId=" +
     id
   ).toString();

@@ -46,6 +46,8 @@ import { SimpleUserInfoType } from "@/model/UserInfoType";
 import VoiceChat from "./utils/VoiceChat";
 const authLocalStorageID = "#auth-context-user-info-record-ID";
 
+const AI_DOMAIN = `${process.env.NEXT_PUBLIC_AI_DOMAIN}`;
+
 interface AIAssistantFloatButtonProps {}
 
 enum AssistantMessageTypes {
@@ -305,7 +307,6 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
   const [inputType, setInputType] = useState<InputType>("KEYBOARD");
   const buttonRef = useRef<HTMLDivElement>(null);
   const userInputRef = useRef<string>("");
-  const AI_DOMAIN = process.env.NEXT_PUBLIC_AI_DOMAIN;
 
   const sendClick = () => {
     if (buttonRef.current) {
