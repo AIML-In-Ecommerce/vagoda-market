@@ -8,6 +8,7 @@ import mediaImgLocalLink from '../../../public/asset/youtube.256x180.png'
 import googleImgLocalLink from '../../../public/asset/google.256x256.png'
 
 import logoImgLocalLink from '../../../public/asset/logo.png'
+import VagodaIcon from "../VagodaIcon"
 
 interface WebFooterProps
 {
@@ -340,9 +341,9 @@ export default function WebFooter({}: WebFooterProps)
                     </div>
                     <div className="w-full flex justify-evenly items-center">
                         <Flex justify="center" className="w-1/2" align="center" gap={6}>
-                            <Image src={logoImgLocalLink.src} width={"60px"} height={"60px"}/>
+                            <VagodaIcon width={60} height={60} color={"#683A25"}/>
                             <Typography.Text className="text-amber-900 text-base">
-                                CÔNG TY CỔ PHẦN THƯƠNG MẠI - DỊCH VỤ TECHZONE
+                                CÔNG TY CỔ PHẦN THƯƠNG MẠI - DỊCH VỤ VAGODA
                             </Typography.Text>
                         </Flex>
                         <Flex vertical justify="center" className="w-1/2">

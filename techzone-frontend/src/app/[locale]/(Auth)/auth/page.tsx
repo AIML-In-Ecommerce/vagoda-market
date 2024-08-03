@@ -13,35 +13,41 @@ export default function Auth() {
   const ref = useRef(null);
   const mainImages = [
     {
-      index:0,
-      url: "https://img.freepik.com/free-photo/person-shopping-second-hand-market_23-2149353683.jpg?t=st=1721832880~exp=1721836480~hmac=df9d19cb997065658fa2b888409b52ba67d4ecd87083bdc41c656161e48be955&w=360",
-      title: "Mua sắm thả ga",
-      subTitle: "vô vàng lựa chọn!!"
-    },
-    {
-      index: 1,
-      url: "https://img.freepik.com/free-photo/full-shot-woman-local-retail_23-2149313473.jpg?t=st=1721902183~exp=1721905783~hmac=7ce5c0dd1c51e19aabb1b2d4d9edd749ab4227cf7f598b0f4cf76b1888f6fefd&w=360",
-      title: "Sales vô vàng",
-      subTitle: "săn ngàn đồ tốt cùng Vagoda!!"
-    },
-    {
-      index: 2,
-      url: "https://img.freepik.com/free-photo/young-woman-surrounded-by-piles-clothes_23-2149133928.jpg?t=st=1721905472~exp=1721909072~hmac=2cab9f5c2a56b4a35283b6056734b5b2875296a7d4cc2dff3c16ab3ec41222ef&w=360",
-      title: "Không biết mặc gì?",
-      subTitle: "hãy để Vagoda giúp bạn..."
-    },
-    {
-      index: 3,
-      url: "https://img.freepik.com/free-photo/satisfied-young-women-holding-shopping-bags-posing-front-clothes-store_23-2147968396.jpg?t=st=1721905578~exp=1721909178~hmac=9de9a3544c3ed7f2181626a918cdc65e9979f8bd4d36cb3dd545f228fef5fcc6&w=360",
-      title: "Chuẩn bị du lịch?",
-      subTitle: "sắm ngay trên Vagoda"
-    },
-    {
-      index: 4,
-      url: "https://img.freepik.com/free-photo/stylish-models-showing-paper-bags_23-2147689035.jpg?t=st=1721905873~exp=1721909473~hmac=28210d161254cb7b99a6a592634e7cf14544772e2d166185fb926c7c7e6ea14d&w=360",
-      title: "Năng động hay Thanh lịch",
-      subTitle: "mọi thứ đều có trên Vagoda!!"
+      index: 0,
+      url: "https://cdn.discordapp.com/attachments/1160486233336713347/1269222657832779828/Image_15.png?ex=66af4736&is=66adf5b6&hm=e1d9578c32129280b97615cbc7f983d5fb52516386ec0227d09ad40b0065606f&",
+      title: "Vagoda",
+      subTitle: "Vagoda"
     }
+    // {
+    //   index:0,
+    //   url: "https://img.freepik.com/free-photo/person-shopping-second-hand-market_23-2149353683.jpg?t=st=1721832880~exp=1721836480~hmac=df9d19cb997065658fa2b888409b52ba67d4ecd87083bdc41c656161e48be955&w=360",
+    //   title: "Mua sắm thả ga",
+    //   subTitle: "vô vàng lựa chọn!!"
+    // },
+    // {
+    //   index: 1,
+    //   url: "https://img.freepik.com/free-photo/full-shot-woman-local-retail_23-2149313473.jpg?t=st=1721902183~exp=1721905783~hmac=7ce5c0dd1c51e19aabb1b2d4d9edd749ab4227cf7f598b0f4cf76b1888f6fefd&w=360",
+    //   title: "Sales vô vàng",
+    //   subTitle: "săn ngàn đồ tốt cùng Vagoda!!"
+    // },
+    // {
+    //   index: 2,
+    //   url: "https://img.freepik.com/free-photo/young-woman-surrounded-by-piles-clothes_23-2149133928.jpg?t=st=1721905472~exp=1721909072~hmac=2cab9f5c2a56b4a35283b6056734b5b2875296a7d4cc2dff3c16ab3ec41222ef&w=360",
+    //   title: "Không biết mặc gì?",
+    //   subTitle: "hãy để Vagoda giúp bạn..."
+    // },
+    // {
+    //   index: 3,
+    //   url: "https://img.freepik.com/free-photo/satisfied-young-women-holding-shopping-bags-posing-front-clothes-store_23-2147968396.jpg?t=st=1721905578~exp=1721909178~hmac=9de9a3544c3ed7f2181626a918cdc65e9979f8bd4d36cb3dd545f228fef5fcc6&w=360",
+    //   title: "Chuẩn bị du lịch?",
+    //   subTitle: "sắm ngay trên Vagoda"
+    // },
+    // {
+    //   index: 4,
+    //   url: "https://img.freepik.com/free-photo/stylish-models-showing-paper-bags_23-2147689035.jpg?t=st=1721905873~exp=1721909473~hmac=28210d161254cb7b99a6a592634e7cf14544772e2d166185fb926c7c7e6ea14d&w=360",
+    //   title: "Năng động hay Thanh lịch",
+    //   subTitle: "mọi thứ đều có trên Vagoda!!"
+    // }
 
   ]
 
