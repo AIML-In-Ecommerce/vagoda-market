@@ -4,10 +4,8 @@ import { Currency } from '@/component/user/utils/CurrencyDisplay';
 import { QuantityControl } from '@/component/user/utils/QuantityControl';
 import { AuthContext } from '@/context/AuthContext';
 import { Button, Modal, Image, Select, Skeleton, Space, Table, TableColumnsType } from 'antd';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { useContext, useEffect, useMemo, useState } from 'react'
-import { BsShop } from 'react-icons/bs';
 import { FaRegTrashCan } from 'react-icons/fa6';
 import styled from 'styled-components';
 

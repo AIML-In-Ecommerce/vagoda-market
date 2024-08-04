@@ -22,6 +22,7 @@ import CartTable from "@/component/customer/cart/CartTable";
 import { AuthContext } from "@/context/AuthContext";
 import { NotificationPlacement } from "antd/es/notification/interface";
 import PromotionListModal from "@/component/customer/cart/PromotionListModal";
+import { usePaymentContext } from "@/context/PaymentContext";
 
 const { Search } = Input;
 
@@ -79,6 +80,7 @@ type PromotionDisplay = {
 
 export default function CartPage() {
     const context = useContext(AuthContext)
+    const paymentContext = usePaymentContext();
     const [products, setProducts] = useState<CartItem[]>();
     const [shopInfos, setShopInfos] = useState<ShopInfo[]>();
     const [promotions, setPromotions] = useState<PromotionType[]>([]);
@@ -190,10 +192,16 @@ export default function CartPage() {
 
         if (createOrderResponse) {
             console.log('Navigating to gateway...', createOrderResponse.data?.order_url);
+            console.log("createOrderResponse", createOrderResponse.data);
+            
             if (paymentMethod === PaymentMethod.ZALOPAY) {
+                paymentContext.setOrderIds(createOrderResponse.data.orderIds);
                 router.push(createOrderResponse.data.order_url)
             }
-            else { router.push('/payment') }
+            else { 
+                paymentContext.setOrderIds(createOrderResponse.data);
+                router.push('/payment');
+            }
         }
     }
 

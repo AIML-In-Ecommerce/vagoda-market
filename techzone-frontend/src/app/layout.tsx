@@ -4,6 +4,7 @@ import "./globals.css";
 // import SocketProvider from "@/socket/SocketProvider";
 import { ReactNode } from "react";
 import AuthContextProvider from "../context/AuthContext";
+import { PaymentProvider } from "@/context/PaymentContext";
 
 interface RootLayoutProps {
   children: ReactNode;
@@ -19,9 +20,11 @@ export default function RootLayout({ children }: RootLayoutProps) {
     <html lang={"en"}>
       <body className="w-full">
         <AuthContextProvider>
+          <PaymentProvider>
           {/* <SocketProvider> */}
           {children}
           {/* </SocketProvider> */}
+          </PaymentProvider>
         </AuthContextProvider>
       </body>
     </html>
