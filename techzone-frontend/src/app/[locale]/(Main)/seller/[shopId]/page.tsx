@@ -76,7 +76,11 @@ export default function ShopPage() {
           {(widgets && (
             <WidgetList
               widgets={widgets}
-              setCollectionId={setSelectedCollectionId}
+              setCollectionId={(id) => {
+                setSelectedCollectionId(id);
+                setTab("2");
+                window.scrollTo(0, 0);
+              }}
               setTab1={() => setTab("1")}
               notify={openNotification}
             />
@@ -119,15 +123,6 @@ export default function ShopPage() {
       ),
     },
   ];
-
-  useEffect(() => {
-    setTab("2");
-    window.scrollTo(0, 0);
-  }, [selectedCollectionId]);
-
-  useEffect(() => {
-    setTab("0");
-  }, []);
 
   // functions
   const handleChange = (e: any) => {
