@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname, useRouter } from 'next/navigation';
 // contexts/PaymentContext.tsx
 import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 
@@ -17,18 +18,28 @@ const PaymentContext = createContext<PaymentContextState | undefined>(undefined)
 // Create a provider component
 export const PaymentProvider = ({ children }: { children: ReactNode }) => {
   const [orderIds, setOrderIds] = useState<string[] | null>(null);
-  const [hasAccessedPaymentPage, setHasAccessedPaymentPage] = useState<boolean>(false);
+  const [hasAccessedPaymentPage, setHasAccessedPaymentPage] = useState<boolean>(true);
+  const router = useRouter();
+  const currentPathname = usePathname();
 
   useEffect(() => {
     const accessed = localStorage.getItem('hasAccessedPaymentPage');
     if (accessed) {
-      setHasAccessedPaymentPage(true);
+      if (currentPathname.includes('/payment') && Boolean(accessed)) {
+        router.replace('/');
+        return;
+      }
+      setHasAccessedPaymentPage(Boolean(accessed));
     }
+    console.log("PaymentContext reloaded");
   }, []);
 
   useEffect(() => {
     if (hasAccessedPaymentPage) {
       localStorage.setItem('hasAccessedPaymentPage', 'true');
+    }
+    else {
+      localStorage.setItem('hasAccessedPaymentPage', 'false');
     }
   }, [hasAccessedPaymentPage]);
 

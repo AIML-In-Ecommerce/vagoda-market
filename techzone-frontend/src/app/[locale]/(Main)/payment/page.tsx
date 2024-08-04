@@ -19,15 +19,8 @@ export default function PaymentPage() {
     const [orders, setOrders] = useState<Order[]>([]);
 
     useEffect(() => {
-        if (paymentContext.hasAccessedPaymentPage) {
-            paymentContext.setOrderIds(null);
-            router.push('/'); // Redirect to home page or another page
-        } else {
-            paymentContext.setHasAccessedPaymentPage(true);
-        }
-    }, [paymentContext.hasAccessedPaymentPage, 
-        router, 
-        paymentContext.setHasAccessedPaymentPage]);
+        paymentContext.setHasAccessedPaymentPage(true);
+    }, [router]);
 
     useEffect(() => {
         // Extract the current query parameters
@@ -47,6 +40,7 @@ export default function PaymentPage() {
         const fetchLatestOrder = async (orderIds: string[]) => {
             setLoading(true);
             console.log("fetchLatestOrder orderIds: ", orderIds);
+            if (orderIds === null) return;
             await POST_GetLatestOrder(context.userInfo?._id as string, orderIds)
             .then((response) => {
                 const ordersResponse = response.data ?? [];
@@ -58,12 +52,12 @@ export default function PaymentPage() {
             fetchLatestOrder(paymentContext.orderIds as string[]);
         }
     }, [context.userInfo, paymentContext.orderIds])
-
+    
     return (
         <React.Fragment>
             <div className="lg:container flex flex-col p-5 mx-auto my-5">
                 {
-                    loading ? <Skeleton active={loading} /> :
+                    loading ? <Skeleton active={loading}/> :
                         <PaymentStatusComponent orders={orders} />
                 }
             </div>

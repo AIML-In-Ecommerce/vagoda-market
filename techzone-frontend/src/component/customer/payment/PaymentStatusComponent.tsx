@@ -89,8 +89,9 @@ export default function PaymentStatusComponent(props: PaymentStatusComponentProp
                                         <div className="flex flex-col gap-2 mb-2">
                                             <div className="flex flex-row gap-2 items-center">
                                                 {/* <Image preview={false} src={}></Image> */}
-                                                <BsShop />
-                                                <div>{order.shop.name}</div>
+                                                <div className="font-semibold"><BsShop /></div>
+                                                <div className="font-semibold">{order.shop.name}</div>
+                                                <div>({order.products.length} sản phẩm - {formatCurrencyFromValue({value: order.totalPrice})})</div>
                                                 <div className="italic text-sky-500 hover:text-sky-600 hover:font-semibold cursor-pointer"
                                                     onClick={() => navigateToOrderDetailPage(order._id)}>
                                                     Chi tiết đơn hàng

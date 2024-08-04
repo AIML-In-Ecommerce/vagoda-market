@@ -240,7 +240,7 @@ export default function CartTable(props: CartTableProps) {
                                         <div>{record.shop}</div>
                                     </div> */}
                                     <div className="text-sm text-gray-500 mb-1">
-                                        {record.color?.color.label.toUpperCase() ?? ""} {record.size ? "/" : ""} {record.size ? record.size.toUpperCase() : ""}
+                                        {record.color?.color.label.toUpperCase() ?? ""} {record.color?.color.label && record.size ? "/" : ""} {record.size ? record.size.toUpperCase() : ""}
                                     </div>
                                     <SelectWrapper className="flex flex-row gap-2 mb-1">
                                         {

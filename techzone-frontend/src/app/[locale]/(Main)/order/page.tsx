@@ -28,12 +28,23 @@ const LOAD_DISPLAY: number = 2;
 const filterSearchQuery = (array: any[], query: string) => {
     const normalizedQuery = query.trim().toLowerCase();
 
-    const filteredArray = array.filter(item => {
-        const includesQuery = Object.values(item).some(value =>
-            typeof value === 'string' && value.toLowerCase().includes(normalizedQuery)
-        );
-        return includesQuery;
-    })
+    const searchInObject = (obj: any, keyword: string) => {
+        if (typeof obj !== 'object' || obj === null) {
+            return false;
+        }
+        for (let key in obj) {
+            if (typeof obj[key] === 'object') {
+                if (searchInObject(obj[key], keyword)) {
+                    return true;
+                }
+            } else if (obj[key].toString().toLowerCase().includes(keyword.toLowerCase())) {
+                return true;
+            }
+        }   
+        return false;
+    };
+
+    const filteredArray = array.filter(item => searchInObject(item, normalizedQuery))
     return filteredArray;
 }
 
