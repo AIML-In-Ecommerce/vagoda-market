@@ -22,52 +22,6 @@ enum OrderStatusType {
     CANCELLED = "CANCELLED",
 }
 
-const tabs =
-    [
-        {
-            index: 0,
-            key: "ALL_ORDER",
-            label: "Tất cả đơn",
-            children: <></>
-        },
-        {
-            index: 1,
-            key: OrderStatusType.WAITING_ONLINE_PAYMENT as string,
-            label: "Chờ thanh toán",
-            children: <></>
-        },
-        {
-            index: 2,
-            key: OrderStatusType.PENDING as string,
-            label: "Chờ xác nhận",
-            children: <></>
-        },
-        {
-            index: 3,
-            key: OrderStatusType.PROCESSING as string,
-            label: "Đang xử lý",
-            children: <></>
-        },
-        {
-            index: 4,
-            key: OrderStatusType.SHIPPING as string,
-            label: "Đang vận chuyển",
-            children: <></>
-        },
-        {
-            index: 5,
-            key: OrderStatusType.COMPLETED as string,
-            label: "Đã giao hàng",
-            children: <></>
-        },
-        {
-            index: 6,
-            key: OrderStatusType.CANCELLED as string,
-            label: "Đã hủy",
-            children: <></>
-        }
-    ]
-
 const INITIAL_DISPLAY: number = 3;
 const LOAD_DISPLAY: number = 2;
 
@@ -95,7 +49,7 @@ export default function OrderOverview(props: OrderOverviewProps) {
     const tab = tabParams.get('tab');
     const activeTabFromUrl = tab || 'ALL_ORDER';
     const router = useRouter();
-    const [selectedTabKey, setSelectedTabKey] = useState<string>(activeTabFromUrl)
+    const [selectedTabKey, setSelectedTabKey] = useState<string>(activeTabFromUrl);
 
     const filterOrders = (filter: string, orders: Order[]) => {
         if (filter === 'ALL_ORDER') return orders;
@@ -103,6 +57,55 @@ export default function OrderOverview(props: OrderOverviewProps) {
                 (order: Order) => 
                     order.orderStatus[order.orderStatus.length - 1].status === filter)
     }
+
+    const tabs = useMemo(() => {
+        const orderTabs =
+    [
+        {
+            index: 0,
+            key: "ALL_ORDER",
+            label: `Tất cả đơn (${filterOrders("ALL_ORDER", orders).length})`,
+            children: <></>
+        },
+        {
+            index: 1,
+            key: OrderStatusType.WAITING_ONLINE_PAYMENT as string,
+            label: `Chờ thanh toán (${filterOrders(OrderStatusType.WAITING_ONLINE_PAYMENT, orders).length})`,
+            children: <></>
+        },
+        {
+            index: 2,
+            key: OrderStatusType.PENDING as string,
+            label: `Chờ xác nhận (${filterOrders(OrderStatusType.PENDING, orders).length})`,
+            children: <></>
+        },
+        {
+            index: 3,
+            key: OrderStatusType.PROCESSING as string,
+            label: `Đang xử lý (${filterOrders(OrderStatusType.PROCESSING, orders).length})`,
+            children: <></>
+        },
+        {
+            index: 4,
+            key: OrderStatusType.SHIPPING as string,
+            label: `Đang vận chuyển (${filterOrders(OrderStatusType.SHIPPING, orders).length})`,
+            children: <></>
+        },
+        {
+            index: 5,
+            key: OrderStatusType.COMPLETED as string,
+            label: `Đã giao hàng (${filterOrders(OrderStatusType.COMPLETED, orders).length})`,
+            children: <></>
+        },
+        {
+            index: 6,
+            key: OrderStatusType.CANCELLED as string,
+            label: `Đã hủy (${filterOrders(OrderStatusType.CANCELLED, orders).length})`,
+            children: <></>
+        }
+    ]
+        return orderTabs;
+    }, [orders])
     
     const handleSearchQuery = (query: string) => {
         setDisplayOrders(filterSearchQuery(orders, query));
