@@ -22,8 +22,8 @@ interface ComboListProps {
   totalPrice: number;
   totalComboPrice: number;
   updateTotalComboPrice: (price: number) => void;
-  comboIdList: Array<string>;
-  setComboIdList: (list: Array<string>) => void;
+  comboList: ProductType[];
+  setComboList: (list: ProductType[]) => void;
   notify(message: string, content: ReactElement): void;
   combo: ProductType[];
   product: ProductDetailType;
@@ -67,15 +67,15 @@ const ComboList = (comboListData: ComboListProps) => {
   // const autoPlayCarouselSpeed = 5000; //ms
 
   // var and functions
-  const handleCheckbox = (isChecked: boolean, id: string, price: number) => {
+  const handleCheckbox = (isChecked: boolean, combo: ProductType) => {
     let tempTotalPrice = comboListData.totalComboPrice;
     if (isChecked) {
-      tempTotalPrice += price;
-      comboListData.comboIdList.push(id);
+      tempTotalPrice += combo.price;
+      comboListData.comboList.push(combo);
     } else {
-      tempTotalPrice -= price;
-      comboListData.setComboIdList(
-        comboListData.comboIdList.filter((i) => i !== id)
+      tempTotalPrice -= combo.price;
+      comboListData.setComboList(
+        comboListData.comboList.filter((i) => i._id !== combo._id)
       );
     }
     comboListData.updateTotalComboPrice(tempTotalPrice);
@@ -98,7 +98,7 @@ const ComboList = (comboListData: ComboListProps) => {
     ];
 
     if (comboListData.combo.length > 0) {
-      comboListData.combo.forEach((combo) => {
+      comboListData.comboList.forEach((combo) => {
         products.push({
           product: combo._id,
           quantity: 1,
@@ -142,8 +142,8 @@ const ComboList = (comboListData: ComboListProps) => {
         accessType
       );
 
-      if (comboListData.combo.length > 0) {
-        comboListData.combo.forEach((combo) => {
+      if (comboListData.comboList.length > 0) {
+        comboListData.comboList.forEach((combo) => {
           comboListData.notify(
             "Bạn đã thêm thành công!",
             <div className="flex flex-row gap-6 w-max">

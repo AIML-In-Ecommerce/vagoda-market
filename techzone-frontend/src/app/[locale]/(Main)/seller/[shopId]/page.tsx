@@ -16,10 +16,11 @@ import { ReactElement, useEffect, useState } from "react";
 import WidgetList from "@/component/customer/shop/WidgetList";
 import Collections from "@/component/customer/shop/collection/Collections";
 import { ShopDetailType, ShopType } from "@/model/ShopType";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { GET_GetShop } from "@/apis/shop/ShopAPI";
 import { POST_GetWidgetList } from "@/apis/widget/WidgetAPI";
 import ShopProductList from "@/component/customer/shop/ShopProductList";
+import { POST_GetProductListByShop } from "@/apis/product/ProductDetailAPI";
 
 interface ShopInfoProps {
   color: string;
@@ -63,8 +64,8 @@ export default function ShopPage() {
   const { shopId } = useParams();
   const [shop, setShop] = useState<ShopType>();
 
-  const router = useRouter();
   const [searchText, setSearchText] = useState("");
+  const [numberOfProduct, setNumberOfProduct] = useState(0);
 
   const tabItems = [
     {
@@ -103,6 +104,7 @@ export default function ShopPage() {
           {/* key = 2 */}
           <Collections
             selectedId={selectedCollectionId}
+            setSelectedId={setSelectedCollectionId}
             notify={openNotification}
           />
         </div>
@@ -139,6 +141,9 @@ export default function ShopPage() {
 
   useEffect(() => {
     if (!shop) return;
+
+    handleGetProductListNumber(shop._id);
+
     if (shop.shopInfoDesign) {
       setShopInfo({
         color: shop.shopInfoDesign.color,
@@ -159,7 +164,7 @@ export default function ShopPage() {
         cancelPercentage: shop.shopDetail.cancelPercentage,
         refundPercentage: shop.shopDetail.refundPercentage,
         sinceYear: shop.shopDetail.sinceYear,
-        totalProductNumber: shop.shopDetail.totalProductNumber,
+        totalProductNumber: numberOfProduct,
         description: shop.description,
         rating: shop.shopDetail.rating,
         replyPercentage: shop.shopDetail.replyPercentage,
@@ -174,6 +179,23 @@ export default function ShopPage() {
       else setWidgets([]);
     }
   }, [shop]);
+
+  useEffect(() => {
+    if (!shop) return;
+
+    if (shop.shopDetail) {
+      setShopDetail({
+        cancelPercentage: shop.shopDetail.cancelPercentage,
+        refundPercentage: shop.shopDetail.refundPercentage,
+        sinceYear: shop.shopDetail.sinceYear,
+        totalProductNumber: numberOfProduct,
+        description: shop.description,
+        rating: shop.shopDetail.rating,
+        replyPercentage: shop.shopDetail.replyPercentage,
+        address: shop.location,
+      });
+    }
+  }, [numberOfProduct]);
 
   const handleGetShop = async () => {
     const response = await GET_GetShop(shopId.toString());
@@ -191,6 +213,16 @@ export default function ShopPage() {
       // console.log(response.data);
       if (response.data) {
         setWidgets(response.data);
+      }
+    }
+  };
+
+  const handleGetProductListNumber = async (id: string) => {
+    const response = await POST_GetProductListByShop(id);
+    if (response.status == 200) {
+      // console.log(response.data);
+      if (response.data) {
+        setNumberOfProduct(response.data.length);
       }
     }
   };
