@@ -14,6 +14,9 @@ import { useEffect, useMemo, useState } from "react";
 import { GET_GetAllReviewsByQuery } from "@/apis/review/ReviewAPI";
 import { ReviewType } from "@/model/ReviewType";
 import axios from "axios";
+const AI_DOMAIN = process.env.NEXT_PUBLIC_AI_DOMAIN;
+
+console.log("AI DOMAIN: ", AI_DOMAIN);
 
 interface ReviewSummaryProps {
   product: ProductDetailType | undefined;
@@ -46,7 +49,7 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const [menuMode, setMenuMode] = useState<"horizontal" | "vertical">(
-    "horizontal"
+    "horizontal",
   );
 
   const checkWindowSize = () => {
@@ -88,13 +91,13 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
 
     try {
       const rawResponse = await axios.post(
-        "http://localhost:8000/genai/review-synthesis",
+        `${AI_DOMAIN}/genai/review-synthesis`,
         postBody,
         {
           headers: {
             "Content-Type": "application/json",
           },
-        }
+        },
       );
       if (rawResponse.status == 200) {
         console.log("Get summary review successfully:", rawResponse.data);
@@ -179,7 +182,7 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
                                   <Progress
                                     percent={Math.round(
                                       (fiveStarNumber / props.reviews.length) *
-                                        100
+                                        100,
                                     )}
                                     size="small"
                                   />
@@ -195,7 +198,7 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
                                   <Progress
                                     percent={Math.round(
                                       (fourStarNumber / props.reviews.length) *
-                                        100
+                                        100,
                                     )}
                                     size="small"
                                   />
@@ -211,7 +214,7 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
                                   <Progress
                                     percent={Math.round(
                                       (threeStarNumber / props.reviews.length) *
-                                        100
+                                        100,
                                     )}
                                     size="small"
                                   />
@@ -227,7 +230,7 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
                                   <Progress
                                     percent={Math.round(
                                       (twoStarNumber / props.reviews.length) *
-                                        100
+                                        100,
                                     )}
                                     size="small"
                                   />
@@ -243,7 +246,7 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
                                   <Progress
                                     percent={Math.round(
                                       (oneStarNumber / props.reviews.length) *
-                                        100
+                                        100,
                                     )}
                                     size="small"
                                   />

@@ -46,7 +46,7 @@ import { SimpleUserInfoType } from "@/model/UserInfoType";
 import VoiceChat from "./utils/VoiceChat";
 const authLocalStorageID = "#auth-context-user-info-record-ID";
 
-const AI_BACKEND_PREFIX = `${process.env.NEXT_PUBLIC_AI_DOMAIN}`
+const AI_DOMAIN = `${process.env.NEXT_PUBLIC_AI_DOMAIN}`;
 
 interface AIAssistantFloatButtonProps {}
 
@@ -677,8 +677,7 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
       setAiState("THINKING");
 
       const rawResponse = await axios.post(
-        `${AI_BACKEND_PREFIX}/chat/agent`,
-        // "http://54.255.29.11/chat/agent",
+        `${AI_DOMAIN}/chat/agent`,
         postBody,
         {
           headers: {
@@ -688,6 +687,7 @@ export default function AIAssistantFloatButton({}: AIAssistantFloatButtonProps) 
       );
       if (rawResponse.status == 200) {
         console.log("AI Response: ", rawResponse.data);
+        setExtendedDisplay(<></>);
 
         let type = "";
         let message = "";

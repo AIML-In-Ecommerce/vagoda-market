@@ -57,7 +57,7 @@ export default function ProductDetail(props: ProductDetailProps) {
 
   const [totalComboPrice, setTotalComboPrice] = useState(0);
 
-  const [comboIdList, setComboIdList] = useState<Array<string>>([]);
+  const [comboList, setComboList] = useState<ProductType[]>([]);
 
   const totalPrice = useMemo(() => {
     if (!product) return 0;
@@ -438,8 +438,8 @@ export default function ProductDetail(props: ProductDetailProps) {
                   updateTotalComboPrice={(price) => {
                     setTotalComboPrice(price);
                   }}
-                  comboIdList={comboIdList}
-                  setComboIdList={setComboIdList}
+                  comboList={comboList}
+                  setComboList={setComboList}
                   notify={props.notify}
                   product={product}
                   numberOfItem={numberOfItem}
@@ -518,7 +518,7 @@ export default function ProductDetail(props: ProductDetailProps) {
             mainProductId={product._id}
             mainProductPrice={product.finalPrice}
             numberOfItem={numberOfItem}
-            comboIdList={comboIdList}
+            comboList={comboList}
             totalComboPrice={totalComboPrice}
           />
         </div>

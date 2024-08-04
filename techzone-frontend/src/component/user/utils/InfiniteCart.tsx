@@ -36,7 +36,7 @@ const InfiniteCart = () => {
   }, []);
 
   return (
-    <div className="w-full h-full p-4 flex flex-col gap-3">
+    <div className="w-full h-full p-4 flex flex-col gap-3 overflow-y-auto">
       {" "}
       <div className="text-3xl font-bold normal-case ">Giỏ hàng của bạn</div>
       <CartTable
