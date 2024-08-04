@@ -32,7 +32,7 @@ export default function PromotionListModal(props: PromotionListModalProps) {
     const promotion_help = "Áp dụng tối đa 1 Mã giảm giá Sản Phẩm Mỗi Cửa Hàng";
 
     useEffect(() => {
-        console.log("Inside modal", props.queryPromotionList);
+        // console.log("Inside modal", props.queryPromotionList);
     }, [props.open, props.queryPromotionList])
     return (
         <React.Fragment>
