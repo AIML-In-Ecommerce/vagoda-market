@@ -5,10 +5,7 @@ import { useEffect, useState } from "react";
 import { priceIndex } from "../ProductDetail";
 import CustomEmpty from "../../shop/mini/CustomEmpty";
 import { ProductDetailType, ProductType } from "@/model/ProductType";
-import {
-  GET_GetProductDetail,
-  POST_GetProductList,
-} from "@/apis/product/ProductDetailAPI";
+import { GET_GetProductDetail } from "@/apis/product/ProductDetailAPI";
 
 interface ModalProps {
   open: boolean;
@@ -17,7 +14,7 @@ interface ModalProps {
   mainProductId: string;
   mainProductPrice: number;
   numberOfItem: number;
-  comboIdList: string[];
+  comboList: ProductType[];
   totalComboPrice: number;
 }
 
@@ -64,12 +61,10 @@ const ProductSummaryModal = (modalData: ModalProps) => {
   }, [modalData.totalPrice]);
 
   const [mainProduct, setMainProduct] = useState<ProductDetailType>();
-  const [comboList, setComboList] = useState<ProductType[]>();
 
   // call api
   useEffect(() => {
     handleGetProduct();
-    handleGetProductList();
   }, [modalData]);
 
   const handleGetProduct = async () => {
@@ -78,16 +73,6 @@ const ProductSummaryModal = (modalData: ModalProps) => {
     if (response.status == 200) {
       if (response.data) {
         setMainProduct(response.data);
-        // console.log("product", data);
-      }
-    }
-  };
-  const handleGetProductList = async () => {
-    if (!modalData.comboIdList) return;
-    const response = await POST_GetProductList(modalData.comboIdList);
-    if (response.status == 200) {
-      if (response.data) {
-        setComboList(response.data);
         // console.log("product", data);
       }
     }
@@ -155,12 +140,14 @@ const ProductSummaryModal = (modalData: ModalProps) => {
         <div className="font-semibold px-5 text-md">
           Sản phẩm có thể kết hợp
         </div>
-        {comboList && comboList.length === 0 && <CustomEmpty />}
+        {modalData.comboList && modalData.comboList.length === 0 && (
+          <CustomEmpty />
+        )}
 
         <div className="max-h-40 overflow-y-auto">
-          {comboList &&
-            comboList.length > 0 &&
-            comboList.map((item, index) => (
+          {modalData.comboList &&
+            modalData.comboList.length > 0 &&
+            modalData.comboList.map((item, index) => (
               <div
                 key={index}
                 className="bg-white border-2 rounded-xl max-w-1/4 h-fit p-4 grid grid-cols-4"
@@ -178,7 +165,7 @@ const ProductSummaryModal = (modalData: ModalProps) => {
             ))}
         </div>
 
-        {comboList && comboList.length > 0 && (
+        {modalData.comboList && modalData.comboList.length > 0 && (
           <div className="bg-white max-w-1/4 h-fit p-4 grid grid-cols-4">
             <div className="col-span-3 col-start-1 font-bold">Tổng combo</div>
             <div className="col-span-1 col-start-4">

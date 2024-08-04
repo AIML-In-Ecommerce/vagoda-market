@@ -5,10 +5,8 @@ import MultipleUpload from "./MultipleUpload";
 import { POST_CreateReview } from "@/apis/review/ReviewAPI";
 import { RawReviewType } from "@/model/ReviewType";
 import TextArea from "antd/es/input/TextArea";
-import { useParams } from "next/navigation";
-import { ProductDetailType } from "@/model/ProductType";
+import { useRouter } from "next/navigation";
 import { priceIndex } from "../product/ProductDetail";
-import { GET_GetProductDetail } from "@/apis/product/ProductDetailAPI";
 import { AuthContext } from "@/context/AuthContext";
 import { useSearchParams } from "next/navigation";
 import { GET_GetOrderProduct } from "@/apis/order/OrderAPI";
@@ -42,6 +40,7 @@ export default function NewReviewForm(props: NewReviewFormProps) {
   ];
 
   const query = useSearchParams();
+  const router = useRouter();
 
   const orderId = query.get("orderId") || "";
   const itemId = query.get("itemId") || "";
@@ -142,6 +141,10 @@ export default function NewReviewForm(props: NewReviewFormProps) {
       setContent("");
       setAsset([]);
       setFileList([]);
+
+      setTimeout(() => {
+        router.push("/order/" + orderId.toString());
+      }, 2000);
     }
   };
 
@@ -164,7 +167,7 @@ export default function NewReviewForm(props: NewReviewFormProps) {
     } else console.log(response.message);
   };
 
-  // TODO: update into product item of user's order
+  // OLD
   // const handleGetProductDetail = async () => {
   //   const response = await GET_GetProductDetail(productId.toString());
   //   if (response.status == 200) {

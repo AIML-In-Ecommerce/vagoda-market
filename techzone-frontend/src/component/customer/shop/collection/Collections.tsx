@@ -11,6 +11,7 @@ import { useParams } from "next/navigation";
 
 interface CollectionsProps {
   selectedId: string;
+  setSelectedId: (id: string) => void;
   notify(message: string, content: ReactElement): void;
 }
 
@@ -81,7 +82,7 @@ export default function Collections(props: CollectionsProps) {
               <AllCollections
                 collections={collections}
                 setCollectionId={(id: string) => {
-                  setOption([id]);
+                  props.setSelectedId(id);
                 }}
               />
             )) || (
