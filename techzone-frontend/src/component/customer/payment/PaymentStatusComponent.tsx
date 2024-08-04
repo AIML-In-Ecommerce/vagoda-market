@@ -64,7 +64,7 @@ export default function PaymentStatusComponent(props: PaymentStatusComponentProp
                     {
                         orderPaymentMethod === PaymentMethod.ZALOPAY ?
                         (<div className="mb-2 text-center">Thanh toán thành công <span><b>{formatCurrencyFromValue({value: totalPurchase ?? 0})}</b></span> với hình thức thanh toán <b>{orderPaymentMethod}</b>.</div>)
-                        : <div className="mb-2">Đã chọn hình thức thanh toán bằng tiền mặt. Vui lòng trả <span><b>{formatCurrencyFromValue({value: totalPurchase ?? 0})}</b></span> cho người giao hàng.</div>
+                        : <div className="mb-2 text-center">Đã chọn hình thức thanh toán bằng tiền mặt. Vui lòng trả <span><b>{formatCurrencyFromValue({value: totalPurchase ?? 0})}</b></span> cho người giao hàng.</div>
                     }
                     <div className="text-gray-600 mb-5 text-center">Cảm ơn bạn đã mua hàng tại VAGODA.</div>
                     {
