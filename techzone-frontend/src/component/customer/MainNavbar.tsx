@@ -152,24 +152,27 @@ export default function MainNavbar() {
     if (authContext.userInfo) {
       // Load cart size on badge
       const loadCartSize = async () => {
-        const data = await GET_getUserCartProducts(authContext.userInfo?._id as string);
+        const data = await GET_getUserCartProducts(
+          authContext.userInfo?._id as string,
+        );
         if (data.data) {
           // console.log('Loading Cart Size', data);
           setCountItemsCart(data.data.products.length);
         }
-      }
+      };
       const intervalId = setInterval(() => {
         loadCartSize();
-      }, 1000 * 5) // in milliseconds
-      return () => clearInterval(intervalId)
+      }, 1000 * 5); // in milliseconds
+      return () => clearInterval(intervalId);
     }
   }, [authContext.userInfo]);
 
   return (
     <div>
       <div
-        className={`flex text-xs  justify-end bg-[#5c6856]  items-center ${menuMode == "mobileMode" ? "px-2" : "px-24"
-          }  `}
+        className={`flex text-xs  justify-end bg-[#5c6856]  items-center ${
+          menuMode == "mobileMode" ? "px-2" : "px-24"
+        }  `}
       >
         {/* <div className="flex  items-center text-white space-x-2">
           <TfiHeadphoneAlt />
@@ -212,16 +215,50 @@ export default function MainNavbar() {
 
             <div className="flex space-x-2 items-center">
               <motion.div whileTap={{ scale: 0.9 }}>
-                <Dropdown
-                  menu={{ items }}
-                  placement="bottomLeft"
-                  className="xs:hidden"
-                >
-                  <div className="flex items-center space-x-2 text-white hover:text-sky  p-1 rounded-lg bg-[#5c6856] text-sm">
-                    <FaUser className="" size={26} />
-                    <p className="">Tài khoản</p>
-                  </div>
-                </Dropdown>
+                {authContext.userInfo ? (
+                  <Dropdown
+                    menu={{ items }}
+                    placement="bottomLeft"
+                    className="xs:hidden"
+                  >
+                    <div className="flex space-x-2 items-center text-white hover:text-sky lg:max-w-[140px] p-[12px] rounded-lg bg-[#5c6856] text-sm">
+                      <>
+                        {authContext.userInfo?.avatar ? (
+                          <Image
+                            className="lg:h-[30px] lg:w-[30px] h-[20px] w-[20px] rounded-full"
+                            width={16}
+                            height={16}
+                            src={authContext.userInfo.avatar}
+                            alt="avatar"
+                          />
+                        ) : (
+                          // <RxPerson className="" size={20} />
+                          <FaUser className="" size={26} />
+                        )}
+                        {authContext.userInfo ? (
+                          <p className="truncate">
+                            {authContext.userInfo?.fullName}
+                          </p>
+                        ) : (
+                          <p className="truncate">Account</p>
+                        )}
+                      </>
+                    </div>
+                  </Dropdown>
+                ) : (
+                  <Dropdown
+                    menu={{ items: unauthItems }}
+                    placement="bottomLeft"
+                    className="xs:hidden"
+                  >
+                    <div className="flex space-x-2 items-center text-white hover:text-sky  p-2 rounded-lg bg-[#5c6856] text-sm">
+                      <>
+                        <FaUser className="" size={26} />
+                        <p className="truncate">Tài khoản</p>
+                      </>
+                    </div>
+                  </Dropdown>
+                )}
               </motion.div>
               <Link href={`/cart`}>
                 <div className="flex items-center cursor-pointer text-white p-2 rounded-lg hover:text-[#5c6856]">
