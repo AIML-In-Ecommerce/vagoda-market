@@ -24,12 +24,18 @@ export const PaymentProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const accessed = localStorage.getItem('hasAccessedPaymentPage');
+    const storageOrderIds = localStorage.getItem('latestOrderIds');
+
     if (accessed) {
-      if (currentPathname.includes('/payment') && Boolean(accessed)) {
+      if (currentPathname.includes('/payment') && (['true', 'undefined'].includes(accessed))) {
+        console.log('accessed payment page', accessed, true);
         router.replace('/');
         return;
       }
-      setHasAccessedPaymentPage(Boolean(accessed));
+      setHasAccessedPaymentPage(false);
+    }
+    if (storageOrderIds) {
+      setOrderIds(JSON.parse(storageOrderIds));
     }
     console.log("PaymentContext reloaded");
   }, []);
@@ -42,6 +48,15 @@ export const PaymentProvider = ({ children }: { children: ReactNode }) => {
       localStorage.setItem('hasAccessedPaymentPage', 'false');
     }
   }, [hasAccessedPaymentPage]);
+
+  useEffect(() => {
+    if (orderIds) {
+      localStorage.setItem('latestOrderIds', JSON.stringify(orderIds));
+    }
+    else {
+      localStorage.setItem('latestOrderIds', 'null');
+    }
+  }, [orderIds]);
 
   return (
     <PaymentContext.Provider value={{ orderIds, setOrderIds, hasAccessedPaymentPage, setHasAccessedPaymentPage }}>

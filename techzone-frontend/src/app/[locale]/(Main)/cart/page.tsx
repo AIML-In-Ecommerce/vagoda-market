@@ -203,8 +203,6 @@ export default function CartPage() {
 
             // When order next time, the access to payment page will be available
             paymentContext.setHasAccessedPaymentPage(false);
-            console.log("setHasAccessedPaymentPage called!");
-            
             
             if (paymentMethod === PaymentMethod.ZALOPAY) {
                 paymentContext.setOrderIds(createOrderResponse.data.orderIds);
