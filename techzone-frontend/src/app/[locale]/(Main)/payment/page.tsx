@@ -19,8 +19,11 @@ export default function PaymentPage() {
     const [orders, setOrders] = useState<Order[]>([]);
 
     useEffect(() => {
+        // set access status, the next time the user routes through is not allowed
         paymentContext.setHasAccessedPaymentPage(true);
-    }, [router]);
+    }, [router,
+        paymentContext.hasAccessedPaymentPage, 
+        paymentContext.setHasAccessedPaymentPage]);
 
     useEffect(() => {
         // Extract the current query parameters
