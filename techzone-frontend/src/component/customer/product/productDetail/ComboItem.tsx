@@ -23,7 +23,11 @@ const ComboItem = (combo: ComboItemProps) => {
         setIsChecked(!isChecked);
       }}
     >
-      <div className="pointer-events-none">
+      <div
+        className={`pointer-events-none ${
+          isChecked ? "border-2 border-blue-400 rounded-md" : ""
+        }`}
+      >
         <ProductItem
           _id={combo.product._id}
           imageLink={combo.product.imageLink}
