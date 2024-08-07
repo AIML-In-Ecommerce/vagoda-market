@@ -131,8 +131,8 @@ const VirtualTryOn = () => {
         if (response.status === 200) {
           let cart: VtoProduct[] = [];
           response.data.data.products.forEach((item: any) => {
-            let colorLabel = item.color ? item.color.label : "";
-            let colorValue = item.color ? item.color.value : "";
+            let colorLabel = item.color ? item.color.color.label : "";
+            let colorValue = item.color ? item.color.color.value : "";
             let imageLink = item.color ? item.color.link : item.images[0];
             const product: VtoProduct = {
               _id: item._id,
