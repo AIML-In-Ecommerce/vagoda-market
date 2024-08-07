@@ -345,7 +345,7 @@ const VirtualTryOn = () => {
       case "PRODUCT":
         return (
           <div className="flex flex-row gap-3 p-5 overflow-x-auto w-full h-[calc(100%-50px)] mt-2 scrollbar scrollbar-thin scrollbar-track-transparent scrollbar-thumb-rounded-full scrollbar-thumb-slate-400 ">
-            {mockVtoProductData.map((product) => (
+            {productList.map((product) => (
               <div className="w-[calc(100%/3.5)]" key={product._id}>
                 <VtoProduct
                   key={product._id}
