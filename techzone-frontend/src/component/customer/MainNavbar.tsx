@@ -142,9 +142,8 @@ export default function MainNavbar() {
       setAllCategories(data);
     };
 
-    if (authContext.userInfo) {
-      loadAllCategories();
-    }
+    loadAllCategories();
+    
   }, [authContext.userInfo]);
 
   //separate categories calling

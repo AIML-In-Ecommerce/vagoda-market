@@ -242,8 +242,8 @@ export default function OrderDetailPage() {
                                     <div className="flex flex-col gap-1">
                                         <div className="text-sm font-bold text-ellipsis overflow-hidden">{record.name}</div>
                                         <div className="text-sm text-gray-500 mb-1">
-                                            {record.color?.color.label.toUpperCase() ?? ""} {record.size ? "/" : ""} {record.size ? record.size.toUpperCase() : ""}</div>
-                                        <div className="text-sm text-gray-500 mb-1 flex flex-row gap-1">Cung cấp bởi <Link href={''}>{order?.shop.name}</Link></div>
+                                            {record.color?.color.label.toUpperCase() ?? ""} {record.color?.color.label && record.size ? "/" : ""} {record.size ? record.size.toUpperCase() : ""}</div>
+                                        <div className="text-sm text-gray-500 mb-1 flex flex-row gap-1">Cung cấp bởi <Link href={`/seller/${order?.shop._id}`}>{order?.shop.name}</Link></div>
                                         <div className="flex flex-row gap-2">
                                             {
                                                 latestOrderStatus ? (

@@ -234,6 +234,7 @@ export async function POST_createOrder(
     let responseData = response.data;
     if (response.status === 200) {
       let orderData = responseData.data;
+      // console.log("@POST_CreateOrder", orderData.flatMap((item: any) => item._id))
       return {
         isDenied: false,
         message: "Create order successfully",
@@ -258,10 +259,12 @@ export async function POST_createOrder(
     };
   }
 }
-export async function GET_GetLatestOrder(userId: string) {
-  const url = `${publicAPIURL}/order/buyer/orders?userId=${userId}`;
+export async function POST_GetLatestOrder(userId: string, orderIds: string[]) {
+  const url = `${publicAPIURL}/order/buyer/list_of_orders?userId=${userId}`;
   try {
-    const response = await axios.get(url);
+    const response = await axios.post(url, {
+      orderIds: orderIds,
+    });
     if (userId === null) {
       return {
         isDenied: true,
@@ -273,12 +276,11 @@ export async function GET_GetLatestOrder(userId: string) {
     let responseData = response.data;
     if (response.status === 200) {
       let ordersData = responseData.data;
-      let latestOrder = ordersData[ordersData.length - 1];
       return {
         isDenied: false,
         message: "Get latest order successfully",
         status: response.status,
-        data: latestOrder,
+        data: ordersData,
       };
     } else {
       return {

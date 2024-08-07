@@ -20,6 +20,7 @@ const authLocalStorageID = "#auth-context-user-info-record-ID";
 
 const matcher: string[] = [
   "/cart",
+  "/payment"
 ];
 
 interface AuthContextProps {

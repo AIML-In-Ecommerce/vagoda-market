@@ -26,7 +26,8 @@ export default function Collections(props: CollectionsProps) {
     if (props.selectedId && props.selectedId !== "") {
       setOption([props.selectedId]);
     } else setOption(["0"]);
-  }, [props.selectedId, props]);
+    console.log("options: ", option);
+  }, [props.selectedId]);
 
   // call api
   useEffect(() => {

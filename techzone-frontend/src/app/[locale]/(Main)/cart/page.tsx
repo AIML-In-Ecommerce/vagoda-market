@@ -1,10 +1,8 @@
 "use client";
 import React, { useState, useEffect, useContext, ReactElement, useMemo } from "react";
-import { Input, Button, Card, Modal, Space, Image, Tooltip, Skeleton, Radio, Divider, Spin, Empty, notification } from 'antd';
+import { Input, Image, Skeleton, Radio, Divider, notification } from 'antd';
 import type { RadioChangeEvent } from 'antd';
-import { FaRegCircleQuestion } from "react-icons/fa6";
 import { DiscountType, PromotionType } from "@/model/PromotionType";
-import PromotionCard from "@/component/customer/product/PromotionCard";
 import styled from 'styled-components'
 import Link from "next/link";
 import { RiContactsBookLine } from "react-icons/ri";
@@ -16,12 +14,13 @@ import { POST_addUserShippingAddress, ShippingAddress } from "@/apis/cart/Addres
 import { useRouter } from "next/navigation";
 import { PaymentMethod } from "@/apis/payment/PaymentAPI";
 import { POST_createOrder } from "@/apis/order/OrderAPI";
-import { GET_GetAllPromotionByShopId, GET_GetPromotionWithSelection, Promotion } from "@/apis/cart/promotion/PromotionAPI";
+import { GET_GetPromotionWithSelection } from "@/apis/cart/promotion/PromotionAPI";
 import { GET_GetShop } from "@/apis/shop/ShopAPI";
 import CartTable from "@/component/customer/cart/CartTable";
 import { AuthContext } from "@/context/AuthContext";
 import { NotificationPlacement } from "antd/es/notification/interface";
 import PromotionListModal from "@/component/customer/cart/PromotionListModal";
+import { usePaymentContext } from "@/context/PaymentContext";
 
 const { Search } = Input;
 
@@ -79,6 +78,7 @@ type PromotionDisplay = {
 
 export default function CartPage() {
     const context = useContext(AuthContext)
+    const paymentContext = usePaymentContext();
     const [products, setProducts] = useState<CartItem[]>();
     const [shopInfos, setShopInfos] = useState<ShopInfo[]>();
     const [promotions, setPromotions] = useState<PromotionType[]>([]);
@@ -97,7 +97,7 @@ export default function CartPage() {
     const [isSavingAddress, setIsSavingAddress] = useState<boolean>(false);
     const [loadingPromotion, setLoadingPromotion] = useState<boolean>(true);
     const router = useRouter();
-
+    
     const queryPromotionList = useMemo<PromotionDisplay[]>(() => {
         console.log('queryPromotionList triggered');
         if (promotionDisplayList === undefined || promotionDisplayList.length === 0) return [] as PromotionDisplay[];
@@ -140,10 +140,10 @@ export default function CartPage() {
     };
 
 
-    const filterShopName = (shopId: string) => {
-        const shopName = shopInfos!.find(shopInfo => shopInfo._id === shopId)!.name;
-        return shopName;
-    }
+    // const filterShopName = (shopId: string) => {
+    //     const shopName = shopInfos!.find(shopInfo => shopInfo._id === shopId)!.name;
+    //     return shopName;
+    // }
 
     const fetchShopInfos = async (products: CartItem[]) => {
         const shopInfosList: ShopInfo[] = [] as ShopInfo[];
@@ -161,6 +161,15 @@ export default function CartPage() {
                 } as ShopInfo));
         }
         setShopInfos(shopInfosList);
+    }
+
+    const calculateShopProductsProvisional = (shopId: string) => {
+        if (!products || !selectedRowKeys) return 0;
+
+        const filteredShopProducts = products.filter(item => 
+            item.shop === shopId && selectedRowKeys.includes(item.itemId));
+        const provisionalResult = filteredShopProducts.reduce((acc, item) => acc + item.finalPrice * item.quantity, 0);
+        return provisionalResult;
     }
 
     const handleShowPromotionModal = async () => {
@@ -190,10 +199,19 @@ export default function CartPage() {
 
         if (createOrderResponse) {
             console.log('Navigating to gateway...', createOrderResponse.data?.order_url);
+            console.log("createOrderResponse", createOrderResponse.data);
+
+            // When order next time, the access to payment page will be available
+            paymentContext.setHasAccessedPaymentPage(false);
+            
             if (paymentMethod === PaymentMethod.ZALOPAY) {
+                paymentContext.setOrderIds(createOrderResponse.data.orderIds);
                 router.push(createOrderResponse.data.order_url)
             }
-            else { router.push('/payment') }
+            else { 
+                paymentContext.setOrderIds(createOrderResponse.data);
+                router.push('/payment');
+            }
         }
     }
 
@@ -223,13 +241,15 @@ export default function CartPage() {
         const promotionList: PromotionDisplay[] = [];
         const promotions: PromotionType[] = [];
         for (const item of shopInfos!) {
+            // Get selected products list
             const selectedProducts = products?.filter(product => selectedRowKeys.includes(product.itemId)) ?? [] as CartItem[]
             const selectedProductIds = new Set<string>();
             selectedProducts.forEach(item => selectedProductIds.add(item._id)) 
-            console.log("selectedProductIds", Array.from(selectedProductIds));
+
+            const shopProductsProvisional = calculateShopProductsProvisional(item._id);
             const response = await GET_GetPromotionWithSelection(
                 item._id,
-                provisional,
+                shopProductsProvisional,
                 Array.from(selectedProductIds),
                 true);
             if (response) promotionList.push(
@@ -298,13 +318,14 @@ export default function CartPage() {
         setSelectedPromotions(updatedDiscounts);
     }
 
-    const calculateDirectPricePromotion = (value: number, lowerBound: number, upperBound: number) => {
+    const calculateDirectPricePromotion = (provisional: number, value: number, lowerBound: number, upperBound: number) => {
         if (!!lowerBound) return (provisional >= lowerBound) ? value : 0;
         else if (!!upperBound !== undefined) return (provisional < upperBound) ? 0 : value;
     }
 
-    const calculatePercentagePromotion = (value: number, upperBound: number) => {
+    const calculatePercentagePromotion = (provisional: number, value: number, upperBound: number) => {
         const discountValue = value * provisional / 100;
+        if (upperBound === 0) return discountValue;
         return (!!upperBound && (discountValue <= upperBound)) ? discountValue : upperBound;
     }
 
@@ -361,11 +382,12 @@ export default function CartPage() {
         //calc discount factor
         let totalDiscount = 0;
         selectedPromotions.forEach((item: PromotionType, key: React.Key) => {
-            // console.log("DISCOUNT_TYPE ", key, item.discountTypeInfo.type)
+            const shopProductsProvisional = calculateShopProductsProvisional(item.shop?._id as string);
             if (item.discountTypeInfo.type === (DiscountType.DIRECT_PRICE as string)) {
 
                 if (item.discountTypeInfo.value) {
                     totalDiscount += calculateDirectPricePromotion(
+                        shopProductsProvisional,
                         item.discountTypeInfo.value,
                         item.discountTypeInfo.lowerBoundaryForOrder,
                         item.discountTypeInfo.limitAmountToReduce) ?? 0;
@@ -375,6 +397,7 @@ export default function CartPage() {
             else if (item.discountTypeInfo.type === (DiscountType.PERCENTAGE as string)) {
                 if (item.discountTypeInfo.value)
                     totalDiscount += calculatePercentagePromotion(
+                        shopProductsProvisional,
                         item.discountTypeInfo.value,
                         item.discountTypeInfo.limitAmountToReduce);
             }
