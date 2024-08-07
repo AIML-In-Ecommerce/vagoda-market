@@ -16,11 +16,11 @@ import VtoProduct from "@/component/customer/product/VtoProduct";
 import Image from "next/image";
 import axios from "axios";
 import { Divider } from "antd";
-import { AiFillCloseCircle } from "react-icons/ai";
 import ImageSwiper from "./swiper";
 import { AuthContext } from "@/context/AuthContext";
 import Replicate from "replicate";
 import { SimpleUserInfoType } from "@/model/UserInfoType";
+import { AiFillCloseCircle } from "react-icons/ai";
 
 const authLocalStorageID = "#auth-context-user-info-record-ID";
 type Mode = "MODEL" | "PRODUCT" | "PREVIEW";
@@ -266,6 +266,7 @@ const VirtualTryOn = () => {
       }
     } catch (error) {
       console.error("Error fetching virtual try-on:", error);
+      setTryOnLoading("ERROR");
     }
 
     const replicate = new Replicate({
@@ -401,6 +402,16 @@ const VirtualTryOn = () => {
           // </div>
           <div className="relative h-full ">
             <ImageSwiper imgList={tryOnImageUrl.current} />
+          </div>
+        );
+      case "ERROR":
+        return (
+          <div className="w-[25%] rounded-xl flex flex-col justify-center items-center bg-white  p-4">
+            <AiFillCloseCircle className="w-[120px] h-[120px] text-[#f53e5a]  " />
+            <div className="text-xl font-bold text-[#f53e5a] mt-2">Error</div>
+            <p className="text-sm text-slate-400 text-center">
+              Đã có lỗi xảy ra trong quá trình thử đồ hãy thử lại
+            </p>
           </div>
         );
     }
