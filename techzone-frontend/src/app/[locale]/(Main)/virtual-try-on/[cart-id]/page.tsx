@@ -315,7 +315,7 @@ const VirtualTryOn = () => {
             </div>
             {imagePreview && (
               <div className="w-full h-full flex flex-col gap-4 justify-center items-center">
-                <div className="relative w-[38%] aspect-square">
+                <div className="relative w-[38%] aspect-[3/4]">
                   <Image
                     src={imagePreview}
                     alt="Preview"
