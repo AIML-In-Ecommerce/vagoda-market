@@ -155,9 +155,9 @@ const AuthService =
         return result
     },
 
-    async fetchSessionId()
+    async fetchSessionId(providedFingerprint: string)
     {
-        const response = await fetchSessionId()
+        const response = await fetchSessionId(providedFingerprint)
         if(response == null)
         {
             return null

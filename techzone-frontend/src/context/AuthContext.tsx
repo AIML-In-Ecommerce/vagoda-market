@@ -10,6 +10,8 @@ import AuthService, {
 } from "@/services/auth.service";
 import UserService from "@/services/user.service";
 
+import fingerprintJs from "@fingerprintjs/fingerprintjs"
+
 const sessionIdKey = "ssid";
 
 interface AuthContextProviderInitProps {
@@ -74,15 +76,19 @@ export default function AuthContextProvider({
   }
 
   const [userInfo, setUserInfo] = useState<SimpleUserInfoType | null>(null);
-
   const router = useRouter();
   const currentPathname = usePathname();
 
   useEffect(() => {
     async function fetchSessionId() {
+
+      console.log("unique browser id:")
+      const fingerprintJsLoader = await fingerprintJs.load()
+      const fingerprint = (await fingerprintJsLoader.get()).visitorId
+
       const currentSessionId = Cookies.get(sessionIdKey);
       if (currentSessionId == null) {
-        const sessionId = await AuthService.fetchSessionId();
+        const sessionId = await AuthService.fetchSessionId(fingerprint);
         if (sessionId != null) {
           Cookies.set(sessionIdKey, sessionId);
         }
@@ -287,3 +293,5 @@ export default function AuthContextProvider({
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
+
+
