@@ -69,9 +69,9 @@ export function getFullAddress(address: Address): string {
         const district = districts.find((d: any) => d.idDistrict === idDistrict);
         const commune = communes.find((c: any) => c.idCommune === idCommune);
 
-        const provinceName = province!.name;
-        const districtName = district!.name;
-        const communeName = commune!.name;
+        const provinceName = province?.name ?? "";
+        const districtName = district?.name ?? "";
+        const communeName = commune?.name ?? "";
 
         return `${street}, ${communeName}, ${districtName}, ${provinceName}, ${country}`;
     } catch (error) {
