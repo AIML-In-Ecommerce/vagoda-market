@@ -147,6 +147,7 @@ export default function MainNavbar() {
   }, [authContext.userInfo]);
 
   //separate categories calling
+  //UPDATE: not interval calling any more.
   useEffect(() => {
     if (authContext.userInfo) {
       // Load cart size on badge
@@ -159,10 +160,11 @@ export default function MainNavbar() {
           setCountItemsCart(data.data.products.length);
         }
       };
-      const intervalId = setInterval(() => {
-        loadCartSize();
-      }, 1000 * 5); // in milliseconds
-      return () => clearInterval(intervalId);
+      // const intervalId = setInterval(() => {
+      //   loadCartSize();
+      // }, 1000 * 5); // in milliseconds
+      // return () => clearInterval(intervalId);
+      loadCartSize();
     }
   }, [authContext.userInfo]);
 

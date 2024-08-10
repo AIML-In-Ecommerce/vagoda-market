@@ -165,7 +165,8 @@ export default function OrderInfoComponent(props: OrderInfoComponentProps) {
             <div className="flex flex-col overflow-auto">
                 {
                     props.order.products.map((product) => (
-                        <Card key={product._id} type="inner" className="mb-2 cursor-pointer select-none relative">
+                        <Card key={product._id} type="inner" onClick={() => handleOrderDetail(props.order._id)}
+                            className="mb-2 cursor-pointer select-none relative">
                             <Meta avatar=
                                 {
                                     <div className="relative border-1 border-slate-100">
