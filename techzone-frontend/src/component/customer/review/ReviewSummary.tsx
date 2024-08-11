@@ -14,7 +14,9 @@ import { useEffect, useMemo, useState } from "react";
 import { GET_GetAllReviewsByQuery } from "@/apis/review/ReviewAPI";
 import { ReviewType } from "@/model/ReviewType";
 import axios from "axios";
+import { GET_GetProductDetail } from "@/apis/product/ProductDetailAPI";
 const AI_DOMAIN = process.env.NEXT_PUBLIC_AI_DOMAIN;
+const GATEWAY_PREFIX = process.env.NEXT_PUBLIC_GATEWAY_PREFIX;
 
 console.log("AI DOMAIN: ", AI_DOMAIN);
 
@@ -27,8 +29,8 @@ interface ReviewSummary {
   positiveCount: number;
   negativeCount: number;
   trashCount: number;
-  positiveSumary: string;
-  negativeSumary: string;
+  positiveSummary: string;
+  negativeSummary: string;
 }
 
 export default function ReviewSummary(props: ReviewSummaryProps) {
@@ -43,8 +45,8 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
     positiveCount: 0,
     negativeCount: 0,
     trashCount: 0,
-    positiveSumary: "",
-    negativeSumary: "",
+    positiveSummary: "",
+    negativeSummary: "",
   });
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -82,28 +84,63 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
     return list;
   }, [props.reviews]);
 
-  const getSummaryReview = async () => {
-    const postBody = {
-      reviews: reviewContentList,
-    };
+  // const getSummaryReview = async () => {
+  //   const postBody = {
+  //     reviews: reviewContentList,
+  //   };
 
-    console.log("Post reviews body: ", postBody);
+  //   console.log("Post reviews body: ", postBody);
 
+  //   try {
+  //     const rawResponse = await axios.post(
+  //       `${AI_DOMAIN}/genai/review-synthesis`,
+  //       postBody,
+  //       {
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //       },
+  //     );
+  //     if (rawResponse.status == 200) {
+  //       console.log("Get summary review successfully:", rawResponse.data);
+  //       const response = JSON.parse(rawResponse.data.data);
+  //       console.log("Response: ", response);
+  //       setSummaryReview(response);
+  //       setIsLoading(false);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error getting summary review :", error);
+  //   }
+  // };
+
+  // const handleGetProductDetail = async () => {
+  //   if (!props.product?._id) return;
+  //   const response = await GET_GetProductDetail(
+  //     props.product?._id.toString(),
+  //   );
+  //   if (response.status == 200) {
+  //     let data = response.data as ProductDetailType;
+  //     if (data) {
+  //       setProduct(data);
+  //       console.log("product", data);
+  //       await setAccessProductByAuthUser(data.shop, data._id);
+  //     }
+  //   } else console.log(response.message);
+  // };
+
+  const getProductDetail = async () => {
     try {
-      const rawResponse = await axios.post(
-        `${AI_DOMAIN}/genai/review-synthesis`,
-        postBody,
+      const response = await axios.get(
+        `${GATEWAY_PREFIX}/product/${props.product?._id}`,
         {
           headers: {
             "Content-Type": "application/json",
           },
         },
       );
-      if (rawResponse.status == 200) {
-        console.log("Get summary review successfully:", rawResponse.data);
-        const response = JSON.parse(rawResponse.data.data);
-        console.log("Response: ", response);
-        setSummaryReview(response);
+      if (response.status == 200) {
+        console.log("Product Summary", response.data.data.reviewSynthesis);
+        setSummaryReview(response.data.data.reviewSynthesis);
         setIsLoading(false);
       }
     } catch (error) {
@@ -112,7 +149,7 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
   };
 
   useEffect(() => {
-    getSummaryReview();
+    getProductDetail();
   }, []);
 
   // api
@@ -316,7 +353,7 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
                                 ({summaryReview.positiveCount} đánh giá)
                               </span>
                             </div>
-                            <div>{summaryReview.positiveSumary}</div>
+                            <div>{summaryReview.positiveSummary}</div>
                           </div>
 
                           <div className="pt-2 text-xs md:text-sm flex flex-col">
@@ -328,7 +365,7 @@ export default function ReviewSummary(props: ReviewSummaryProps) {
                                 ({summaryReview.negativeCount} đánh giá)
                               </span>
                             </div>
-                            <div>{summaryReview.negativeSumary}</div>
+                            <div>{summaryReview.negativeSummary}</div>
                           </div>
                         </Skeleton>
                       </div>
