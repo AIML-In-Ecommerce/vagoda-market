@@ -11,7 +11,7 @@ const GATEWAY_PREFIX = process.env.NEXT_PUBLIC_GATEWAY_PREFIX;
 const BACKEND_PREFIX = process.env.NEXT_PUBLIC_BACKEND_PREFIX;
 const PRODUCT_PORT = process.env.NEXT_PUBLIC_PRODUCT_PORT;
 
-const publicAPIURL = `${GATEWAY_PREFIX}`
+const publicAPIURL = `${GATEWAY_PREFIX}`;
 // const publicAPIURL = `${BACKEND_PREFIX}:${PRODUCT_PORT}`
 
 interface ProductDetailResponse {
@@ -21,10 +21,7 @@ interface ProductDetailResponse {
 }
 
 export async function GET_GetProductDetail(id: string) {
-  const url = (publicAPIURL +
-    "/product/" +
-    id
-  ).toString();
+  const url = (publicAPIURL + "/product/" + id).toString();
 
   try {
     // console.log(url);
@@ -87,10 +84,7 @@ export async function GET_GetProductDetail(id: string) {
 }
 
 export async function PUT_UpdateProductRating(id: string) {
-  const url = (publicAPIURL +
-    "/product/" +
-    id
-  ).toString();
+  const url = (publicAPIURL + "/product/" + id).toString();
 
   try {
     // console.log(url);
@@ -134,15 +128,13 @@ interface ProductListResponse {
 }
 
 export async function POST_GetProductList(idList: string[]) {
-  const url = (publicAPIURL +
-    "/products/list"
-  ).toString();
+  const url = (publicAPIURL + "/products/list").toString();
 
   try {
     // console.log(url);
     const response = await axios.post(
       url,
-      { ids: idList }
+      { ids: idList },
       // {
       //   headers: {
       //     Authorization: `Bearer ${auth.user?.access_token}`,
@@ -197,15 +189,13 @@ export async function POST_GetProductList(idList: string[]) {
 }
 
 export async function POST_GetProductListByShop(shopId: string) {
-  const url = (publicAPIURL +
-    "/products/filter"
-  ).toString();
+  const url = (publicAPIURL + "/products/filter").toString();
 
   try {
     // console.log(url);
     const response = await axios.post(
       url,
-      { shopId: shopId }
+      { shopId: shopId },
       // {
       //   headers: {
       //     Authorization: `Bearer ${auth.user?.access_token}`,
@@ -263,15 +253,12 @@ export async function POST_GetProductListByShop(shopId: string) {
 }
 
 export async function GET_GetRelatedProduct(id: string) {
-  const url = (publicAPIURL +
-    "/related/" +
-    id
-  ).toString();
+  const url = (publicAPIURL + "/related/" + id).toString();
 
   try {
     // console.log(url);
     const response = await axios.get(
-      url
+      url,
       // {
       //   headers: {
       //     Authorization: `Bearer ${auth.user?.access_token}`,

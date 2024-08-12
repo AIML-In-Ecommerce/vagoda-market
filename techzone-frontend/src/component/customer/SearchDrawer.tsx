@@ -5,7 +5,7 @@ import { _ProductType } from "@/model/ProductType";
 import { CategoryService } from "@/services/Category";
 import { ProductService } from "@/services/Product";
 import StatisticsService from "@/services/statistics.service";
-import { Drawer, Input } from "antd";
+import { Drawer, Input, InputRef } from "antd";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -37,7 +37,7 @@ export default function SearchDrawer(props: SearchDrawerProp) {
     []
   );
 
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<InputRef>(null);
 
   const extractCategoryNames = (categories: _CategoryType[]): string[] => {
     let names: string[] = [];
