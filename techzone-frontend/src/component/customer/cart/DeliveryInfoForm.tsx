@@ -31,16 +31,9 @@ export default function DeliveryInfoForm(props: DeliveryInfoFormProps) {
     const [isLoadingCommune, setIsLoadingCommune] = React.useState(false);
     const [checked, setIsChecked] = React.useState<boolean>(false);
 
-    // useEffect(() => {
-    //     getProvince().then((value: any) => setProvinceList(value));
-    //     handleChangeProvince(provinceValue);
-    //     handleChangeDistrict(districtValue);
-    //     handleChangeCommune(communeValue);
-    // },[]);
-
-    const onSavingAddress: CheckboxProps['onChange'] = (e) => {
-        props.setIsSavingAddress(e.target.checked);
+    useEffect(() => {
         const savingAddress = {
+            ...props.currentAddress,
             street: streetAddress,
             idProvince: provinceValue,
             idDistrict: districtValue,
@@ -53,8 +46,35 @@ export default function DeliveryInfoForm(props: DeliveryInfoFormProps) {
             isDefault: false
         } as ShippingAddress;
         props.setCurrentAddress(savingAddress);
-        setIsChecked(e.target.checked);
-    }
+    }, [streetAddress, provinceValue, districtValue, communeValue,
+        name, phoneNumber
+    ])
+
+    // useEffect(() => {
+    //     getProvince().then((value: any) => setProvinceList(value));
+    //     handleChangeProvince(provinceValue);
+    //     handleChangeDistrict(districtValue);
+    //     handleChangeCommune(communeValue);
+    // },[]);
+
+    //legacy
+    // const onSavingAddress: CheckboxProps['onChange'] = (e) => {
+    //     props.setIsSavingAddress(e.target.checked);
+    //     const savingAddress = {
+    //         street: streetAddress,
+    //         idProvince: provinceValue,
+    //         idDistrict: districtValue,
+    //         idCommune: communeValue,
+    //         country: address?.country ?? "Việt Nam",
+    //         receiverName: name,
+    //         phoneNumber: phoneNumber,
+    //         coordinate: {},
+    //         label: "HOME",
+    //         isDefault: false
+    //     } as ShippingAddress;
+    //     props.setCurrentAddress(savingAddress);
+    //     setIsChecked(e.target.checked);
+    // }
 
     useEffect(() => {
         const fetchAddressData = async () => {
@@ -152,7 +172,7 @@ export default function DeliveryInfoForm(props: DeliveryInfoFormProps) {
     return (
         <div className="flex flex-col gap-4">
             <div className="grid grid-cols-2 gap-5">
-                <Input className="border-1 border-gray-400 rounded-xl"
+                <Input required className="border-1 border-gray-400 rounded-xl"
                     size="large" placeholder='Họ tên'
                     value={name}
                     onChange={(e) => setName(e.target.value)}></Input>
@@ -187,9 +207,9 @@ export default function DeliveryInfoForm(props: DeliveryInfoFormProps) {
                 </Select>
             </div>
             <Input className="border-1 border-gray-400 rounded-xl" size="large" placeholder='Ghi chú thêm (Ví dụ: Giao hàng giờ hành chính)'></Input>
-            <Checkbox checked={checked} onChange={onSavingAddress}>
+            {/* <Checkbox checked={checked} onChange={onSavingAddress}>
                 <div className="font-semibold">Lưu vào sổ địa chỉ để dùng cho lần giao hàng tiếp theo</div>
-            </Checkbox>
+            </Checkbox> */}
         </div>
     )
 }

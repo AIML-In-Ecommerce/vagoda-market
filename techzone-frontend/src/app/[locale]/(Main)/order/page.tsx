@@ -141,7 +141,9 @@ export default function OrderOverview(props: OrderOverviewProps) {
                 }}
                 className="mb-5"
             >
-                <Button onClick={onLoadMore}>Xem thêm</Button>
+                <Button size="large" onClick={onLoadMore}>
+                    <div className="text-lg">Xem thêm</div>
+                </Button>
             </div>
         ) : null);
     },[initLoading, loading, displayOrders, orders]);
