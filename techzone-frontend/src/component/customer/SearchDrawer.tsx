@@ -9,7 +9,7 @@ import { Drawer, Input } from "antd";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { IoClose } from "react-icons/io5";
 import { LuSearch } from "react-icons/lu";
 import logo from "../../../public/asset/vagoda.png";
@@ -34,8 +34,10 @@ export default function SearchDrawer(props: SearchDrawerProp) {
   const [allCategoryNames, setAllCategoryNames] = useState<string[]>([]);
   const [suggestedKeywords, setSuggestedKeywords] = useState<string[]>([]);
   const [suggestedProducts, setSuggestedProducts] = useState<_ProductType[]>(
-    [],
+    []
   );
+
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const extractCategoryNames = (categories: _CategoryType[]): string[] => {
     let names: string[] = [];
@@ -60,19 +62,23 @@ export default function SearchDrawer(props: SearchDrawerProp) {
       if (!props.isOpen) {
         return;
       }
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
+
       setSearchText("");
       let subCategoryList: string[] = [];
       if (authContext.userInfo) {
         console.log("HERE");
         const recentProduct: _ProductType[] =
           await StatisticsService.getRecentProducts(
-            authContext.userInfo._id ?? "",
+            authContext.userInfo._id ?? ""
           );
 
         console.log("RECENT PRODUCTS", recentProduct);
 
         subCategoryList = recentProduct.map(
-          (product) => product.subCategory._id,
+          (product) => product.subCategory._id
         );
       }
 
@@ -107,7 +113,7 @@ export default function SearchDrawer(props: SearchDrawerProp) {
   useEffect(() => {
     const updateSuggestedKeywords = () => {
       const updatedData = allCategoryNames.filter((category) =>
-        category.toLowerCase().includes(searchText.toLowerCase()),
+        category.toLowerCase().includes(searchText.toLowerCase())
       );
       const uniqueUpdatedData = Array.from(new Set(updatedData));
       setSuggestedKeywords(uniqueUpdatedData);
@@ -160,6 +166,7 @@ export default function SearchDrawer(props: SearchDrawerProp) {
         </div>
       </div>
       <Input
+        ref={inputRef}
         placeholder="Bạn đang tìm kiếm sản phẩm nào ?"
         variant="borderless"
         size="middle"

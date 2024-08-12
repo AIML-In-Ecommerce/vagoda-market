@@ -21,8 +21,8 @@ const VirtualTryOnWelcomePage = () => {
             Phòng thử đồ ảo với công nghệ AI
           </div>
           <div className="font-normal text-xl text-white">
-            Tuyệt vời, Techzone mang đến cho bạn một công cụ tiên tiến giúp bạn
-            dễ dàng trải nghiệm mặc thử quần áo. Bạn có thể khám phá nhiều kiểu
+            Tuyệt vời, Vagoda mang đến cho bạn một công cụ tiên tiến giúp bạn dễ
+            dàng trải nghiệm mặc thử quần áo. Bạn có thể khám phá nhiều kiểu
             dáng và màu sắc quần áo khác nhau từ những bộ sưu tập đặc sắc mà
             Techzone mang đến. Techzone luôn muốn tạo cho bạn một không gian mua
             sắm thú vị và thuận tiện. Bạn đã sẵn sàng khám phá phong cách của

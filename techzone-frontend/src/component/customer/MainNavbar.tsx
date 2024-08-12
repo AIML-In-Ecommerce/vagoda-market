@@ -368,7 +368,7 @@ export default function MainNavbar() {
                               {authContext.userInfo?.fullName}
                             </p>
                           ) : (
-                            <p className="truncate">Account</p>
+                            <p className="truncate">Tài khoản</p>
                           )}
                         </>
                       </div>

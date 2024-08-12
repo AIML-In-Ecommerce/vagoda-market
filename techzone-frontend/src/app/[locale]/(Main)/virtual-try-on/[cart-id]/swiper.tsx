@@ -38,11 +38,14 @@ const ImageSwiper: React.FC<ImageSwiperProps> = ({ imgList }) => {
       className="w-full py-10"
     >
       {imgList.map((image, index) => (
-        <SwiperSlide key={index} className="w-[38%] h-[38%] bg-center bg-cover">
+        <SwiperSlide
+          key={index}
+          className="w-[38%] aspect-[3/4] bg-center bg-cover"
+        >
           <img
             src={image}
             alt={`slide-${index}`}
-            className="block w-full aspect-square"
+            className="block w-full aspect-[3/4]"
           />
         </SwiperSlide>
       ))}

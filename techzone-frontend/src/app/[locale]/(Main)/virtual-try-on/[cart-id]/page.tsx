@@ -16,11 +16,11 @@ import VtoProduct from "@/component/customer/product/VtoProduct";
 import Image from "next/image";
 import axios from "axios";
 import { Divider } from "antd";
-import { AiFillCloseCircle } from "react-icons/ai";
 import ImageSwiper from "./swiper";
 import { AuthContext } from "@/context/AuthContext";
 import Replicate from "replicate";
 import { SimpleUserInfoType } from "@/model/UserInfoType";
+import { AiFillCloseCircle } from "react-icons/ai";
 
 const authLocalStorageID = "#auth-context-user-info-record-ID";
 type Mode = "MODEL" | "PRODUCT" | "PREVIEW";
@@ -131,8 +131,8 @@ const VirtualTryOn = () => {
         if (response.status === 200) {
           let cart: VtoProduct[] = [];
           response.data.data.products.forEach((item: any) => {
-            let colorLabel = item.color ? item.color.label : "";
-            let colorValue = item.color ? item.color.value : "";
+            let colorLabel = item.color ? item.color.color.label : "";
+            let colorValue = item.color ? item.color.color.value : "";
             let imageLink = item.color ? item.color.link : item.images[0];
             const product: VtoProduct = {
               _id: item._id,
@@ -266,6 +266,7 @@ const VirtualTryOn = () => {
       }
     } catch (error) {
       console.error("Error fetching virtual try-on:", error);
+      setTryOnLoading("ERROR");
     }
 
     const replicate = new Replicate({
@@ -314,7 +315,7 @@ const VirtualTryOn = () => {
             </div>
             {imagePreview && (
               <div className="w-full h-full flex flex-col gap-4 justify-center items-center">
-                <div className="relative w-[38%] aspect-square">
+                <div className="relative w-[38%] aspect-[3/4]">
                   <Image
                     src={imagePreview}
                     alt="Preview"
@@ -345,7 +346,7 @@ const VirtualTryOn = () => {
       case "PRODUCT":
         return (
           <div className="flex flex-row gap-3 p-5 overflow-x-auto w-full h-[calc(100%-50px)] mt-2 scrollbar scrollbar-thin scrollbar-track-transparent scrollbar-thumb-rounded-full scrollbar-thumb-slate-400 ">
-            {mockVtoProductData.map((product) => (
+            {productList.map((product) => (
               <div className="w-[calc(100%/3.5)]" key={product._id}>
                 <VtoProduct
                   key={product._id}
@@ -401,6 +402,16 @@ const VirtualTryOn = () => {
           // </div>
           <div className="relative h-full ">
             <ImageSwiper imgList={tryOnImageUrl.current} />
+          </div>
+        );
+      case "ERROR":
+        return (
+          <div className="w-[25%] rounded-xl flex flex-col justify-center items-center bg-white  p-4">
+            <AiFillCloseCircle className="w-[120px] h-[120px] text-[#f53e5a]  " />
+            <div className="text-xl font-bold text-[#f53e5a] mt-2">Error</div>
+            <p className="text-sm text-slate-400 text-center">
+              Đã có lỗi xảy ra trong quá trình thử đồ hãy thử lại
+            </p>
           </div>
         );
     }
