@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect, useContext, ReactElement, useMemo } from "react";
-import { Input, Image, Skeleton, Radio, Divider, notification } from 'antd';
+import { Input, Image, Skeleton, Radio, Divider, notification, message } from 'antd';
 import type { RadioChangeEvent } from 'antd';
 import { DiscountType, PromotionType } from "@/model/PromotionType";
 import styled from 'styled-components'
@@ -24,24 +24,24 @@ import { usePaymentContext } from "@/context/PaymentContext";
 
 const { Search } = Input;
 
-const formatDate = (date: Date) => {
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const year = date.getFullYear();
+// const formatDate = (date: Date) => {
+//     const hours = date.getHours().toString().padStart(2, '0');
+//     const minutes = date.getMinutes().toString().padStart(2, '0');
+//     const day = date.getDate().toString().padStart(2, '0');
+//     const month = (date.getMonth() + 1).toString().padStart(2, '0');
+//     const year = date.getFullYear();
 
-    return `${hours}:${minutes} ${day}/${month}/${year}`;
-};
+//     return `${hours}:${minutes} ${day}/${month}/${year}`;
+// };
 
-const parseDateString = (dateString: string) => {
-    const [timePart, datePart] = dateString.split(' ');
-    const [hours, minutes] = timePart.split(':').map(Number);
-    const [day, month, year] = datePart.split('/').map(Number);
+// const parseDateString = (dateString: string) => {
+//     const [timePart, datePart] = dateString.split(' ');
+//     const [hours, minutes] = timePart.split(':').map(Number);
+//     const [day, month, year] = datePart.split('/').map(Number);
 
-    // JavaScript months are 0-indexed, so we subtract 1 from the month
-    return new Date(year, month - 1, day, hours, minutes);
-};
+//     // JavaScript months are 0-indexed, so we subtract 1 from the month
+//     return new Date(year, month - 1, day, hours, minutes);
+// };
 
 // const compareDateString = (dateString1: string, dateString2: string) => {
 //     return parseDateString(dateString1) <= parseDateString(dateString2) ? 1 : -1;
@@ -63,6 +63,22 @@ const parseDateString = (dateString: string) => {
 
 //     return hashedName;
 // }
+
+const isShippingAddressComplete = (address: ShippingAddress) => {
+    const requiredFields: (keyof ShippingAddress)[] = [
+        'street',
+        'idProvince',
+        'idDistrict',
+        'idCommune',
+        'receiverName',
+        'phoneNumber',
+    ];
+
+    return requiredFields.every(field => {
+        const value = address[field];
+        return typeof value === 'string' && value.trim() !== '' && value.trim() !== '0';
+    });
+}
 
 type ShopInfo = {
     _id: string,
@@ -97,11 +113,11 @@ export default function CartPage() {
     const [isSavingAddress, setIsSavingAddress] = useState<boolean>(false);
     const [loadingPromotion, setLoadingPromotion] = useState<boolean>(true);
     const router = useRouter();
-    
+
     const queryPromotionList = useMemo<PromotionDisplay[]>(() => {
         console.log('queryPromotionList triggered');
         if (promotionDisplayList === undefined || promotionDisplayList.length === 0) return [] as PromotionDisplay[];
-        
+
         const resultQueryList: PromotionDisplay[] = [] as PromotionDisplay[];
         promotionDisplayList.forEach(item => {
             const shopCodeFilterResult = (item.promotions && item.promotions.length > 0) ? item.promotions.filter(promotion => {
@@ -116,7 +132,14 @@ export default function CartPage() {
     }, [currentCode, promotionDisplayList]);
 
     const [currentAddress, setCurrentAddress] = useState<ShippingAddress>({
-        _id: 'datn'
+        _id: '@NEW_ADDRESS_FROM_USER',
+        street: '',
+        idProvince: '',
+        idDistrict: '',
+        idCommune: '',
+        receiverName: '',
+        phoneNumber: '',
+
     } as ShippingAddress);
     const [api, contextHolder] = notification.useNotification();
     const durationInMiliseconds: number = 4000;
@@ -166,7 +189,7 @@ export default function CartPage() {
     const calculateShopProductsProvisional = (shopId: string) => {
         if (!products || !selectedRowKeys) return 0;
 
-        const filteredShopProducts = products.filter(item => 
+        const filteredShopProducts = products.filter(item =>
             item.shop === shopId && selectedRowKeys.includes(item.itemId));
         const provisionalResult = filteredShopProducts.reduce((acc, item) => acc + item.finalPrice * item.quantity, 0);
         return provisionalResult;
@@ -203,12 +226,12 @@ export default function CartPage() {
 
             // When order next time, the access to payment page will be available
             paymentContext.setHasAccessedPaymentPage(false);
-            
+
             if (paymentMethod === PaymentMethod.ZALOPAY) {
                 paymentContext.setOrderIds(createOrderResponse.data.orderIds);
                 router.push(createOrderResponse.data.order_url)
             }
-            else { 
+            else {
                 paymentContext.setOrderIds(createOrderResponse.data);
                 router.push('/payment');
             }
@@ -219,9 +242,37 @@ export default function CartPage() {
     const handleTransaction = async () => {
         console.log('Transaction processing...');
 
-        //if isSavingAddress checked
-        if (isSavingAddress) {
-            console.log('currentAddress', currentAddress);
+        //legacy
+        // //if isSavingAddress checked
+        // if (isSavingAddress) {
+        //     console.log('currentAddress', currentAddress);
+        //     const response = await POST_addUserShippingAddress(context.userInfo?._id as string, currentAddress);
+        //     if (response.status === 200) {
+        //         if (response.data) {
+        //             const latestAddress: ShippingAddress = response.data[response.data.length - 1];
+        //             setCurrentAddress(latestAddress);
+        //             await handleCreateOrder(latestAddress);
+        //         }
+        //     }
+        // }
+        // else {
+        //     await handleCreateOrder(currentAddress);
+        // }
+
+        const isNewShippingInfo = currentAddress._id === '@NEW_ADDRESS_FROM_USER'
+        // if (isNewShippingInfo) {
+        //     console.log('New shipping info, saving..');
+        // }
+
+        // console.log('currentAddress', currentAddress);
+        const isCompleteFillingShippingInfo = isShippingAddressComplete(currentAddress);
+        if (!isCompleteFillingShippingInfo) {
+            message.error("Vui lòng kiểm tra Thông tin vận chuyển, hoặc chọn tử Sổ địa chỉ");
+            return;
+        }
+
+        
+        if (isNewShippingInfo) {
             const response = await POST_addUserShippingAddress(context.userInfo?._id as string, currentAddress);
             if (response.status === 200) {
                 if (response.data) {
@@ -244,7 +295,7 @@ export default function CartPage() {
             // Get selected products list
             const selectedProducts = products?.filter(product => selectedRowKeys.includes(product.itemId)) ?? [] as CartItem[]
             const selectedProductIds = new Set<string>();
-            selectedProducts.forEach(item => selectedProductIds.add(item._id)) 
+            selectedProducts.forEach(item => selectedProductIds.add(item._id))
 
             const shopProductsProvisional = calculateShopProductsProvisional(item._id);
             const response = await GET_GetPromotionWithSelection(
@@ -285,7 +336,10 @@ export default function CartPage() {
         console.log("current user", context.userInfo._id);
         await GET_getUserCartProducts(context.userInfo._id as string)
             .then(response => {
-                setProducts(response.data?.products || undefined);
+                let productsTimeSorted = response.data?.products;
+                productsTimeSorted = productsTimeSorted?.reverse();
+                
+                setProducts(productsTimeSorted);
                 setLoading(false);
             })
     }
@@ -545,7 +599,7 @@ export default function CartPage() {
                     </div>
                     <div className="lg:col-span-6 lg:w-auto w-full flex flex-col lg:border-l-2 lg:pl-3">
                         <div className="w-full">
-                            <div className="text-3xl font-bold normal-case p-2">Giỏ hàng</div>
+                            <div className="text-3xl font-bold normal-case p-2">Giỏ hàng ({products?.length ?? 0})</div>
                             <CartTable products={products}
                                 setProducts={setProducts}
                                 loading={loading}
@@ -579,17 +633,17 @@ export default function CartPage() {
                     </div>
                 </div>
             </div>
-            <PromotionListModal 
-                loading={loadingPromotion} 
-                open={showPromotionModal} 
-                currentCode={currentCode} 
-                handleCodeFilter={handleCodeFilter} 
-                handleOKPromotionModal={handleOKPromotionModal} 
-                handleCancelPromotionModal={handleCancelPromotionModal} 
-                queryPromotionList={queryPromotionList} 
-                selectedPromotions={selectedPromotions} 
-                applyDiscount={applyDiscount} 
-                removeDiscount={removeDiscount}/>
+            <PromotionListModal
+                loading={loadingPromotion}
+                open={showPromotionModal}
+                currentCode={currentCode}
+                handleCodeFilter={handleCodeFilter}
+                handleOKPromotionModal={handleOKPromotionModal}
+                handleCancelPromotionModal={handleCancelPromotionModal}
+                queryPromotionList={queryPromotionList}
+                selectedPromotions={selectedPromotions}
+                applyDiscount={applyDiscount}
+                removeDiscount={removeDiscount} />
         </React.Fragment>
     );
 }

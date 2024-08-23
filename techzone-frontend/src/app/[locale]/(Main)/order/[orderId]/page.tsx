@@ -162,7 +162,7 @@ const displayOrderStatusLabel = (status: string) => {
         case OrderStatusType.PROCESSING:
             return "Nhà bán đang chuẩn bị".toUpperCase();
         case OrderStatusType.SHIPPING:
-            return "Đang bàn giao cho ĐVVC".toUpperCase();
+            return "Đang vận chuyển".toUpperCase();
         case OrderStatusType.COMPLETED:
             return "Đã giao hàng".toUpperCase();
         case OrderStatusType.CANCELLED:
@@ -182,7 +182,7 @@ const displayCompleteOrderStatusLabel = (status: string) => {
         case OrderStatusType.PROCESSING:
             return "Đơn hàng đã đóng gói".toUpperCase();
         case OrderStatusType.SHIPPING:
-            return "Đã bàn giao cho ĐVVC".toUpperCase();
+            return "Đã vận chuyển".toUpperCase();
         case OrderStatusType.COMPLETED:
             return "Đã giao hàng".toUpperCase();
         case OrderStatusType.CANCELLED:

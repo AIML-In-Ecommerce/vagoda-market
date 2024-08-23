@@ -35,6 +35,19 @@ const SelectWrapper = styled.div`
     }
 `
 
+const StyledTableWrapper = styled.div`
+  .ant-table-body {
+    overflow: auto; /* Enable scrolling */
+    -ms-overflow-style: none;  /* Internet Explorer 10+ */
+    scrollbar-width: none;  /* Firefox */
+  }
+
+  /* For WebKit-based browsers (Chrome, Safari, etc.) */
+  .ant-table-body::-webkit-scrollbar {
+    display: none;
+  }
+`;
+
 interface CartTableItem extends CartItem {
     key: React.Key
 }
@@ -51,7 +64,7 @@ export default function CartTable(props: CartTableProps) {
 
     //load userInfo context
     useEffect(() => {
-        
+
     }, [context.userInfo])
 
     const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
@@ -138,7 +151,7 @@ export default function CartTable(props: CartTableProps) {
         if (props.products) {
             const payloadUpdateProducts = props.products.map((item: CartItem) => {
                 if (item.itemId === key) {
-                    return {...item, quantity: 0};
+                    return { ...item, quantity: 0 };
                 }
                 else return item;
             })
@@ -155,7 +168,7 @@ export default function CartTable(props: CartTableProps) {
         console.log('handleRemoveSelectedRows', props.selectedRowKeys)
         const payloadUpdateProducts = props.products.map((item: CartItem) => {
             if (props.selectedRowKeys.includes(item.itemId)) {
-                return {...item, quantity: 0};
+                return { ...item, quantity: 0 };
             }
             else return item;
         })
@@ -247,7 +260,7 @@ export default function CartTable(props: CartTableProps) {
                                             (record.attribute.colors && record.attribute.colors.length !== 0) ? (
                                                 <Select
                                                     labelInValue
-                                                    value={record.color ? record.color.color : record.attribute.colors[0].color }
+                                                    value={record.color ? record.color.color : record.attribute.colors[0].color}
                                                     style={{ width: 100 }}
                                                     onChange={(e) => handleColorChange(record.itemId, e.value)}
                                                     options={record.attribute.colors.map((item) => {
@@ -259,7 +272,7 @@ export default function CartTable(props: CartTableProps) {
                                         {
                                             (record.attribute.size && record.attribute.size.length !== 0) ? (
                                                 <Select
-                                                    value={record.size ? record.size : record.attribute.size[0] }
+                                                    value={record.size ? record.size : record.attribute.size[0]}
                                                     style={{ width: 75 }}
                                                     onChange={(e) => handleSizeChange(record.itemId, e)}
                                                     options={record.attribute.size.map((item) => {
@@ -284,7 +297,7 @@ export default function CartTable(props: CartTableProps) {
 
 
                 </Space >,
-            width: '65%',
+            width: '55%',
             align: 'start' as const,
         },
         {
@@ -304,7 +317,7 @@ export default function CartTable(props: CartTableProps) {
                             />)
                     }
                 </div>,
-            width: '10%',
+            width: '20%',
             align: 'center' as const,
 
         },
@@ -337,22 +350,24 @@ export default function CartTable(props: CartTableProps) {
 
     return (
         <React.Fragment>
-            <Table
-                tableLayout='auto'
-                rowSelection={{
-                    type: selectionType,
-                    ...rowSelection,
+            <StyledTableWrapper>
+                <Table
+                    tableLayout='auto'
+                    rowSelection={{
+                        type: selectionType,
+                        ...rowSelection,
 
-                }}
-                columns={columns}
-                dataSource={props.products?.map((item: CartItem) => ({ ...item, key: item.itemId } as CartTableItem))}
-                // onRow={(record) => ({
-                //         onClick: () => handleRowClick(record),
-                //       })}
-                loading={props.loading}
-                pagination={false}
-                scroll={{ x: 'min-content' }}
-            />
+                    }}
+                    columns={columns}
+                    dataSource={props.products?.map((item: CartItem) => ({ ...item, key: item.itemId } as CartTableItem))}
+                    // onRow={(record) => ({
+                    //         onClick: () => handleRowClick(record),
+                    //       })}
+                    loading={props.loading}
+                    pagination={false}
+                    scroll={{ x: 'min-content', y: 500}}
+                />
+            </StyledTableWrapper>
             <Modal
                 width={400}
                 open={showDeleteModal}

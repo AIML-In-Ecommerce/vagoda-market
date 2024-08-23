@@ -5,8 +5,10 @@ import { Button, Card, Image, message, Skeleton, Tooltip } from 'antd'
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useMemo, useState } from 'react'
 import { BiDetail } from 'react-icons/bi';
+import { BsThreeDots } from 'react-icons/bs';
 import { CiShop } from 'react-icons/ci';
 import { FaCartArrowDown, FaPen, FaShippingFast } from 'react-icons/fa';
+import { FaPlus } from 'react-icons/fa6';
 import { LiaTruckLoadingSolid } from 'react-icons/lia';
 import { MdOutlinePendingActions } from 'react-icons/md';
 import { SlWallet } from 'react-icons/sl';
@@ -164,7 +166,7 @@ export default function OrderInfoComponent(props: OrderInfoComponentProps) {
         }>
             <div className="flex flex-col overflow-auto">
                 {
-                    props.order.products.map((product) => (
+                    props.order.products.slice(0, 3).map((product) => (
                         <Card key={product._id} type="inner" onClick={() => handleOrderDetail(props.order._id)}
                             className="mb-2 cursor-pointer select-none relative">
                             <Meta avatar=
@@ -185,6 +187,17 @@ export default function OrderInfoComponent(props: OrderInfoComponentProps) {
                     ))
                 }
             </div>
+            {
+                props.order.products.length > 3 ? (
+                    <div className="flex flex-col items-center space-y-5 mt-5">
+                        <div className="text-3xl"><BsThreeDots /></div>
+                        <div className="flex flex-row gap-2 items-center text-lg justify-center mt-5 select-none">
+                            <FaPlus />
+                            <div className="font-semibold">{props.order.products.length - 3} sản phẩm</div>
+                        </div>
+                    </div>
+                ) : null
+            }
             <div className="text-xl text-end mt-5">
                 <span className="text-gray-500">Tông tiền:</span> <span className="text-red-500 font-semibold">
                     {/* <Currency value={calculateOrderTotalPrice(props.order.products)} /> */}
