@@ -21,9 +21,9 @@ export default function RootLayout({ children }: RootLayoutProps) {
       <body className="w-full">
         <AuthContextProvider>
           <PaymentProvider>
-          {/* <SocketProvider> */}
-          {children}
-          {/* </SocketProvider> */}
+            {/* <SocketProvider> */}
+            {children}
+            {/* </SocketProvider> */}
           </PaymentProvider>
         </AuthContextProvider>
       </body>
